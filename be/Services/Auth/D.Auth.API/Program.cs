@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+
+using Microsoft.OpenApi.Models;
 
 namespace D.Auth.API
 {

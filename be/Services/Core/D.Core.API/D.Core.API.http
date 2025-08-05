@@ -1,4 +1,4 @@
-@D.Core.API_HostAddress = http://localhost:5054
+@D.Core.API_HostAddress = http://localhost:5148
 
 GET {{D.Core.API_HostAddress}}/weatherforecast/
 Accept: application/json

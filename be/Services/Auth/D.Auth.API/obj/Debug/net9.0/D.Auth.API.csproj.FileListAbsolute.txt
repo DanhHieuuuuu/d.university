@@ -8,6 +8,9 @@ E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\D.Auth.API
 E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\D.Auth.API.pdb
 E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Microsoft.OpenApi.dll
+E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.csproj.AssemblyReference.cache
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.GeneratedMSBuildEditorConfig.editorconfig
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.AssemblyInfoInputs.cache
@@ -15,6 +18,7 @@ E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.csproj.CoreCompileInputs.cache
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.MvcApplicationPartsAssemblyInfo.cs
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.MvcApplicationPartsAssemblyInfo.cache
+E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.sourcelink.json
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\scopedcss\bundle\D.Auth.API.styles.css
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\staticwebassets.build.json
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\staticwebassets.build.json.cache
@@ -27,6 +31,3 @@ E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\refint\D.A
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.pdb
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\D.Auth.API.genruntimeconfig.cache
 E:\download\d.university\be\Services\Auth\D.Auth.API\obj\Debug\net9.0\ref\D.Auth.API.dll
-E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
-E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-E:\download\d.university\be\Services\Auth\D.Auth.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll

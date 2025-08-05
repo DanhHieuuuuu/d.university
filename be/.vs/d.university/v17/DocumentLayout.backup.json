@@ -1,0 +1,314 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\download\\d.university\\be\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|solutionrelative:services\\auth\\d.auth.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|solutionrelative:services\\auth\\d.auth.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F54ABD0-2AD2-4BF3-B758-BFE673F04504}|Services\\Core\\D.Core.API\\D.Core.API.csproj|e:\\download\\d.university\\be\\services\\core\\d.core.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3F54ABD0-2AD2-4BF3-B758-BFE673F04504}|Services\\Core\\D.Core.API\\D.Core.API.csproj|solutionrelative:services\\core\\d.core.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4CAFFB53-08FD-48B0-BBA7-495265344C77}|Services\\Core\\D.Core.Application\\D.Core.Application.csproj|e:\\download\\d.university\\be\\services\\core\\d.core.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4CAFFB53-08FD-48B0-BBA7-495265344C77}|Services\\Core\\D.Core.Application\\D.Core.Application.csproj|solutionrelative:services\\core\\d.core.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9B93A657-CD59-41D9-87D8-EEC57F7B8986}|Services\\Core\\D.Core.Infrastructure\\D.Core.Infrastructure.csproj|e:\\download\\d.university\\be\\services\\core\\d.core.infrastructure\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9B93A657-CD59-41D9-87D8-EEC57F7B8986}|Services\\Core\\D.Core.Infrastructure\\D.Core.Infrastructure.csproj|solutionrelative:services\\core\\d.core.infrastructure\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{35F4C2BA-EE50-4126-80C5-C10BB4457E3E}|Services\\Core\\D.Core.Domain\\D.Core.Domain.csproj|e:\\download\\d.university\\be\\services\\core\\d.core.domain\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{35F4C2BA-EE50-4126-80C5-C10BB4457E3E}|Services\\Core\\D.Core.Domain\\D.Core.Domain.csproj|solutionrelative:services\\core\\d.core.domain\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{01AEE615-E583-4AAA-987B-600AF32F56EF}|Services\\Auth\\D.Auth.Infrastructure\\D.Auth.Infrastructure.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.infrastructure\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{01AEE615-E583-4AAA-987B-600AF32F56EF}|Services\\Auth\\D.Auth.Infrastructure\\D.Auth.Infrastructure.csproj|solutionrelative:services\\auth\\d.auth.infrastructure\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8982D23B-86CB-4261-A3D1-C22B3E1787E2}|Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8982D23B-86CB-4261-A3D1-C22B3E1787E2}|Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj|solutionrelative:services\\auth\\d.auth.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7C3B2BAB-E5FD-46A0-AFD0-715B6B829015}|Services\\Auth\\D.Auth.Domain\\D.Auth.Domain.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.domain\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7C3B2BAB-E5FD-46A0-AFD0-715B6B829015}|Services\\Auth\\D.Auth.Domain\\D.Auth.Domain.csproj|solutionrelative:services\\auth\\d.auth.domain\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5B82E2B-1873-40F9-8E20-42475460D01A}|Library\\D.ControllerBase\\D.ControllerBase.csproj|e:\\download\\d.university\\be\\library\\d.controllerbase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5B82E2B-1873-40F9-8E20-42475460D01A}|Library\\D.ControllerBase\\D.ControllerBase.csproj|solutionrelative:library\\d.controllerbase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{30CDCFAF-EE48-4A30-956A-D76C04D90E99}|Library\\D.InfrastructureBase\\D.InfrastructureBase.csproj|e:\\download\\d.university\\be\\library\\d.infrastructurebase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{30CDCFAF-EE48-4A30-956A-D76C04D90E99}|Library\\D.InfrastructureBase\\D.InfrastructureBase.csproj|solutionrelative:library\\d.infrastructurebase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FAE51CC-3C83-4F24-AA60-9D10BE1FE4A2}|Library\\D.DomainBase\\D.DomainBase.csproj|e:\\download\\d.university\\be\\library\\d.domainbase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FAE51CC-3C83-4F24-AA60-9D10BE1FE4A2}|Library\\D.DomainBase\\D.DomainBase.csproj|solutionrelative:library\\d.domainbase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{66637604-5A37-41DE-AD33-EAAF4973CC9B}|Library\\D.ApplicationBase\\D.ApplicationBase.csproj|e:\\download\\d.university\\be\\library\\d.applicationbase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{66637604-5A37-41DE-AD33-EAAF4973CC9B}|Library\\D.ApplicationBase\\D.ApplicationBase.csproj|solutionrelative:library\\d.applicationbase\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3F54ABD0-2AD2-4BF3-B758-BFE673F04504}|Services\\Core\\D.Core.API\\D.Core.API.csproj|e:\\download\\d.university\\be\\services\\core\\d.core.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3F54ABD0-2AD2-4BF3-B758-BFE673F04504}|Services\\Core\\D.Core.API\\D.Core.API.csproj|solutionrelative:services\\core\\d.core.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\D.Auth.API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\Auth\\D.Auth.API\\D.Auth.API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|solutionrelative:services\\auth\\d.auth.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 715,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{6324226f-61b6-4f28-92ee-18d4b5fe1e48}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.ApplicationBase\\Class1.cs",
+              "RelativeDocumentMoniker": "Library\\D.ApplicationBase\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Library\\D.ApplicationBase\\Class1.cs",
+              "RelativeToolTip": "Library\\D.ApplicationBase\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T16:21:49.243Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.API\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "Services\\Core\\D.Core.API\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.API\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "Services\\Core\\D.Core.API\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAwBYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:25:34.169Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.API\\Program.cs",
+              "RelativeDocumentMoniker": "Services\\Core\\D.Core.API\\Program.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.API\\Program.cs",
+              "RelativeToolTip": "Services\\Core\\D.Core.API\\Program.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAuwA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:24:17.797Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "D.Auth.API.csproj",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\D.Auth.API.csproj",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.API\\D.Auth.API.csproj",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\D.Auth.API.csproj",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.API\\D.Auth.API.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-08-05T14:19:01.659Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.API\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.API\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABQAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:20:16.256Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\Program.cs",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.API\\Program.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\Program.cs",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.API\\Program.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAA2wA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:16:19.828Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\appsettings.json",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.API\\appsettings.json",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\appsettings.json",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-05T14:15:53.469Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.Domain\\Class1.cs",
+              "RelativeDocumentMoniker": "Services\\Core\\D.Core.Domain\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.Domain\\Class1.cs",
+              "RelativeToolTip": "Services\\Core\\D.Core.Domain\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:13:45.272Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.Infrastructure\\Class1.cs",
+              "RelativeDocumentMoniker": "Services\\Core\\D.Core.Infrastructure\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.Infrastructure\\Class1.cs",
+              "RelativeToolTip": "Services\\Core\\D.Core.Infrastructure\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:13:00.048Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.Application\\Class1.cs",
+              "RelativeDocumentMoniker": "Services\\Core\\D.Core.Application\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Core\\D.Core.Application\\Class1.cs",
+              "RelativeToolTip": "Services\\Core\\D.Core.Application\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:12:14.837Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Class1.cs",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Class1.cs",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:10:52.541Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Domain\\Class1.cs",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Domain\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Domain\\Class1.cs",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.Domain\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:10:24.856Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Application\\Class1.cs",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Application\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Application\\Class1.cs",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.Application\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:09:19.456Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.DomainBase\\Class1.cs",
+              "RelativeDocumentMoniker": "Library\\D.DomainBase\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Library\\D.DomainBase\\Class1.cs",
+              "RelativeToolTip": "Library\\D.DomainBase\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:06:07.641Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.InfrastructureBase\\Class1.cs",
+              "RelativeDocumentMoniker": "Library\\D.InfrastructureBase\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Library\\D.InfrastructureBase\\Class1.cs",
+              "RelativeToolTip": "Library\\D.InfrastructureBase\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:05:48.168Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.ControllerBase\\Class1.cs",
+              "RelativeDocumentMoniker": "Library\\D.ControllerBase\\Class1.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Library\\D.ControllerBase\\Class1.cs",
+              "RelativeToolTip": "Library\\D.ControllerBase\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:05:12.389Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 573,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

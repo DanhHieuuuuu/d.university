@@ -8,6 +8,9 @@ E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\D.Core.API
 E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\D.Core.API.pdb
 E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Microsoft.OpenApi.dll
+E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.csproj.AssemblyReference.cache
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.GeneratedMSBuildEditorConfig.editorconfig
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.AssemblyInfoInputs.cache
@@ -15,6 +18,7 @@ E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.csproj.CoreCompileInputs.cache
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.MvcApplicationPartsAssemblyInfo.cs
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.MvcApplicationPartsAssemblyInfo.cache
+E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.sourcelink.json
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\scopedcss\bundle\D.Core.API.styles.css
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\staticwebassets.build.json
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\staticwebassets.build.json.cache
@@ -27,6 +31,3 @@ E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\refint\D.C
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.pdb
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\D.Core.API.genruntimeconfig.cache
 E:\download\d.university\be\Services\Core\D.Core.API\obj\Debug\net9.0\ref\D.Core.API.dll
-E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
-E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-E:\download\d.university\be\Services\Core\D.Core.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
