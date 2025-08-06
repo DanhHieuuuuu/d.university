@@ -1,7 +1,9 @@
-import Loading from '@components/common/Loading';
+import { Spin } from 'antd';
 
-function Index() {
-  return <Loading />;
+export default function Loading() {
+  return (
+    <div className="flex justify-center pt-20">
+      <Spin size="large" />
+    </div>
+  );
 }
-
-export default Index;
