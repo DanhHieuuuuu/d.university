@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>D.Core.API</name>
+    </assembly>
+    <members>
+        <member name="M:D.Core.API.Controllers.WeatherForecastController.Get">
+            <summary>
+            Tesst
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

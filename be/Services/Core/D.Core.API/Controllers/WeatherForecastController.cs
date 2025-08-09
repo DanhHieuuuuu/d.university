@@ -17,7 +17,10 @@ namespace D.Core.API.Controllers
         {
             _logger = logger;
         }
-
+        /// <summary>
+        /// Tesst
+        /// </summary>
+        /// <returns></returns>
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {

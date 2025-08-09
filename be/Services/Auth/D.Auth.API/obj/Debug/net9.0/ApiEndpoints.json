@@ -1,15 +1,31 @@
 [
   {
-    "ContainingType": "D.Auth.API.Controllers.WeatherForecastController",
-    "Method": "Get",
-    "RelativePath": "WeatherForecast",
+    "ContainingType": "D.Auth.API.Controllers.StudentController",
+    "Method": "GetListStudent",
+    "RelativePath": "api/student/list-student",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "pageIndex",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "keyword",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[D.Auth.API.WeatherForecast, D.Auth.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "D.ControllerBases.ResponseAPI",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -17,7 +33,6 @@
         ],
         "StatusCode": 200
       }
-    ],
-    "EndpointName": "GetWeatherForecast"
+    ]
   }
 ]

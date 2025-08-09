@@ -1,5 +1,9 @@
-
+using D.Auth.Application;
+using D.Auth.Domain;
+using D.Auth.Infrastructure;
+using D.ControllerBases;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace D.Auth.API
 {
@@ -11,15 +15,15 @@ namespace D.Auth.API
 
             builder.Services.AddControllers();
 
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "D.Auth API",
-                    Version = "v1"
-                });
-            });
+            builder.ConfigureTokenSwagger();
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            builder.ConfigureSumarrySwagger(xmlFilename);
+
+            builder.ConfigureDbContext<AuthDBContext>();
+
+            builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
+            builder.Services.AddMediatRServices();
+            builder.ConfigureCors();
 
             var app = builder.Build();
 
@@ -32,7 +36,7 @@ namespace D.Auth.API
                     c.RoutePrefix = "swagger";
                 });
             }
-
+            app.UseCors(ProgramBase.CorsPolicy);
             app.UseAuthorization();
             app.MapControllers();
             app.Run();

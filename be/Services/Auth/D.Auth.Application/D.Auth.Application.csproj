@@ -6,4 +6,19 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Command\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\D.ApplicationBase\D.ApplicationBase.csproj" />
+    <ProjectReference Include="..\D.Auth.Domain\D.Auth.Domain.csproj" />
+    <ProjectReference Include="..\D.Auth.Infrastructure\D.Auth.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
