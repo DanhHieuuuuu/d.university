@@ -8,7 +8,15 @@ Antd v5
 
 ## Getting Started
 
-Chaỵ dự án lên môi trường dev:
+Cài đặt thư viện:
+
+```bash
+npm install
+# or
+yarn
+```
+
+Chạy dự án lên môi trường dev:
 
 ```bash
 npm run dev
