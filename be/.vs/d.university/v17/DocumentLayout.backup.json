@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "E:\\download\\d.university\\be\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.api\\controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|solutionrelative:services\\auth\\d.auth.api\\controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7C3B2BAB-E5FD-46A0-AFD0-715B6B829015}|Services\\Auth\\D.Auth.Domain\\D.Auth.Domain.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.domain\\dtos\\students\\studentresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7C3B2BAB-E5FD-46A0-AFD0-715B6B829015}|Services\\Auth\\D.Auth.Domain\\D.Auth.Domain.csproj|solutionrelative:services\\auth\\d.auth.domain\\dtos\\students\\studentresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{01AEE615-E583-4AAA-987B-600AF32F56EF}|Services\\Auth\\D.Auth.Infrastructure\\D.Auth.Infrastructure.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.infrastructure\\serviceunitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{01AEE615-E583-4AAA-987B-600AF32F56EF}|Services\\Auth\\D.Auth.Infrastructure\\D.Auth.Infrastructure.csproj|solutionrelative:services\\auth\\d.auth.infrastructure\\serviceunitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -21,10 +29,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{8982D23B-86CB-4261-A3D1-C22B3E1787E2}|Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.application\\query\\studens\\getliststudent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8982D23B-86CB-4261-A3D1-C22B3E1787E2}|Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj|solutionrelative:services\\auth\\d.auth.application\\query\\studens\\getliststudent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.api\\controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9E916473-95E9-4C26-94E7-E368558911D8}|Services\\Auth\\D.Auth.API\\D.Auth.API.csproj|solutionrelative:services\\auth\\d.auth.api\\controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{30CDCFAF-EE48-4A30-956A-D76C04D90E99}|Library\\D.InfrastructureBase\\D.InfrastructureBase.csproj|e:\\download\\d.university\\be\\library\\d.infrastructurebase\\repository\\repositorybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -69,10 +73,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{30CDCFAF-EE48-4A30-956A-D76C04D90E99}|Library\\D.InfrastructureBase\\D.InfrastructureBase.csproj|e:\\download\\d.university\\be\\library\\d.infrastructurebase\\service\\servicebase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{30CDCFAF-EE48-4A30-956A-D76C04D90E99}|Library\\D.InfrastructureBase\\D.InfrastructureBase.csproj|solutionrelative:library\\d.infrastructurebase\\service\\servicebase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7C3B2BAB-E5FD-46A0-AFD0-715B6B829015}|Services\\Auth\\D.Auth.Domain\\D.Auth.Domain.csproj|e:\\download\\d.university\\be\\services\\auth\\d.auth.domain\\dtos\\students\\studentresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7C3B2BAB-E5FD-46A0-AFD0-715B6B829015}|Services\\Auth\\D.Auth.Domain\\D.Auth.Domain.csproj|solutionrelative:services\\auth\\d.auth.domain\\dtos\\students\\studentresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0FAE51CC-3C83-4F24-AA60-9D10BE1FE4A2}|Library\\D.DomainBase\\D.DomainBase.csproj|e:\\download\\d.university\\be\\library\\d.domainbase\\common\\icommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -134,11 +134,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 715,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "APIControllerBase.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.ControllerBase\\APIControllerBase.cs",
               "RelativeDocumentMoniker": "Library\\D.ControllerBase\\APIControllerBase.cs",
@@ -147,34 +147,7 @@
               "ViewState": "AgIAAEAAAAAAAAAAAAAawE0AAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-07T06:58:25.235Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "IStudentService.cs",
-              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
-              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
-              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
-              "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T11:36:52.854Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ServiceUnitOfWork.cs",
-              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
-              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
-              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
-              "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAYwBAAAABYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T11:33:23.132Z",
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Bookmark",
@@ -190,7 +163,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 4,
+              "Title": "IStudentService.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\Services\\Abstracts\\IStudentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-09T11:36:52.854Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ServiceUnitOfWork.cs",
+              "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
+              "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
+              "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
+              "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\ServiceUnitOfWork.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAA1wBAAAABYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-09T11:33:23.132Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "RepositoryBase.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.InfrastructureBase\\Repository\\RepositoryBase.cs",
               "RelativeDocumentMoniker": "Library\\D.InfrastructureBase\\Repository\\RepositoryBase.cs",
@@ -198,38 +195,36 @@
               "RelativeToolTip": "Library\\D.InfrastructureBase\\Repository\\RepositoryBase.cs",
               "ViewState": "AgIAAGIAAAAAAAAAAAAowHYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T09:37:43.227Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T09:37:43.227Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "D.Auth.Application",
+              "DocumentIndex": 13,
+              "Title": "D.Auth.Application.csproj",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj",
               "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj",
               "RelativeToolTip": "Services\\Auth\\D.Auth.Application\\D.Auth.Application.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-08-09T05:02:06.437Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T05:02:06.437Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
               "Title": "StudentController.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\Controllers\\StudentController.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.API\\Controllers\\StudentController.cs",
               "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\Controllers\\StudentController.cs",
               "RelativeToolTip": "Services\\Auth\\D.Auth.API\\Controllers\\StudentController.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAABUAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAB8AAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-09T04:12:14.332Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "GetListStudent.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Application\\Query\\Studens\\GetListStudent.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Application\\Query\\Studens\\GetListStudent.cs",
@@ -237,12 +232,11 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Application\\Query\\Studens\\GetListStudent.cs",
               "ViewState": "AgIAAAQAAAAAAAAAAAAAAA0AAABlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T03:59:52.491Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T03:59:52.491Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "StudentResquestDto.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Domain\\Dtos\\students\\StudentResquestDto.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Domain\\Dtos\\students\\StudentResquestDto.cs",
@@ -250,8 +244,7 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Domain\\Dtos\\students\\StudentResquestDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T03:58:45.48Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T03:58:45.48Z"
             },
             {
               "$type": "Document",
@@ -263,8 +256,7 @@
               "RelativeToolTip": "Library\\D.DomainBase\\Common\\IQuery.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T03:19:56.034Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T03:19:56.034Z"
             },
             {
               "$type": "Document",
@@ -276,25 +268,23 @@
               "RelativeToolTip": "Library\\D.DomainBase\\Common\\ICommand.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T03:17:49.808Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T03:17:49.808Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 1,
               "Title": "StudentResponseDto.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Domain\\Dtos\\students\\StudentResponseDto.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Domain\\Dtos\\students\\StudentResponseDto.cs",
               "ToolTip": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Domain\\Dtos\\students\\StudentResponseDto.cs",
               "RelativeToolTip": "Services\\Auth\\D.Auth.Domain\\Dtos\\students\\StudentResponseDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAgAAAARAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA8AAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T04:26:01.901Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T04:26:01.901Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "StudentRepository.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Repositories\\StudentRepository.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\Repositories\\StudentRepository.cs",
@@ -302,12 +292,11 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\Repositories\\StudentRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T04:25:28.239Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T04:25:28.239Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "StudentService.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\Services\\Implements\\StudentService.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\Services\\Implements\\StudentService.cs",
@@ -315,8 +304,7 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\Services\\Implements\\StudentService.cs",
               "ViewState": "AgIAABYAAAAAAAAAAAAQwCQAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T04:20:29.498Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T04:20:29.498Z"
             },
             {
               "$type": "Document",
@@ -328,8 +316,7 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Domain\\Migrations\\AuthDBContextModelSnapshot.cs",
               "ViewState": "AgIAAAoAAAAAAAAAAIBJwBYAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T04:06:19.665Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T04:06:19.665Z"
             },
             {
               "$type": "Document",
@@ -341,12 +328,11 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Domain\\Migrations\\20250808040506_init.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T04:05:13.661Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T04:05:13.661Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "D.Auth.API.csproj",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\D.Auth.API.csproj",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.API\\D.Auth.API.csproj",
@@ -354,12 +340,11 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.API\\D.Auth.API.csproj",
               "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-08-08T04:02:51.844Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T04:02:51.844Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "Program.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.API\\Program.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.API\\Program.cs",
@@ -367,8 +352,7 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.API\\Program.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAA+wBgAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T03:49:05.568Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T03:49:05.568Z"
             },
             {
               "$type": "Document",
@@ -380,8 +364,7 @@
               "RelativeToolTip": "Library\\D.InfrastructureBase\\Database\\IDbContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T03:33:10.281Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T03:33:10.281Z"
             },
             {
               "$type": "Document",
@@ -393,12 +376,11 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\D.Auth.Infrastructure.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-08-08T03:21:38.666Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T03:21:38.666Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "AuthDBContext.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Domain\\AuthDBContext.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Domain\\AuthDBContext.cs",
@@ -406,12 +388,11 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Domain\\AuthDBContext.cs",
               "ViewState": "AgIAAAoAAAAAAAAAAAAAABQAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T03:26:47.63Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T03:26:47.63Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "DependencyInjection.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Infrastructure\\DependencyInjection.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Infrastructure\\DependencyInjection.cs",
@@ -419,12 +400,11 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Infrastructure\\DependencyInjection.cs",
               "ViewState": "AgIAAA4AAAAAAAAAAAAcwBIAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-08T03:24:38.004Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-08T03:24:38.004Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "MediatRServiceRegistration.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Services\\Auth\\D.Auth.Application\\MediatRServiceRegistration.cs",
               "RelativeDocumentMoniker": "Services\\Auth\\D.Auth.Application\\MediatRServiceRegistration.cs",
@@ -432,8 +412,7 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.Application\\MediatRServiceRegistration.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-07T08:04:20.202Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-07T08:04:20.202Z"
             },
             {
               "$type": "Document",
@@ -445,8 +424,7 @@
               "RelativeToolTip": "Services\\Auth\\D.Auth.API\\Properties\\launchSettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-07T07:53:23.187Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-07T07:53:23.187Z"
             },
             {
               "$type": "Document",
@@ -458,8 +436,7 @@
               "RelativeToolTip": "Library\\D.ControllerBase\\Exceptions\\ErrorCode.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-07T07:31:33.806Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-07T07:31:33.806Z"
             },
             {
               "$type": "Document",
@@ -471,12 +448,11 @@
               "RelativeToolTip": "Library\\D.ControllerBase\\Exceptions\\BaseException.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAIBZwBIAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-07T07:13:20.179Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-07T07:13:20.179Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "ProgramBase.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.ControllerBase\\ProgramBase.cs",
               "RelativeDocumentMoniker": "Library\\D.ControllerBase\\ProgramBase.cs",
@@ -484,8 +460,7 @@
               "RelativeToolTip": "Library\\D.ControllerBase\\ProgramBase.cs",
               "ViewState": "AgIAAGkAAAAAAAAAAAAYwHYAAAA/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-07T06:25:49.206Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-07T06:25:49.206Z"
             },
             {
               "$type": "Document",
@@ -497,12 +472,11 @@
               "RelativeToolTip": "Services\\Core\\D.Core.API\\D.Core.API.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-08-07T04:10:53.511Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-07T04:10:53.511Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "ServiceBase.cs",
               "DocumentMoniker": "E:\\download\\d.university\\be\\Library\\D.InfrastructureBase\\Service\\ServiceBase.cs",
               "RelativeDocumentMoniker": "Library\\D.InfrastructureBase\\Service\\ServiceBase.cs",
@@ -510,8 +484,7 @@
               "RelativeToolTip": "Library\\D.InfrastructureBase\\Service\\ServiceBase.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-06T14:45:37.577Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-06T14:45:37.577Z"
             },
             {
               "$type": "Document",
@@ -523,8 +496,7 @@
               "RelativeToolTip": "Library\\D.InfrastructureBase\\Shared\\CustomClaimType.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-06T14:12:53.762Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-06T14:12:53.762Z"
             },
             {
               "$type": "Document",
@@ -536,8 +508,7 @@
               "RelativeToolTip": "Library\\D.DomainBase\\Dto\\FilterBaseDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-06T13:58:23.483Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-06T13:58:23.483Z"
             },
             {
               "$type": "Document",
@@ -549,8 +520,7 @@
               "RelativeToolTip": "Library\\D.DomainBase\\Entity\\EntityBase.cs",
               "ViewState": "AgIAABgAAAAAAAAAAAAYwCAAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-06T13:41:40.963Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-06T13:41:40.963Z"
             }
           ]
         },

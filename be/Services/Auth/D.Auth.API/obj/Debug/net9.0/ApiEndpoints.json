@@ -1,6 +1,32 @@
 [
   {
     "ContainingType": "D.Auth.API.Controllers.StudentController",
+    "Method": "Test",
+    "RelativePath": "api/student",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "test",
+        "Type": "D.Auth.Domain.Dtos.students.Test",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "D.ControllerBases.ResponseAPI",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "D.Auth.API.Controllers.StudentController",
     "Method": "GetListStudent",
     "RelativePath": "api/student/list-student",
     "HttpMethod": "GET",

@@ -27,6 +27,12 @@ namespace D.Auth.API.Controllers
             {
                 return BadRequest(ex);
             }
-        } 
+        }
+        [HttpGet]
+        public ResponseAPI Test([FromQuery]Test test)
+        {
+            return new(true);
+        }
+        
     }
 }
