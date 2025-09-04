@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-const Home = () => {
+const Index = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -13,4 +13,4 @@ const Home = () => {
   return null;
 };
 
-export default Home;
+export default Index;
