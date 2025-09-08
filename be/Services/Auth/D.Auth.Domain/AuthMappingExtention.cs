@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace D.Auth.Domain
 {
-    public class MappingExtention : Profile
+    public class AuthMappingExtention : Profile
     {
-        public MappingExtention()
+        public AuthMappingExtention()
         {
             // Add your mappings here
             // Example: CreateMap<Source, Destination>();

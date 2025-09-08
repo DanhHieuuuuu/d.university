@@ -1,7 +1,4 @@
-﻿using D.Auth.Domain;
-using D.Auth.Infrastructure.Repositories;
-using D.Auth.Infrastructure.Services.Abstracts;
-using D.Auth.Infrastructure.Services.Implements;
+﻿using D.Core.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -9,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.Auth.Infrastructure
+namespace D.Core.Infrastructure
 {
     public static class DependencyInjection
     {
@@ -17,21 +14,19 @@ namespace D.Auth.Infrastructure
         {
             return services
                 .AddScoped<ServiceUnitOfWork>()
-                .AddScoped<IStudentService, StudentService>()
                 ;
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
-            return services
-                .AddScoped<IStudentRepository, StudentRepository>();
+            return services;
         }
 
         public static IServiceCollection AddAutoMapperProfile(this IServiceCollection services)
         {
             services.AddAutoMapper(cfg =>
             {
-                cfg.AddProfile<AuthMappingExtention>();
+                cfg.AddProfile<CoreMappingExtention>();
             });
 
             return services;
