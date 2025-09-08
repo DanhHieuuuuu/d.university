@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
-import { useRouter } from 'next/navigation';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme as antdTheme } from 'antd';
@@ -15,23 +13,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
   const { theme } = useTheme();
-
-  useEffect(() => {
-    checkAuth();
-  }, [router]);
-
-  const checkAuth = async () => {
-    const accessToken = localStorage.getItem('accessToken');
-
-    if (!accessToken) {
-      router.push('/login');
-      return;
-    }
-
-    // call api get me
-  };
 
   return (
     <html lang="en" suppressHydrationWarning>

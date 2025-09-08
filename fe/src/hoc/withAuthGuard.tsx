@@ -9,8 +9,8 @@ import React from 'react';
 export function withAuth(WrappedComponent: React.ComponentType, requiredPermission: string) {
   const GuardedComponent = (props: any) => {
     const router = useRouter();
-    const userId = useSelector((state: RootState) => state.user.id);
-    const permissions = useSelector((state: RootState) => state.user.role?.permissions?.map((x: any) => x.name)) || [];
+    const userId = useSelector((state: RootState) => state.authState.user?.id);
+    const permissions = useSelector((state: RootState) => state.authState.role?.permissions?.map((x: any) => x.name)) || [];
 
     useEffect(() => {
       if (userId && !permissions.includes(requiredPermission)) {
