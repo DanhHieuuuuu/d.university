@@ -9,6 +9,8 @@
   <ItemGroup>
     <Folder Include="Dtos\" />
     <Folder Include="Entities\" />
+    <Folder Include="Hrm\DanhMuc\" />
+    <Folder Include="Hrm\View\" />
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="15.0.1" />
