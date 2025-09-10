@@ -104,7 +104,7 @@ namespace D.ControllerBases
                 options =>
                 {
                     options.UseSqlServer(
-                        builder.Configuration.GetConnectionString("Default"),
+                        builder.Configuration.GetConnectionString("Core"),
 
                         options =>
                         {
