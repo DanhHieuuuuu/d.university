@@ -1,4 +1,4 @@
-﻿using D.Auth.Domain.Dtos.students;
+﻿using D.Auth.Domain.Dtos;
 using D.DomainBase.Dto;
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace D.Auth.Infrastructure.Services.Abstracts
 {
-    public interface IStudentService
+    public interface INsNhanSuService
     {
-        PageResultDto<StudentResponseDto> GetAll(StudentResquestDto dto);
+        PageResultDto<NsNhanSuResponseDto> FindPagingNsNhanSu(NsNhanSuRequestDto dto);
     }
 }

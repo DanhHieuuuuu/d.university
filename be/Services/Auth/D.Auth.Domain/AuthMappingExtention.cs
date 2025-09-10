@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using D.Auth.Domain.Dtos.students;
+using D.Auth.Domain.Dtos;
 using D.Auth.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace D.Auth.Domain
             // Add your mappings here
             // Example: CreateMap<Source, Destination>();
 
-            CreateMap<Student, StudentResponseDto>();
+            CreateMap<NsNhanSu, NsNhanSuResponseDto>();
         }
     }
 }

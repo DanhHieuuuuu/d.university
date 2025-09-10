@@ -1,22 +1,22 @@
-﻿using D.Auth.Domain.Dtos.students;
+﻿using D.Auth.Domain.Dtos;
 using D.ControllerBases;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace D.Auth.API.Controllers
 {
-    [Route("/api/student")]
+    [Route("/api/nhansu")]
     [ApiController]
-    public class StudentController : APIControllerBase
+    public class NsNhanSuController : APIControllerBase
     {
         private IMediator _mediator;
-        public StudentController(IMediator mediator) : base(mediator)
+        public NsNhanSuController(IMediator mediator) : base(mediator)
         {
             _mediator = mediator;
         }
 
-        [HttpGet("list-student")]
-        public async Task<ResponseAPI> GetListStudent(StudentResquestDto dto)
+        [HttpGet("list-nhan-su")]
+        public async Task<ResponseAPI> GetListNhanSu(NsNhanSuRequestDto dto)
         {
             try
             {
@@ -27,11 +27,6 @@ namespace D.Auth.API.Controllers
             {
                 return BadRequest(ex);
             }
-        }
-        [HttpGet]
-        public ResponseAPI Test([FromQuery]Test test)
-        {
-            return new(true);
         }
         
     }

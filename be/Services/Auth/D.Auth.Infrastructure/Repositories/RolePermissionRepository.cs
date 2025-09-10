@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace D.Auth.Infrastructure.Repositories
 {
-    public class StudentRepository : RepositoryBase<Student>, IStudentRepository
+    public class RolePermissionRepository : RepositoryBase<RolePermission>, IRolePermissionRepository
     {
-        public StudentRepository(IDbContext dbContext, IHttpContextAccessor httpContext) : base(dbContext, httpContext)
+        public RolePermissionRepository(IDbContext dbContext, IHttpContextAccessor httpContext) : base(dbContext, httpContext)
         {
         }
     }
 
-    public interface IStudentRepository : IRepositoryBase<Student> { }
+    public interface IRolePermissionRepository : IRepositoryBase<RolePermission> { }
 }
