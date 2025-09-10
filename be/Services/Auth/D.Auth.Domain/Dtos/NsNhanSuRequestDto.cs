@@ -6,9 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.Auth.Domain.Dtos.students
+namespace D.Auth.Domain.Dtos
 {
-    public class StudentResquestDto : FilterBaseDto, IQuery<PageResultDto<StudentResponseDto>>
+    public class NsNhanSuRequestDto : FilterBaseDto, IQuery<PageResultDto<NsNhanSuResponseDto>>
     {
+
     }
 }
