@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using D.Core.Domain.Hrm.NhanSu;
+﻿using D.Core.Domain.Entities.Hrm.DanhMuc;
+using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.InfrastructureBase.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -33,7 +28,18 @@ namespace D.Core.Domain
         // DbSet
 
         #region hrm
-        DbSet<NsNhanSu> NhanSus { get; set; }
+        // Danh mục
+        DbSet<DmChucVu> DmChucVus { get; set; }
+        DbSet<DmLoaiHopDong> DmLoaiHopDongs { get; set; }
+        DbSet<DmLoaiPhongBan> DmLoaiPhongBans { get; set; }
+        DbSet<DmPhongBan> DmPhongBans { get; set; }
+        DbSet<DmToBoMon> DmToBoMon { get; set; }
+
+        // Nhân sự
+        DbSet<NsNhanSu> NsNhanSus { get; set; }
+        DbSet<NsHopDong> NsHopDongs { get; set; }
+        DbSet<NsHopDongChiTiet> NsHopDongChiTiets { get; set; }
+        DbSet<NsToBoMon> NsToBoMons { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

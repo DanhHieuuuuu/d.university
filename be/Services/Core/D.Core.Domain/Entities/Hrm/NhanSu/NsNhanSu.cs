@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using D.Core.Domain.Shared.Constants;
 using D.DomainBase.Entity;
 
-namespace D.Core.Domain.Hrm.NhanSu
+namespace D.Core.Domain.Entities.Hrm.NhanSu
 {
-    [Table(nameof(NsNhanSu), Schema = "hrm")]
+    [Table(nameof(NsNhanSu), Schema = DbSchema.Hrm)]
     public class NsNhanSu : EntityBase
     {
         public string? MaNhanSu { get; set; }
@@ -35,7 +36,6 @@ namespace D.Core.Domain.Hrm.NhanSu
         public string? Atm2 { get; set; }
         public int? HienTaiChucVu { get; set; }
         public int? HienTaiPhongBan { get; set; }
-        public int? IdLoaiHopDong { get; set; }
         public int? IdHopDong { get; set; }
         public bool? DaChamDutHopDong { get; set; }
         public bool? DaVeHuu { get; set; }
