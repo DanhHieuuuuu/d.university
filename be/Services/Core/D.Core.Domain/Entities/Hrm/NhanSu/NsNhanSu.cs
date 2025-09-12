@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using D.Core.Domain.Shared.Constants;
 using D.DomainBase.Entity;
 
@@ -40,5 +41,13 @@ namespace D.Core.Domain.Entities.Hrm.NhanSu
         public bool? DaChamDutHopDong { get; set; }
         public bool? DaVeHuu { get; set; }
         public bool? IsThoiViec { get; set; }
+
+        // Thông tin đăng nhập
+
+        [Description("Email do nhà trường cấp")]
+        public string? Email2 { get; set; }
+        public string? Password { get; set; }
+        public string? RefreshToken { get; set; }
+        public string? PasswordKey { get; set; }
     }
 }
