@@ -14,6 +14,9 @@ namespace D.Auth.Infrastructure.Services.Abstracts
     {
         bool AddUserRole(CreateUserRoleDto createUserRole);
         PageResultDto<NsNhanSuResponseDto> FindPagingNsNhanSu(NsNhanSuRequestDto dto);
-        LoginResponseDto Login(LoginRequestDto loginRequest);
+        Task<LoginResponseDto> Login(LoginRequestDto loginRequest);
+        Task<bool> Logout(LogoutRequestDto logoutRequestDto);
+        Task<RefreshTokenResponseDto> RefreshToken(RefreshTokenRequestDto refreshToken);
+        Task<bool> ValidateTokenAsync();
     }
 }

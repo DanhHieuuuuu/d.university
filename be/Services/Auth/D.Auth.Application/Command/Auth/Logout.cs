@@ -7,18 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.Auth.Application.Query.NsNhanSu
+namespace D.Auth.Application.Command.Auth
 {
-    public class Login : IQueryHandler<LoginRequestDto, LoginResponseDto>
+    public class Logout : ICommandHandler<LogoutRequestDto, bool>
     {
         public INsNhanSuService _nsNhanSuService;
-        public Login(INsNhanSuService nsNhanSuService)
+        public Logout(INsNhanSuService nsNhanSuService)
         {
             _nsNhanSuService = nsNhanSuService;
         }
-        public async Task<LoginResponseDto> Handle(LoginRequestDto request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(LogoutRequestDto request, CancellationToken cancellationToken)
         {
-            return await _nsNhanSuService.Login(request);
+            return await _nsNhanSuService.Logout(request);
         }
     }
 }

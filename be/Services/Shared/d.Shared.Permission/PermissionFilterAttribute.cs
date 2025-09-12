@@ -1,4 +1,5 @@
 ﻿using D.Auth.Infrastructure.Services.Abstracts;
+using D.Auth.Infrastructure.Services.Implements;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -6,28 +7,31 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace d.Shared.Permission
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class PermissionFilterAttribute : Attribute, IAuthorizationFilter
+    public class PermissionFilterAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly string[] _permission;
         private IRoleService _roleService;
+        private INsNhanSuService _nsNhanSuService;
 
         public PermissionFilterAttribute(params string[] permissions)
         {
             _permission = permissions;
         }
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             _roleService = context.HttpContext.RequestServices.GetRequiredService<IRoleService>();
+            _nsNhanSuService = context.HttpContext.RequestServices.GetRequiredService<INsNhanSuService>();
 
             // Lấy claims từ token
-            var user = context.HttpContext.User;
+            var user = await _nsNhanSuService.ValidateTokenAsync();
 
-            if (user?.Identity == null || !user.Identity.IsAuthenticated)
+            if (!user)
             {
                 // Token không hợp lệ hoặc hết hạn → 401
                 context.Result = new UnauthorizedObjectResult(new { message = "Token hết hạn hoặc không hợp lệ." });
