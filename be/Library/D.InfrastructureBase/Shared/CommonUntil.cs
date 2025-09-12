@@ -18,7 +18,7 @@ namespace D.InfrastructureBase.Shared
             var claim = claims?.FindFirst(CustomClaimType.UserId);
             if (claim == null)
             {
-                throw new Exception($"Tài khoản không chứa claim \"{System.Security.Claims.ClaimTypes.NameIdentifier}\"");
+                throw new Exception($"Token không chứa claim \"{CustomClaimType.UserId}\"");
             }
 
             return int.Parse(claim.Value);

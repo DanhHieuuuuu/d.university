@@ -57,8 +57,6 @@ public partial class NsNhanSu : EntityBase
 
     public int? HienTaiPhongBan { get; set; }
 
-    public int? IdLoaiHopDong { get; set; }
-
     public int? IdHopDong { get; set; }
 
     public bool? DaChamDutHopDong { get; set; }

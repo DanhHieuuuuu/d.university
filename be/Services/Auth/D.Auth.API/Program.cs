@@ -25,6 +25,7 @@ namespace D.Auth.API
             builder.Services.AddMediatRServices();
             builder.ConfigureCors();
 
+            builder.ConfigureJwtAuthentication();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
