@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { Button, Checkbox, Form, FormProps, Input } from 'antd';
 import Loading from '@components/common/Loading';
 
-import { GraduationCap } from "lucide-react";
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { login } from '@redux/feature/authSlice';
 
@@ -56,66 +55,47 @@ function Index() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Background image with 10% opacity */}
-      <img
-        src="/images/school-869061_1280.jpg"
-        alt="library background"
-        className="absolute inset-0 w-full h-full object-cover opacity-10 z-0"
-        style={{ pointerEvents: 'none' }}
-      />
-      {/* Overlay content */}
-      <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-        <GraduationCap className="h-12 w-12 text-blue-600 mb-6" />
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Đăng nhập</h2>
-        <p className="text-gray-500 mb-6 text-center">Chào mừng bạn đến với hệ thống quản lý trường học</p>
-        {loginLoading ? (
-          <Loading />
-        ) : (
-          <Form
-            name="basic"
-            layout="vertical"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            autoComplete="off"
-            className="w-full flex flex-col"
+    <div className="flex h-[100vh] flex-col items-center justify-center">
+      {loginLoading ? (
+        <Loading />
+      ) : (
+        <Form
+          name="basic"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          style={{ maxWidth: 600, minWidth: 400 }}
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
+        >
+          <Form.Item<FieldType>
+            label="Username"
+            name="username"
+            rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <Form.Item<FieldType>
-              label={<span className="text-sm font-medium text-gray-700">Email</span>}
-              name="username"
-              rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
-            >
-              <Input className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập email" />
-            </Form.Item>
+            <Input />
+          </Form.Item>
 
-            <Form.Item<FieldType>
-              label={<span className="text-sm font-medium text-gray-700">Mật khẩu</span>}
-              name="password"
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-            >
-              <Input.Password className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập mật khẩu" />
-            </Form.Item>
+          <Form.Item<FieldType>
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: 'Please input your password!' }]}
+          >
+            <Input.Password />
+          </Form.Item>
 
-            <Form.Item<FieldType> name="remember" valuePropName="checked" label={null}>
-              <Checkbox>Ghi nhớ đăng nhập</Checkbox>
-            </Form.Item>
+          <Form.Item<FieldType> name="remember" valuePropName="checked" label={null}>
+            <Checkbox>Remember me</Checkbox>
+          </Form.Item>
 
-            <Form.Item label={null}>
-              <Button type="primary" htmlType="submit" className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-                Đăng nhập
-              </Button>
-            </Form.Item>
-          </Form>
-        )}
-        <div className="mt-6 text-sm text-gray-500 text-center">
-          <span>Bạn cần hỗ trợ? Liên hệ ngay </span>
-          <a href="#" className="text-blue-600 hover:underline">19001009</a>
-        </div>
-      </div>
-      <footer className="relative z-10 mt-8 text-xs text-gray-400 text-center">
-        &copy; {new Date().getFullYear()} D.University. All rights reserved.
-      </footer>
+          <Form.Item label={null}>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
     </div>
   );
 }
