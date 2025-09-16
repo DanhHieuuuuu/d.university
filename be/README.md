@@ -33,5 +33,12 @@ Chạy lệnh sau để update database theo migration mới nhất:
 ```powershell
 dotnet ef database update --context CoreDBContext --startup-project ..\D.Core.API
 ```
-
----
+## Cài đặt redis (ubuntu)
+``` xml
+sudo apt update
+sudo apt install redis-server -y
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+```
+- Check : redis-cli ping => pong => sucess
+- kiểm tra port(dòng port): sudo nano /etc/redis/redis.conf

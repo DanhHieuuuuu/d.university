@@ -1,4 +1,7 @@
-﻿using D.Auth.Domain.Dtos;
+﻿using d.Shared.Permission;
+using D.Auth.Domain.Dtos;
+using D.Auth.Domain.Dtos.Login;
+using D.Auth.Domain.Dtos.UserRole;
 using D.ControllerBases;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +31,80 @@ namespace D.Auth.API.Controllers
                 return BadRequest(ex);
             }
         }
-        
+        /// <summary>
+        /// Đăng nhập
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("login")]
+        public async Task<ResponseAPI> Login(LoginRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Đăng xuất
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter("admin")]
+        [HttpGet("logout")]
+        public async Task<ResponseAPI> Logout([FromQuery] LogoutRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Refresh token
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("refresh-token")]
+        public async Task<ResponseAPI> RefreshToken(RefreshTokenRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Thêm người dùng vào role
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("create-user-role")]
+        public async Task<ResponseAPI> CreateUserRole(CreateUserRoleDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

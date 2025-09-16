@@ -1,7 +1,6 @@
 ﻿using D.DomainBase.Entity;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace D.Auth.Domain.Entities;
 
@@ -57,8 +56,6 @@ public partial class NsNhanSu : EntityBase
 
     public int? HienTaiPhongBan { get; set; }
 
-    public int? IdLoaiHopDong { get; set; }
-
     public int? IdHopDong { get; set; }
 
     public bool? DaChamDutHopDong { get; set; }
@@ -66,6 +63,11 @@ public partial class NsNhanSu : EntityBase
     public bool? DaVeHuu { get; set; }
 
     public bool? IsThoiViec { get; set; }
-    [JsonIgnore]
-    public virtual ICollection<UserRole>? UserRoles { get; set; }
+    public string? Email2 { get; set; }
+
+    public string? Password { get; set; }
+
+    public string? PasswordKey { get; set; }
+
+    public string? RefreshToken { get; set; }
 }

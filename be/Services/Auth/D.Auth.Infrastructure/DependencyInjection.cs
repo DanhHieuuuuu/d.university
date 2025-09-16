@@ -18,6 +18,7 @@ namespace D.Auth.Infrastructure
             return services
                 .AddScoped<ServiceUnitOfWork>()
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
+                .AddScoped<IRoleService, RoleService>()
                 ;
         }
 

@@ -8,9 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.9.17" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\D.ControllerBase\D.ControllerBases.csproj" />
     <ProjectReference Include="..\..\..\Library\D.InfrastructureBase\D.InfrastructureBase.csproj" />
     <ProjectReference Include="..\D.Auth.Domain\D.Auth.Domain.csproj" />
   </ItemGroup>
