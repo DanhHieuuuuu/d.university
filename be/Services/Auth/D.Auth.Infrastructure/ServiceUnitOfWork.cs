@@ -20,17 +20,55 @@ namespace D.Auth.Infrastructure
             _httpContext = httpContext;
         }
 
-        private StudentRepository _studentRepository;
-
-        public IStudentRepository iStudentRepository
+        private NsNhanSuRepository _nsNhanSuRepository;
+        private RoleRepository _roleRepository;
+        private RolePermissionRepository _rolePermissionRepository;
+        private UserRoleRepository _userRoleRepository;
+        public INsNhanSuRepository iNsNhanSuRepository
         {
             get
             {
-                if(_studentRepository == null)
+                if(_nsNhanSuRepository == null)
                 {
-                    _studentRepository = new StudentRepository(_dbContext, _httpContext);
+                    _nsNhanSuRepository = new NsNhanSuRepository(_dbContext, _httpContext);
                 }
-                return _studentRepository;
+                return _nsNhanSuRepository;
+            }
+        }
+
+        public IRoleRepository iRoleRepository
+        {
+            get
+            {
+                if (_roleRepository == null)
+                {
+                    _roleRepository = new RoleRepository(_dbContext, _httpContext);
+                }
+                return _roleRepository;
+            }
+        }
+
+        public IRolePermissionRepository iRolePermissionRepository
+        {
+            get
+            {
+                if (_rolePermissionRepository == null)
+                {
+                    _rolePermissionRepository = new RolePermissionRepository(_dbContext, _httpContext);
+                }
+                return _rolePermissionRepository;
+            }
+        }
+
+        public IUserRoleRepository iUserRoleRepository
+        {
+            get
+            {
+                if (_userRoleRepository == null)
+                {
+                    _userRoleRepository = new UserRoleRepository(_dbContext, _httpContext);
+                }
+                return _userRoleRepository;
             }
         }
     }

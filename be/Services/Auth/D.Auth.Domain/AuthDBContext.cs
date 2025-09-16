@@ -29,11 +29,24 @@ namespace D.Auth.Domain
         public new Task<int> SaveChangesAsync() => base.SaveChangesAsync();
         public new DatabaseFacade Database => base.Database;
 
-        public DbSet<Student> Students { get; set; }
+        public DbSet<NsNhanSu> NsNhanSus { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<NsNhanSu>(entity =>
+            {
+                entity.ToTable("NsNhanSu", "hrm");
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(255);
+                entity.Property(e => e.DeletedBy).HasMaxLength(255);
+                entity.Property(e => e.ModifiedBy).HasMaxLength(255);
+                entity.Property(e => e.NoiOhienTai).HasColumnName("NoiOHienTai");
+            });
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using D.InfrastructureBase.Database;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -117,6 +119,38 @@ namespace D.ControllerBases
                 ServiceLifetime.Scoped
             );
             builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<TDbContext>());
+        }
+        /// <summary>
+        /// JWT Authentication configuration
+        /// </summary>
+        public static void ConfigureJwtAuthentication(this WebApplicationBuilder builder)
+        {
+            // Đọc secret key từ appsettings.json
+            var secretKey = builder.Configuration["JwtSettings:SecretKey"];
+            var issuer = builder.Configuration["JwtSettings:Issuer"];
+            var audience = builder.Configuration["JwtSettings:Audience"];
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = issuer,      
+                    ValidAudience = audience,     
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+            });
+
+            builder.Services.AddAuthorization();
         }
     }
 }

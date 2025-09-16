@@ -22,7 +22,7 @@ namespace D.Auth.Domain.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("D.Auth.Domain.Entity.Student", b =>
+            modelBuilder.Entity("D.Auth.Domain.Entities.NsNhanSu", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,12 +30,10 @@ namespace D.Auth.Domain.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
+                    b.Property<string>("Atm1")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClassName")
-                        .IsRequired()
+                    b.Property<string>("Atm2")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
@@ -46,10 +44,16 @@ namespace D.Auth.Domain.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                    b.Property<bool?>("DaChamDutHopDong")
+                        .HasColumnType("bit");
 
-                    b.Property<bool?>("Deleted")
+                    b.Property<bool?>("DaVeHuu")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("DanToc")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("DeletedBy")
@@ -60,8 +64,123 @@ namespace D.Auth.Domain.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("GioiTinh")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("HienTaiChucVu")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("HienTaiPhongBan")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HoDem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("IdHopDong")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdLoaiHopDong")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsThoiViec")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("KhanCapNguoiLienHe")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("KhanCapSoDienThoai")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaNhanSu")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaSoThue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NgayCapCccd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NgaySinh")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NguyenQuan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoiCapCccd")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoiOhienTai")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("NoiOHienTai");
+
+                    b.Property<string>("NoiSinh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("QuocTich")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SoCccd")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SoDienThoai")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ten")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenNganHang1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenNganHang2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TonGiao")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NsNhanSu", "hrm");
+                });
+
+            modelBuilder.Entity("D.Auth.Domain.Entities.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Description");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
@@ -72,15 +191,165 @@ namespace D.Auth.Domain.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("Name");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("Status");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Students");
+                    b.ToTable("Role", "auth");
+                });
+
+            modelBuilder.Entity("D.Auth.Domain.Entities.RolePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("PermissionName");
+
+                    b.Property<string>("PermissonKey")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("PermissonKey");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int")
+                        .HasColumnName("RoleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermission", "auth");
+                });
+
+            modelBuilder.Entity("D.Auth.Domain.Entities.UserRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NhanSuId")
+                        .HasColumnType("int")
+                        .HasColumnName("NhanSuId");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int")
+                        .HasColumnName("RoleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NhanSuId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserRole", "auth");
+                });
+
+            modelBuilder.Entity("D.Auth.Domain.Entities.RolePermission", b =>
+                {
+                    b.HasOne("D.Auth.Domain.Entities.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("D.Auth.Domain.Entities.UserRole", b =>
+                {
+                    b.HasOne("D.Auth.Domain.Entities.NsNhanSu", "NsNhanSu")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("NhanSuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("D.Auth.Domain.Entities.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NsNhanSu");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("D.Auth.Domain.Entities.NsNhanSu", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("D.Auth.Domain.Entities.Role", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

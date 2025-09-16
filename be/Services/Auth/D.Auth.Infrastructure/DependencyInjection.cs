@@ -17,14 +17,19 @@ namespace D.Auth.Infrastructure
         {
             return services
                 .AddScoped<ServiceUnitOfWork>()
-                .AddScoped<IStudentService, StudentService>()
+                .AddScoped<INsNhanSuService, NsNhanSuService>()
+                .AddScoped<IRoleService, RoleService>()
                 ;
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             return services
-                .AddScoped<IStudentRepository, StudentRepository>();
+                .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
+                .AddScoped<IRoleRepository, RoleRepository>()
+                .AddScoped<IRolePermissionRepository, RolePermissionRepository>()
+                .AddScoped<IUserRoleRepository, UserRoleRepository>()
+                ;
         }
 
         public static IServiceCollection AddAutoMapperProfile(this IServiceCollection services)
