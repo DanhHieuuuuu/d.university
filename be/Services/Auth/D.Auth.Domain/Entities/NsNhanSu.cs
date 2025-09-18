@@ -68,6 +68,4 @@ public partial class NsNhanSu : EntityBase
     public string? Password { get; set; }
 
     public string? PasswordKey { get; set; }
-
-    public string? RefreshToken { get; set; }
 }
