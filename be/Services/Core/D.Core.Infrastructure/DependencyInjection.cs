@@ -1,10 +1,8 @@
 ﻿using D.Core.Domain;
+using D.Core.Infrastructure.Repositories.Hrm;
+using D.Core.Infrastructure.Services.Hrm.Abstracts;
+using D.Core.Infrastructure.Services.Hrm.Implements;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure
 {
@@ -14,12 +12,13 @@ namespace D.Core.Infrastructure
         {
             return services
                 .AddScoped<ServiceUnitOfWork>()
-                ;
+                .AddScoped<INsNhanSuService, NsNhanSuService>();
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
-            return services;
+            return services
+                .AddScoped<INsNhanSuRepository, NsNhanSuRepository>();
         }
 
         public static IServiceCollection AddAutoMapperProfile(this IServiceCollection services)
