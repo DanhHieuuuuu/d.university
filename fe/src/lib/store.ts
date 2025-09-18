@@ -4,7 +4,7 @@ import authReducer from './feature/authSlice';
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      authState: authReducer,
+      authState: authReducer
     }
   });
 };

@@ -1,11 +1,30 @@
-import { ILogin, IUser } from '@models/auth/auth.model';
-import { IRole } from '@models/role';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthService } from '@src/service/auth.service';
+import { ILogin, IUser } from '@models/auth/auth.model';
+import { IRole } from '@models/role';
+import { setItem as setToken, clearToken, getItem } from '@utils/token-storage';
 
 export const login = createAsyncThunk('auth/login', async (args: ILogin, { rejectWithValue }) => {
   try {
-    const res = await AuthService.login(args);
+    const res = await AuthService.loginApi(args);
+    return res;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
+
+export const refreshToken = createAsyncThunk('auth/refresh', async (_, { rejectWithValue }) => {
+  try {
+    const { accessToken, refreshToken } = getItem();
+
+    if (!accessToken || !refreshToken) {
+      return rejectWithValue('Không có token');
+    }
+
+    const res = await AuthService.refreshTokenApi({
+      token: accessToken,
+      refreshToken
+    });
     return res;
   } catch (error) {
     return rejectWithValue(error);
@@ -56,6 +75,7 @@ const authSlice = createSlice({
       };
     },
     clearUser() {
+      clearToken();
       return { ...initialState };
     }
   },
@@ -65,10 +85,44 @@ const authSlice = createSlice({
         state.$login.loading = true;
       })
       .addCase(login.fulfilled, (state, action) => {
+        const { remember } = action.meta.arg;
+        const { data: result, code } = action.payload;
+
+        // save token
+        setToken({
+          accessToken: result.token,
+          refreshToken: result.refreshToken,
+          expiredAccessToken: result.expiredToken,
+          expiredRefreshToken: result.expiredRefreshToken,
+          remember
+        });
+
+        // update state
         state.$login.loading = false;
-        state.user = action.payload.user;
+        state.user = result.user;
+        state.isAuthenticated = true;
+        state.status = code;
       })
       .addCase(login.rejected, (state) => {
+        state.$login.loading = false;
+      })
+      .addCase(refreshToken.pending, (state) => {
+        state.$login.loading = true;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.$login.loading = false;
+        const result = action.payload.data;
+
+        // luôn lưu như "remember" để đảm bảo user không bị đá ra giữa chừng
+        setToken({
+          accessToken: result.token,
+          refreshToken: result.refreshToken,
+          expiredAccessToken: result.expiredToken,
+          expiredRefreshToken: result.expiredRefreshToken,
+          remember: true
+        });
+      })
+      .addCase(refreshToken.rejected, (state) => {
         state.$login.loading = false;
       });
   }

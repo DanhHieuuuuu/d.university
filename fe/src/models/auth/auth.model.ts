@@ -5,12 +5,13 @@ export type IConnectToken = {
   scope: string;
   client_id: string;
   client_secret: string;
-}
+};
 
 export type ILogin = {
   maNhanSu: string;
   password: string;
-}
+  remember: boolean;
+};
 
 export type IUser = {
   id: number;
@@ -21,4 +22,4 @@ export type IUser = {
   email: string | null;
   role: string | null;
   position: string | null;
-}
+};
