@@ -31,19 +31,22 @@ namespace D.Auth.Infrastructure.Services.Implements
         private readonly ServiceUnitOfWork _unitOfWork;
         private IConfiguration _configuration;
         private readonly IDatabase _database;
+        private readonly IPasswordService _passwordService;
         public NsNhanSuService(
             ILogger<NsNhanSuService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
             IConfiguration configuration,
-            IDatabase database
+            IDatabase database,
+            IPasswordService passwordService
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
             _database = database;
+            _passwordService = passwordService;
         }
 
         public PageResultDto<NsNhanSuResponseDto> FindPagingNsNhanSu(NsNhanSuRequestDto dto)
@@ -62,6 +65,8 @@ namespace D.Auth.Infrastructure.Services.Implements
             };
         }
 
+        // Đăng nhập
+
         public async Task<LoginResponseDto> Login(LoginRequestDto loginRequest)
         {
             _logger.LogInformation($"{nameof(Login)} method called. Dto: {JsonSerializer.Serialize(loginRequest)}");
@@ -75,6 +80,14 @@ namespace D.Auth.Infrastructure.Services.Implements
                 throw new UserFriendlyException(404, "Không đúng mật khẩu hoặc tài khoản.");
             }
 
+            if (string.IsNullOrEmpty(ns.Password) || string.IsNullOrEmpty(ns.PasswordKey))
+            {
+                throw new UserFriendlyException(500, "Tài khoản chưa được thiết lập mật khẩu.");
+            }
+            if (!_passwordService.VerifyPassword(loginRequest.Password, ns.Password, ns.PasswordKey))
+            {
+                throw new UserFriendlyException(401, "Mật khẩu không đúng.");
+            }
             var result = _mapper.Map<LoginResponseDto>(ns);
 
             DateTime date = DateTime.Now;
@@ -89,6 +102,8 @@ namespace D.Auth.Infrastructure.Services.Implements
 
             return result;
         }
+
+
 
         public bool AddUserRole(CreateUserRoleDto createUserRole)
         {

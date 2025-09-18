@@ -19,6 +19,8 @@ namespace D.Auth.Infrastructure
                 .AddScoped<ServiceUnitOfWork>()
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
                 .AddScoped<IRoleService, RoleService>()
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IPasswordService, PasswordService>()
                 ;
         }
 
@@ -29,6 +31,7 @@ namespace D.Auth.Infrastructure
                 .AddScoped<IRoleRepository, RoleRepository>()
                 .AddScoped<IRolePermissionRepository, RolePermissionRepository>()
                 .AddScoped<IUserRoleRepository, UserRoleRepository>()
+                .AddScoped<IUserRepository, UserRepository>()
                 ;
         }
 
