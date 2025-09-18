@@ -3,7 +3,7 @@ import { IRole } from '@models/role';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthService } from '@src/service/auth.service';
 
-export const login = createAsyncThunk('auth/login', async (args: ILogin, { rejectWithValue }) => {
+export const login = createAsyncThunk(`${process.env.NEXT_PUBLIC_LOGIN_API}`, async (args: ILogin, { rejectWithValue }) => {
   try {
     const res = await AuthService.login(args);
     return res;

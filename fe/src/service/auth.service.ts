@@ -6,7 +6,7 @@ const login = async (body: ILogin) => {
   try {
     const params: IConnectToken = {
       grant_type: process.env.NEXT_PUBLIC_AUTH_GRANT_TYPE || '',
-      username: body.username,
+      maNhanSu: body.maNhanSu,
       password: body.password,
       scope: process.env.NEXT_PUBLIC_AUTH_SCOPE || '',
       client_id: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID || '',
@@ -20,28 +20,25 @@ const login = async (body: ILogin) => {
     //   baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
     // });
 
-    const draft_data: IUser = {
-      id: 1,
-      ho: 'Phó Đức',
-      ten: 'Thành',
-      fullName: 'Phó Đức Thành',
-      email: 'phoducthanh@gmail.com',
-      role: 'admin',
-      username: 'admin',
-      position: 'Giảng viên'
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_LOGIN_API}`, body);
+
+    const { token, refreshToken, maNhanSu, hoDem, ten, email, hienTaiChucVu } = res.data.data;
+    const user: IUser = {
+      // id: 1, 
+      maNhanSu: maNhanSu,
+      ho: hoDem,
+      ten: ten,
+      fullName: `${hoDem} ${ten}`,
+      email: email,
+      role: 'admin', 
+      position: hienTaiChucVu 
     };
 
-    const res = {
-      status: 200,
-      messsage: 'Ok',
-      data: {
-        user: draft_data,
-        access_token: 'abcxyz',
-        refresh_token: 'zyxcba'
-      }
-    };
-
-    return Promise.resolve(res.data);
+    return Promise.resolve({
+      user: user,
+      access_token: token,
+      refresh_token: refreshToken
+    });
   } catch (err) {
     processApiMsgError(err, '');
     return Promise.reject(err);

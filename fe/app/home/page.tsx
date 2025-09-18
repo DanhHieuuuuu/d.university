@@ -1,19 +1,19 @@
-
 'use client';
 
 import React, { useState } from 'react';
 import {
   DesktopOutlined,
-  FileOutlined,
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Card, Col, Row, Typography, Divider, Avatar } from 'antd';
 import { useAppSelector } from '@redux/hooks';
+import { UserOutlined as AntdUserOutlined, MailOutlined, IdcardOutlined, SolutionOutlined } from '@ant-design/icons';
 
 const { Header, Content, Footer, Sider } = Layout;
+const { Title, Text } = Typography;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -40,7 +40,7 @@ const items: MenuItem[] = [
     getItem('Alex', '5'),
   ]),
   getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-  getItem('Files', '9', <FileOutlined />),
+  getItem('Files', '9', ' <FileOutlined />'),
 ];
 
 const HomePage: React.FC = () => {
@@ -59,7 +59,7 @@ const HomePage: React.FC = () => {
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }} />
         <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'User' }, { title: 'Bill' }]} />
+          <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'User' }, { title: user?.fullName }]} />
           <div
             style={{
               padding: 24,
@@ -68,7 +68,54 @@ const HomePage: React.FC = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            Xin chào {user?.fullName || 'Bill is a cat.'}
+            {user ? (
+              <Card
+                title={
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <AntdUserOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
+                    <Title level={4} style={{ margin: 0 }}>Hồ sơ người dùng</Title>
+                  </div>
+                }
+                style={{ width: '100%' }}
+              >
+                <Row gutter={16}>
+                  <Col span={8} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Avatar size={100} icon={<AntdUserOutlined />} style={{ marginBottom: '16px' }} />
+                    <Title level={4}>{user.fullName}</Title>
+                    <Text type="secondary">{user.position}</Text>
+                  </Col>
+                  <Col span={16}>
+                    <Title level={5}>Thông tin cá nhân</Title>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Row gutter={[16, 16]} style={{ width: '100%' }}>
+                      <Col span={24}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <IdcardOutlined style={{ color: '#1890ff' }} />
+                          <Text>Mã nhân sự: <strong>{user.maNhanSu}</strong></Text>
+                        </div>
+                      </Col>
+                      <Col span={24}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <MailOutlined style={{ color: '#1890ff' }} />
+                          <Text>Email: <strong>{user.email}</strong></Text>
+                        </div>
+                      </Col>
+                      <Col span={24}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <SolutionOutlined style={{ color: '#1890ff' }} />
+                          <Text>Chức vụ: <strong>{user.position}</strong></Text>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </Card>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '50px' }}>
+                <Title level={3}>Không tìm thấy thông tin người dùng.</Title>
+                <Text type="secondary">Vui lòng đăng nhập lại để xem hồ sơ.</Text>
+              </div>
+            )}
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>

@@ -13,7 +13,7 @@ import { ILogin } from '@models/auth/auth.model';
 import { processApiMsgError } from '@utils/index';
 
 type FieldType = {
-  username?: string;
+  maNhanSu?: string;
   password?: string;
   remember?: string;
 };
@@ -37,7 +37,7 @@ function Index() {
 
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     const body: ILogin = {
-      username: values.username!,
+      maNhanSu: values.maNhanSu!,
       password: values.password!
     };
 
@@ -82,9 +82,9 @@ function Index() {
             className="w-full flex flex-col"
           >
             <Form.Item<FieldType>
-              label={<span className="text-sm font-medium text-gray-700">Email</span>}
-              name="username"
-              rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
+              label={<span className="text-sm font-medium text-gray-700">Mã Nhân Sự</span>}
+              name="maNhanSu"
+              rules={[{ required: true, message: 'Vui lòng nhập Mã nhân sự của bạn!' }]}
             >
               <Input className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập email" />
             </Form.Item>
