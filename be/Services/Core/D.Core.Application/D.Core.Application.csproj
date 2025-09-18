@@ -8,9 +8,14 @@
 
   <ItemGroup>
     <Folder Include="Command\" />
-    <Folder Include="Query\" />
 	  <PackageReference Include="MediatR" Version="13.0.0" />
 	  <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\D.ApplicationBase\D.ApplicationBase.csproj" />
+    <ProjectReference Include="..\D.Core.Domain\D.Core.Domain.csproj" />
+    <ProjectReference Include="..\D.Core.Infrastructure\D.Core.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

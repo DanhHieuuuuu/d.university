@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using D.Core.Domain.Dtos.Hrm;
+using D.Core.Domain.Entities.Hrm.NhanSu;
 
 namespace D.Core.Domain
 {
@@ -14,6 +11,11 @@ namespace D.Core.Domain
             // Add your mappings here
             // Example: CreateMap<Source, Destination>();
 
+            #region hrm
+
+            CreateMap<NsNhanSu, NsNhanSuResponseDto>();
+
+            #endregion
         }
     }
 }

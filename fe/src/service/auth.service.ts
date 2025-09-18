@@ -13,32 +13,14 @@ const login = async (body: ILogin) => {
       client_secret: process.env.NEXT_PUBLIC_AUTH_CLIENT_SECRET || ''
     };
 
-    // const res = await axios.post(`connect/token`, params, {
-    //   headers: {
-    //     'Content-Type': 'application/x-www-form-urlencoded'
-    //   },
-    //   baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
-    // });
-
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_LOGIN_API}`, body);
-
-    const { token, refreshToken, maNhanSu, hoDem, ten, email, hienTaiChucVu } = res.data.data;
-    const user: IUser = {
-      // id: 1, 
-      maNhanSu: maNhanSu,
-      ho: hoDem,
-      ten: ten,
-      fullName: `${hoDem} ${ten}`,
-      email: email,
-      role: 'admin', 
-      position: hienTaiChucVu 
-    };
-
-    return Promise.resolve({
-      user: user,
-      access_token: token,
-      refresh_token: refreshToken
+    const res = await axios.post(`nhansu/login`, params, {
+      headers: {
+        // 'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
     });
+
+    return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, '');
     return Promise.reject(err);

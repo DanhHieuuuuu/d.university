@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Entities\Hrm\View\" />
-    <Folder Include="Dtos\" />
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="15.0.1" />
