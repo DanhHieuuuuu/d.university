@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthService } from '@src/service/auth.service';
+import { AuthService } from '@services/auth.service';
 import { ILogin, IUser } from '@models/auth/auth.model';
 import { IRole } from '@models/role';
 import { setItem as setToken, clearToken, getItem } from '@utils/token-storage';

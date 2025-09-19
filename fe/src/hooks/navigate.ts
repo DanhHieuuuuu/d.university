@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '@redux/feature/loadingSlice';
 
-export function useNavigateTo() {
+export function useNavigate() {
   const router = useRouter();
   const dispatch = useDispatch();
 

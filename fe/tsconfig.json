@@ -18,10 +18,13 @@
       }
     ],
     "paths": {
-      "@api/*": ["./src/api"],
       "@components/*": ["./src/components/*"],
-      "@models/*": ["./src/models/*"],
+      "@helpers/*": ["./src/helpers/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@services/*": ["./src/services/*"],
       "@redux/*": ["./src/lib/*"],
+      "@models/*": ["./src/models/*"],
+      "@styles/*": ["./src/styles/*"],
       "@utils/*": ["./src/utils/*"],
       "@src/*": ["./src/*"],
       "@/*": ["./*"]

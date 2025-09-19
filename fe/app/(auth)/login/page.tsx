@@ -9,13 +9,13 @@ import { login } from '@redux/feature/authSlice';
 import { ILogin } from '@models/auth/auth.model';
 import { userStatusE } from '@models/common';
 
-import { useNavigateTo } from '@src/hooks/navigateTo';
+import { useNavigate } from '@hooks/navigate';
 import { processApiMsgError } from '@utils/index';
 import GlobalLoading from '@components/common/Loading';
 
 function Index() {
   const dispatch = useAppDispatch();
-  const { navigateTo } = useNavigateTo();
+  const { navigateTo } = useNavigate();
 
   const { loading: loginLoading } = useAppSelector((state) => state.authState.$login);
 

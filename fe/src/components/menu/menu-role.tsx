@@ -1,38 +1,19 @@
 'use client';
 
-import { useTheme } from 'next-themes';
-import { usePathname, useRouter } from 'next/navigation';
 import { Layout, Menu, MenuProps } from 'antd';
-import { GlobalOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
+import { useTheme } from 'next-themes';
+import { usePathname } from 'next/navigation';
+import { useNavigate } from '@hooks/navigate';
+
 import { getMenuKeysFromPath } from '@src/helpers/menu';
-import '@src/styles/menu.style.scss';
-import { useNavigateTo } from '@src/hooks/navigateTo';
+import { listMenuRole } from '@/constants/menu/menu.role';
+import '@styles/menu.style.scss';
 
 const { Sider } = Layout;
 
-type MenuItem = Required<MenuProps>['items'][number];
-
-const listMenuRole: MenuItem[] = [
-  {
-    key: '/role',
-    label: 'Tổng quan',
-    icon: <HomeOutlined />
-  },
-  {
-    key: '/role/web-manage',
-    label: 'Phân quyền website',
-    icon: <GlobalOutlined />
-  },
-  {
-    key: '/role/user-manage',
-    label: 'Quản lý tài khoản',
-    icon: <TeamOutlined />
-  }
-];
-
 const RoleMenuComponent = () => {
   const pathname = usePathname();
-  const { navigateTo } = useNavigateTo();
+  const { navigateTo } = useNavigate();
 
   const { resolvedTheme } = useTheme();
   const siderTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'dark' : 'light';
