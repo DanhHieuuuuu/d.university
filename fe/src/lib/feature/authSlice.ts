@@ -8,8 +8,12 @@ export const login = createAsyncThunk('auth/login', async (args: ILogin, { rejec
   try {
     const res = await AuthService.loginApi(args);
     return res;
-  } catch (error) {
-    return rejectWithValue(error);
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 
@@ -26,8 +30,12 @@ export const refreshToken = createAsyncThunk('auth/refresh', async (_, { rejectW
       refreshToken
     });
     return res;
-  } catch (error) {
-    return rejectWithValue(error);
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 

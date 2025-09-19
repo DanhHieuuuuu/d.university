@@ -9,7 +9,7 @@ import { login } from '@redux/feature/authSlice';
 import { ILogin } from '@models/auth/auth.model';
 import { userStatusE } from '@models/common';
 
-import { useNavigateTo } from '@utils/hooks/navigateTo';
+import { useNavigateTo } from '@src/hooks/navigateTo';
 import { processApiMsgError } from '@utils/index';
 import GlobalLoading from '@components/common/Loading';
 
