@@ -545,9 +545,6 @@ namespace D.Core.Domain.Migrations
                     b.Property<int?>("QuocTich")
                         .HasColumnType("int");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("SoCccd")
                         .HasColumnType("nvarchar(max)");
 

@@ -1,10 +1,6 @@
-﻿using D.InfrastructureBase.Database;
+﻿using D.Core.Infrastructure.Repositories.Hrm;
+using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure
 {
@@ -13,10 +9,24 @@ namespace D.Core.Infrastructure
         private IDbContext _dbContext;
         private IHttpContextAccessor _httpContext;
 
+        private NsNhanSuRepository _nsNhanSuRepository;
+
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
         {
             _dbContext = dbContext;
             _httpContext = httpContext;
+        }
+
+        public INsNhanSuRepository iNsNhanSuRepository
+        {
+            get
+            {
+                if (_nsNhanSuRepository == null)
+                {
+                    _nsNhanSuRepository = new NsNhanSuRepository(_dbContext, _httpContext);
+                }
+                return _nsNhanSuRepository;
+            }
         }
     }
 }

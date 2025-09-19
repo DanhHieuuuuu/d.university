@@ -47,7 +47,6 @@ namespace D.Core.Domain.Entities.Hrm.NhanSu
         [Description("Email do nhà trường cấp")]
         public string? Email2 { get; set; }
         public string? Password { get; set; }
-        public string? RefreshToken { get; set; }
         public string? PasswordKey { get; set; }
     }
 }

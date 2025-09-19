@@ -1,16 +1,17 @@
 export type IConnectToken = {
   grant_type: string;
-  username: string;
+  maNhanSu: string;
   password: string;
   scope: string;
   client_id: string;
   client_secret: string;
-}
+};
 
 export type ILogin = {
-  username: string;
+  maNhanSu: string;
   password: string;
-}
+  remember: boolean;
+};
 
 export type IUser = {
   id: number;
@@ -21,4 +22,4 @@ export type IUser = {
   email: string | null;
   role: string | null;
   position: string | null;
-}
+};

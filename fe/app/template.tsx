@@ -2,25 +2,40 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch } from '@redux/hooks';
+import { refreshToken } from '@redux/feature/authSlice';
+import { processApiMsgError } from '@utils/index';
+import { clearToken, getValidToken } from '@utils/token-storage';
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     checkAuth();
   }, [router]);
 
   const checkAuth = async () => {
-    const accessToken = localStorage.getItem('accessToken');
+    const valid = getValidToken();
 
-    if (!accessToken) {
+    if (!valid) {
+      clearToken();
       router.push('/login');
       return;
-    } else {
-      // call api get me here
     }
 
-    console.log('Đã xem trang');
+    if (valid.needRefresh) {
+      try {
+        await dispatch(refreshToken()).unwrap();
+      } catch (err) {
+        processApiMsgError(err);
+        clearToken();
+        router.push('/login');
+      }
+    } else {
+      // token còn hạn → có thể gọi API getMe
+      console.log('Đã xem trang');
+    }
   };
 
   return <>{children}</>;

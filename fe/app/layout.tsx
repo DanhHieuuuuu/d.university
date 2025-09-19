@@ -6,6 +6,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import StoreProvider from './StoreProvider';
 
+import GlobalLoading from '@components/common/Loading';
 import '@src/styles/globals.scss';
 
 export default function RootLayout({
@@ -57,6 +58,7 @@ export default function RootLayout({
                 }}
               >
                 {children}
+                <GlobalLoading />
               </ConfigProvider>
               <ToastContainer autoClose={2000} position="top-right" />
             </StoreProvider>
