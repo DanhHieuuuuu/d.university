@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Button, Checkbox, Form, FormProps, Input } from 'antd';
 import { toast } from 'react-toastify';
 import { GraduationCap } from 'lucide-react';
@@ -8,21 +7,22 @@ import { GraduationCap } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { login } from '@redux/feature/authSlice';
 import { ILogin } from '@models/auth/auth.model';
-
-import { processApiMsgError } from '@utils/index';
 import { userStatusE } from '@models/common';
-import Loading from '@components/common/Loading';
+
+import { useNavigateTo } from '@utils/hooks/navigateTo';
+import { processApiMsgError } from '@utils/index';
+import GlobalLoading from '@components/common/Loading';
 
 function Index() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
+  const { navigateTo } = useNavigateTo();
 
   const { loading: loginLoading } = useAppSelector((state) => state.authState.$login);
 
   const user = useAppSelector((state) => state.authState);
   if (Object.keys(user).length > 0) {
     if (user.status === userStatusE.active) {
-      router.push('/home');
+      navigateTo('/home');
     }
   }
 
@@ -39,7 +39,7 @@ function Index() {
 
       if (data.status == 1) {
         toast.success('Đăng nhập thành công');
-        router.push('/home');
+        navigateTo('/home');
       } else {
         toast.error(data.message);
       }
@@ -63,7 +63,7 @@ function Index() {
         <h2 className="mb-2 text-2xl font-bold text-gray-800">Đăng nhập</h2>
         <p className="mb-6 text-center text-gray-500">Chào mừng bạn đến với hệ thống quản lý trường học</p>
         {loginLoading ? (
-          <Loading />
+          <GlobalLoading />
         ) : (
           <Form
             name="login-form"
