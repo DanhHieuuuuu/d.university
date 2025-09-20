@@ -1,5 +1,6 @@
 ﻿using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
+using D.Core.Domain.Entities.SinhVien;
 using D.InfrastructureBase.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -40,6 +41,12 @@ namespace D.Core.Domain
         DbSet<NsHopDong> NsHopDongs { get; set; }
         DbSet<NsHopDongChiTiet> NsHopDongChiTiets { get; set; }
         DbSet<NsToBoMon> NsToBoMons { get; set; }
+        #endregion
+
+        #region sv
+
+        DbSet<SvSinhVien> SvSinhViens { get; set; }
+
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,0 +1,44 @@
+﻿using D.Core.Domain.Entities.Hrm.NhanSu;
+using D.Core.Domain.Shared.Constants;
+using D.DomainBase.Entity;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace D.Core.Domain.Entities.SinhVien
+{
+    [Table(nameof(SvSinhVien), Schema = DbSchema.Sv)]
+    public class SvSinhVien : EntityBase
+    {
+        public string? Mssv { get; set; }
+
+        // Thông tin cá nhân
+        public string? HoDem { get; set; }
+        public string? Ten { get; set; }
+        public DateTime? NgaySinh { get; set; }
+        public string? NoiSinh { get; set; }
+        public bool? GioiTinh { get; set; }
+        public int? QuocTich { get; set; }
+        public int? DanToc { get; set; }
+        public string? SoCccd { get; set; }
+        public string? SoDienThoai { get; set; }
+
+        // Thông tin công việc
+
+        public int? Khoa { get; set; }
+        public int? ChuyenNganh { get; set; }
+        public int? Lop { get; set; }
+        public bool? TrangThaiHoc { get; set; }
+
+        // Thông tin đăng nhập
+
+        [Description("Email do nhà trường cấp")]
+        public string? Email2 { get; set; }
+        public string? Password { get; set; }
+        public string? PasswordKey { get; set; }
+    }
+}
