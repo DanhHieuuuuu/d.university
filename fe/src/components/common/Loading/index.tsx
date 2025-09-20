@@ -1,11 +1,15 @@
+'use client';
+
 import { Spin } from 'antd';
+import { useSelector } from 'react-redux';
+import { RootState } from '@redux/store';
 
-function Loading() {
-  return (
-    <div className="flex justify-center pt-20">
-      <Spin size="large" />
-    </div>
-  );
-}
+const GlobalLoading = () => {
+  const { isLoading } = useSelector((state: RootState) => state.loadState);
 
-export default Loading;
+  if (!isLoading) return null;
+
+  return <Spin spinning={isLoading} size="large" tip="Đang tải..." fullscreen />;
+};
+
+export default GlobalLoading;

@@ -1,54 +1,47 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Button, Checkbox, Form, FormProps, Input } from 'antd';
-import Loading from '@components/common/Loading';
-
+import { toast } from 'react-toastify';
 import { GraduationCap } from 'lucide-react';
+
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { login } from '@redux/feature/authSlice';
-
-import { userStatusE } from '@models/common';
 import { ILogin } from '@models/auth/auth.model';
+import { userStatusE } from '@models/common';
+
+import { useNavigate } from '@hooks/navigate';
 import { processApiMsgError } from '@utils/index';
-
-type LoginField = ILogin & {
-  remember?: string;
-};
-
-const onFinishFailed: FormProps<LoginField>['onFinishFailed'] = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-};
+import GlobalLoading from '@components/common/Loading';
 
 function Index() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
+  const { navigateTo } = useNavigate();
 
   const { loading: loginLoading } = useAppSelector((state) => state.authState.$login);
 
   const user = useAppSelector((state) => state.authState);
   if (Object.keys(user).length > 0) {
     if (user.status === userStatusE.active) {
-      router.push('/home');
+      navigateTo('/home');
     }
   }
 
-  const onFinish: FormProps<LoginField>['onFinish'] = async (values) => {
+  const onFinish: FormProps<ILogin>['onFinish'] = async (values) => {
     const body: ILogin = {
       maNhanSu: values.maNhanSu!,
-      password: values.password!
+      password: values.password!,
+      remember: values.remember
     };
 
     try {
       const data: any = await dispatch(login(body)).unwrap();
-
-      if (values.remember) {
-        localStorage.setItem('refreshToken', data.refresh_token);
-      }
-      localStorage.setItem('accessToken', data.access_token);
+      console.log('result login', data);
 
       if (data.status == 1) {
-        router.push('/home');
+        toast.success('Đăng nhập thành công');
+        navigateTo('/home');
+      } else {
+        toast.error(data.message);
       }
     } catch (err) {
       processApiMsgError(err, 'Đăng nhập thất bại, vui lòng thử lại.');
@@ -70,18 +63,17 @@ function Index() {
         <h2 className="mb-2 text-2xl font-bold text-gray-800">Đăng nhập</h2>
         <p className="mb-6 text-center text-gray-500">Chào mừng bạn đến với hệ thống quản lý trường học</p>
         {loginLoading ? (
-          <Loading />
+          <GlobalLoading />
         ) : (
           <Form
-            name="basic"
+            name="login-form"
             layout="vertical"
             initialValues={{ remember: true }}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             autoComplete="off"
             className="flex w-full flex-col"
           >
-            <Form.Item<LoginField>
+            <Form.Item<ILogin>
               label={<span className="text-sm font-medium text-gray-700">Mã nhân sự</span>}
               name="maNhanSu"
               rules={[{ required: true, message: 'Vui lòng nhập mã nhân sự!' }]}
@@ -92,7 +84,7 @@ function Index() {
               />
             </Form.Item>
 
-            <Form.Item<LoginField>
+            <Form.Item<ILogin>
               label={<span className="text-sm font-medium text-gray-700">Mật khẩu</span>}
               name="password"
               rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
@@ -103,7 +95,7 @@ function Index() {
               />
             </Form.Item>
 
-            <Form.Item<LoginField> name="remember" valuePropName="checked" label={null}>
+            <Form.Item<ILogin> name="remember" valuePropName="checked" label={null}>
               <Checkbox>Ghi nhớ đăng nhập</Checkbox>
             </Form.Item>
 

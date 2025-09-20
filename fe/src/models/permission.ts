@@ -1,10 +1,6 @@
 export type IPermission = {
-  id?: string;
-  action?: string;
-  entity?: string;
-  name?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  permissonKey: string;
+  permissionName: string;
 };
 
 export type IPermissionGroupByEntity = {

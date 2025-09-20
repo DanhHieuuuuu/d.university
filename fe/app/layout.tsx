@@ -6,6 +6,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import StoreProvider from './StoreProvider';
 
+import GlobalLoading from '@components/common/Loading';
 import '@src/styles/globals.scss';
 
 export default function RootLayout({
@@ -52,11 +53,16 @@ export default function RootLayout({
                     },
                     Checkbox: {
                       colorTextDisabled: 'rgba(0,0,0,0.88)'
+                    },
+                    Breadcrumb: {
+                      linkColor: '#0045DC',
+                      linkHoverColor: '#0045DC'
                     }
                   }
                 }}
               >
                 {children}
+                <GlobalLoading />
               </ConfigProvider>
               <ToastContainer autoClose={2000} position="top-right" />
             </StoreProvider>

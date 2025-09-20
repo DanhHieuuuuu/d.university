@@ -15,7 +15,7 @@ export type IQueryPagingRoles = IQueryPaging & {};
 export type ICreateRole = {
   name: string;
   description?: string;
-  permissions?: string[];
+  rolePermissions?: IPermission[];
 };
 
 export type IUpdateRole = ICreateRole & {

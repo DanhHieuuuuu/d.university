@@ -2,7 +2,7 @@ import axios from 'axios';
 import { processApiMsgError } from '@utils/index';
 import { IConnectToken, ILogin, IUser } from '@models/auth/auth.model';
 
-const login = async (body: ILogin) => {
+const loginApi = async (body: ILogin) => {
   try {
     const params: IConnectToken = {
       grant_type: process.env.NEXT_PUBLIC_AUTH_GRANT_TYPE || '',
@@ -13,12 +13,7 @@ const login = async (body: ILogin) => {
       client_secret: process.env.NEXT_PUBLIC_AUTH_CLIENT_SECRET || ''
     };
 
-    const res = await axios.post(`nhansu/login`, params, {
-      headers: {
-        // 'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
-    });
+    const res = await axios.post(`nhansu/login`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
 
     return Promise.resolve(res.data);
   } catch (err) {
@@ -37,7 +32,18 @@ const changePassword = async (body: { currentPassword: string; newPassword: stri
   }
 };
 
+const refreshTokenApi = async (params: { token: string; refreshToken: string }) => {
+  try {
+    const res = await axios.post(`nhansu/refresh-token`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err);
+    return Promise.reject(err);
+  }
+};
+
 export const AuthService = {
-  login,
-  changePassword
+  loginApi,
+  changePassword,
+  refreshTokenApi
 };
