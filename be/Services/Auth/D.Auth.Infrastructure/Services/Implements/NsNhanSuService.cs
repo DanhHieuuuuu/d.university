@@ -90,6 +90,9 @@ namespace D.Auth.Infrastructure.Services.Implements
             }
             var result = _mapper.Map<LoginResponseDto>(ns);
 
+            LoginResponseDto result = new LoginResponseDto();
+            result.User = _mapper.Map<NsNhanSuResponseDto>(ns);
+
             DateTime date = DateTime.Now;
 
             result.Token = GenerateToken(ns);
