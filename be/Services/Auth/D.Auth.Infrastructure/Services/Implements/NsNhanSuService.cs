@@ -88,7 +88,6 @@ namespace D.Auth.Infrastructure.Services.Implements
             {
                 throw new UserFriendlyException(401, "Mật khẩu không đúng.");
             }
-            var result = _mapper.Map<LoginResponseDto>(ns);
 
             LoginResponseDto result = new LoginResponseDto();
             result.User = _mapper.Map<NsNhanSuResponseDto>(ns);
