@@ -14,8 +14,8 @@ export type ILogin = {
 };
 
 export type IUser = {
-  id: number;
-  username: string;
+  // id: number;
+  maNhanSu: string;
   ho: string | null;
   ten: string | null;
   fullName: string | null;

@@ -3,6 +3,7 @@ using D.Auth.Domain.Dtos;
 using D.Auth.Domain.Dtos.Login;
 using D.Auth.Domain.Dtos.Permission;
 using D.Auth.Domain.Dtos.Role;
+using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,8 @@ namespace D.Auth.Domain
             CreateMap<CreateRoleRequestDto, Role>();
 
             CreateMap<CreatePermissionRequestDto, RolePermission>();
+
+            CreateMap<CreateUserRequestDto, NsNhanSu>();
         }
     }
 }

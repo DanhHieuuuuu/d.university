@@ -24,6 +24,7 @@ namespace D.Auth.Infrastructure
         private RoleRepository _roleRepository;
         private RolePermissionRepository _rolePermissionRepository;
         private UserRoleRepository _userRoleRepository;
+        private UserRepository _userRepository;
         public INsNhanSuRepository iNsNhanSuRepository
         {
             get
@@ -69,6 +70,18 @@ namespace D.Auth.Infrastructure
                     _userRoleRepository = new UserRoleRepository(_dbContext, _httpContext);
                 }
                 return _userRoleRepository;
+            }
+        }
+
+        public IUserRepository iUserRepository
+        {
+            get
+            {
+                if (_userRepository == null)
+                {
+                    _userRepository = new UserRepository(_dbContext, _httpContext);
+                }
+                return _userRepository;
             }
         }
     }

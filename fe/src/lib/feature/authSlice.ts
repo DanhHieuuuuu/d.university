@@ -4,7 +4,7 @@ import { ILogin, IUser } from '@models/auth/auth.model';
 import { IRole } from '@models/role';
 import { setItem as setToken, clearToken, getItem } from '@utils/token-storage';
 
-export const login = createAsyncThunk('auth/login', async (args: ILogin, { rejectWithValue }) => {
+export const login = createAsyncThunk(`${process.env.NEXT_PUBLIC_LOGIN_API}`, async (args: ILogin, { rejectWithValue }) => {
   try {
     const res = await AuthService.loginApi(args);
     return res;

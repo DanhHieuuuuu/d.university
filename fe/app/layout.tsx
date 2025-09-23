@@ -53,6 +53,10 @@ export default function RootLayout({
                     },
                     Checkbox: {
                       colorTextDisabled: 'rgba(0,0,0,0.88)'
+                    },
+                    Breadcrumb: {
+                      linkColor: '#0045DC',
+                      linkHoverColor: '#0045DC'
                     }
                   }
                 }}

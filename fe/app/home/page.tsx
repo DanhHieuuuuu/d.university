@@ -42,4 +42,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default Home;
+export default HomePage;
