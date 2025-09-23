@@ -75,7 +75,8 @@ namespace D.Auth.Infrastructure.Services.Implements
                 throw new UserFriendlyException(404, "Không đúng mật khẩu hoặc tài khoản.");
             }
 
-            var result = _mapper.Map<LoginResponseDto>(ns);
+            LoginResponseDto result = new LoginResponseDto();
+            result.User = _mapper.Map<NsNhanSuResponseDto>(ns);
 
             DateTime date = DateTime.Now;
 
