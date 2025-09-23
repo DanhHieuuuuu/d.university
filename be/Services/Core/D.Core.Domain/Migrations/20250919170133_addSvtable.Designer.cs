@@ -4,6 +4,7 @@ using D.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    partial class CoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250919170133_addSvtable")]
+    partial class addSvtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -662,9 +665,6 @@ namespace D.Core.Domain.Migrations
                     b.Property<int?>("Khoa")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Lop")
-                        .HasColumnType("int");
-
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -698,9 +698,6 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<string>("Ten")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("TrangThaiHoc")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

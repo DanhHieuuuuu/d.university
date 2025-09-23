@@ -15,7 +15,6 @@ const HomePage: React.FC = () => {
     token: { colorBgContainer, borderRadiusLG }
   } = theme.useToken();
   const { user } = useAppSelector((state) => state.authState);
-
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
