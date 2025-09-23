@@ -76,7 +76,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
         public async Task<bool> UpdateAsync(SvSinhVienUpdateRequestDto dto)
         {
             //var entity = await _unitOfWork.iSvSinhVienRepository.GetByIdAsync(dto.Id);
-            var entity = _unitOfWork.iSvSinhVienRepository.FindById(id);
+            var entity = _unitOfWork.iSvSinhVienRepository.FindById(dto.Id);
             if (entity == null) return false;
             //entity.Mssv = dto.Mssv;
             entity.HoDem = dto.HoDem;
