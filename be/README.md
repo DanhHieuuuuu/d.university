@@ -47,3 +47,133 @@ sudo systemctl start redis-server
 
 - Check : redis-cli ping => pong => sucess
 - kiểm tra port (dòng port): sudo nano /etc/redis/redis.conf
+
+## Flow từ entity => controller
+
+1. Tạo entity extends entity base (khai báo dbset)
+
+2. Tạo repository để lấy dữ liệu từ db
+
+ví dụ:
+``` xml
+using D.Auth.Domain.Entities;
+using D.InfrastructureBase.Database;
+using D.InfrastructureBase.Repository;
+using Microsoft.AspNetCore.Http;
+
+namespace D.Auth.Infrastructure.Repositories
+{
+    public class NsNhanSuRepository : RepositoryBase<NsNhanSu> INsNhanSuRepository
+    {
+        public NsNhanSuRepository(IDbContext dbContext, IHttpContextAccessor httpContext) : base(dbContext, httpContext)
+        {
+        }
+    }
+
+    public interface INsNhanSuRepository : IRepositoryBase<NsNhanSu> { }
+}
+
+```
+RepositoryBase và IRepositoryBase phải là của namespace D.InfrastructureBase.Repository.<br>
+IDbContext phải là của namespace D.InfrastructureBase.Database.<br>
+Inject chúng vào trong file DependencyInjection ngay dưới.
+
+3. Tạo file service và Iservice để viết logic nghiệp vụ
+
+Ví dụ:
+``` xml
+using System.Text.Json;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using D.Core.Infrastructure.Services.Hrm.Abstracts;
+using D.InfrastructureBase.Service;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+
+namespace D.Core.Infrastructure.Services.Hrm.Implements
+{
+    public class NsNhanSuService : ServiceBase, INsNhanSuService
+    {
+        private readonly ServiceUnitOfWork _unitOfWork;
+
+        public NsNhanSuService(
+            ILogger<NsNhanSuService> logger,
+            IHttpContextAccessor httpContext,
+            IMapper mapper,
+            ServiceUnitOfWork unitOfWork
+        )
+            : base(logger, httpContext, mapper)
+        {
+            _unitOfWork = unitOfWork;
+        }
+    }
+}
+```
+Khai báo các biến như trên và inject vào DependencyInjection
+
+4. Khai báo dto cho MediatR
+
+Ví dụ:
+```xml
+    public class NsNhanSuRequestDto : FilterBaseDto, IQuery<PageResultDto<NsNhanSuResponseDto>>
+    {
+        [FromQuery(Name = "cccd")]
+        public string? Cccd { get; set; }
+    }
+```
+Request nào thì phải imp Response đó, có thể khai báo kiểu Iquery hoặc Icommand tùy theo logic sử dụng namspace D.DomainBase.Common
+
+5. Xử lý truy vấn MediatR gọi đến
+
+Ví dụ:
+``` xml
+using D.ApplicationBase;
+using D.Core.Domain.Dtos.Hrm;
+using D.Core.Infrastructure.Services.Hrm.Abstracts;
+using D.DomainBase.Dto;
+
+namespace D.Core.Application.Query.Hrm.NsNhanSu
+{
+    public class FindPagingNsNhanSu
+        : IQueryHandler<NsNhanSuRequestDto, PageResultDto<NsNhanSuResponseDto>>
+    {
+        public INsNhanSuService _nsNhanSuService;
+
+        public FindPagingNsNhanSu(INsNhanSuService nsNhanSuService)
+        {
+            _nsNhanSuService = nsNhanSuService;
+        }
+
+        public async Task<PageResultDto<NsNhanSuResponseDto>> Handle(
+            NsNhanSuRequestDto request,
+            CancellationToken cancellationToken
+        )
+        {
+            return _nsNhanSuService.FindPagingNsNhanSu(request);
+        }
+    }
+}
+
+```
+
+Sử dụng IQueryHandler, hoặc ICommand của namespace D.ApplicationBase để service biết resquest, response là gì
+
+6. Viết controller
+
+Ví dụ:
+```xml
+        public async Task<ResponseAPI> GetListNhanSu(NsNhanSuRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+```
+
+Chỉ cần truyền Request vào thì mediator sẽ biết response là gì => mỗi api đều cần 1 request riêng biệt
