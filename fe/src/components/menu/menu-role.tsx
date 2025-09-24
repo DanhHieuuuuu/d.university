@@ -30,7 +30,7 @@ const RoleMenuComponent = () => {
         mode="inline"
         items={listMenuRole}
         openKeys={openKeys}
-        defaultSelectedKeys={selectedKeys}
+        selectedKeys={selectedKeys}
         onClick={onClick}
       />
     </Sider>

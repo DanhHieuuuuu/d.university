@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Checkbox, Form, FormProps, Input } from 'antd';
+import { Button, Checkbox, Form, FormProps, Input, Spin } from 'antd';
 import { toast } from 'react-toastify';
 import { GraduationCap } from 'lucide-react';
 
@@ -11,7 +11,6 @@ import { userStatusE } from '@models/common';
 
 import { useNavigate } from '@hooks/navigate';
 import { processApiMsgError } from '@utils/index';
-import GlobalLoading from '@components/common/Loading';
 
 function Index() {
   const dispatch = useAppDispatch();
@@ -63,7 +62,9 @@ function Index() {
         <h2 className="mb-2 text-2xl font-bold text-gray-800">Đăng nhập</h2>
         <p className="mb-6 text-center text-gray-500">Chào mừng bạn đến với hệ thống quản lý trường học</p>
         {loginLoading ? (
-          <GlobalLoading />
+          <div className="p-24">
+            <Spin size="large" />
+          </div>
         ) : (
           <Form
             name="login-form"

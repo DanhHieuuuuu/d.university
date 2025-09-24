@@ -70,7 +70,7 @@ const authSlice = createSlice({
   initialState,
   selectors: {
     isGranted: (state: AuthState, permission: string) => {
-      const permissions = state.role?.permissions?.map((x) => x.name) || [];
+      const permissions = state.role?.permissions?.map((x) => x.permissionName) || [];
       return permissions.includes(permission);
     }
   },
