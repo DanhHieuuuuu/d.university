@@ -15,7 +15,7 @@ namespace D.Core.Domain.Entities.Hrm.NhanSu
         public string? Ten { get; set; }
         public DateTime? NgaySinh { get; set; }
         public string? NoiSinh { get; set; }
-        public bool? GioiTinh { get; set; }
+        public int? GioiTinh { get; set; }
         public int? QuocTich { get; set; }
         public int? DanToc { get; set; }
         public int? TonGiao { get; set; }

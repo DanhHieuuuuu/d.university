@@ -10,6 +10,6 @@ namespace D.Core.Domain.Entities.Hrm.DanhMuc
         public string? MaLoaiHopDong { get; set; }
         public string? TenLoaiHopDong { get; set; }
         public string? IdBieuMau { get; set; }
-        public bool? IsActive { get; set; }
+        public bool? IsActive { get; set; } = true;
     }
 }
