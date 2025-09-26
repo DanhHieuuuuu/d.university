@@ -10,6 +10,6 @@ namespace D.Auth.Infrastructure.Services.Abstracts
     public interface IRoleService
     {
         bool CreateRole(CreateRoleRequestDto request);
-        List<string> GetAllRoleNhanSu();
+        List<string> GetAllRoleNhanSu(RoleRequestDto dto);
     }
 }

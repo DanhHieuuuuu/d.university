@@ -53,6 +53,10 @@ namespace D.ControllerBases
         {
             Data = data;
         }
+
+        public ResponseAPI() : base() // ✅ thêm constructor rỗng
+        {
+        }
     }
 
     public enum StatusCode

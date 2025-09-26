@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,6 +121,23 @@ namespace D.ControllerBases
                 ServiceLifetime.Scoped
             );
             builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<TDbContext>());
+        }
+        /// <summary>
+        /// Redis configuration
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void ConfigureRedis(this WebApplicationBuilder builder)
+        {
+            var redis = ConnectionMultiplexer.Connect("localhost:6379");
+
+            builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+
+            // sign in IDatabase
+            builder.Services.AddScoped<StackExchange.Redis.IDatabase>(sp =>
+            {
+                var connection = sp.GetRequiredService<IConnectionMultiplexer>();
+                return connection.GetDatabase();
+            });
         }
         /// <summary>
         /// JWT Authentication configuration

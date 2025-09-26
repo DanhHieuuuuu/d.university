@@ -23,16 +23,7 @@ namespace D.Auth.API
             builder.ConfigureDbContext<AuthDBContext>();
 
             // connection redis
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
-
-            builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
-
-            // sign in IDatabase
-            builder.Services.AddScoped<IDatabase>(sp =>
-            {
-                var connection = sp.GetRequiredService<IConnectionMultiplexer>();
-                return connection.GetDatabase();
-            });
+            builder.ConfigureRedis();
 
             builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
             builder.Services.AddMediatRServices();

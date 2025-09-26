@@ -1,11 +1,14 @@
 ﻿using D.Auth.Infrastructure.Services.Abstracts;
 using D.Auth.Infrastructure.Services.Implements;
+using D.ControllerBases;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using System;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,8 +18,7 @@ namespace d.Shared.Permission
     public class PermissionFilterAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly string[] _permission;
-        private IRoleService _roleService;
-        private INsNhanSuService _nsNhanSuService;
+        //private INsNhanSuService _nsNhanSuService;
 
         public PermissionFilterAttribute(params string[] permissions)
         {
@@ -25,22 +27,34 @@ namespace d.Shared.Permission
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            _roleService = context.HttpContext.RequestServices.GetRequiredService<IRoleService>();
-            _nsNhanSuService = context.HttpContext.RequestServices.GetRequiredService<INsNhanSuService>();
+            var httpClient = new HttpClient();
+            var token = context.HttpContext.Request.Headers["Authorization"].ToString();
 
-            // Lấy claims từ token
-            var user = await _nsNhanSuService.ValidateTokenAsync();
+            httpClient.DefaultRequestHeaders.Add("Authorization", token);
 
-            if (!user)
+            // Gọi sang service Auth để check quyền
+            var response = await httpClient.GetAsync("http://localhost:5268/api/role/get-all-role");
+
+            if((int)response.StatusCode == 401)
             {
-                // Token không hợp lệ hoặc hết hạn → 401
+                context.Result = new UnauthorizedObjectResult(new { message = "Token hết hạn." });
+                return;
+            }
+
+            var permissions = await response.Content.ReadFromJsonAsync<ResponseAPI<List<string>>>();
+            var list = permissions?.Data ?? new List<string>();
+
+            var _database = context.HttpContext.RequestServices.GetRequiredService<IDatabase>();
+
+            string key = $"token:{token.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase).Trim()}";
+            var checkToken = await _database.KeyExistsAsync(key);
+            if (!checkToken)
+            {
                 context.Result = new UnauthorizedObjectResult(new { message = "Token hết hạn hoặc không hợp lệ." });
                 return;
             }
 
-            var permissions = _roleService.GetAllRoleNhanSu();
-
-            bool isAuthorize = permissions.Any(p => _permission.Contains(p));
+            bool isAuthorize = list.Any(p => _permission.Contains(p));
 
             if (!isAuthorize)
             {
