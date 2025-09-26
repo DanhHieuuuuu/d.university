@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using AutoMapper;
 using D.Core.Domain.Dtos.Hrm;
+using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Entities.Hrm.NhanSu;
+using D.Core.Domain.Entities.SinhVien;
 
 namespace D.Core.Domain
 {
@@ -34,6 +36,12 @@ namespace D.Core.Domain
                     }
                 );
             CreateMap<CreateHopDongDto, NsHopDong>();
+
+            #endregion
+
+            #region sv
+
+            CreateMap<SvSinhVien, SvSinhVienResponseDto>();
 
             #endregion
         }
