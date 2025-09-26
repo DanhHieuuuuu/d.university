@@ -4,6 +4,8 @@
 - SQL Server
 - Entity Framework Core (EF Core)
 
+---
+
 ## Hướng dẫn chạy Migration
 
 ### 1. Di chuyển vào thư mục `D.Core.Domain`
@@ -21,6 +23,14 @@ dotnet ef migrations add <migration_name> --context CoreDBContext --startup-proj
 ```
 
 => Lệnh này sẽ sinh ra file migration trong thư mục **Migrations** của `D.Core.Domain`.
+
+### 3. Xóa migration
+
+Dùng lệnh sau để xóa migration (chỉ xóa được khi chưa update database):
+
+```powershell
+dotnet ef migrations remove --context CoreDBContext --startup-project ..\D.Core.API
+```
 
 ---
 
@@ -48,14 +58,17 @@ sudo systemctl start redis-server
 - Check : redis-cli ping => pong => sucess
 - kiểm tra port (dòng port): sudo nano /etc/redis/redis.conf
 
+---
+
 ## Flow từ entity => controller
 
-1. Tạo entity extends entity base (khai báo dbset)
+1. Tạo `entity` extends `EntityBase` (khai báo `DbSet`)
 
 2. Tạo repository để lấy dữ liệu từ db
 
 ví dụ:
-``` xml
+
+```xml
 using D.Auth.Domain.Entities;
 using D.InfrastructureBase.Database;
 using D.InfrastructureBase.Repository;
@@ -74,14 +87,18 @@ namespace D.Auth.Infrastructure.Repositories
 }
 
 ```
-RepositoryBase và IRepositoryBase phải là của namespace D.InfrastructureBase.Repository.<br>
-IDbContext phải là của namespace D.InfrastructureBase.Database.<br>
-Inject chúng vào trong file DependencyInjection ngay dưới.
 
-3. Tạo file service và Iservice để viết logic nghiệp vụ
+`RepositoryBase` và `IRepositoryBase` phải là của namespace `D.InfrastructureBase.Repository`.
+
+`IDbContext` phải là của namespace `D.InfrastructureBase.Database`.
+
+Inject chúng vào trong file `DependencyInjection` ngay dưới.
+
+3. Tạo file `service` và `iService` để viết logic nghiệp vụ
 
 Ví dụ:
-``` xml
+
+```xml
 using System.Text.Json;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -109,11 +126,13 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
     }
 }
 ```
-Khai báo các biến như trên và inject vào DependencyInjection
+
+Khai báo các biến như trên và inject vào `DependencyInjection`
 
 4. Khai báo dto cho MediatR
 
 Ví dụ:
+
 ```xml
     public class NsNhanSuRequestDto : FilterBaseDto, IQuery<PageResultDto<NsNhanSuResponseDto>>
     {
@@ -121,12 +140,18 @@ Ví dụ:
         public string? Cccd { get; set; }
     }
 ```
-Request nào thì phải imp Response đó, có thể khai báo kiểu Iquery hoặc Icommand tùy theo logic sử dụng namspace D.DomainBase.Common
+
+Request nào thì phải implement Response đó, có thể khai báo kiểu `IQuery` hoặc `ICommand` tùy theo logic, sử dụng namespace `D.DomainBase.Common`.
+
+<div style="text-align: center;">
+  <img src="overview_cqrs.png" alt="CQRS Design Pattern in Microservices Architectures" />
+</div>
 
 5. Xử lý truy vấn MediatR gọi đến
 
 Ví dụ:
-``` xml
+
+```xml
 using D.ApplicationBase;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
@@ -156,11 +181,12 @@ namespace D.Core.Application.Query.Hrm.NsNhanSu
 
 ```
 
-Sử dụng IQueryHandler, hoặc ICommand của namespace D.ApplicationBase để service biết resquest, response là gì
+Sử dụng `IQueryHandler` hoặc `ICommandHandler` của namespace `D.ApplicationBase` để service biết resquest, response là gì
 
 6. Viết controller
 
 Ví dụ:
+
 ```xml
         public async Task<ResponseAPI> GetListNhanSu(NsNhanSuRequestDto dto)
         {
