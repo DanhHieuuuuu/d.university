@@ -1,6 +1,7 @@
 ﻿using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Shared.SeedData;
+using D.DomainBase.Entity;
 using D.InfrastructureBase.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -53,8 +54,17 @@ namespace D.Core.Domain
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.SeedDataHrm();
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(EntityBase).IsAssignableFrom(entityType.ClrType))
+                {
+                    modelBuilder.Entity(entityType.ClrType)
+                                .Property<DateTime>(nameof(EntityBase.CreatedDate))
+                                .HasDefaultValueSql("GETDATE()");
+                }
+            }
 
+            modelBuilder.SeedDataHrm();
             base.OnModelCreating(modelBuilder);
         }
     }

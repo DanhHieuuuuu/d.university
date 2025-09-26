@@ -20,7 +20,7 @@ namespace D.DomainBase.Entity
         public string CreatedBy { get; set; } = "root";
 
         [Description("Ngày tạo")]
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; }
 
         [Description("Người sửa")]
         [MaxLength(255)]

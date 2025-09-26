@@ -377,7 +377,7 @@ namespace D.Core.Domain.Shared.SeedData
                     {
                         Id = 5,
                         MaLoaiHopDong = "HD04",
-                        TenLoaiHopDong = "Hợp đồng lao độgn không thời hạn",
+                        TenLoaiHopDong = "Hợp đồng lao động không thời hạn",
                     }
                 );
         }
@@ -390,31 +390,31 @@ namespace D.Core.Domain.Shared.SeedData
                     new DmLoaiPhongBan
                     {
                         Id = 1,
-                        MaLoaiPhongBan = "KH",
+                        MaLoaiPhongBan = "KHAC",
                         TenLoaiPhongBan = "Khác",
                     },
                     new DmLoaiPhongBan
                     {
                         Id = 2,
-                        MaLoaiPhongBan = "KH",
+                        MaLoaiPhongBan = "KHOA",
                         TenLoaiPhongBan = "Khoa",
                     },
                     new DmLoaiPhongBan
                     {
                         Id = 3,
-                        MaLoaiPhongBan = "BA",
+                        MaLoaiPhongBan = "BAN",
                         TenLoaiPhongBan = "Phòng - Ban",
                     },
                     new DmLoaiPhongBan
                     {
                         Id = 4,
-                        MaLoaiPhongBan = "VI",
+                        MaLoaiPhongBan = "VIEN",
                         TenLoaiPhongBan = "Viện",
                     },
                     new DmLoaiPhongBan
                     {
                         Id = 5,
-                        MaLoaiPhongBan = "TT",
+                        MaLoaiPhongBan = "TRUNGTAM",
                         TenLoaiPhongBan = "Trung tâm",
                     }
                 );
@@ -917,7 +917,7 @@ namespace D.Core.Domain.Shared.SeedData
                     {
                         Id = 2,
                         MaQuanHe = "Con",
-                        TenQuanHe = "Con 1",
+                        TenQuanHe = "Con",
                     },
                     new DmQuanHeGiaDinh
                     {
