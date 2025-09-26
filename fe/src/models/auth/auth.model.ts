@@ -14,12 +14,8 @@ export type ILogin = {
 };
 
 export type IUser = {
-  // id: number;
-  maNhanSu: string;
-  ho: string | null;
+  maNhanSu: string | null;
+  hoDem: string | null;
   ten: string | null;
-  fullName: string | null;
   email: string | null;
-  role: string | null;
-  position: string | null;
 };

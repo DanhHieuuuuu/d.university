@@ -23,6 +23,12 @@ namespace D.Core.Infrastructure
         {
             return services
                 .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
+                .AddScoped<IDmChucVuRepository, DmChucVuRepository>()
+                .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
+                .AddScoped<INsQuanHeGiaDinhRepository, NsQuanHeGiaDinhRepository>()
+                .AddScoped<INsHopDongRepository, NsHopDongRepository>()
+                .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>();
+
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>();
         }
 

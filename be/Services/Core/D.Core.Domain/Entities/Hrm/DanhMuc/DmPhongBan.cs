@@ -14,7 +14,7 @@ namespace D.Core.Domain.Entities.Hrm.DanhMuc
         public string? Hotline { get; set; }
         public string? Fax { get; set; }
         public DateTime? NgayThanhLap { get; set; }
-        public bool? IsActive { get; set; }
+        public bool? IsActive { get; set; } = true;
         public int? STT { get; set; }
         public string? ChucVuNguoiDaiDien { get; set; }
         public string? NguoiDaiDien { get; set; }

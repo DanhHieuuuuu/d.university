@@ -1,6 +1,7 @@
 ﻿using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
+using D.Core.Domain.Shared.SeedData;
 using D.InfrastructureBase.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -29,18 +30,26 @@ namespace D.Core.Domain
         // DbSet
 
         #region hrm
+
         // Danh mục
         DbSet<DmChucVu> DmChucVus { get; set; }
+        DbSet<DmDanToc> DmDanTocs { get; set; }
+        DbSet<DmGioiTinh> DmGioiTinhs { get; set; }
         DbSet<DmLoaiHopDong> DmLoaiHopDongs { get; set; }
         DbSet<DmLoaiPhongBan> DmLoaiPhongBans { get; set; }
+        DbSet<DmQuanHeGiaDinh> DmQuanHeGiaDinhs { get; set; }
         DbSet<DmPhongBan> DmPhongBans { get; set; }
+        DbSet<DmQuocTich> DmQuocTiches { get; set; }
         DbSet<DmToBoMon> DmToBoMon { get; set; }
+        DbSet<DmTonGiao> DmTonGiaos { get; set; }
 
         // Nhân sự
         DbSet<NsNhanSu> NsNhanSus { get; set; }
         DbSet<NsHopDong> NsHopDongs { get; set; }
         DbSet<NsHopDongChiTiet> NsHopDongChiTiets { get; set; }
         DbSet<NsToBoMon> NsToBoMons { get; set; }
+        DbSet<NsQuanHeGiaDinh> NsQuanHeGiaDinhs { get; set; }
+
         #endregion
 
         #region sv
@@ -51,6 +60,8 @@ namespace D.Core.Domain
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //modelBuilder.SeedDataHrm();
+
             base.OnModelCreating(modelBuilder);
         }
     }

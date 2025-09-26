@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using System.Reflection;
+using AutoMapper;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
 
@@ -15,7 +17,25 @@ namespace D.Core.Domain
 
             #region hrm
 
-            CreateMap<NsNhanSu, NsNhanSuResponseDto>();
+            CreateMap<NsNhanSu, NsNhanSuResponseDto>()
+                .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id))
+                .ForMember(
+                    dest => dest.HoTen,
+                    options =>
+                        options.MapFrom(src =>
+                            string.Join(" ", new[] { src.HoDem, src.Ten }
+                            .Where(x => !string.IsNullOrWhiteSpace(x)))
+                        )
+                );
+            CreateMap<CreateNsQuanHeGiaDinhDto, NsQuanHeGiaDinh>();
+            CreateMap<CreateNhanSuDto, NsNhanSu>()
+                .BeforeMap(
+                    (src, dest) =>
+                    {
+                        TrimAllStringProperties(src);
+                    }
+                );
+            CreateMap<CreateHopDongDto, NsHopDong>();
 
             #endregion
 
@@ -24,6 +44,29 @@ namespace D.Core.Domain
             CreateMap<SvSinhVien, SvSinhVienResponseDto>();
 
             #endregion
+        }
+
+        /// <summary>
+        /// (Trim) Bỏ khoảng trống 2 đầu với tất cả thuộc tính dạng string
+        /// </summary>
+        /// <param name="obj"></param>
+        private void TrimAllStringProperties(object obj)
+        {
+            if (obj == null)
+                return;
+
+            var stringProperties = obj.GetType()
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.PropertyType == typeof(string) && p.CanRead && p.CanWrite);
+
+            foreach (var prop in stringProperties)
+            {
+                var value = prop.GetValue(obj) as string;
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    prop.SetValue(obj, value.Trim());
+                }
+            }
         }
     }
 }
