@@ -27,7 +27,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
                 .AddScoped<INsQuanHeGiaDinhRepository, NsQuanHeGiaDinhRepository>()
                 .AddScoped<INsHopDongRepository, NsHopDongRepository>()
-                .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>();
+                .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>()
 
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>();
         }
