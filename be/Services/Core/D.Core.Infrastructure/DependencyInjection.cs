@@ -18,7 +18,11 @@ namespace D.Core.Infrastructure
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             return services
-                .AddScoped<INsNhanSuRepository, NsNhanSuRepository>();
+                .AddScoped<IDmChucVuRepository, DmChucVuRepository>()
+                .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
+                .AddScoped<INsQuanHeGiaDinhRepository, NsQuanHeGiaDinhRepository>()
+                .AddScoped<INsHopDongRepository, NsHopDongRepository>()
+                .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>();
         }
 
         public static IServiceCollection AddAutoMapperProfile(this IServiceCollection services)
