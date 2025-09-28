@@ -42,10 +42,10 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var items = query
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
-                .ProjectTo<NsNhanSuResponseDto>(_mapper.ConfigurationProvider)
+                //.ProjectTo<NsNhanSuResponseDto>(_mapper.ConfigurationProvider)
                 .ToList();
 
-            return new PageResultDto<NsNhanSuResponseDto> { Items = items, TotalItem = totalCount };
+            return new PageResultDto<NsNhanSuResponseDto> { Items = _mapper.Map<List<NsNhanSuResponseDto>>(items), TotalItem = totalCount };
         }
 
         public void CreateGiaDinhNhanSu(int idNhanSu, CreateNsQuanHeGiaDinhDto dto)

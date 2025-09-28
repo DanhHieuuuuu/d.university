@@ -1,5 +1,6 @@
 ﻿using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
+using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Shared.SeedData;
 using D.DomainBase.Entity;
 using D.InfrastructureBase.Database;
@@ -49,6 +50,12 @@ namespace D.Core.Domain
         DbSet<NsHopDongChiTiet> NsHopDongChiTiets { get; set; }
         DbSet<NsToBoMon> NsToBoMons { get; set; }
         DbSet<NsQuanHeGiaDinh> NsQuanHeGiaDinhs { get; set; }
+
+        #endregion
+
+        #region sv
+
+        DbSet<SvSinhVien> SvSinhViens { get; set; }
 
         #endregion
 

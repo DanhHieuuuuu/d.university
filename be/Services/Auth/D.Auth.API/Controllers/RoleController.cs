@@ -35,5 +35,25 @@ namespace D.Auth.API.Controllers
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Lấy danh sách role
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("get-all-role")]
+        public async Task<ResponseAPI> GetAllRole([FromQuery] RoleRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

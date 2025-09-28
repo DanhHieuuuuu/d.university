@@ -58,7 +58,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             return true;
         }
 
-        public List<string> GetAllRoleNhanSu()
+        public List<string> GetAllRoleNhanSu(RoleRequestDto dto)
         {
             _logger.LogInformation($"{nameof(GetAllRoleNhanSu)}.");
 

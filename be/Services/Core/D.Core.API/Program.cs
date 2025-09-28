@@ -22,6 +22,9 @@ namespace D.Core.API
 
             builder.ConfigureDbContext<CoreDBContext>();
 
+            // connection redis
+            builder.ConfigureRedis();
+
             builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
             builder.Services.AddMediatRServices();
             builder.ConfigureCors();

@@ -16,7 +16,7 @@ public partial class NsNhanSu : EntityBase
 
     public string? NoiSinh { get; set; }
 
-    public bool? GioiTinh { get; set; }
+    public int? GioiTinh { get; set; }
 
     public int? QuocTich { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using D.Core.Infrastructure.Repositories.Hrm;
+using D.Core.Infrastructure.Repositories.SinhVien;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
 
@@ -14,6 +15,8 @@ namespace D.Core.Infrastructure
         private NsHopDongRepository _nsHopDongRepository;
         private NsHopDongChiTietRepository _nsHopDongChiTietRepository;
         private DmChucVuRepository _dmChucVuRepository;
+        
+        private SvSinhVienRepository _svSinhVienRepository;
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
         {
@@ -80,5 +83,18 @@ namespace D.Core.Infrastructure
                 return _dmChucVuRepository;
             }
         }
+        
+        public ISvSinhVienRepository iSvSinhVienRepository
+        {
+            get
+            {
+                if (_svSinhVienRepository == null)
+                {
+                    _svSinhVienRepository = new SvSinhVienRepository(_dbContext, _httpContext);
+                }
+                return _svSinhVienRepository;
+            }
+        }
+        
     }
 }

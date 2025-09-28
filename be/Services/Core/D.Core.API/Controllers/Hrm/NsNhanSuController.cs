@@ -1,4 +1,5 @@
-﻿using D.ControllerBases;
+﻿using d.Shared.Permission;
+using D.ControllerBases;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using MediatR;
@@ -61,6 +62,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpPost("create-hd")]
         public async Task<ResponseAPI> CreateHopDong(CreateHopDongDto dto)
         {
