@@ -1,22 +1,20 @@
-import { MenuProps } from 'antd';
+import { IMenu } from '@components/common/Menu';
 import { GlobalOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
 
-type MenuItem = Required<MenuProps>['items'][number];
-
-export const listMenuRole: MenuItem[] = [
+export const listMenuRole: IMenu[] = [
   {
-    key: '/role',
     label: 'Tổng quan',
+    routerLink: '/role',
     icon: <HomeOutlined />
   },
   {
-    key: '/role/web-manage',
     label: 'Phân quyền website',
+    routerLink: '/role/web-manage',
     icon: <GlobalOutlined />
   },
   {
-    key: '/role/user-manage',
     label: 'Quản lý tài khoản',
+    routerLink: '/role/user-manage',
     icon: <TeamOutlined />
   }
 ];

@@ -1,21 +1,54 @@
-import { DesktopOutlined, FileOutlined, HomeOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
+import { FileOutlined, HomeOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import { IMenu } from '@components/common/Menu';
 
-type MenuItem = Required<MenuProps>['items'][number];
+export const listMenuCore: IMenu[] = [
+  {
+    label: 'Trang chủ',
+    routerLink: '/home',
+    icon: <HomeOutlined />
+  },
+  {
+    label: 'Nhân sự',
+    routerLink: '/hrm',
+    icon: <TeamOutlined />
+  },
+  {
+    label: 'User',
+    routerLink: 'sub1',
+    icon: <UserOutlined />,
+    items: [
+      {
+        label: 'Tom',
+        routerLink: '3'
+      },
+      {
+        label: 'Bill',
+        routerLink: '4'
+      },
+      {
+        label: 'Alexaxx',
+        routerLink: '5'
+      }
+    ]
+  },
+  {
+    label: 'Team',
+    routerLink: 'sub2',
+    items: [
+      {
+        label: 'Team 1',
+        routerLink: '6'
+      },
+      {
+        label: 'Team 2',
+        routerLink: '8'
+      }
+    ]
+  },
+  {
+    label: 'Files',
 
-function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label
-  } as MenuItem;
-}
-
-export const listMenuCore: MenuItem[] = [
-  getItem('Trang chủ', '/home', <HomeOutlined />),
-  getItem('Nhân sự', '/hrm', <TeamOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [getItem('Tom', '3'), getItem('Bill', '4'), getItem('Alex', '5')]),
-  getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-  getItem('Files', '9', <FileOutlined />)
+    routerLink: '9',
+    icon: <FileOutlined />
+  }
 ];

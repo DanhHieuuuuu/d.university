@@ -1,22 +1,28 @@
 import { MenuProps } from 'antd';
+import { IMenu } from '@components/common/Menu';
 
-type MenuItem = Required<MenuProps>['items'][number];
+export function mapToAntdItems(data: IMenu[]): MenuProps['items'] {
+  return data
+    .filter((item) => !item.hidden)
+    .map((item) => ({
+      key: item.routerLink,
+      label: item.label,
+      icon: item.icon,
+      children: item.items ? mapToAntdItems(item.items) : undefined
+    }));
+}
 
-/**
- * Tìm các key được chọn (selectedKeys) và key menu cha cần mở (openKeys)
- * dựa vào pathname hiện tại.
- */
 export function getMenuKeysFromPath(
-  menuItems: MenuItem[],
+  menuItems: IMenu[],
   pathname: string
 ): { selectedKeys: string[]; openKeys: string[] } {
   let selectedKeys: string[] = [];
   let openKeys: string[] = [];
 
-  const traverse = (items: MenuItem[], parentKey?: string) => {
+  const traverse = (items: IMenu[], parentKey?: string) => {
     for (const item of items) {
       if (!item) continue;
-      const key = item.key as string;
+      const key = item.routerLink as string;
 
       // Nếu pathname khớp prefix thì chọn
       if (pathname === key || pathname.startsWith(key + '/')) {
