@@ -102,6 +102,26 @@ namespace D.Auth.Infrastructure.Services.Implements
             result.ExpiredRefreshToken = date.AddDays(7);
             await SaveRefreshTokenAsync(result.Token, result.RefreshToken, TimeSpan.FromDays(7));
 
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+            string body = await System.IO.File.ReadAllTextAsync(filePath);
+
+            //body = body.Replace("{{userName}}", "Nguyễn Danh Hiếu")
+            //           .Replace("{{newPassword}}", "123456")
+            //           .Replace("{{year}}", DateTime.Now.Year.ToString());
+
+            //SendEmailDto dto = new SendEmailDto()
+            //{
+            //    EmailFrom = _configuration["Email_Configuration:Email"],
+            //    Password = _configuration["Email_Configuration:Password"],
+            //    Host = _configuration["Email_Configuration:Host"],
+            //    Post = int.Parse(_configuration["Email_Configuration:Port"]),
+            //    Title = "Mật khẩu mới",
+            //    EmailTo = "hieunguyendanh91@gmail.com",
+            //    Body = body
+            //};
+
+            //await SendNotification.SendEmail(dto);
+
             return result;
         }
 
