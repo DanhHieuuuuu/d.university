@@ -16,6 +16,8 @@ namespace D.Core.Infrastructure
             return services
                 .AddScoped<ServiceUnitOfWork>()
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
+                .AddScoped<IDmChucVuService, DmChucVuService>()
+                .AddScoped<IDmPhongBanService, DmPhongBanService>()
                 .AddScoped<ISvSinhVienService, SvSinhVienService>();
         }
 
@@ -28,7 +30,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsQuanHeGiaDinhRepository, NsQuanHeGiaDinhRepository>()
                 .AddScoped<INsHopDongRepository, NsHopDongRepository>()
                 .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>()
-
+                .AddScoped<IDmPhongBanRepository, DmPhongBanRepository>()
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>();
         }
 

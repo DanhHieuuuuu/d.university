@@ -13,6 +13,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
     public interface INsNhanSuService
     {
         PageResultDto<NsNhanSuResponseDto> FindPagingNsNhanSu(NsNhanSuRequestDto dto);
+
+        PageResultDto<NsNhanSuGetAllResponseDto> GetAllNhanSu(NsNhanSuGetAllRequestDto dto);
+
         void CreateGiaDinhNhanSu(int idNhanSu, CreateNsQuanHeGiaDinhDto dto);
         NsNhanSuResponseDto CreateNhanSu(CreateNhanSuDto dto);
         void CreateHopDong(CreateHopDongDto dto);

@@ -14,22 +14,8 @@ export const listMenuCore: IMenu[] = [
   },
   {
     label: 'User',
-    routerLink: 'sub1',
-    icon: <UserOutlined />,
-    items: [
-      {
-        label: 'Tom',
-        routerLink: '3'
-      },
-      {
-        label: 'Bill',
-        routerLink: '4'
-      },
-      {
-        label: 'Alexaxx',
-        routerLink: '5'
-      }
-    ]
+    routerLink: '/role/user-manage',
+    icon: <UserOutlined />
   },
   {
     label: 'Team',

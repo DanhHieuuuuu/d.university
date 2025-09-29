@@ -1,10 +1,13 @@
-﻿using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using D.Core.Domain.Dtos.Hrm;
-using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
+using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
+using System.Reflection;
 
 namespace D.Core.Domain
 {
@@ -27,6 +30,8 @@ namespace D.Core.Domain
                             .Where(x => !string.IsNullOrWhiteSpace(x)))
                         )
                 );
+
+
             CreateMap<CreateNsQuanHeGiaDinhDto, NsQuanHeGiaDinh>();
             CreateMap<CreateNhanSuDto, NsNhanSu>()
                 .BeforeMap(
@@ -36,6 +41,8 @@ namespace D.Core.Domain
                     }
                 );
             CreateMap<CreateHopDongDto, NsHopDong>();
+            CreateMap<DmPhongBan, DmPhongBanResponseDto>();
+            CreateMap<DmChucVu, DmChucVuResponseDto>();
 
             #endregion
 

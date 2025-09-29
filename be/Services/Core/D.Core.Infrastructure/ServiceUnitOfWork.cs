@@ -15,7 +15,7 @@ namespace D.Core.Infrastructure
         private NsHopDongRepository _nsHopDongRepository;
         private NsHopDongChiTietRepository _nsHopDongChiTietRepository;
         private DmChucVuRepository _dmChucVuRepository;
-        
+        private DmPhongBanRepository _dmPhongBanRepository;
         private SvSinhVienRepository _svSinhVienRepository;
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -95,6 +95,18 @@ namespace D.Core.Infrastructure
                 return _svSinhVienRepository;
             }
         }
-        
+
+        public IDmPhongBanRepository iDmPhongBanRepository
+        {
+            get
+            {
+                if (_dmPhongBanRepository == null)
+                {
+                    _dmPhongBanRepository = new DmPhongBanRepository(_dbContext, _httpContext);
+                }
+                return _dmPhongBanRepository;
+            }
+        }
+
     }
 }

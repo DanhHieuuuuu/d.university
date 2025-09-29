@@ -39,6 +39,25 @@ namespace D.Core.API.Controllers.Hrm
         }
 
         /// <summary>
+        /// Danh sách nhân sự bản format
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-all")]
+        public async Task<ResponseAPI> GetAll(NsNhanSuGetAllRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Thêm mới nhân sự
         /// </summary>
         /// <param name="dto"></param>

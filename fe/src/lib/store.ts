@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './feature/authSlice';
 import loadingReducer from './feature/loadingSlice';
 import nhanSuReducer from './feature/nhansuSlice';
+import userReducer from './feature/userSlice';
 
 export const makeStore = () => {
   return configureStore({
@@ -9,6 +10,7 @@ export const makeStore = () => {
       authState: authReducer,
       loadState: loadingReducer,
       nhanSuState: nhanSuReducer,
+      userState: userReducer,
     }
   });
 };
