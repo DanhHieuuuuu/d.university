@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './feature/authSlice';
 import loadingReducer from './feature/loadingSlice';
+import nhanSuReducer from './feature/nhansuSlice';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       authState: authReducer,
       loadState: loadingReducer,
+      nhanSuState: nhanSuReducer,
     }
   });
 };
