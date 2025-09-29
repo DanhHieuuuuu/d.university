@@ -70,7 +70,7 @@ export const _isGranted = (permissions: IPermission[], permission: string) => {
   if (!permissions || !permissions.length) {
     return false;
   }
-  const permissionNames = permissions.map((x) => x.name);
+  const permissionNames = permissions.map((x) => x.permissionName);
   return permissionNames.includes(permission);
 };
 

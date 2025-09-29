@@ -28,7 +28,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       try {
         await dispatch(refreshToken()).unwrap();
       } catch (err) {
-        processApiMsgError(err);
+        processApiMsgError(err, 'Có lỗi xảy ra khi refresh token.');
         clearToken();
         router.push('/login');
       }

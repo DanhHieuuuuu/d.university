@@ -1,26 +1,27 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useTransition } from 'react';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '@redux/feature/loadingSlice';
 
 export function useNavigate() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [isPending, startTransition] = useTransition();
 
-  const navigateTo = async (href: string) => {
-    try {
-      dispatch(setLoading(true));
-
-      await router.prefetch(href);
+  const navigateTo = (href: string) => {
+    dispatch(setLoading(true));
+    startTransition(() => {
       router.push(href);
-    } catch (err) {
-      console.error('Navigation error:', err);
-      router.push(href);
-    } finally {
-      setTimeout(() => dispatch(setLoading(false)), 100);
-    }
+    });
   };
+
+  useEffect(() => {
+    if (!isPending) {
+      dispatch(setLoading(false));
+    }
+  }, [isPending, dispatch]);
 
   return { navigateTo };
 }
