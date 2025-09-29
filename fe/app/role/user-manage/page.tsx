@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useState, useEffect } from 'react';
-import { Breadcrumb, Button, Card, Form, Input, TableProps } from 'antd';
+import { Breadcrumb, Button, Card, Form, Input, Tag } from 'antd';
 import { PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
 
 import { ReduxStatus } from '@redux/const';
@@ -14,7 +14,7 @@ import { IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
-import CreateUser from './(dialog)/create';
+import CreateNhanSuModal from './(dialog)/create';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -24,23 +24,17 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
-  useEffect(() => {
-    if (list) {
-      console.log('✅ Data từ API:', list);
-    }
-  }, [list]);
+
   const columns: IColumn<IUserView>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
-      title: 'ID'
+      title: 'ID',
     },
     {
       key: 'maNhanSu',
       dataIndex: 'maNhanSu',
       title: 'Mã nhân sự',
-      align: 'center',
-      showOnConfig: false
     },
     {
       key: 'hoTen',
@@ -84,7 +78,28 @@ const Page = () => {
     {
       key: 'trangThai',
       dataIndex: 'trangThai',
-      title: 'Trạng thái'
+      title: 'Trạng thái',
+      width: 150,
+      render: (value) => {
+        let color = 'default';
+        switch (value) {
+          case 'Đang hoạt động':
+            color = 'green';
+            break;
+          case 'Thôi việc':
+            color = 'orange';
+            break;
+          case 'Đã về hưu':
+            color = 'blue';
+            break;
+          case 'Chấm dứt hợp đồng':
+            color = 'red';
+            break;
+          default:
+            color = 'default';
+        }
+        return <Tag color={color}>{value || 'Chưa có'}</Tag>;
+      }
     }
   ];
 
@@ -159,7 +174,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <CreateUser
+      <CreateNhanSuModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         isUpdate={isUpdate}
