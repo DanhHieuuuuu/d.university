@@ -3,14 +3,14 @@
 import React from 'react';
 import { Layout } from 'antd';
 import RoleMenuComponent from '@components/menu/menu-role';
-import HeaderComponent from '@components/common/Header';
+import AppHeader from '@components/common/Header';
 
 const { Content } = Layout;
 
 const RoleLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <HeaderComponent />
+      <AppHeader />
       <Layout hasSider className="h-full">
         <RoleMenuComponent />
         <Content

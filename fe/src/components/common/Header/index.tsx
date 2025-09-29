@@ -1,16 +1,16 @@
 'use client';
 
 import { Layout, Typography } from 'antd';
-import '@src/styles/globals.scss';
 import { useNavigate } from '@hooks/navigate';
+import '@src/styles/globals.scss';
 
-const { Header: HeaderAntd } = Layout;
+const { Header } = Layout;
 const { Title } = Typography;
 
-const HeaderComponent = () => {
+const AppHeader = () => {
   const { navigateTo } = useNavigate();
   return (
-    <HeaderAntd
+    <Header
       style={{
         background: 'var(--background-header)',
         color: 'var(--foreground)'
@@ -21,8 +21,8 @@ const HeaderComponent = () => {
           University
         </Title>
       </div>
-    </HeaderAntd>
+    </Header>
   );
 };
 
-export default HeaderComponent;
+export default AppHeader;

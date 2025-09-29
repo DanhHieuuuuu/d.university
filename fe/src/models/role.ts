@@ -1,4 +1,4 @@
-import type { IQueryPaging } from '@models/model.common';
+import type { IQueryPaging } from '@models/common/model.common';
 import type { IPermission } from '@models/permission';
 
 export type IRole = {

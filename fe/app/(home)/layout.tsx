@@ -4,7 +4,7 @@ import React from 'react';
 import { Layout } from 'antd';
 
 import MenuComponent from '@components/menu/menu-home';
-import HeaderComponent from '@components/common/Header';
+import AppHeader from '@components/common/Header';
 
 const { Content, Footer } = Layout;
 
@@ -13,7 +13,7 @@ const Index = ({ children }: { children: React.ReactNode }) => {
     <Layout hasSider style={{ minHeight: '100vh' }}>
       <MenuComponent />
       <Layout>
-        <HeaderComponent />
+        <AppHeader />
         <Content style={{ margin: 16, height: '100%' }}>{children}</Content>
         <Footer style={{ textAlign: 'center' }}>Ant Design ©{new Date().getFullYear()} Created by Ant UED</Footer>
       </Layout>

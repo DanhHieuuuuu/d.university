@@ -1,0 +1,22 @@
+.ant-table {
+  .ant-table-container {
+
+    .ant-table-body,
+    .ant-table-content {
+      scrollbar-width: thin;
+      scrollbar-color: #eaeaea transparent;
+      scrollbar-gutter: stable;
+      
+      &::-webkit-scrollbar {
+        height: 6px;
+        background: transparent;
+      }
+  
+      &::-webkit-scrollbar-thumb {
+        background: #eaeaea;
+        border-radius: 4px;
+      }
+    }
+
+  }
+}

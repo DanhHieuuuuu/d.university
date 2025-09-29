@@ -21,3 +21,8 @@ export enum EnvironmentE {
   DEVELOPMENT = 'development',
   PRODUCTION = 'production'
 }
+
+export enum EStatusResonse {
+  SUCCESS = 1,
+  ERROR = 0
+}

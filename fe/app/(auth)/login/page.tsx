@@ -8,7 +8,7 @@ import { GraduationCap } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { login } from '@redux/feature/authSlice';
 import { ILogin } from '@models/auth/auth.model';
-import { userStatusE } from '@models/common';
+import { userStatusE } from '@models/common/common';
 
 import { useNavigate } from '@hooks/navigate';
 import { processApiMsgError } from '@utils/index';
