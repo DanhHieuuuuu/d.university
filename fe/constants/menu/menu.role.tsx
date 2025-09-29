@@ -1,5 +1,5 @@
-import { IMenu } from '@components/common/Menu';
 import { GlobalOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
+import { IMenu } from '@models/common/menu.model';
 
 export const listMenuRole: IMenu[] = [
   {

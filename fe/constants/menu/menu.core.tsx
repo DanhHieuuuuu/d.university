@@ -1,5 +1,5 @@
 import { FileOutlined, HomeOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
-import { IMenu } from '@components/common/Menu';
+import { IMenu } from '@models/common/menu.model';
 
 export const listMenuCore: IMenu[] = [
   {

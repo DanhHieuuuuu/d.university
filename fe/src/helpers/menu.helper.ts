@@ -1,5 +1,5 @@
 import { MenuProps } from 'antd';
-import { IMenu } from '@components/common/Menu';
+import { IMenu } from '@models/common/menu.model';
 
 export function mapToAntdItems(data: IMenu[]): MenuProps['items'] {
   return data

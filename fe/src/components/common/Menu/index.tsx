@@ -1,24 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu as MenuAntd, MenuProps } from 'antd';
+import { Menu, MenuProps } from 'antd';
 import { useNavigate } from '@hooks/navigate';
-import { getMenuKeysFromPath, mapToAntdItems } from '@helpers/menu';
-
-export type IMenu = {
-  label: string;
-  routerLink: string;
-  icon?: React.ReactNode;
-  hidden?: boolean;
-  items?: IMenu[];
-};
+import { getMenuKeysFromPath, mapToAntdItems } from '@helpers/menu.helper';
+import { IMenu } from '@models/common/menu.model';
 
 type MenuPropsCustom = {
   data: IMenu[];
 };
 
-const AppMenu = ({ data }: MenuPropsCustom) => {
+const AppMenu: React.FC<MenuPropsCustom> = ({ data }) => {
   const pathname = usePathname();
   const { navigateTo } = useNavigate();
 
@@ -37,7 +30,7 @@ const AppMenu = ({ data }: MenuPropsCustom) => {
   const items = mapToAntdItems(data);
 
   return (
-    <MenuAntd
+    <Menu
       mode="inline"
       items={items}
       openKeys={openKeys}

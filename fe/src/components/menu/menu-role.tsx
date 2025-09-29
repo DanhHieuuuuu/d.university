@@ -10,12 +10,8 @@ import '@styles/menu.style.scss';
 const { Sider } = Layout;
 
 const RoleMenuComponent = () => {
-  
-
   const { resolvedTheme } = useTheme();
   const siderTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'dark' : 'light';
-
-  
 
   return (
     <Sider width="20%" theme={siderTheme} className="role-menu">
