@@ -15,13 +15,6 @@ namespace D.Core.Application.Command.Hrm.NsNhanSu
 
         public async Task Handle(CreateHopDongDto req, CancellationToken cancellationToken)
         {
-            //await Task.Run(
-            //    () =>
-            //    {
-            //        _nsNhanSuService.CreateHopDong(req);
-            //    },
-            //    cancellationToken
-            //);
             _nsNhanSuService.CreateHopDong(req);
             return;
         }

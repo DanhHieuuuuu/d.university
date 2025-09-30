@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Entities.Hrm.NhanSu;
@@ -45,7 +44,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 //.ProjectTo<NsNhanSuResponseDto>(_mapper.ConfigurationProvider)
                 .ToList();
 
-            return new PageResultDto<NsNhanSuResponseDto> { Items = _mapper.Map<List<NsNhanSuResponseDto>>(items), TotalItem = totalCount };
+            return new PageResultDto<NsNhanSuResponseDto>
+            {
+                Items = _mapper.Map<List<NsNhanSuResponseDto>>(items),
+                TotalItem = totalCount,
+            };
         }
 
         public PageResultDto<NsNhanSuGetAllResponseDto> GetAllNhanSu(NsNhanSuGetAllRequestDto dto)
@@ -54,42 +57,51 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"{nameof(FindPagingNsNhanSu)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking
-            .Where(x => string.IsNullOrEmpty(dto.MaNhanSu) || x.MaNhanSu == dto.MaNhanSu);
+            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking.Where(x =>
+                string.IsNullOrEmpty(dto.MaNhanSu) || x.MaNhanSu == dto.MaNhanSu
+            );
 
             var totalCount = query.Count();
 
             var items = query
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
-                //.ProjectTo<NsNhanSuResponseDto>(_mapper.ConfigurationProvider)
                 .ToList();
 
-
             // Map dữ liệu trả về
-            var result = items.Select(x => new NsNhanSuGetAllResponseDto
+            var result = items
+                .Select(x => new NsNhanSuGetAllResponseDto
+                {
+                    Id = x.Id,
+                    MaNhanSu = x.MaNhanSu,
+                    HoDem = x.HoDem,
+                    Ten = x.Ten,
+                    NgaySinh = x.NgaySinh,
+                    NoiSinh = x.NoiSinh,
+                    SoDienThoai = x.SoDienThoai,
+                    Email = x.Email,
+                    TenPhongBan = x.HienTaiPhongBan.HasValue
+                        ? _unitOfWork
+                            .iDmPhongBanRepository.FindById(x.HienTaiPhongBan.Value)
+                            ?.TenPhongBan
+                        : null,
+                    TenChucVu = x.HienTaiChucVu.HasValue
+                        ? _unitOfWork.iDmChucVuRepository.FindById(x.HienTaiChucVu.Value)?.TenChucVu
+                        : null,
+                    TrangThai =
+                        x.IsThoiViec == true ? "Thôi việc"
+                        : x.DaVeHuu == true ? "Nghỉ hưu"
+                        : x.DaChamDutHopDong == true ? "Chấm dứt HĐ"
+                        : "Đang hoạt động",
+                })
+                .ToList();
+
+            return new PageResultDto<NsNhanSuGetAllResponseDto>
             {
-                Id = x.Id,
-                MaNhanSu = x.MaNhanSu,
-                HoDem = x.HoDem,
-                Ten = x.Ten,
-                NgaySinh = x.NgaySinh,
-                NoiSinh = x.NoiSinh,
-                SoDienThoai = x.SoDienThoai,
-                Email = x.Email,
-                TenPhongBan = x.HienTaiPhongBan.HasValue ? _unitOfWork.iDmPhongBanRepository.FindById(x.HienTaiPhongBan.Value)?.TenPhongBan
-                : null,
-                TenChucVu = x.HienTaiChucVu.HasValue ? _unitOfWork.iDmChucVuRepository.FindById(x.HienTaiChucVu.Value)?.TenChucVu
-                : null,
-                TrangThai = x.IsThoiViec == true ? "Thôi việc"
-                         : x.DaVeHuu == true ? "Nghỉ hưu"
-                         : x.DaChamDutHopDong == true ? "Chấm dứt HĐ"
-                         : "Đang hoạt động"
-            }).ToList();
-
-            return new PageResultDto<NsNhanSuGetAllResponseDto> { Items = result, TotalItem = totalCount };
+                Items = result,
+                TotalItem = totalCount,
+            };
         }
-
 
         public void CreateGiaDinhNhanSu(int idNhanSu, CreateNsQuanHeGiaDinhDto dto)
         {
@@ -194,7 +206,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             if (dto.ThongTinNhanSu != null)
             {
                 var newNhanSu = CreateNhanSu(dto.ThongTinNhanSu);
-                
+
                 var chiTietHopDong = new NsHopDongChiTiet
                 {
                     IdHopDong = newHd.Id,
@@ -213,6 +225,23 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 _unitOfWork.iNsHopDongChiTietRepository.Add(chiTietHopDong);
                 _unitOfWork.iNsHopDongChiTietRepository.SaveChange();
             }
+        }
+
+        public NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(FindByMaNsSdt)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
+
+            var nhanSu = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x =>
+                string.IsNullOrEmpty(dto.Keyword)
+                || dto.Keyword == x.SoDienThoai
+                || dto.Keyword == x.MaNhanSu
+            );
+
+            var result = _mapper.Map<NsNhanSuResponseDto>(nhanSu);
+
+            return result;
         }
     }
 }

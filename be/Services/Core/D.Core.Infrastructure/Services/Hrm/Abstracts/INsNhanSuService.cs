@@ -19,5 +19,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         void CreateGiaDinhNhanSu(int idNhanSu, CreateNsQuanHeGiaDinhDto dto);
         NsNhanSuResponseDto CreateNhanSu(CreateNhanSuDto dto);
         void CreateHopDong(CreateHopDongDto dto);
+        NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto);
     }
 }
