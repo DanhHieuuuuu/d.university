@@ -64,8 +64,7 @@ namespace D.Auth.Infrastructure.Services.Implements
 
             var nsId = CommonUntil.GetCurrentUserId(_contextAccessor);
 
-            var role = _unitOfWork.iUserRoleRepository.TableNoTracking
-                        .Where(x => x.NhanSuId == nsId).Include(x => x.Role).ThenInclude(x => x.RolePermissions)
+            var role = _unitOfWork.iUserRoleRepository.GetDetailUserRole(nsId)
                         .SelectMany(x => x.Role.RolePermissions);
 
             var listRole = role.Select(x => x.PermissonKey).Distinct().ToList();

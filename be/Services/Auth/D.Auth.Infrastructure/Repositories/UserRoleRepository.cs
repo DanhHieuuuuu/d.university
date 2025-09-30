@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace D.Auth.Infrastructure.Repositories
 {
@@ -15,7 +16,21 @@ namespace D.Auth.Infrastructure.Repositories
         public UserRoleRepository(IDbContext dbContext, IHttpContextAccessor httpContext) : base(dbContext, httpContext)
         {
         }
+
+        public IQueryable<UserRole> GetDetailUserRole(int id)
+        {
+            return TableNoTracking.Where(x => x.NhanSuId == id).Include(x => x.Role).ThenInclude(x => x.RolePermissions);
+        }
+
+        public UserRole? FindByRoleIdAndNsId(int roleId, int nsId)
+        {
+            return TableNoTracking.FirstOrDefault(x => x.RoleId == roleId && x.NhanSuId == nsId);
+        }
     }
 
-    public interface IUserRoleRepository : IRepositoryBase<UserRole> { }
+    public interface IUserRoleRepository : IRepositoryBase<UserRole>
+    {
+        UserRole? FindByRoleIdAndNsId(int roleId, int nsId);
+        IQueryable<UserRole> GetDetailUserRole(int id);
+    }
 }

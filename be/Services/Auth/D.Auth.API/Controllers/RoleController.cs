@@ -21,7 +21,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter("admin")]
+        [PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpPost("create-role")]
         public async Task<ResponseAPI> Login(CreateRoleRequestDto dto)
         {

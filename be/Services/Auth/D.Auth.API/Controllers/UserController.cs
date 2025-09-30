@@ -1,6 +1,7 @@
 ﻿using d.Shared.Permission;
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
+using D.Auth.Domain.Dtos.User.Password;
 using D.ControllerBases;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +23,42 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter("admin")]
+        [PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpPost("create-user")]
         public async Task<ResponseAPI> Login(CreateUserRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Thay đổi mật khẩu
+        /// </summary>
+        /// <param name="dto">request</param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpPost("change-password")]
+        public async Task<ResponseAPI> ChangePassword(ChangePasswordRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<ResponseAPI> ResetPassword(ResetPasswordRequestDto dto)
         {
             try
             {

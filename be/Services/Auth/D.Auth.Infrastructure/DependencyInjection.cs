@@ -20,7 +20,6 @@ namespace D.Auth.Infrastructure
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
                 .AddScoped<IRoleService, RoleService>()
                 .AddScoped<IUserService, UserService>()
-                .AddScoped<IPasswordService, PasswordService>()
                 ;
         }
 

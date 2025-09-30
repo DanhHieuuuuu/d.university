@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
+using d.Shared.Permission.Error;
 using D.Auth.Domain.Dtos;
 using D.Auth.Domain.Dtos.Login;
 using D.Auth.Domain.Dtos.UserRole;
@@ -31,22 +32,19 @@ namespace D.Auth.Infrastructure.Services.Implements
         private readonly ServiceUnitOfWork _unitOfWork;
         private IConfiguration _configuration;
         private readonly IDatabase _database;
-        private readonly IPasswordService _passwordService;
         public NsNhanSuService(
             ILogger<NsNhanSuService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
             IConfiguration configuration,
-            IDatabase database,
-            IPasswordService passwordService
+            IDatabase database
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
             _database = database;
-            _passwordService = passwordService;
         }
 
         public PageResultDto<NsNhanSuResponseDto> FindPagingNsNhanSu(NsNhanSuRequestDto dto)
@@ -71,22 +69,20 @@ namespace D.Auth.Infrastructure.Services.Implements
         {
             _logger.LogInformation($"{nameof(Login)} method called. Dto: {JsonSerializer.Serialize(loginRequest)}");
 
-            var ns = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x =>
-                x.MaNhanSu == loginRequest.MaNhanSu
-            );
+            var ns = _unitOfWork.iNsNhanSuRepository.FindByMaNhanSu(loginRequest.MaNhanSu);
 
             if (ns == null)
             {
-                throw new UserFriendlyException(404, "Không đúng mật khẩu hoặc tài khoản.");
+                throw new UserFriendlyException(ErrorCodeConstant.PasswordOrCodeWrong, "Không đúng mật khẩu hoặc tài khoản.");
             }
 
             if (string.IsNullOrEmpty(ns.Password) || string.IsNullOrEmpty(ns.PasswordKey))
             {
                 throw new UserFriendlyException(500, "Tài khoản chưa được thiết lập mật khẩu.");
             }
-            if (!_passwordService.VerifyPassword(loginRequest.Password, ns.Password, ns.PasswordKey))
+            if (!PasswordHelper.VerifyPassword(loginRequest.Password, ns.Password, ns.PasswordKey))
             {
-                throw new UserFriendlyException(401, "Mật khẩu không đúng.");
+                throw new UserFriendlyException(ErrorCodeConstant.PasswordWrong, "Mật khẩu không đúng.");
             }
 
             LoginResponseDto result = new LoginResponseDto();
@@ -102,26 +98,6 @@ namespace D.Auth.Infrastructure.Services.Implements
             result.ExpiredRefreshToken = date.AddDays(7);
             await SaveRefreshTokenAsync(result.Token, result.RefreshToken, TimeSpan.FromDays(7));
 
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
-            string body = await System.IO.File.ReadAllTextAsync(filePath);
-
-            //body = body.Replace("{{userName}}", "Nguyễn Danh Hiếu")
-            //           .Replace("{{newPassword}}", "123456")
-            //           .Replace("{{year}}", DateTime.Now.Year.ToString());
-
-            //SendEmailDto dto = new SendEmailDto()
-            //{
-            //    EmailFrom = _configuration["Email_Configuration:Email"],
-            //    Password = _configuration["Email_Configuration:Password"],
-            //    Host = _configuration["Email_Configuration:Host"],
-            //    Post = int.Parse(_configuration["Email_Configuration:Port"]),
-            //    Title = "Mật khẩu mới",
-            //    EmailTo = "hieunguyendanh91@gmail.com",
-            //    Body = body
-            //};
-
-            //await SendNotification.SendEmail(dto);
-
             return result;
         }
 
@@ -131,13 +107,11 @@ namespace D.Auth.Infrastructure.Services.Implements
         {
             _logger.LogInformation($"{nameof(AddUserRole)} method called. Dto: {JsonSerializer.Serialize(createUserRole)}");
 
-            var checkAny = _unitOfWork.iUserRoleRepository.TableNoTracking.FirstOrDefault(x =>
-                x.RoleId == createUserRole.RoleId && x.NhanSuId == createUserRole.NhanSuId
-            );
+            var checkAny = _unitOfWork.iUserRoleRepository.FindByRoleIdAndNsId(createUserRole.RoleId, createUserRole.NhanSuId);
 
             if (checkAny != null)
             {
-                throw new UserFriendlyException(1005, "Người dùng đã tồn tại quyền này");
+                throw new UserFriendlyException(ErrorCodeConstant.UserExists, "Người dùng đã tồn tại quyền này");
             }
             _unitOfWork.iUserRoleRepository.Add(
                 new UserRole()
@@ -160,13 +134,13 @@ namespace D.Auth.Infrastructure.Services.Implements
 
             if (claim == null)
             {
-                throw new UserFriendlyException(401, "Token không hợp lệ.")
+                throw new UserFriendlyException(ErrorCode.Unauthorized, "Token không hợp lệ.")
 ;           }
 
             var checkRefresh = await ValidateRefreshTokenAsync(refreshToken.Token, refreshToken.RefreshToken);
 
             if (!checkRefresh)
-                throw new UserFriendlyException(400, "Refresh token không đúng hoặc đã hết hạn.");
+                throw new UserFriendlyException(ErrorCodeConstant.RefreshTokenNotFound, "Refresh token không đúng hoặc đã hết hạn.");
             var ns = _unitOfWork.iNsNhanSuRepository.FindById(int.Parse(claim.Value));
 
             DateTime date = DateTime.Now;

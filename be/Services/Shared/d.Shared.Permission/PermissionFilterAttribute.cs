@@ -1,6 +1,4 @@
-﻿using D.Auth.Infrastructure.Services.Abstracts;
-using D.Auth.Infrastructure.Services.Implements;
-using D.ControllerBases;
+﻿using D.ControllerBases;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

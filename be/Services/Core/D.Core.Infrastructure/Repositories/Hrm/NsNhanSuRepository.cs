@@ -12,7 +12,7 @@ namespace D.Core.Infrastructure.Repositories.Hrm
 
         public bool IsMaNhanSuExist(string maNhanSu)
         {
-            return _dbContext.Set<NsNhanSu>().Any(x => x.MaNhanSu == maNhanSu);
+            return TableNoTracking.Any(x => x.MaNhanSu == maNhanSu);
         }
     }
 
