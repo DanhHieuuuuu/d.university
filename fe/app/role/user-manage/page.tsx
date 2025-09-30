@@ -1,9 +1,9 @@
 'use client';
 
 import { ChangeEvent, useState, useEffect } from 'react';
-import { Breadcrumb, Button, Card, Form, Input, Tag } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
-
+import { Breadcrumb, Button, Card, Form, Input, Tag, Dropdown, Menu, Space } from 'antd';
+import { PlusOutlined, SearchOutlined, SyncOutlined, MoreOutlined } from '@ant-design/icons';
+import EditUserModal from './(dialog)/edit';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getAllUser } from '@redux/feature/userSlice';
@@ -24,17 +24,20 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<IUserView | null>(null);
 
   const columns: IColumn<IUserView>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
       title: 'ID',
+      showOnConfig: false
     },
     {
       key: 'maNhanSu',
       dataIndex: 'maNhanSu',
-      title: 'Mã nhân sự',
+      title: 'Mã nhân sự'
     },
     {
       key: 'hoTen',
@@ -99,6 +102,43 @@ const Page = () => {
             color = 'default';
         }
         return <Tag color={color}>{value || 'Chưa có'}</Tag>;
+      }
+    },
+    {
+      key: 'action',
+      title: '',
+      width: 100,
+      render: (_, record) => {
+        const menu = (
+          <Menu
+            items={[
+              {
+                key: 'edit',
+                label: 'Chỉnh sửa',
+                onClick: () => {
+                  setSelectedUser(record);
+                  setIsEditModalOpen(true);
+                }
+              },
+              {
+                key: 'toggleActive',
+                label: record.trangThai === 'Đang hoạt động' ? 'Vô hiệu hóa' : 'Kích hoạt',
+                onClick: () => {}
+              },
+              {
+                key: 'delete',
+                label: 'Xóa',
+                onClick: () => {}
+              }
+            ]}
+          />
+        );
+
+        return (
+          <Dropdown overlay={menu} trigger={['click']}>
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
+        );
       }
     }
   ];
@@ -174,12 +214,8 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <CreateNhanSuModal
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        isUpdate={isUpdate}
-        isView={isView}
-      />
+      <CreateNhanSuModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <EditUserModal isModalOpen={isEditModalOpen} setIsModalOpen={setIsEditModalOpen} user={selectedUser} />
     </Card>
   );
 };

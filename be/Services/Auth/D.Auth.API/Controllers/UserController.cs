@@ -25,7 +25,27 @@ namespace D.Auth.API.Controllers
         /// <returns></returns>
         [PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpPost("create-user")]
-        public async Task<ResponseAPI> Login(CreateUserRequestDto dto)
+        public async Task<ResponseAPI> CreateUser(CreateUserRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Thay đổi người dùng
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpPut("update-user")]
+        public async Task<ResponseAPI> UpdateUser(UpdateUserRequestDto dto)
         {
             try
             {

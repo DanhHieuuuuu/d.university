@@ -40,31 +40,92 @@ namespace D.Auth.Infrastructure.Services.Implements
             _logger.LogInformation($"{nameof(CreateUser)} method called. Dto: {request}");
 
             var existed = _unitOfWork.iNsNhanSuRepository.FindByMaNhanSu(request.MaNhanSu);
-            if (existed != null)
-            {
-                throw new UserFriendlyException(ErrorCodeConstant.CodeExits, "Mã nhân sự đã tồn tại.");
-            }
+            if (existed == null)
+                throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "Nhân sự không tồn tại trong hệ thống.");
 
-            var entity = _mapper.Map<NsNhanSu>(request);
+            if (!string.IsNullOrEmpty(existed.Password))
+                throw new UserFriendlyException(ErrorCodeConstant.CodeExits, "Tài khoản đã được tạo trước đó.");
 
-            // Mật khẩu mặc định = ngày sinh (ddMMyyyy)
-            var rawPassword = request.NgaySinh.ToString("ddMMyyyy");
+
+            string rawPassword = string.IsNullOrWhiteSpace(request.Password)
+            ? PasswordHelper.GenerateRandomPassword()
+            : request.Password;
             var (hash, salt) = PasswordHelper.HashPassword(rawPassword);
-            entity.Password = hash;
-            entity.PasswordKey = salt;
+            existed.Password = hash;
+            existed.PasswordKey = salt;
+
+            _unitOfWork.iNsNhanSuRepository.Update(existed);
+            await _unitOfWork.iNsNhanSuRepository.SaveChangeAsync();
 
 
-            _unitOfWork.iNsNhanSuRepository.Add(entity);
-            await _unitOfWork.iUserRepository.SaveChangeAsync();
+            // Gửi email thông báo mật khẩu
+            if (!string.IsNullOrWhiteSpace(existed.Email))
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+                        string body = await System.IO.File.ReadAllTextAsync(filePath);
+
+                        body = body.Replace("{{userName}}", $"{existed.HoDem} {existed.Ten}")
+                                   .Replace("{{newPassword}}", rawPassword)
+                                   .Replace("{{year}}", DateTime.Now.Year.ToString());
+
+                        var dto = new SendEmailDto
+                        {
+                            EmailFrom = _configuration["Email_Configuration:Email"],
+                            Password = _configuration["Email_Configuration:Password"],
+                            Host = _configuration["Email_Configuration:Host"],
+                            Post = int.Parse(_configuration["Email_Configuration:Port"]),
+                            Title = "Thông tin tài khoản",
+                            EmailTo = existed.Email,
+                            Body = body
+                        };
+
+                        await SendNotification.SendEmail(dto);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Gửi email mật khẩu tạm thất bại cho MaNhanSu={MaNhanSu}", existed.MaNhanSu);
+                    }
+                });
+            }
 
             return new CreateUserResponseDto
             {
-                Id = entity.Id,
-                MaNhanSu = entity.MaNhanSu,
-                FullName = $"{entity.HoDem} {entity.Ten}",
-                Email = entity.Email
+                Id = existed.Id,
+                MaNhanSu = existed.MaNhanSu,
+                FullName = $"{existed.HoDem} {existed.Ten}",
+                Email = existed.Email
             };
         }
+
+
+        public async Task<bool> UpdateUser(UpdateUserRequestDto request)
+        {
+            _logger.LogInformation($"{nameof(UpdateUser)} method called. Dto: {request}");
+
+            var existed = _unitOfWork.iNsNhanSuRepository.FindById(request.Id);
+            if (existed == null)
+                throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "Người dùng không tồn tại.");
+
+            if (!string.IsNullOrEmpty(request.NewPassword))
+            {
+                var (hash, salt) = PasswordHelper.HashPassword(request.NewPassword);
+                existed.Password = hash;
+                existed.PasswordKey = salt;
+            }
+            if (!string.IsNullOrEmpty(request.Email))
+                existed.Email = request.Email;
+
+            _unitOfWork.iNsNhanSuRepository.Update(existed);
+
+            await _unitOfWork.iUserRepository.SaveChangeAsync();
+
+            return true;
+        }
+
 
         public bool ChangePassword(ChangePasswordRequestDto request)
         {
