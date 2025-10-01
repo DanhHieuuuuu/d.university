@@ -2,11 +2,13 @@
 
 import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
-import { Button, Form, FormProps, Modal } from 'antd';
+import { Button, Form, FormProps, Modal, Tabs } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 
-import { useAppSelector } from '@redux/hooks';
-import { ICreateNhanSu } from '@models/nhansu/nhansu.model';
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { clearSelected, getDetailNhanSu } from '@redux/feature/nhansuSlice';
+import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab)';
 
 type NhanSuModalProps = {
   isModalOpen: boolean;
@@ -16,9 +18,11 @@ type NhanSuModalProps = {
 };
 
 const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
-  const [form] = Form.useForm<ICreateNhanSu>();
-  const [title, setTitle] = useState<string>('');
+  const dispatch = useAppDispatch();
   const { selected } = useAppSelector((state) => state.nhanSuState);
+  
+  const [form] = Form.useForm<ICreateHopDongNs>();
+  const [title, setTitle] = useState<string>('');
 
   useEffect(() => {
     if (props.isModalOpen) {
@@ -36,14 +40,48 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
         setTitle('Thêm mới');
       }
     }
-    return () => form.resetFields();
   }, [props.isModalOpen]);
 
+
+  const tabItems = [
+    {
+      key: 'personal',
+      label: 'Thông tin cá nhân',
+      children: <PersonalTab />,
+    },
+    {
+      key: 'family',
+      label: 'Thông tin gia đình',
+      children: <FamilyTab />,
+    },
+    {
+      key: 'job',
+      label: 'Thông tin vị trí làm việc',
+      children: <JobTab />,
+    },
+    {
+      key: 'salary',
+      label: 'Mức lương',
+      children: <SalaryTab />,
+    },
+  ];
+
   const initData = () => {
-    form.setFieldsValue({ ...selected });
+    dispatch(getDetailNhanSu(selected.maNhanSu));
+    form.setFieldsValue(selected.data);
   };
 
-  const onFinish: FormProps<ICreateNhanSu>['onFinish'] = (values) => {
+  const onCloseModal = () => {
+    props.setIsModalOpen(false)
+    dispatch(clearSelected());
+    form.resetFields();
+  }
+
+  const onOkModal = () => {
+    props.setIsModalOpen(true);
+  }
+
+  const onFinish: FormProps<ICreateHopDongNs>['onFinish'] = (values) => {
     // if (props.isUpdate) {
     //   JobPositionService.update(props.selectedId || '', {
     //     id: props.selectedId,
@@ -62,12 +100,14 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
     //     props.setIsModalOpen(false);
     //   });
     // }
-    if (props.isUpdate) {
+    if (props.isUpdate) {      
       toast.success('Cập nhật thành công');
-      props.setIsModalOpen(false);
+      console.log('All form data:', values);
+      onCloseModal();
     } else {
       toast.success('Thêm mới thành công');
-      props.setIsModalOpen(false);
+      console.log('All form data:', values);
+      onCloseModal();
     }
   };
 
@@ -75,11 +115,11 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
     <Modal
       title={title}
       className="app-modal"
-      width="60%"
+      width="80%"
       closable={{ 'aria-label': 'Custom Close Button' }}
       open={props.isModalOpen}
-      onOk={() => props.setIsModalOpen(true)}
-      onCancel={() => props.setIsModalOpen(false)}
+      onOk={onOkModal}
+      onCancel={onCloseModal}
       footer={() => (
         <>
           {!props.isView && (
@@ -87,14 +127,14 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
               {props.isUpdate ? 'Lưu' : 'Tạo mới'}
             </Button>
           )}
-          <Button color="default" variant="filled" onClick={() => props.setIsModalOpen(false)} icon={<CloseOutlined />}>
+          <Button color="default" variant="filled" onClick={onCloseModal} icon={<CloseOutlined />}>
             Đóng
           </Button>
         </>
       )}
     >
       <Form
-        name="documentType"
+        name="hopDongNhanSu"
         layout="vertical"
         form={form}
         onFinish={onFinish}
@@ -102,7 +142,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
         disabled={props.isView}
         labelCol={{ style: { fontWeight: 600 } }}
       >
-        xxxxx
+        <Tabs type='card' items={tabItems} />
       </Form>
     </Modal>
   );

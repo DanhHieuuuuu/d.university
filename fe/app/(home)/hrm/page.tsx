@@ -1,20 +1,20 @@
 'use client';
 
-import { ChangeEvent, useEffect, useState } from 'react';
-import { Breadcrumb, Button, Card, Form, Input, TableProps } from 'antd';
+import { ChangeEvent, useState } from 'react';
+import { Button, Card, Form, Input } from 'antd';
 import { PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getListNhanSu } from '@redux/feature/nhansuSlice';
-
+import { getListNhanSu, selectMaNhanSu } from '@redux/feature/nhansuSlice';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
+
 import AppTable from '@components/common/Table';
 import { IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
-import { toast } from 'react-toastify';
-import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
+import { usePaginationWithFilter } from '@hooks/usePagination';
+
 import CreateNhanSuModal from './(dialog)/create';
 
 const Page = () => {
@@ -87,6 +87,20 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
+  const onClickView = (data: IViewNhanSu) => {
+    dispatch(selectMaNhanSu(data.maNhanSu!));
+    setIsModalView(true);
+    setIsModalUpdate(false);
+    setIsModalOpen(true);
+  };
+
+  const onClickUpdate = (data: IViewNhanSu) => {
+    dispatch(selectMaNhanSu(data.maNhanSu!));
+    setIsModalView(false);
+    setIsModalUpdate(true);
+    setIsModalOpen(true);
+  };
+
   return (
     <Card
       title="Danh sách nhân sự"
@@ -122,7 +136,7 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
-      
+
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="maNhanSu"
