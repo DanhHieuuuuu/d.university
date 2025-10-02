@@ -56,7 +56,11 @@ namespace D.Auth.API.Controllers
                 return BadRequest(ex);
             }
         }
-
+        /// <summary>
+        /// Lấy lại mật khẩu
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost("reset-password")]
         public async Task<ResponseAPI> ResetPassword(ResetPasswordRequestDto dto)
         {
