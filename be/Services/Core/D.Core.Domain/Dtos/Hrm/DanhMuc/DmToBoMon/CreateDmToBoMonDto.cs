@@ -1,6 +1,8 @@
-﻿namespace D.Core.Domain.Dtos.Hrm.DanhMuc
+﻿using D.DomainBase.Common;
+
+namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon
 {
-    public class CreateDmToBoMonDto
+    public class CreateDmToBoMonDto : ICommand
     {
         public string? MaBoMon { get; set; }
         public string? TenBoMon { get; set; }

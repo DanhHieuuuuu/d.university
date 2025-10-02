@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using D.DomainBase.Common;
+using Microsoft.EntityFrameworkCore;
 
-namespace D.Core.Domain.Dtos.Hrm.DanhMuc
+namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu
 {
-    public class CreateDmChucVuDto
+    public class CreateDmChucVuDto : ICommand
     {
         public string? MaChucVu { get; set; }
         public string? TenChucVu { get; set; }

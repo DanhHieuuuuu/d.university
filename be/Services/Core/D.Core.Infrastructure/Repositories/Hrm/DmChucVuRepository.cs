@@ -9,7 +9,14 @@ namespace D.Core.Infrastructure.Repositories.Hrm
     {
         public DmChucVuRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
             : base(dbContext, httpContext) { }
+
+        public bool IsMaChucVuExist(string maChucVu)
+        {
+            return TableNoTracking.Any(x => x.MaChucVu == maChucVu);
+        }
     }
 
-    public interface IDmChucVuRepository : IRepositoryBase<DmChucVu> { }
+    public interface IDmChucVuRepository : IRepositoryBase<DmChucVu> {
+        bool IsMaChucVuExist(string maChucVu);
+    }
 }

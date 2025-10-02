@@ -10,12 +10,22 @@ namespace D.Core.Infrastructure
         private IDbContext _dbContext;
         private IHttpContextAccessor _httpContext;
 
+        private DmChucVuRepository _dmChucVuRepository;
+        private DmDanTocRepository _dmDanTocRepository;
+        private DmGioiTinhRepository _dmGioiTinhRepository;
+        private DmLoaiHopDongRepository _dmLoaiHopDongRepository;
+        private DmLoaiPhongBanRepository _dmLoaiPhongBanRepository;
+        private DmPhongBanRepository _dmPhongBanRepository;
+        private DmQuanHeGiaDinhRepository _dmQuanHeGiaDinhRepository;
+        private DmQuocTichRepository _dmQuocTichRepository;
+        private DmToBoMonRepository _dmToBoMonRepository;
+        private DmTonGiaoRepository _dmTonGiaoRepository;
+
         private NsNhanSuRepository _nsNhanSuRepository;
         private NsQuanHeGiaDinhRepository _nsQuanHeGiaDinhRepository;
         private NsHopDongRepository _nsHopDongRepository;
         private NsHopDongChiTietRepository _nsHopDongChiTietRepository;
-        private DmChucVuRepository _dmChucVuRepository;
-        private DmPhongBanRepository _dmPhongBanRepository;
+
         private SvSinhVienRepository _svSinhVienRepository;
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -42,7 +52,10 @@ namespace D.Core.Infrastructure
             {
                 if (_nsQuanHeGiaDinhRepository == null)
                 {
-                    _nsQuanHeGiaDinhRepository = new NsQuanHeGiaDinhRepository(_dbContext, _httpContext);
+                    _nsQuanHeGiaDinhRepository = new NsQuanHeGiaDinhRepository(
+                        _dbContext,
+                        _httpContext
+                    );
                 }
                 return _nsQuanHeGiaDinhRepository;
             }
@@ -66,7 +79,10 @@ namespace D.Core.Infrastructure
             {
                 if (_nsHopDongChiTietRepository == null)
                 {
-                    _nsHopDongChiTietRepository = new NsHopDongChiTietRepository(_dbContext, _httpContext);
+                    _nsHopDongChiTietRepository = new NsHopDongChiTietRepository(
+                        _dbContext,
+                        _httpContext
+                    );
                 }
                 return _nsHopDongChiTietRepository;
             }
@@ -83,7 +99,7 @@ namespace D.Core.Infrastructure
                 return _dmChucVuRepository;
             }
         }
-        
+
         public ISvSinhVienRepository iSvSinhVienRepository
         {
             get
@@ -108,5 +124,107 @@ namespace D.Core.Infrastructure
             }
         }
 
+        public IDmLoaiPhongBanRepository iDmLoaiPhongBanRepository
+        {
+            get
+            {
+                if (_dmLoaiPhongBanRepository == null)
+                {
+                    _dmLoaiPhongBanRepository = new DmLoaiPhongBanRepository(
+                        _dbContext,
+                        _httpContext
+                    );
+                }
+                return _dmLoaiPhongBanRepository;
+            }
+        }
+
+        public IDmDanTocRepository iDmDanTocRepository
+        {
+            get
+            {
+                if (_dmDanTocRepository == null)
+                {
+                    _dmDanTocRepository = new DmDanTocRepository(_dbContext, _httpContext);
+                }
+                return _dmDanTocRepository;
+            }
+        }
+
+        public IDmGioiTinhRepository iDmGioiTinhRepository
+        {
+            get
+            {
+                if (_dmGioiTinhRepository == null)
+                {
+                    _dmGioiTinhRepository = new DmGioiTinhRepository(_dbContext, _httpContext);
+                }
+                return _dmGioiTinhRepository;
+            }
+        }
+
+        public IDmLoaiHopDongRepository iDmLoaiHopDongRepository
+        {
+            get
+            {
+                if (_dmLoaiHopDongRepository == null)
+                {
+                    _dmLoaiHopDongRepository = new DmLoaiHopDongRepository(
+                        _dbContext,
+                        _httpContext
+                    );
+                }
+                return _dmLoaiHopDongRepository;
+            }
+        }
+
+        public IDmQuanHeGiaDinhRepository iDmQuanHeGiaDinhRepository
+        {
+            get
+            {
+                if (_dmQuanHeGiaDinhRepository == null)
+                {
+                    _dmQuanHeGiaDinhRepository = new DmQuanHeGiaDinhRepository(
+                        _dbContext,
+                        _httpContext
+                    );
+                }
+                return _dmQuanHeGiaDinhRepository;
+            }
+        }
+
+        public IDmQuocTichRepository iDmQuocTichRepository
+        {
+            get
+            {
+                if (_dmQuocTichRepository == null)
+                {
+                    _dmQuocTichRepository = new DmQuocTichRepository(_dbContext, _httpContext);
+                }
+                return _dmQuocTichRepository;
+            }
+        }
+        public IDmTonGiaoRepository iDmTonGiaoRepository
+        {
+            get
+            {
+                if (_dmTonGiaoRepository == null)
+                {
+                    _dmTonGiaoRepository = new DmTonGiaoRepository(_dbContext, _httpContext);
+                }
+                return _dmTonGiaoRepository;
+            }
+        }
+        public IDmToBoMonRepository iDmToBoMonRepository
+        {
+            get
+            {
+                if (_dmToBoMonRepository == null)
+                {
+                    _dmToBoMonRepository = new DmToBoMonRepository(_dbContext, _httpContext);
+                }
+                return _dmToBoMonRepository;
+            }
+        }
     }
 }
