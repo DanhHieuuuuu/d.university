@@ -50,7 +50,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
 
   return (
     <>
-      <Table<T> bordered size="middle" columns={newColumns} scroll={{ x: 'max-content', y: 250 }} {...rest} />
+      <Table<T> bordered size="middle" columns={newColumns} scroll={{ x: 'max-content' }} {...rest} />
       <Modal width={250} title="Cấu hình hiển thị" open={open} onCancel={closePopup} footer={null}>
         <Checkbox.Group
           style={{ flexDirection: 'column' }}

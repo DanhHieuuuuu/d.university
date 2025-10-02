@@ -95,5 +95,25 @@ namespace D.Core.API.Controllers.Hrm
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Lấy thông tin nhân sự bằng số điện thoại, mã nhân sự
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        //[PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpGet("get")]
+        public async Task<ResponseAPI> FindByMaNsSdt(FindByMaNsSdtDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
