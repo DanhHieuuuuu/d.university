@@ -1,5 +1,5 @@
-﻿using D.ControllerBases.Exceptions;
-using D.ControllerBases.Shared;
+﻿using D.ControllerBase.Exceptions;
+using D.ControllerBase.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace D.ControllerBases
+namespace D.ControllerBase
 {
-    public class APIControllerBase : ControllerBase
+    public class APIControllerBase : Microsoft.AspNetCore.Mvc.ControllerBase
     {
         private readonly IMediator _mediator;
         public APIControllerBase(IMediator mediator)
@@ -118,7 +118,7 @@ namespace D.ControllerBases
                     message = invalidOperationException.Message;
                 }
             }
-            return new ResponseAPI(ControllerBases.StatusCode.Error, data, errorCode, message);
+            return new ResponseAPI(ControllerBase.StatusCode.Error, data, errorCode, message);
 
         }
     }

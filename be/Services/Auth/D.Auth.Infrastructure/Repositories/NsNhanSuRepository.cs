@@ -1,6 +1,6 @@
 ﻿using d.Shared.Permission.Error;
 using D.Auth.Domain.Entities;
-using D.ControllerBases.Exceptions;
+using D.ControllerBase.Exceptions;
 using D.InfrastructureBase.Database;
 using D.InfrastructureBase.Repository;
 using Microsoft.AspNetCore.Http;

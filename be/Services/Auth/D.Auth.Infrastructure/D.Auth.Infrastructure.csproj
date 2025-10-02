@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Library\D.ControllerBase\D.ControllerBases.csproj" />
+    <ProjectReference Include="..\..\..\Library\D.ControllerBase\D.ControllerBase.csproj" />
     <ProjectReference Include="..\..\..\Library\D.InfrastructureBase\D.InfrastructureBase.csproj" />
     <ProjectReference Include="..\..\Shared\d.Shared.Permission\d.Shared.Permission.csproj" />
     <ProjectReference Include="..\D.Auth.Domain\D.Auth.Domain.csproj" />

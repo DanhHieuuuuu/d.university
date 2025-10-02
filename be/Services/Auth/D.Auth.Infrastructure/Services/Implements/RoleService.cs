@@ -3,7 +3,7 @@ using Azure.Core;
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
-using D.ControllerBases.Exceptions;
+using D.ControllerBase.Exceptions;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Authorization;

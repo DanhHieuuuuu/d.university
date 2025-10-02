@@ -1,5 +1,5 @@
 ﻿
-using D.ControllerBases;
+using D.ControllerBase;
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
@@ -41,6 +41,7 @@ namespace D.Core.API
                 });
             }
             app.UseCors(ProgramBase.CorsPolicy);
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
             app.Run();

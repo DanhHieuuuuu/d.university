@@ -2,7 +2,7 @@
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
-using D.ControllerBases;
+using D.ControllerBase;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
