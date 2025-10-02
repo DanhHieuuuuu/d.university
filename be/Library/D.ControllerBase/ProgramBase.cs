@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.ControllerBases
+namespace D.ControllerBase
 {
     /// <summary>
     /// Cấu hình program

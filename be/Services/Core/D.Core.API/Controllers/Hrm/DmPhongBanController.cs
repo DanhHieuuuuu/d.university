@@ -1,4 +1,4 @@
-﻿using D.ControllerBases;
+﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

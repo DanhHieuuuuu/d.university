@@ -14,7 +14,7 @@ using D.Auth.Domain.Dtos.Login;
 using D.Auth.Domain.Dtos.UserRole;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
-using D.ControllerBases.Exceptions;
+using D.ControllerBase.Exceptions;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;

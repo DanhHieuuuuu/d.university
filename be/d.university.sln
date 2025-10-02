@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.DomainBase", "Library\D.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.InfrastructureBase", "Library\D.InfrastructureBase\D.InfrastructureBase.csproj", "{30CDCFAF-EE48-4A30-956A-D76C04D90E99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.ControllerBases", "Library\D.ControllerBase\D.ControllerBases.csproj", "{F5B82E2B-1873-40F9-8E20-42475460D01A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.ControllerBase", "Library\D.ControllerBase\D.ControllerBase.csproj", "{F5B82E2B-1873-40F9-8E20-42475460D01A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.Auth.API", "Services\Auth\D.Auth.API\D.Auth.API.csproj", "{9E916473-95E9-4C26-94E7-E368558911D8}"
 EndProject

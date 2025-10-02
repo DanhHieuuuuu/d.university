@@ -5,7 +5,7 @@ using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
-using D.ControllerBases.Exceptions;
+using D.ControllerBase.Exceptions;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
