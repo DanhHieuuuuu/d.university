@@ -5,6 +5,7 @@ export type IQueryNhanSu = IQueryPaging & {
 }
 
 export type IViewNhanSu = {
+  idNhanSu: number;
   maNhanSu?: string;
   hoDem?: string;
   ten?: string;

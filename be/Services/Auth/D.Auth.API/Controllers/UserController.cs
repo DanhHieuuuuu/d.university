@@ -2,7 +2,7 @@
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
-using D.ControllerBases;
+using D.ControllerBase;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -76,7 +76,11 @@ namespace D.Auth.API.Controllers
                 return BadRequest(ex);
             }
         }
-
+        /// <summary>
+        /// Lấy lại mật khẩu
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPost("reset-password")]
         public async Task<ResponseAPI> ResetPassword(ResetPasswordRequestDto dto)
         {

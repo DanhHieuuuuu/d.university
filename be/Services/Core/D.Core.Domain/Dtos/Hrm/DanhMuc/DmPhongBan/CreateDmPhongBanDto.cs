@@ -1,6 +1,8 @@
-﻿namespace D.Core.Domain.Dtos.Hrm.DanhMuc
+﻿using D.DomainBase.Common;
+
+namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan
 {
-    public class CreateDmPhongBanDto
+    public class CreateDmPhongBanDto : ICommand
     {
         public string? MaPhongBan { get; set; }
         public string? TenPhongBan { get; set; }

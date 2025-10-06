@@ -13,15 +13,33 @@ export const getListNhanSu = createAsyncThunk('nhansu/list', async (args: IQuery
   }
 });
 
+export const getDetailNhanSu = createAsyncThunk('nhansu/get', async (keyword: string) => {
+  try {
+    const res = await NhanSuService.find(keyword);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+
 interface NhanSuState {
   status: ReduxStatus;
-  selected: IViewNhanSu | null;
+  selected: {
+    status: ReduxStatus;
+    maNhanSu: string;
+    data: any | null;
+  };
   list: IViewNhanSu[];
   total: number;
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
-  selected: null,
+  selected: {
+    status: ReduxStatus.IDLE,
+    maNhanSu: '',
+    data: null
+  },
   list: [],
   total: 0
 };
@@ -29,9 +47,17 @@ const initialState: NhanSuState = {
 const nhanSuSlice = createSlice({
   name: 'nhansu',
   initialState,
+  selectors: {
+    nhanSuSelected: (state: NhanSuState) => {
+      return state.selected;
+    }
+  },
   reducers: {
-    selectNhanSu: (state, action: PayloadAction<IViewNhanSu>) => {
-      state.selected = action.payload;
+    selectMaNhanSu: (state, action: PayloadAction<string>) => {
+      state.selected.maNhanSu = action.payload;
+    },
+    clearSelected: (state) => {
+      state.selected = { maNhanSu: '', status: ReduxStatus.IDLE, data: null };
     }
   },
   extraReducers: (builder) => {
@@ -46,12 +72,22 @@ const nhanSuSlice = createSlice({
       })
       .addCase(getListNhanSu.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
+      })
+      .addCase(getDetailNhanSu.pending, (state) => {
+        state.selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getDetailNhanSu.fulfilled, (state, action: PayloadAction<any>) => {
+        state.selected.status = ReduxStatus.SUCCESS;
+        state.selected.data = action.payload;
+      })
+      .addCase(getDetailNhanSu.rejected, (state) => {
+        state.selected.status = ReduxStatus.FAILURE;
       });
   }
 });
 
 const nhanSuReducer = nhanSuSlice.reducer;
 
-export const { selectNhanSu } = nhanSuSlice.actions;
+export const { selectMaNhanSu, clearSelected } = nhanSuSlice.actions;
 
 export default nhanSuReducer;

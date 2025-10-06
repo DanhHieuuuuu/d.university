@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -13,16 +15,25 @@ namespace D.InfrastructureBase.Shared
     {
         public static int GetCurrentUserId(IHttpContextAccessor httpContextAccessor)
         {
-            var claims = httpContextAccessor.HttpContext?.User?.Identity as ClaimsIdentity;
-            //nếu trong program dùng JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            //thì các claim type sẽ không bị ghi đè tên nên phải dùng trực tiếp "sub"
-            var claim = claims?.FindFirst(CustomClaimType.UserId);
-            if (claim == null)
-            {
-                throw new Exception($"Token không chứa claim \"{CustomClaimType.UserId}\"");
-            }
+            //var claims = httpContextAccessor.HttpContext?.User?.Identity as ClaimsIdentity;
+            ////nếu trong program dùng JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            ////thì các claim type sẽ không bị ghi đè tên nên phải dùng trực tiếp "sub"
+            //var claim = claims?.FindFirst(CustomClaimType.UserId);
+            //if (claim == null)
+            //{
+            //    throw new Exception($"Token không chứa claim \"{CustomClaimType.UserId}\"");
+            //}
 
-            return int.Parse(claim.Value);
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(GetToken(httpContextAccessor));
+            var userIdClaim = jwt.Claims.FirstOrDefault(c => c.Type == CustomClaimType.UserId);
+            if (userIdClaim == null)
+                throw new Exception($"Token không chứa claim \"{CustomClaimType.UserId}\"");
+
+
+            return int.Parse(userIdClaim.Value);
+
+            //return int.Parse(claim.Value);
         }
         public static string GetToken(IHttpContextAccessor httpContextAccessor)
         {

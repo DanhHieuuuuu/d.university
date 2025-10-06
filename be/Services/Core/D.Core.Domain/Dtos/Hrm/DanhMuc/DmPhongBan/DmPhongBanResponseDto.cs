@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan
+﻿namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan
 {
     public class DmPhongBanResponseDto
     {
+        public int Id { get; set; }
         public string? MaPhongBan { get; set; }
         public string? TenPhongBan { get; set; }
-        public int? IdLoaiPhongBan { get; set; }
+        public string? LoaiPhongBan { get; set; }
         public string? DiaChi { get; set; }
         public string? Hotline { get; set; }
         public string? Fax { get; set; }

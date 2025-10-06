@@ -63,10 +63,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
             var totalCount = query.Count();
 
-            var items = query
-                .Skip(dto.SkipCount())
-                .Take(dto.PageSize)
-                .ToList();
+            var items = query.Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
 
             // Map dữ liệu trả về
             var result = items

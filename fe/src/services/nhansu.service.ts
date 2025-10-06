@@ -21,6 +21,20 @@ const findPaging = async (query: IQueryNhanSu) => {
   }
 };
 
+const find = async (keyword: string) => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/get`, {
+      params: {
+        keyword: keyword
+      }
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
 const createNhanSu = async (body: ICreateNhanSu) => {
   try {
     const res = await axios.post(`${apiNhanSuEndpoint}/create`, body);
@@ -41,4 +55,4 @@ const createHopDong = async (body: ICreateHopDongNs) => {
   }
 };
 
-export const NhanSuService = { findPaging, createNhanSu, createHopDong };
+export const NhanSuService = { findPaging, find, createNhanSu, createHopDong };

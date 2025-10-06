@@ -1,7 +1,7 @@
 using D.Auth.Application;
 using D.Auth.Domain;
 using D.Auth.Infrastructure;
-using D.ControllerBases;
+using D.ControllerBase;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System.Reflection;

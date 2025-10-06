@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.ControllerBases.Exceptions
+namespace D.ControllerBase.Exceptions
 {
     public class UserFriendlyException : BaseException
     {

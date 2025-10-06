@@ -18,19 +18,28 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
                 .AddScoped<IDmChucVuService, DmChucVuService>()
                 .AddScoped<IDmPhongBanService, DmPhongBanService>()
+                .AddScoped<IDmDanhMucService, DmDanhMucService>()
                 .AddScoped<ISvSinhVienService, SvSinhVienService>();
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             return services
-                .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
                 .AddScoped<IDmChucVuRepository, DmChucVuRepository>()
+                .AddScoped<IDmDanTocRepository, DmDanTocRepository>()
+                .AddScoped<IDmGioiTinhRepository, DmGioiTinhRepository>()
+                .AddScoped<IDmLoaiHopDongRepository, DmLoaiHopDongRepository>()
+                .AddScoped<IDmLoaiPhongBanRepository, DmLoaiPhongBanRepository>()
+                .AddScoped<IDmPhongBanRepository, DmPhongBanRepository>()
+                .AddScoped<IDmQuanHeGiaDinhRepository, DmQuanHeGiaDinhRepository>()
+                .AddScoped<IDmQuocTichRepository, DmQuocTichRepository>()
+                .AddScoped<IDmToBoMonRepository, DmToBoMonRepository>()
+                .AddScoped<IDmTonGiaoRepository, DmTonGiaoRepository>()
                 .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
                 .AddScoped<INsQuanHeGiaDinhRepository, NsQuanHeGiaDinhRepository>()
                 .AddScoped<INsHopDongRepository, NsHopDongRepository>()
                 .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>()
-                .AddScoped<IDmPhongBanRepository, DmPhongBanRepository>()
+                .AddScoped<INsToBoMonRepository, NsToBoMonRepository>()
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>();
         }
 

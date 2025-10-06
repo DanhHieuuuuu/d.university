@@ -1,13 +1,19 @@
-﻿using AutoMapper;
+﻿using System.Reflection;
+using AutoMapper;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
-using System.Reflection;
 
 namespace D.Core.Domain
 {
@@ -20,17 +26,34 @@ namespace D.Core.Domain
 
             #region hrm
 
+            CreateMap<DmChucVu, DmChucVuResponseDto>();
+            CreateMap<DmDanToc, DmDanTocResponseDto>();
+            CreateMap<DmGioiTinh, DmGioiTinhResponseDto>();
+            CreateMap<DmLoaiHopDong, DmLoaiHopDongResponseDto>();
+            CreateMap<DmLoaiPhongBan, DmLoaiPhongBanResponseDto>();
+            CreateMap<DmPhongBan, DmPhongBanResponseDto>();
+            CreateMap<DmQuanHeGiaDinh, DmQuanHeGiaDinhResponseDto>();
+            CreateMap<DmQuocTich, DmQuocTichResponseDto>();
+            CreateMap<DmToBoMon, DmToBoMonResponseDto>();
+            CreateMap<CreateDmPhongBanDto, DmPhongBan>();
+            CreateMap<CreateDmChucVuDto, DmChucVu>();
+            CreateMap<CreateDmToBoMonDto, DmToBoMon>();
+
+            CreateMap<CreateHopDongDto, NsHopDong>();
             CreateMap<NsNhanSu, NsNhanSuResponseDto>()
                 .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id))
                 .ForMember(
                     dest => dest.HoTen,
                     options =>
                         options.MapFrom(src =>
-                            string.Join(" ", new[] { src.HoDem, src.Ten }
-                            .Where(x => !string.IsNullOrWhiteSpace(x)))
+                            string.Join(
+                                " ",
+                                new[] { src.HoDem, src.Ten }.Where(x =>
+                                    !string.IsNullOrWhiteSpace(x)
+                                )
+                            )
                         )
                 );
-
 
             CreateMap<CreateNsQuanHeGiaDinhDto, NsQuanHeGiaDinh>();
             CreateMap<CreateNhanSuDto, NsNhanSu>()
@@ -40,9 +63,6 @@ namespace D.Core.Domain
                         TrimAllStringProperties(src);
                     }
                 );
-            CreateMap<CreateHopDongDto, NsHopDong>();
-            CreateMap<DmPhongBan, DmPhongBanResponseDto>();
-            CreateMap<DmChucVu, DmChucVuResponseDto>();
 
             #endregion
 

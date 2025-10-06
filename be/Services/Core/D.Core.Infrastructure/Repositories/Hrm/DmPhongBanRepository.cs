@@ -9,7 +9,15 @@ namespace D.Core.Infrastructure.Repositories.Hrm
     {
         public DmPhongBanRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
             : base(dbContext, httpContext) { }
+
+        public bool IsMaPhongBanExist(string maPhongBan)
+        {
+            return TableNoTracking.Any(x => x.MaPhongBan == maPhongBan);
+        }
     }
 
-    public interface IDmPhongBanRepository : IRepositoryBase<DmPhongBan> { }
+    public interface IDmPhongBanRepository : IRepositoryBase<DmPhongBan>
+    {
+        bool IsMaPhongBanExist(string maPhongBan);
+    }
 }
