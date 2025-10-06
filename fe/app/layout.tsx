@@ -57,6 +57,10 @@ export default function RootLayout({
                     Breadcrumb: {
                       linkColor: '#0045DC',
                       linkHoverColor: '#0045DC'
+                    },
+                    Table: {
+                      cellPaddingInlineSM: 16,
+                      headerBg: '#ebecf0'
                     }
                   }
                 }}

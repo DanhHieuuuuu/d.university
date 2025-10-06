@@ -1,22 +1,49 @@
 .ant-table {
   .ant-table-container {
-
     .ant-table-body,
     .ant-table-content {
       scrollbar-width: thin;
       scrollbar-color: #eaeaea transparent;
       scrollbar-gutter: stable;
-      
+
       &::-webkit-scrollbar {
         height: 6px;
         background: transparent;
       }
-  
+
       &::-webkit-scrollbar-thumb {
         background: #eaeaea;
         border-radius: 4px;
       }
-    }
 
+      // Dòng chẵn
+      .ant-table-row:nth-child(odd) {
+        background-color: #f1f4fe;
+
+        .ant-table-cell-fix-left,
+        .ant-table-cell-fix-right {
+          background-color: #f1f4fe;
+        }
+      }
+
+      // Dòng lẻ
+      .ant-table-row:nth-child(even) {
+        background-color: #ffffff;
+
+        .ant-table-cell-fix-left,
+        .ant-table-cell-fix-right {
+          background-color: #ffffff;
+        }
+      }
+
+      .ant-table-row:hover {
+        background-color: #fafafa;
+
+        .ant-table-cell-fix-left,
+        .ant-table-cell-fix-right {
+          background-color: #fafafa;
+        }
+      }
+    }
   }
 }

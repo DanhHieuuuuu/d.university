@@ -10,7 +10,7 @@ export const makeStore = () => {
       authState: authReducer,
       loadState: loadingReducer,
       nhanSuState: nhanSuReducer,
-      userState: userReducer,
+      userState: userReducer
     }
   });
 };

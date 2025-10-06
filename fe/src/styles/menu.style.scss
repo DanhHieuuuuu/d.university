@@ -11,13 +11,26 @@
 }
 
 .menu-core {
-  font-weight: 400;
-  overflow: auto;
-  height: 90vh;
-  position: sticky;
-  inset-inline-start: 0;
-  top: 0;
-  bottom: 0;
-  scrollbar-width: thin;
-  scrollbar-gutter: stable;
+  .menu-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0d47a1;
+    font-weight: 600;
+    font-size: 18px;
+    overflow: hidden;
+    transition: all 0.3s ease; // mượt hơn
+
+    .menu-icon {
+      font-size: 20px;
+    }
+
+    .menu-text {
+      margin-left: 4px;
+    }
+
+    &.collapsed {
+      display: none;
+    }
+  }
 }

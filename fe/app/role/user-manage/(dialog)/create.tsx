@@ -67,13 +67,7 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
         </Space>
       }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        disabled={isView}
-        autoComplete="off"
-      >
+      <Form form={form} layout="vertical" onFinish={onFinish} disabled={isView} autoComplete="off">
         <Form.Item
           label="Tài khoản xác thực"
           name="maNhanSu"
@@ -98,11 +92,7 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
           <Input placeholder="Nhập tên đăng nhập" />
         </Form.Item>
 
-        <Form.Item
-          label="Password"
-          name="Mật khẩu"
-          rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-        >
+        <Form.Item label="Password" name="Mật khẩu" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
           <Input.Password placeholder="Nhập mật khẩu" />
         </Form.Item>
 

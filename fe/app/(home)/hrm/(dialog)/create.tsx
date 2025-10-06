@@ -20,7 +20,7 @@ type NhanSuModalProps = {
 const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const { selected } = useAppSelector((state) => state.nhanSuState);
-  
+
   const [form] = Form.useForm<ICreateHopDongNs>();
   const [title, setTitle] = useState<string>('');
 
@@ -42,28 +42,27 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
     }
   }, [props.isModalOpen]);
 
-
   const tabItems = [
     {
       key: 'personal',
       label: 'Thông tin cá nhân',
-      children: <PersonalTab />,
+      children: <PersonalTab />
     },
     {
       key: 'family',
       label: 'Thông tin gia đình',
-      children: <FamilyTab />,
+      children: <FamilyTab />
     },
     {
       key: 'job',
       label: 'Thông tin vị trí làm việc',
-      children: <JobTab />,
+      children: <JobTab />
     },
     {
       key: 'salary',
       label: 'Mức lương',
-      children: <SalaryTab />,
-    },
+      children: <SalaryTab />
+    }
   ];
 
   const initData = () => {
@@ -72,14 +71,14 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   };
 
   const onCloseModal = () => {
-    props.setIsModalOpen(false)
+    props.setIsModalOpen(false);
     dispatch(clearSelected());
     form.resetFields();
-  }
+  };
 
   const onOkModal = () => {
     props.setIsModalOpen(true);
-  }
+  };
 
   const onFinish: FormProps<ICreateHopDongNs>['onFinish'] = (values) => {
     // if (props.isUpdate) {
@@ -100,7 +99,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
     //     props.setIsModalOpen(false);
     //   });
     // }
-    if (props.isUpdate) {      
+    if (props.isUpdate) {
       toast.success('Cập nhật thành công');
       console.log('All form data:', values);
       onCloseModal();
@@ -142,7 +141,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
         disabled={props.isView}
         labelCol={{ style: { fontWeight: 600 } }}
       >
-        <Tabs type='card' items={tabItems} />
+        <Tabs type="card" items={tabItems} />
       </Form>
     </Modal>
   );

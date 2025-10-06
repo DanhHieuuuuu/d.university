@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { Form, Input, InputNumber } from 'antd';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';

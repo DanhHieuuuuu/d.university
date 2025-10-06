@@ -29,12 +29,12 @@ const Page = () => {
     {
       key: 'Id',
       dataIndex: 'id',
-      title: 'ID',
+      title: 'ID'
     },
     {
       key: 'maNhanSu',
       dataIndex: 'maNhanSu',
-      title: 'Mã nhân sự',
+      title: 'Mã nhân sự'
     },
     {
       key: 'hoTen',
