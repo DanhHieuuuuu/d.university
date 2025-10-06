@@ -2,7 +2,14 @@
 
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  SyncOutlined
+} from '@ant-design/icons';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -10,7 +17,7 @@ import { getListNhanSu, selectMaNhanSu } from '@redux/feature/nhansuSlice';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
-import { IColumn } from '@models/common/table.model';
+import { IAction, IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -28,26 +35,22 @@ const Page = () => {
 
   const columns: IColumn<IViewNhanSu>[] = [
     {
-      key: 'maNhanSu',
-      dataIndex: 'maNhanSu',
-      title: 'Mã NS',
+      key: 'idNhanSu',
+      dataIndex: 'idNhanSu',
+      title: 'ID',
       align: 'center',
       showOnConfig: false
     },
     {
-      key: 'hoDem',
-      dataIndex: 'hoDem',
-      title: 'Họ đệm'
+      key: 'maNhanSu',
+      dataIndex: 'maNhanSu',
+      title: 'Mã NS',
+      align: 'center'
     },
     {
-      key: 'ten',
-      dataIndex: 'ten',
-      title: 'Tên'
-    },
-    {
-      key: 'soCccd',
-      dataIndex: 'soCccd',
-      title: 'Số CCCD'
+      key: 'hoTen',
+      dataIndex: 'hoTen',
+      title: 'Họ và tên'
     },
     {
       key: 'ngaySinh',
@@ -57,6 +60,51 @@ const Page = () => {
         const date = formatDateView(value);
         return <p>{date}</p>;
       }
+    },
+    {
+      key: 'noiSinh',
+      dataIndex: 'noiSinh',
+      title: 'Nơi sinh'
+    },
+    {
+      key: 'soDienThoai',
+      dataIndex: 'soDienThoai',
+      title: 'Số điện thoại'
+    },
+    {
+      key: 'email',
+      dataIndex: 'email',
+      title: 'Email'
+    },
+    {
+      key: 'tenChucVu',
+      dataIndex: 'tenChucVu',
+      title: 'Chức vụ'
+    },
+    {
+      key: 'tenPhongBan',
+      dataIndex: 'tenPhongBan',
+      title: 'Phòng / Ban'
+    }
+  ];
+
+  const actions: IAction[] = [
+    {
+      label: 'Hồ sơ nhân sự',
+      icon: <EyeOutlined />,
+      command: (record: IViewNhanSu) => console.log('view', record)
+    },
+    {
+      label: 'Sửa',
+      tooltip: 'Sửa thông tin nhân viên',
+      icon: <EditOutlined />,
+      command: (record: IViewNhanSu) => console.log('edit', record)
+    },
+    {
+      label: 'Xóa',
+      color: 'red',
+      icon: <DeleteOutlined />,
+      command: (record: IViewNhanSu) => console.log('delete', record)
     }
   ];
 
@@ -142,6 +190,7 @@ const Page = () => {
         rowKey="maNhanSu"
         columns={columns}
         dataSource={list}
+        listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 

@@ -1,14 +1,15 @@
-import { IQueryPaging } from "@models/common/model.common";
+import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryNhanSu = IQueryPaging & {
-  cccd?: string
-}
+  cccd?: string;
+};
 
 export type IViewNhanSu = {
   idNhanSu: number;
   maNhanSu?: string;
   hoDem?: string;
   ten?: string;
+  hoTen?: string;
   ngaySinh?: Date;
   noiSinh?: string;
   gioiTinh?: number;
@@ -24,6 +25,8 @@ export type IViewNhanSu = {
   email?: string;
   khanCapSoDienThoai?: string;
   khanCapNguoiLienHe?: string;
+  tenChucVu: string;
+  tenPhongBan: string;
 };
 
 export type ICreateNhanSu = {
