@@ -37,69 +37,73 @@ namespace D.Auth.Infrastructure.Services.Implements
         }
         public async Task<CreateUserResponseDto> CreateUser(CreateUserRequestDto request)
         {
-            _logger.LogInformation($"{nameof(CreateUser)} method called. Dto: {request}");
+            _logger.LogInformation($"{nameof(CreateUser)} called with {request.MaNhanSu}");
 
-            var existed = _unitOfWork.iNsNhanSuRepository.FindByMaNhanSu(request.MaNhanSu);
-            if (existed == null)
+            var ns = _unitOfWork.iNsNhanSuRepository.FindByMaNhanSu(request.MaNhanSu);
+            if (ns == null)
                 throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "Nhân sự không tồn tại trong hệ thống.");
 
-            if (!string.IsNullOrEmpty(existed.Password))
+            if (!string.IsNullOrEmpty(ns.Password))
                 throw new UserFriendlyException(ErrorCodeConstant.CodeExits, "Tài khoản đã được tạo trước đó.");
 
+            if (string.IsNullOrWhiteSpace(request.Email2))
+                throw new UserFriendlyException(1011, "Thiếu thông tin email nội bộ.");
 
             string rawPassword = string.IsNullOrWhiteSpace(request.Password)
-            ? PasswordHelper.GenerateRandomPassword()
-            : request.Password;
-            var (hash, salt) = PasswordHelper.HashPassword(rawPassword);
-            existed.Password = hash;
-            existed.PasswordKey = salt;
+                ? PasswordHelper.GenerateRandomPassword()
+                : request.Password;
 
-            _unitOfWork.iNsNhanSuRepository.Update(existed);
+            var (hash, salt) = PasswordHelper.HashPassword(rawPassword);
+
+            ns.Email2 = request.Email2;
+            ns.Password = hash;
+            ns.PasswordKey = salt;
+
+            _unitOfWork.iNsNhanSuRepository.Update(ns);
             await _unitOfWork.iNsNhanSuRepository.SaveChangeAsync();
 
-
-            // Gửi email thông báo mật khẩu
-            if (!string.IsNullOrWhiteSpace(existed.Email))
+            if (!string.IsNullOrWhiteSpace(ns.Email))
             {
                 _ = Task.Run(async () =>
                 {
                     try
                     {
-                        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
-                        string body = await System.IO.File.ReadAllTextAsync(filePath);
+                        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+                        string body = await File.ReadAllTextAsync(templatePath);
 
-                        body = body.Replace("{{userName}}", $"{existed.HoDem} {existed.Ten}")
+                        body = body.Replace("{{userName}}", $"{ns.HoDem} {ns.Ten}")
                                    .Replace("{{newPassword}}", rawPassword)
                                    .Replace("{{year}}", DateTime.Now.Year.ToString());
 
-                        var dto = new SendEmailDto
+                        var mailDto = new SendEmailDto
                         {
                             EmailFrom = _configuration["Email_Configuration:Email"],
                             Password = _configuration["Email_Configuration:Password"],
                             Host = _configuration["Email_Configuration:Host"],
                             Post = int.Parse(_configuration["Email_Configuration:Port"]),
                             Title = "Thông tin tài khoản",
-                            EmailTo = existed.Email,
+                            EmailTo = ns.Email,
                             Body = body
                         };
 
-                        await SendNotification.SendEmail(dto);
+                        await SendNotification.SendEmail(mailDto);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Gửi email mật khẩu tạm thất bại cho MaNhanSu={MaNhanSu}", existed.MaNhanSu);
+                        _logger.LogError(ex, "Gửi email thất bại cho {MaNhanSu}", ns.MaNhanSu);
                     }
                 });
             }
 
             return new CreateUserResponseDto
             {
-                Id = existed.Id,
-                MaNhanSu = existed.MaNhanSu,
-                FullName = $"{existed.HoDem} {existed.Ten}",
-                Email = existed.Email
+                Id = ns.Id,
+                MaNhanSu = ns.MaNhanSu,
+                FullName = $"{ns.HoDem} {ns.Ten}",
+                Email2 = ns.Email2
             };
         }
+
 
 
         public async Task<bool> UpdateUser(UpdateUserRequestDto request)

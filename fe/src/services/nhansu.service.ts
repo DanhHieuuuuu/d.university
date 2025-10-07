@@ -28,13 +28,13 @@ const find = async (keyword: string) => {
         keyword: keyword
       }
     });
-    return Promise.resolve(res.data);
+    // Trả về data (object API)
+    return res.data;
   } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+    processApiMsgError(err, 'Không thể tìm kiếm nhân sự.'); // 💡 ĐIỂM QUAN TRỌNG: Throws lỗi để Redux Thunk xử lý là rejected action
+    throw err;
   }
 };
-
 const createNhanSu = async (body: ICreateNhanSu) => {
   try {
     const res = await axios.post(`${apiNhanSuEndpoint}/create`, body);

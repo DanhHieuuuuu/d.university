@@ -1,7 +1,7 @@
 import { processApiMsgError } from '@utils/index';
 import { IResponseList } from '@models/common/response.model';
 import axios from '@utils/axios';
-import { IQueryUser, IUserCreate, IUserView } from '@models/user/user.model';
+import { INhanSuData, IQueryUser, IUserCreate, IUserView } from '@models/user/user.model';
 
 const apiNhanSuEndpoint = 'nhansu';
 
@@ -48,4 +48,25 @@ const updateUser = async (body: { Id: number; Email?: string; NewPassword?: stri
   }
 };
 
-export const UserService = { getAll, createUser, updateUser };
+
+const getNhanSuByMaNhanSu = async (maNhanSu: string): Promise<INhanSuData> => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/get`, { params: { keyword: maNhanSu } });
+
+    // Kiểm tra cấu trúc response: { status: 1, data: INhanSuData, ... }
+    if (res.data.status === 1 && res.data.data) {
+      return Promise.resolve(res.data.data as INhanSuData);
+    }
+    
+    // Nếu API trả về thành công nhưng không có dữ liệu nhân sự
+    return Promise.reject(new Error('Không tìm thấy thông tin nhân sự.'));
+
+  } catch (err) {
+    // Xử lý lỗi kết nối hoặc lỗi backend
+    processApiMsgError(err, 'Lỗi khi lấy thông tin nhân sự');
+    return Promise.reject(err);
+  }
+};
+
+
+export const UserService = { getAll, createUser, updateUser, getNhanSuByMaNhanSu };

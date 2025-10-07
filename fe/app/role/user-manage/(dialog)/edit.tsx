@@ -1,4 +1,3 @@
-// edit.tsx
 'use client';
 import { useEffect } from 'react';
 import { Modal, Form, Input, message } from 'antd';
@@ -10,9 +9,10 @@ type EditUserModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   user: IUserView | null;
+  onSuccess?: () => void;
 };
 
-const EditUserModal = ({ isModalOpen, setIsModalOpen, user }: EditUserModalProps) => {
+const EditUserModal = ({ isModalOpen, setIsModalOpen, user, onSuccess }: EditUserModalProps) => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
 
@@ -39,6 +39,7 @@ const EditUserModal = ({ isModalOpen, setIsModalOpen, user }: EditUserModalProps
       ).unwrap();
 
       message.success('Cập nhật thành công');
+      onSuccess?.();
       setIsModalOpen(false);
     } catch {
       message.error('Cập nhật thất bại');

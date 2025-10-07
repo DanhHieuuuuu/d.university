@@ -1,8 +1,7 @@
 'use client';
-
-import { ChangeEvent, useState, useEffect } from 'react';
-import { Breadcrumb, Button, Card, Form, Input, Tag, Dropdown, Menu, Space } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined, MoreOutlined } from '@ant-design/icons';
+import { ChangeEvent, useState } from 'react';
+import { Button, Card, Form, Input, Tag } from 'antd';
+import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
 import EditUserModal from './(dialog)/edit';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -10,7 +9,7 @@ import { getAllUser } from '@redux/feature/userSlice';
 
 import { IQueryUser, IUserView } from '@models/user/user.model';
 import AppTable from '@components/common/Table';
-import { IColumn } from '@models/common/table.model';
+import { IAction, IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
@@ -103,42 +102,25 @@ const Page = () => {
         }
         return <Tag color={color}>{value || 'Chưa có'}</Tag>;
       }
+    }
+  ];
+  const actions: IAction[] = [
+    {
+      label: 'Sửa',
+      tooltip: 'Sửa thông tin nhân viên',
+      icon: <EditOutlined />,
+      command: (record: IUserView) => {
+        setSelectedUser(record);
+        setIsEditModalOpen(true);
+      }
     },
     {
-      key: 'action',
-      title: '',
-      width: 100,
-      render: (_, record) => {
-        const menu = (
-          <Menu
-            items={[
-              {
-                key: 'edit',
-                label: 'Chỉnh sửa',
-                onClick: () => {
-                  setSelectedUser(record);
-                  setIsEditModalOpen(true);
-                }
-              },
-              {
-                key: 'toggleActive',
-                label: record.trangThai === 'Đang hoạt động' ? 'Vô hiệu hóa' : 'Kích hoạt',
-                onClick: () => {}
-              },
-              {
-                key: 'delete',
-                label: 'Xóa',
-                onClick: () => {}
-              }
-            ]}
-          />
-        );
-
-        return (
-          <Dropdown overlay={menu} trigger={['click']}>
-            <Button icon={<MoreOutlined />} />
-          </Dropdown>
-        );
+      label: 'Vô hiệu hóa',
+      color: 'red',
+      icon: <StopOutlined />,
+      command: (record: IUserView) => {
+        setSelectedUser(record);
+        setIsEditModalOpen(true);
       }
     }
   ];
@@ -211,11 +193,20 @@ const Page = () => {
         rowKey="maNhanSu"
         columns={columns}
         dataSource={list}
+        listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
-
-      <CreateNhanSuModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-      <EditUserModal isModalOpen={isEditModalOpen} setIsModalOpen={setIsEditModalOpen} user={selectedUser} />
+      <CreateNhanSuModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        onSuccess={() => dispatch(getAllUser(query))}
+      />
+      <EditUserModal
+        isModalOpen={isEditModalOpen}
+        setIsModalOpen={setIsEditModalOpen}
+        user={selectedUser}
+        onSuccess={() => dispatch(getAllUser(query))}
+      />
     </Card>
   );
 };

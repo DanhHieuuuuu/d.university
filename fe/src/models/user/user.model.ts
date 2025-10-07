@@ -17,8 +17,24 @@ export type IUserView = {
   trangThai?: string;
 };
 
+export interface INhanSuData {
+  idNhanSu: number | null;
+  maNhanSu: string;
+  hoDem: string | null;
+  ten: string | null;
+  hoTen: string | null;
+  ngaySinh: string | null;
+  noiSinh: string | null;
+  gioiTinh: string | null;
+  soCccd: string | null;
+  soDienThoai: string | null;
+  email: string | null; 
+  tenChucVu: string | null;
+  tenPhongBan: string | null;
+}
+
 export interface IUserCreate {
   maNhanSu: string;
-  email?: string | null;
+  email2?: string | null;
   password?: string | null;
 };

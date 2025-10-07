@@ -71,10 +71,6 @@ const userSlice = createSlice({
         state.status = ReduxStatus.FAILURE;
       })
       .addCase(createUser.fulfilled, (state, action: PayloadAction<any>) => {
-        // append vào list sau khi tạo
-        if (action.payload) {
-          state.list.push(action.payload);
-        }
       })
       .addCase(updateUser.pending, (state) => {
         state.status = ReduxStatus.LOADING;

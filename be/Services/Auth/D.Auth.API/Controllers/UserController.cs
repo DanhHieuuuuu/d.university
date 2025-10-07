@@ -23,20 +23,20 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
-        [HttpPost("create-user")]
-        public async Task<ResponseAPI> CreateUser(CreateUserRequestDto dto)
-        {
-            try
+            [PermissionFilter(PermissionKeyConstant.Admin)]
+            [HttpPost("create-user")]
+            public async Task<ResponseAPI> CreateUser([FromBody] CreateUserRequestDto dto)
             {
-                var result = await _mediator.Send(dto);
-                return new(result);
+                try
+                {
+                    var result = await _mediator.Send(dto);
+                    return new(result);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex);
+                }
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
 
         /// <summary>
         /// Thay đổi người dùng
