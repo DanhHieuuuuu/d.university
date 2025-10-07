@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - app-network
+
+  d.core.api:
+    image: ${DOCKER_REGISTRY-}dcoreapi
+    build:
+      context: .
+      dockerfile: Services/Core/D.Core.API/Dockerfile
+    ports:
+      - "23457:8080"
+    environment:
+      - REDIS__HOST=redis
+      - REDIS__PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+  d.auth.api:
+    image: ${DOCKER_REGISTRY-}dauthapi
+    build:
+      context: .
+      dockerfile: Services/Auth/D.Auth.API/Dockerfile
+    ports:
+      - "23456:8080"
+    environment:
+      - REDIS__HOST=redis
+      - REDIS__PORT=6379
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+volumes:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge

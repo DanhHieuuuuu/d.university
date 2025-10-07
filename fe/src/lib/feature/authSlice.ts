@@ -40,6 +40,7 @@ export const refreshToken = createAsyncThunk('auth/refresh', async (_, { rejectW
 });
 
 interface AuthState {
+  id?: number,
   user: IUser | null;
   status: string | number | null;
   permissions: string[];
