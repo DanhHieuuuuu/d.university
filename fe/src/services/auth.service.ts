@@ -42,8 +42,19 @@ const refreshTokenApi = async (params: { token: string; refreshToken: string }) 
   }
 };
 
+const logoutApi = async () => {
+  try {
+    const res = await axios.get(`nhansu/logout`, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err);
+    return Promise.reject(err);
+  }
+};
+
 export const AuthService = {
   loginApi,
   changePassword,
-  refreshTokenApi
+  refreshTokenApi,
+  logoutApi
 };

@@ -15,7 +15,6 @@ const Index = ({ children }: { children: React.ReactNode }) => {
       <Layout>
         <AppHeader />
         <Content style={{ margin: 16, height: '100%' }}>{children}</Content>
-        <Footer style={{ textAlign: 'center' }}>Ant Design ©{new Date().getFullYear()} Created by Ant UED</Footer>
       </Layout>
     </Layout>
   );
