@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
 import { Button, DatePicker, Form, Input, Select } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
 
 export default function FamilyTab() {
@@ -51,18 +51,17 @@ export default function FamilyTab() {
                   <Input />
                 </Form.Item>
               </div>
-              <div className='flex justify-end'>
+              <div className="flex justify-end">
                 <Button type="primary" danger onClick={() => remove(field.name)} icon={<DeleteOutlined />}>
                   Xóa
                 </Button>
               </div>
             </div>
           ))}
-          
-            <Button type="primary" color="primary" onClick={() => add()} icon={<PlusOutlined />}>
-              Thêm người thân
-            </Button>
-          
+
+          <Button type="primary" color="primary" onClick={() => add()} icon={<PlusOutlined />}>
+            Thêm người thân
+          </Button>
         </div>
       )}
     </Form.List>

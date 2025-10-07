@@ -49,7 +49,10 @@ function Index() {
   };
 
   return (
-  <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden" style={{ backgroundColor: colors.white }}>
+    <div
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden"
+      style={{ backgroundColor: colors.white }}
+    >
       {/* Background image with 10% opacity */}
       <img
         src="/images/school-869061_1280.jpg"
@@ -62,8 +65,10 @@ function Index() {
         className="relative z-10 flex w-full max-w-md flex-col items-center rounded-2xl p-8 shadow-lg"
         style={{ backgroundColor: colors.white }}
       >
-  <GraduationCap className="mb-6 h-12 w-12" style={{ color: colors.primary }} />
-  <h2 className="mb-2 text-2xl font-bold" style={{ color: colors.primaryNavy }}>Đăng nhập</h2>
+        <GraduationCap className="mb-6 h-12 w-12" style={{ color: colors.primary }} />
+        <h2 className="mb-2 text-2xl font-bold" style={{ color: colors.primaryNavy }}>
+          Đăng nhập
+        </h2>
         <p className="mb-6 text-center" style={{ color: colors.gray }}>
           Chào mừng bạn đến với hệ thống quản lý trường học
         </p>

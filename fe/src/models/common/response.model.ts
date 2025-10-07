@@ -1,4 +1,4 @@
-import { EStatusResonse } from "./common";
+import { EStatusResonse } from './common';
 
 export interface IResponseList<Item> {
   code: number;

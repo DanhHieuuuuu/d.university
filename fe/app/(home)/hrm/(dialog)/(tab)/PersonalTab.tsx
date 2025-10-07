@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { Form, Input, DatePicker, Select } from 'antd';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
@@ -45,7 +45,7 @@ export default function PersonalTab() {
         label="Nơi sinh"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
-        <Input placeholder='Nhập tính / thành phố' />
+        <Input placeholder="Nhập tính / thành phố" />
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'danToc']} label="Dân tộc">
         <Select />

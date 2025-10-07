@@ -1,8 +1,8 @@
-import { IQueryPaging } from "@models/common/model.common";
+import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryUser = IQueryPaging & {
-  maNhanSu?: string
-}
+  maNhanSu?: string;
+};
 
 export type IUserView = {
   id?: number;
