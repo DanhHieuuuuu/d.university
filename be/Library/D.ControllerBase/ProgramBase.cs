@@ -128,8 +128,13 @@ namespace D.ControllerBase
         /// <param name="builder"></param>
         public static void ConfigureRedis(this WebApplicationBuilder builder)
         {
-            var redis = ConnectionMultiplexer.Connect("redis:6379");
+            // Lấy ra p hần Redis trong appsettings
+            var redisSection = builder.Configuration.GetSection("Redis");
+            var host = redisSection["Host"];
+            var port = redisSection["Port"];
 
+            // Kết nối Redis
+            var redis = ConnectionMultiplexer.Connect($"{host}:{port}");
             builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
             // sign in IDatabase
