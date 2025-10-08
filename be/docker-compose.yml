@@ -47,7 +47,7 @@ services:
     ports: 
       - "3000:3000"
     env_file:
-      - ../fe/.env
+      - ../fe/.env.production
     depends_on:
       - d.core.api
       - d.auth.api
