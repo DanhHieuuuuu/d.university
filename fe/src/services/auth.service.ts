@@ -1,6 +1,7 @@
 import axios from 'axios';
+import api from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
-import { IConnectToken, ILogin, IUser } from '@models/auth/auth.model';
+import { IConnectToken, ILogin } from '@models/auth/auth.model';
 
 const loginApi = async (body: ILogin) => {
   try {
@@ -22,19 +23,11 @@ const loginApi = async (body: ILogin) => {
   }
 };
 
-const changePassword = async (body: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
-  try {
-    const { data } = await axios.post('auth/change-password', body);
-    return Promise.resolve(data);
-  } catch (err) {
-    processApiMsgError(err, '');
-    return Promise.reject(err);
-  }
-};
+
 
 const refreshTokenApi = async (params: { token: string; refreshToken: string }) => {
   try {
-    const res = await axios.post(`nhansu/refresh-token`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    const res = await api.post(`nhansu/refresh-token`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err);
@@ -44,8 +37,18 @@ const refreshTokenApi = async (params: { token: string; refreshToken: string }) 
 
 const logoutApi = async () => {
   try {
-    const res = await axios.get(`nhansu/logout`, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    const res = await api.get(`nhansu/logout`, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
     return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err);
+    return Promise.reject(err);
+  }
+};
+
+const changePasswordApi = async (body: { oldPassword: string; newPassword: string }) => {
+  try {
+    const { data } = await api.post('user/change-password', body, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    return Promise.resolve(data);
   } catch (err) {
     processApiMsgError(err);
     return Promise.reject(err);
@@ -54,7 +57,7 @@ const logoutApi = async () => {
 
 export const AuthService = {
   loginApi,
-  changePassword,
   refreshTokenApi,
-  logoutApi
+  logoutApi,
+  changePasswordApi
 };

@@ -75,7 +75,7 @@ const userSlice = createSlice({
       .addCase(updateUser.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
-      .addCase(updateUser.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(updateUser.fulfilled, (state, action) => {
         state.status = ReduxStatus.SUCCESS;
         if (state.selected) {
           // Cập nhật list local

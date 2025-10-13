@@ -1,6 +1,6 @@
 'use client';
 
-import { Layout, Typography, Dropdown, Avatar, Modal, Form, Input, Button, Space } from 'antd';
+import { Layout, Typography, Dropdown, Avatar, Modal, Form, Input, Button, Space, message } from 'antd';
 import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { useNavigate } from '@hooks/navigate';
 import { useSelector, useDispatch } from 'react-redux';
@@ -45,12 +45,16 @@ const AppHeader = () => {
 
   const handleChangePassword = async (values: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
     try {
-      // TODO: Implement change password API call
-      console.log('Change password:', values);
+      await AuthService.changePasswordApi({
+        oldPassword: values.currentPassword,
+        newPassword: values.newPassword
+      });
+      message.success('Đổi mật khẩu thành công!');
       setChangePasswordModalVisible(false);
       passwordForm.resetFields();
     } catch (error) {
       console.error('Change password error:', error);
+      message.error('Đổi mật khẩu thất bại! Vui lòng kiểm tra lại mật khẩu hiện tại.');
     }
   };
 
@@ -110,6 +114,7 @@ const AppHeader = () => {
                 icon={<UserOutlined />} 
                 className="mr-3"
               />
+              <span className="font-medium">{userDisplayName}</span>
               </div>
             </Dropdown>
           </div>
