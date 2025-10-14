@@ -1,13 +1,14 @@
 'use client';
 
 import { Layout, Typography, Dropdown, Avatar, Modal, Form, Input, Button, Space, message } from 'antd';
-import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined, EditOutlined } from '@ant-design/icons';
 import { useNavigate } from '@hooks/navigate';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@redux/store';
 import { clearUser } from '@redux/feature/authSlice';
 import { AuthService } from '@services/auth.service';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { AvatarStorage } from '@utils/avatar-storage';
 import '@src/styles/globals.scss';
 
 const { Header } = Layout;
@@ -21,6 +22,16 @@ const AppHeader = () => {
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
   const [passwordForm] = Form.useForm();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (user?.maNhanSu) {
+      const savedAvatar = AvatarStorage.getAvatar(user.maNhanSu);
+      setAvatarUrl(savedAvatar);
+    }
+  }, [user?.maNhanSu]);
 
   const handleProfileClick = () => {
     setProfileModalVisible(true);
@@ -55,6 +66,36 @@ const AppHeader = () => {
     } catch (error) {
       console.error('Change password error:', error);
       message.error('Đổi mật khẩu thất bại! Vui lòng kiểm tra lại mật khẩu hiện tại.');
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.maNhanSu) return;
+
+    const validation = AvatarStorage.validateImageFile(file);
+    if (!validation.valid) {
+      message.error(validation.error);
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const base64String = await AvatarStorage.saveAvatar(user.maNhanSu, file);
+      setAvatarUrl(base64String);
+      message.success('Cập nhật ảnh đại diện thành công!');
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      message.error('Không thể tải lên ảnh đại diện!');
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -111,7 +152,8 @@ const AppHeader = () => {
             <div className="flex items-center cursor-pointer hover:bg-gray-100 rounded-lg p-2 transition-colors gap-2">
               <Avatar 
                 size="large" 
-                icon={<UserOutlined />} 
+                src={avatarUrl}
+                icon={!avatarUrl && <UserOutlined />}
                 className="mr-3"
               />
               <span className="font-medium">{userDisplayName}</span>
@@ -134,11 +176,29 @@ const AppHeader = () => {
         width={500}
       >
         <div className="flex flex-col items-center">
-          <Avatar 
-            size={120} 
-            icon={<UserOutlined />} 
+          <div className="relative mb-4">
+            <Avatar 
+              size={120} 
+              src={avatarUrl}
+              icon={!avatarUrl && <UserOutlined />}
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+          </div>
+          <Button
+            type="default"
+            icon={<EditOutlined />}
+            onClick={handleAvatarClick}
+            loading={uploadingAvatar}
             className="mb-4"
-          />
+          >
+            Đổi ảnh đại diện
+          </Button>
           <div className="w-full space-y-3">
             <div className="flex justify-between py-2 border-b">
               <span className="font-medium">Mã nhân viên:</span>
