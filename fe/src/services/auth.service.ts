@@ -55,9 +55,20 @@ const changePasswordApi = async (body: { oldPassword: string; newPassword: strin
   }
 };
 
+const forgotPasswordApi = async (body: { maNhanSu: string }) => {
+  try {
+    const { data } = await axios.post('user/reset-password', { MaNhanSu: body.maNhanSu }, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err);
+    return Promise.reject(err);
+  }
+};
+
 export const AuthService = {
   loginApi,
   refreshTokenApi,
   logoutApi,
-  changePasswordApi
+  changePasswordApi,
+  forgotPasswordApi
 };

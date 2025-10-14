@@ -108,7 +108,7 @@ const AppHeader = () => {
             placement="bottomRight"
             trigger={['click']}
           >
-            <div className="flex items-center cursor-pointer hover:bg-gray-100 rounded-lg p-2 transition-colors">
+            <div className="flex items-center cursor-pointer hover:bg-gray-100 rounded-lg p-2 transition-colors gap-2">
               <Avatar 
                 size="large" 
                 icon={<UserOutlined />} 
