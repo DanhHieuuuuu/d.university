@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Checkbox, Form, FormProps, Input, Spin } from 'antd';
+import { Button, Checkbox, Form, FormProps, Input, Spin, Modal, message } from 'antd';
 import { colors } from '@styles/colors';
 import { toast } from 'react-toastify';
 import { GraduationCap } from 'lucide-react';
@@ -12,10 +12,15 @@ import { userStatusE } from '@models/common/common';
 
 import { useNavigate } from '@hooks/navigate';
 import { processApiMsgError } from '@utils/index';
+import { AuthService } from '@services/auth.service';
+import React from 'react';
 
 function Index() {
   const dispatch = useAppDispatch();
   const { navigateTo } = useNavigate();
+  const [forgotPasswordModal, setForgotPasswordModal] = React.useState(false);
+  const [forgotPasswordForm] = Form.useForm();
+  const [isSendingEmail, setIsSendingEmail] = React.useState(false);
 
   const { loading: loginLoading } = useAppSelector((state) => state.authState.$login);
 
@@ -45,6 +50,21 @@ function Index() {
       }
     } catch (err) {
       processApiMsgError(err, 'Đăng nhập thất bại, vui lòng thử lại.');
+    }
+  };
+
+  const handleForgotPassword = async (values: { maNhanSu: string }) => {
+    setIsSendingEmail(true);
+    try {
+      await AuthService.forgotPasswordApi({ maNhanSu: values.maNhanSu });
+      message.success('Mật khẩu mới đã được gửi vào mail thành công');
+      setForgotPasswordModal(false);
+      forgotPasswordForm.resetFields();
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      message.error('Không tìm thấy mã nhân sự hoặc có lỗi xảy ra!');
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -109,9 +129,18 @@ function Index() {
               />
             </Form.Item>
 
-            <Form.Item<ILogin> name="remember" valuePropName="checked" label={null}>
-              <Checkbox>Ghi nhớ đăng nhập</Checkbox>
-            </Form.Item>
+            <div className="flex items-center justify-between mb-4">
+              <Form.Item<ILogin> name="remember" valuePropName="checked" label={null} className="mb-0">
+                <Checkbox>Ghi nhớ đăng nhập</Checkbox>
+              </Form.Item>
+              <a 
+                onClick={() => setForgotPasswordModal(true)}
+                style={{ color: colors.primaryLight }} 
+                className="text-sm hover:underline cursor-pointer"
+              >
+                Quên mật khẩu?
+              </a>
+            </div>
 
             <Form.Item label={null}>
               <Button
@@ -135,6 +164,51 @@ function Index() {
       <footer className="relative z-10 mt-8 text-center text-xs" style={{ color: colors.gray }}>
         &copy; {new Date().getFullYear()} D.University. All rights reserved.
       </footer>
+
+      {/* Forgot Password Modal */}
+      <Modal
+        title="Quên mật khẩu"
+        open={forgotPasswordModal}
+        onCancel={() => {
+          setForgotPasswordModal(false);
+          forgotPasswordForm.resetFields();
+        }}
+        footer={null}
+        width={400}
+      >
+        <p className="mb-4 text-gray-600">
+          Nhập mã nhân sự của bạn, chúng tôi sẽ gửi mật khẩu mới về email đã đăng ký.
+        </p>
+        <Form
+          form={forgotPasswordForm}
+          layout="vertical"
+          onFinish={handleForgotPassword}
+        >
+          <Form.Item
+            name="maNhanSu"
+            label="Mã nhân sự"
+            rules={[
+              { required: true, message: 'Vui lòng nhập mã nhân sự!' }
+            ]}
+          >
+            <Input placeholder="Nhập mã nhân sự của bạn" />
+          </Form.Item>
+          
+          <Form.Item className="mb-0">
+            <div className="flex gap-2 justify-end">
+              <Button onClick={() => {
+                setForgotPasswordModal(false);
+                forgotPasswordForm.resetFields();
+              }}>
+                Hủy
+              </Button>
+              <Button type="primary" htmlType="submit" loading={isSendingEmail}>
+                Gửi
+              </Button>
+            </div>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }
