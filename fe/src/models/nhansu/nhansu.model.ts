@@ -85,4 +85,6 @@ export type ICreateHopDongNs = {
   ghiChu?: string;
   idNhanSu?: number;
   thongTinNhanSu?: ICreateNhanSu;
+  currency: string | null;
+  payFrequency: string | null;
 };

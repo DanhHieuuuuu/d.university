@@ -243,6 +243,16 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
                 newHd.IdNhanSu = newNhanSu.IdNhanSu;
 
+                var nhansu = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x => x.Id == newNhanSu.IdNhanSu);
+
+                if (nhansu != null)
+                {
+                    nhansu.HienTaiChucVu = dto.IdChucVu;
+                    nhansu.HienTaiPhongBan = dto.IdPhongBan;
+
+                    _unitOfWork.iNsNhanSuRepository.Update(nhansu);
+                }
+
                 _unitOfWork.iNsHopDongChiTietRepository.Add(chiTietHopDong);
                 _unitOfWork.iNsHopDongChiTietRepository.SaveChange();
             }

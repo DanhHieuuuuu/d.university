@@ -2,9 +2,11 @@
 
 import { Form, Input, DatePicker, Select } from 'antd';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { useAppSelector } from '@redux/hooks';
 
 export default function PersonalTab() {
   const form = Form.useFormInstance<ICreateHopDongNs>();
+  const { listGioiTinh, listQuocTich, listDanToc, listTonGiao } = useAppSelector((state) => state.danhmucState);
 
   return (
     <div className="grid grid-cols-4 gap-x-5">
@@ -24,10 +26,9 @@ export default function PersonalTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'gioiTinh']} label="Giới tính">
         <Select
-          options={[
-            { label: 'Nam', value: 1 },
-            { label: 'Nữ', value: 2 }
-          ]}
+          options={listGioiTinh?.map((item) => {
+            return { label: item.tenGioiTinh, value: item.id };
+          })}
         />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
@@ -38,7 +39,11 @@ export default function PersonalTab() {
         <DatePicker format="DD/MM/YYYY" needConfirm className="!w-full" />
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'quocTich']} label="Quốc tịch">
-        <Select />
+        <Select
+          options={listQuocTich?.map((item) => {
+            return { label: item.tenQuocGia, value: item.id };
+          })}
+        />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
         name={['thongTinNhanSu', 'noiSinh']}
@@ -48,10 +53,18 @@ export default function PersonalTab() {
         <Input placeholder="Nhập tính / thành phố" />
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'danToc']} label="Dân tộc">
-        <Select />
+        <Select
+          options={listDanToc?.map((item) => {
+            return { label: item.tenDanToc, value: item.id };
+          })}
+        />
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'tonGiao']} label="Tôn giáo">
-        <Select />
+        <Select
+          options={listTonGiao?.map((item) => {
+            return { label: item.tenTonGiao, value: item.id };
+          })}
+        />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
         name={['thongTinNhanSu', 'soCccd']}

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input } from 'antd';
 import {
   DeleteOutlined,
@@ -13,7 +13,7 @@ import {
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getListNhanSu, selectMaNhanSu } from '@redux/feature/nhansuSlice';
+import { getListNhanSu, resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansuSlice';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
@@ -120,6 +120,13 @@ const Page = () => {
     },
     triggerFirstLoad: true
   });
+
+  useEffect(() => {
+    if (!isModalOpen) {      
+      dispatch(resetStatusCreate());
+      dispatch(getListNhanSu(query));
+    }
+  }, [isModalOpen])
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ cccd: value });
