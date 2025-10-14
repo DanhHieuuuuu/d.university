@@ -12,7 +12,7 @@ const getAll = async (query: IQueryUser) => {
     const data: IResponseList<IUserView> = res.data;
 
     // map hoTen từ hoDem + ten
-    data.data.items = data.data.items.map((x: any) => ({
+    data.data.items = data.data.items.map((x: IUserView) => ({
       ...x,
       hoTen: `${x.hoDem ?? ''} ${x.ten ?? ''}`.trim()
     }));
@@ -48,7 +48,6 @@ const updateUser = async (body: { Id: number; Email?: string; NewPassword?: stri
   }
 };
 
-
 const getNhanSuByMaNhanSu = async (maNhanSu: string): Promise<INhanSuData> => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/get`, { params: { keyword: maNhanSu } });
@@ -57,16 +56,14 @@ const getNhanSuByMaNhanSu = async (maNhanSu: string): Promise<INhanSuData> => {
     if (res.data.status === 1 && res.data.data) {
       return Promise.resolve(res.data.data as INhanSuData);
     }
-    
+
     // Nếu API trả về thành công nhưng không có dữ liệu nhân sự
     return Promise.reject(new Error('Không tìm thấy thông tin nhân sự.'));
-
   } catch (err) {
     // Xử lý lỗi kết nối hoặc lỗi backend
     processApiMsgError(err, 'Lỗi khi lấy thông tin nhân sự');
     return Promise.reject(err);
   }
 };
-
 
 export const UserService = { getAll, createUser, updateUser, getNhanSuByMaNhanSu };

@@ -7,7 +7,8 @@ export type IQueryUser = IQueryPaging & {
 export type IUserView = {
   id?: number;
   maNhanSu?: string;
-  hoTen?: string;
+  hoDem?: string ;
+  ten?: string;
   ngaySinh?: Date;
   noiSinh?: string;
   soDienThoai?: string;
