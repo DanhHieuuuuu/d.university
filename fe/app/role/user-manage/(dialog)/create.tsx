@@ -1,7 +1,7 @@
 'use client';
 import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Input, Modal, Space, Switch } from 'antd';
+import { Button, Col, Form, Input, Modal, Row, Space, Switch } from 'antd';
 import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch } from '@redux/hooks';
 import { createUser } from '@redux/feature/userSlice';
@@ -14,9 +14,13 @@ type CreateUserModalProps = {
   setIsModalOpen: (value: boolean) => void;
   onSuccess?: () => void;
 };
+type IUserCreateForm = IUserCreate & {
+  hoDem?: string | null;
+  ten?: string | null;
+};
 
 const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpen, onSuccess }) => {
-  const [form] = Form.useForm<IUserCreate>();
+  const [form] = Form.useForm<IUserCreateForm>();
   const dispatch = useAppDispatch();
 
   const [autoPassword, setAutoPassword] = useState(true);
@@ -35,9 +39,13 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
           if (data.hoDem && data.ten && data.tenChucVu) {
             const newEmail = generateHuceEmail(data.hoDem, data.ten, data.tenChucVu);
             form.setFieldValue('email2', newEmail);
+            form.setFieldValue('hoDem', data.hoDem);
+            form.setFieldValue('ten', data.ten);
           } else {
             toast.warn('Không đủ thông tin để tạo Email.');
             form.setFieldValue('email2', '');
+            form.setFieldValue('hoDem', '');
+            form.setFieldValue('ten', '');
           }
         } catch (error: any) {
           // Xử lý lỗi (ví dụ: không tìm thấy nhân sự)
@@ -110,7 +118,6 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
       }
     >
       <Form form={form} layout="vertical" onFinish={onFinish} autoComplete="off">
-        {/* Mã nhân sự */}
         <Form.Item<IUserCreate>
           label="Mã nhân sự"
           name="maNhanSu"
@@ -118,6 +125,19 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
         >
           <Input placeholder="Nhập mã nhân sự" disabled={isFetchingNhanSu} />
         </Form.Item>
+
+        <Row gutter={12}>
+          <Col span={14}>
+            <Form.Item label="Họ đệm" name="hoDem">
+              <Input placeholder="Tự động lấy từ nhân sự" disabled />
+            </Form.Item>
+          </Col>
+          <Col span={10}>
+            <Form.Item label="Tên" name="ten">
+              <Input placeholder="Tự động lấy từ nhân sự" disabled />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Form.Item<IUserCreate> label="Email (Được tạo)" name="email2">
           <Input

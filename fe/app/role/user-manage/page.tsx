@@ -20,11 +20,11 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem } = useAppSelector((state) => state.userState);
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
-  const [isView, setIsModalView] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IUserView | null>(null);
+
+  const onClickAdd = () => setIsModalOpen(true);
 
   const columns: IColumn<IUserView>[] = [
     {
@@ -83,24 +83,13 @@ const Page = () => {
       title: 'Trạng thái',
       width: 150,
       render: (value) => {
-        let color = 'default';
-        switch (value) {
-          case 'Đang hoạt động':
-            color = 'green';
-            break;
-          case 'Thôi việc':
-            color = 'orange';
-            break;
-          case 'Đã về hưu':
-            color = 'blue';
-            break;
-          case 'Chấm dứt hợp đồng':
-            color = 'red';
-            break;
-          default:
-            color = 'default';
-        }
-        return <Tag color={color}>{value || 'Chưa có'}</Tag>;
+        const colors: Record<string, string> = {
+          'Đang hoạt động': 'green',
+          'Thôi việc': 'orange',
+          'Đã về hưu': 'blue',
+          'Chấm dứt hợp đồng': 'red'
+        };
+        return <Tag color={colors[value] || 'default'}>{value || 'Chưa có'}</Tag>;
       }
     }
   ];
@@ -144,12 +133,6 @@ const Page = () => {
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     handleDebouncedSearch(event.target.value);
-  };
-
-  const onClickAdd = () => {
-    setIsModalView(false);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
   };
 
   return (
