@@ -7,6 +7,7 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
 import StoreProvider from './StoreProvider';
 
 import GlobalLoading from '@components/common/Loading';
+import { colors } from '@styles/colors';
 import '@src/styles/globals.scss';
 
 export default function RootLayout({
@@ -31,16 +32,16 @@ export default function RootLayout({
                 theme={{
                   algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
                   token: {
-                    colorPrimary: '#0095e8'
+                    colorPrimary: colors.primary
                   },
                   components: {
                     Menu: {
-                      itemColor: '#5e6278',
-                      itemActiveBg: '#f4f6fa',
-                      itemSelectedBg: '#f4f6fa',
-                      colorBgTextActive: 'rgb(244, 246, 250)',
-                      itemHoverBg: 'white',
-                      itemHoverColor: '#000'
+                      itemColor: colors.black,
+                      itemHoverColor: colors.white,
+                      itemHoverBg: colors.primaryLight,
+                      itemActiveBg: colors.primaryNavy,
+                      itemSelectedColor: colors.white,
+                      itemSelectedBg: colors.primaryNavy
                     },
                     Input: {
                       colorTextDisabled: 'rgba(0,0,0,0.88)'

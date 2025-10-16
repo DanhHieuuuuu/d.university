@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateHopDongNs, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { NhanSuService } from '@services/nhansu.service';
 import { ReduxStatus } from '@redux/const';
 
@@ -23,6 +23,16 @@ export const getDetailNhanSu = createAsyncThunk('nhansu/get', async (keyword: st
   }
 });
 
+export const createNhanSu = createAsyncThunk('nhansu/create-hd', async (payload: ICreateHopDongNs) => {
+  try {
+    const res = await NhanSuService.createHopDong(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+})
+
 interface NhanSuState {
   status: ReduxStatus;
   selected: {
@@ -32,6 +42,9 @@ interface NhanSuState {
   };
   list: IViewNhanSu[];
   total: number;
+  $create: {
+    status: ReduxStatus;
+  }
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
@@ -41,7 +54,10 @@ const initialState: NhanSuState = {
     data: null
   },
   list: [],
-  total: 0
+  total: 0,
+  $create: {
+    status: ReduxStatus.IDLE
+  }
 };
 
 const nhanSuSlice = createSlice({
@@ -58,7 +74,10 @@ const nhanSuSlice = createSlice({
     },
     clearSelected: (state) => {
       state.selected = { maNhanSu: '', status: ReduxStatus.IDLE, data: null };
-    }
+    },
+    resetStatusCreate: (state) => {
+      state.$create = { status: ReduxStatus.IDLE };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -82,12 +101,21 @@ const nhanSuSlice = createSlice({
       })
       .addCase(getDetailNhanSu.rejected, (state) => {
         state.selected.status = ReduxStatus.FAILURE;
+      })
+      .addCase(createNhanSu.pending, (state) => {
+        state.$create.status = ReduxStatus.LOADING
+      })
+      .addCase(createNhanSu.fulfilled, (state) => {
+        state.$create.status = ReduxStatus.SUCCESS
+      })
+      .addCase(createNhanSu.rejected, (state) => {
+        state.$create.status = ReduxStatus.FAILURE
       });
   }
 });
 
 const nhanSuReducer = nhanSuSlice.reducer;
 
-export const { selectMaNhanSu, clearSelected } = nhanSuSlice.actions;
+export const { selectMaNhanSu, clearSelected, resetStatusCreate } = nhanSuSlice.actions;
 
 export default nhanSuReducer;

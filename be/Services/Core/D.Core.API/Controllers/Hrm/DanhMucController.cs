@@ -8,6 +8,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -288,6 +289,25 @@ namespace D.Core.API.Controllers.Hrm
             {
                 await _mediator.Send(dto);
                 return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Danh sách tôn giáo
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("ton-giao")]
+        public async Task<ResponseAPI> GetAllTonGiao([FromQuery] DmTonGiaoRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
             }
             catch (Exception ex)
             {

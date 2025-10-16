@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { Checkbox, DatePicker, Form, Input, Select } from 'antd';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { useAppSelector } from '@redux/hooks';
 
 const { TextArea } = Input;
 
 export default function JobTab() {
   const form = Form.useFormInstance<ICreateHopDongNs>();
   const [probation, setProbation] = useState<boolean>(false);
+  const { listPhongBan, listLoaiHopDong, listChucVu, listToBoMon } = useAppSelector((state) => state.danhmucState);
 
   return (
     <div className="grid grid-cols-3 gap-x-5">
@@ -27,7 +29,11 @@ export default function JobTab() {
         <Input />
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name="idLoaiHopDong" label="Loại hợp đồng">
-        <Select />
+        <Select
+          options={listLoaiHopDong?.map((item) => {
+            return { label: item.tenLoaiHopDong, value: item.id };
+          })}
+        />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
         name="ngayKyKet"
@@ -37,17 +43,29 @@ export default function JobTab() {
         <DatePicker showTime needConfirm format="HH:mm - DD/MM/YYYY" className="!w-full" />
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name="idPhongBan" label="Phòng ban">
-        <Select />
+        <Select
+          options={listPhongBan?.map((item) => {
+            return { label: item.tenPhongBan, value: item.id };
+          })}
+        />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
         name="idChucVu"
         label="Chức vụ"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
-        <Select />
+        <Select
+          options={listChucVu?.map((item) => {
+            return { label: item.tenChucVu, value: item.id };
+          })}
+        />
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name="idToBoMon" label="Tổ bộ môn">
-        <Select />
+        <Select
+          options={listToBoMon?.map((item) => {
+            return { label: item.tenBoMon, value: item.id };
+          })}
+        />
       </Form.Item>
 
       <Form.Item name="hasProbation" className="col-span-full !mb-3">

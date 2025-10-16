@@ -1,3 +1,5 @@
+@import './_colors.scss';
+
 .role-menu {
   font-weight: 500;
   overflow: auto;
@@ -11,11 +13,13 @@
 }
 
 .menu-core {
+  font-weight: 500;
+
   .menu-title {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #0d47a1;
+    color: $primary;
     font-weight: 600;
     font-size: 18px;
     overflow: hidden;
@@ -32,5 +36,15 @@
     &.collapsed {
       display: none;
     }
+  }
+
+  // Khi hover submenu đã active
+  .ant-menu-submenu-selected>.ant-menu-submenu-title:hover {
+    color: $white !important;
+    background-color: $primaryLight !important;
+  }
+
+  .ant-menu-submenu>.ant-menu-submenu-title:hover {
+    color: $white !important;
   }
 }

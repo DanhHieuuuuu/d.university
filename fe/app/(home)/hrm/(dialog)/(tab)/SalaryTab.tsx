@@ -2,9 +2,15 @@
 
 import { Form, Input, InputNumber } from 'antd';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { useEffect } from 'react';
 
 export default function SalaryTab() {
   const form = Form.useFormInstance<ICreateHopDongNs>();
+
+  useEffect(() => {
+    form.setFieldValue('currency', 'VNĐ');
+    form.setFieldValue('payFrequency', 'Hàng tháng');
+  }, []);
 
   return (
     <div className="grid grid-cols-2 gap-x-5">
@@ -15,11 +21,11 @@ export default function SalaryTab() {
       >
         <InputNumber className="!w-full" min={0} />
       </Form.Item>
-      <Form.Item name="currency" label="Đơn vị">
+      <Form.Item label="Đơn vị">
         <Input defaultValue="VNĐ" disabled />
       </Form.Item>
       <Form.Item name="payFrequency" label="Trả lương" className="col-span-full">
-        <Input defaultValue="Hàng tháng" />
+        <Input />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
         name={['thongTinNhanSu', 'tenNganHang1']}

@@ -5,9 +5,10 @@ import React, { useEffect, useState } from 'react';
 import { Button, Form, FormProps, Modal, Tabs } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 
+import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
-import { clearSelected, getDetailNhanSu } from '@redux/feature/nhansuSlice';
+import { clearSelected, createNhanSu, getDetailNhanSu, getListNhanSu, resetStatusCreate } from '@redux/feature/nhansuSlice';
 import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab)';
 
 type NhanSuModalProps = {
@@ -19,7 +20,7 @@ type NhanSuModalProps = {
 
 const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   const dispatch = useAppDispatch();
-  const { selected } = useAppSelector((state) => state.nhanSuState);
+  const { selected, $create } = useAppSelector((state) => state.nhanSuState);
 
   const [form] = Form.useForm<ICreateHopDongNs>();
   const [title, setTitle] = useState<string>('');
@@ -71,16 +72,16 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   };
 
   const onCloseModal = () => {
-    props.setIsModalOpen(false);
     dispatch(clearSelected());
     form.resetFields();
+    props.setIsModalOpen(false);
   };
 
   const onOkModal = () => {
     props.setIsModalOpen(true);
   };
 
-  const onFinish: FormProps<ICreateHopDongNs>['onFinish'] = (values) => {
+  const onFinish: FormProps<ICreateHopDongNs>['onFinish'] = async (values) => {
     // if (props.isUpdate) {
     //   JobPositionService.update(props.selectedId || '', {
     //     id: props.selectedId,
@@ -104,8 +105,12 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
       console.log('All form data:', values);
       onCloseModal();
     } else {
-      toast.success('Thêm mới thành công');
-      console.log('All form data:', values);
+      console.log(values);
+
+      await dispatch(createNhanSu(values));
+      if ($create.status === ReduxStatus.SUCCESS) {
+        toast.success('Thêm mới thành công');
+      }
       onCloseModal();
     }
   };

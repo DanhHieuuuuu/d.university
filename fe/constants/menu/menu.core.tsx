@@ -1,5 +1,14 @@
-import { FileOutlined, HomeOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
 import { IMenu } from '@models/common/menu.model';
+import {
+  ApartmentOutlined,
+  BarsOutlined,
+  DeploymentUnitOutlined,
+  FileOutlined,
+  HomeOutlined,
+  PartitionOutlined,
+  TeamOutlined,
+  UserOutlined
+} from '@ant-design/icons';
 
 export const listMenuCore: IMenu[] = [
   {
@@ -18,22 +27,29 @@ export const listMenuCore: IMenu[] = [
     icon: <UserOutlined />
   },
   {
-    label: 'Team',
-    routerLink: 'sub2',
+    label: 'Danh mục',
+    routerLink: '/list',
+    icon: <BarsOutlined />,
     items: [
       {
-        label: 'Team 1',
-        routerLink: '6'
+        label: 'Chức vụ',
+        routerLink: '/list/positions',
+        icon: <ApartmentOutlined />
       },
       {
-        label: 'Team 2',
-        routerLink: '8'
+        label: 'Phòng ban',
+        routerLink: '/list/departments',
+        icon: <PartitionOutlined />
+      },
+      {
+        label: 'Tổ bộ môn',
+        routerLink: '/list/divisions',
+        icon: <DeploymentUnitOutlined />
       }
     ]
   },
   {
     label: 'Files',
-
     routerLink: '9',
     icon: <FileOutlined />
   }

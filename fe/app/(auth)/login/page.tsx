@@ -21,6 +21,7 @@ function Index() {
   const [forgotPasswordModal, setForgotPasswordModal] = React.useState(false);
   const [forgotPasswordForm] = Form.useForm();
   const [isSendingEmail, setIsSendingEmail] = React.useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const { loading: loginLoading } = useAppSelector((state) => state.authState.$login);
 
@@ -57,159 +58,159 @@ function Index() {
     setIsSendingEmail(true);
     try {
       await AuthService.forgotPasswordApi({ maNhanSu: values.maNhanSu });
-      message.success('Mật khẩu mới đã được gửi vào mail thành công');
+      messageApi.success('Mật khẩu mới đã được gửi vào mail thành công');
       setForgotPasswordModal(false);
       forgotPasswordForm.resetFields();
     } catch (error) {
       console.error('Forgot password error:', error);
-      message.error('Không tìm thấy mã nhân sự hoặc có lỗi xảy ra!');
+      messageApi.error('Không tìm thấy mã nhân sự hoặc có lỗi xảy ra!');
     } finally {
       setIsSendingEmail(false);
     }
   };
 
   return (
-    <div
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden"
-      style={{ backgroundColor: colors.white }}
-    >
-      {/* Background image with 10% opacity */}
-      <img
-        src="/images/school-869061_1280.jpg"
-        alt="library background"
-        className="absolute inset-0 z-0 h-full w-full object-cover opacity-10"
-        style={{ pointerEvents: 'none' }}
-      />
-      {/* Overlay content */}
+    <>
+      {contextHolder}
       <div
-        className="relative z-10 flex w-full max-w-md flex-col items-center rounded-2xl p-8 shadow-lg"
+        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden"
         style={{ backgroundColor: colors.white }}
       >
-        <GraduationCap className="mb-6 h-12 w-12" style={{ color: colors.primary }} />
-        <h2 className="mb-2 text-2xl font-bold" style={{ color: colors.primaryNavy }}>
-          Đăng nhập
-        </h2>
-        <p className="mb-6 text-center" style={{ color: colors.gray }}>
-          Chào mừng bạn đến với hệ thống quản lý trường học
-        </p>
-        {loginLoading ? (
-          <div className="p-24">
-            <Spin size="large" />
+        {/* Background image with 10% opacity */}
+        <img
+          src="/images/school-869061_1280.jpg"
+          alt="library background"
+          className="absolute inset-0 z-0 h-full w-full object-cover opacity-10"
+          style={{ pointerEvents: 'none' }}
+        />
+        {/* Overlay content */}
+        <div
+          className="relative z-10 flex w-full max-w-md flex-col items-center rounded-2xl p-8 shadow-lg"
+          style={{ backgroundColor: colors.white }}
+        >
+          <GraduationCap className="mb-6 h-12 w-12" style={{ color: colors.primary }} />
+          <h2 className="mb-2 text-2xl font-bold" style={{ color: colors.primaryNavy }}>
+            Đăng nhập
+          </h2>
+          <p className="mb-6 text-center" style={{ color: colors.gray }}>
+            Chào mừng bạn đến với hệ thống quản lý trường học
+          </p>
+          {loginLoading ? (
+            <div className="p-24">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <Form
+              name="login-form"
+              layout="vertical"
+              initialValues={{ remember: true }}
+              onFinish={onFinish}
+              autoComplete="off"
+              className="flex w-full flex-col"
+            >
+              <Form.Item<ILogin>
+                label={<span className="text-sm font-medium text-gray-700">Mã nhân sự</span>}
+                name="maNhanSu"
+                rules={[{ required: true, message: 'Vui lòng nhập mã nhân sự!' }]}
+              >
+                <Input
+                  className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
+                  style={{ borderColor: colors.gray, boxShadow: `0 0 0 2px ${colors.primaryLight}33` }}
+                  placeholder="Nhập mã nhân sự"
+                />
+              </Form.Item>
+
+              <Form.Item<ILogin>
+                label={<span className="text-sm font-medium text-gray-700">Mật khẩu</span>}
+                name="password"
+                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+              >
+                <Input.Password
+                  className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
+                  style={{ borderColor: colors.gray, boxShadow: `0 0 0 2px ${colors.primaryLight}33` }}
+                  placeholder="Nhập mật khẩu"
+                />
+              </Form.Item>
+
+              <div className="mb-4 flex items-center justify-between">
+                <Form.Item<ILogin> name="remember" valuePropName="checked" label={null} className="mb-0">
+                  <Checkbox>Ghi nhớ đăng nhập</Checkbox>
+                </Form.Item>
+                <a
+                  onClick={() => setForgotPasswordModal(true)}
+                  style={{ color: colors.primaryLight }}
+                  className="cursor-pointer text-sm hover:underline"
+                >
+                  Quên mật khẩu?
+                </a>
+              </div>
+
+              <Form.Item label={null}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className="w-full rounded-lg py-2 font-semibold text-white transition"
+                  style={{ backgroundColor: colors.primary, borderColor: colors.primaryNavy }}
+                >
+                  Đăng nhập
+                </Button>
+              </Form.Item>
+            </Form>
+          )}
+          <div className="mt-6 text-center text-sm" style={{ color: colors.gray }}>
+            <span>Bạn cần hỗ trợ? Liên hệ ngay </span>
+            <a href="#" style={{ color: colors.primaryLight }} className="hover:underline">
+              19001009
+            </a>
           </div>
-        ) : (
-          <Form
-            name="login-form"
-            layout="vertical"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            autoComplete="off"
-            className="flex w-full flex-col"
-          >
-            <Form.Item<ILogin>
-              label={<span className="text-sm font-medium text-gray-700">Mã nhân sự</span>}
+        </div>
+        <footer className="relative z-10 mt-8 text-center text-xs" style={{ color: colors.gray }}>
+          &copy; {new Date().getFullYear()} D.University. All rights reserved.
+        </footer>
+
+        {/* Forgot Password Modal */}
+        <Modal
+          centered
+          title="Quên mật khẩu"
+          open={forgotPasswordModal}
+          onCancel={() => {
+            setForgotPasswordModal(false);
+            forgotPasswordForm.resetFields();
+          }}
+          footer={null}
+          width={400}
+        >
+          <p className="mb-4 text-gray-600">
+            Nhập mã nhân sự của bạn, chúng tôi sẽ gửi mật khẩu mới về email đã đăng ký.
+          </p>
+          <Form form={forgotPasswordForm} layout="vertical" onFinish={handleForgotPassword}>
+            <Form.Item
               name="maNhanSu"
+              label="Mã nhân sự"
               rules={[{ required: true, message: 'Vui lòng nhập mã nhân sự!' }]}
             >
-              <Input
-                className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
-                style={{ borderColor: colors.gray, boxShadow: `0 0 0 2px ${colors.primaryLight}33` }}
-                placeholder="Nhập mã nhân sự"
-              />
+              <Input placeholder="Nhập mã nhân sự của bạn" />
             </Form.Item>
 
-            <Form.Item<ILogin>
-              label={<span className="text-sm font-medium text-gray-700">Mật khẩu</span>}
-              name="password"
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-            >
-              <Input.Password
-                className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
-                style={{ borderColor: colors.gray, boxShadow: `0 0 0 2px ${colors.primaryLight}33` }}
-                placeholder="Nhập mật khẩu"
-              />
-            </Form.Item>
-
-            <div className="flex items-center justify-between mb-4">
-              <Form.Item<ILogin> name="remember" valuePropName="checked" label={null} className="mb-0">
-                <Checkbox>Ghi nhớ đăng nhập</Checkbox>
-              </Form.Item>
-              <a 
-                onClick={() => setForgotPasswordModal(true)}
-                style={{ color: colors.primaryLight }} 
-                className="text-sm hover:underline cursor-pointer"
-              >
-                Quên mật khẩu?
-              </a>
-            </div>
-
-            <Form.Item label={null}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="w-full rounded-lg py-2 font-semibold text-white transition"
-                style={{ backgroundColor: colors.primary, borderColor: colors.primaryNavy }}
-              >
-                Đăng nhập
-              </Button>
+            <Form.Item className="mb-0">
+              <div className="flex justify-end gap-2">
+                <Button
+                  onClick={() => {
+                    setForgotPasswordModal(false);
+                    forgotPasswordForm.resetFields();
+                  }}
+                >
+                  Hủy
+                </Button>
+                <Button type="primary" htmlType="submit" loading={isSendingEmail}>
+                  Gửi
+                </Button>
+              </div>
             </Form.Item>
           </Form>
-        )}
-        <div className="mt-6 text-center text-sm" style={{ color: colors.gray }}>
-          <span>Bạn cần hỗ trợ? Liên hệ ngay </span>
-          <a href="#" style={{ color: colors.primaryLight }} className="hover:underline">
-            19001009
-          </a>
-        </div>
+        </Modal>
       </div>
-      <footer className="relative z-10 mt-8 text-center text-xs" style={{ color: colors.gray }}>
-        &copy; {new Date().getFullYear()} D.University. All rights reserved.
-      </footer>
-
-      {/* Forgot Password Modal */}
-      <Modal
-        title="Quên mật khẩu"
-        open={forgotPasswordModal}
-        onCancel={() => {
-          setForgotPasswordModal(false);
-          forgotPasswordForm.resetFields();
-        }}
-        footer={null}
-        width={400}
-      >
-        <p className="mb-4 text-gray-600">
-          Nhập mã nhân sự của bạn, chúng tôi sẽ gửi mật khẩu mới về email đã đăng ký.
-        </p>
-        <Form
-          form={forgotPasswordForm}
-          layout="vertical"
-          onFinish={handleForgotPassword}
-        >
-          <Form.Item
-            name="maNhanSu"
-            label="Mã nhân sự"
-            rules={[
-              { required: true, message: 'Vui lòng nhập mã nhân sự!' }
-            ]}
-          >
-            <Input placeholder="Nhập mã nhân sự của bạn" />
-          </Form.Item>
-          
-          <Form.Item className="mb-0">
-            <div className="flex gap-2 justify-end">
-              <Button onClick={() => {
-                setForgotPasswordModal(false);
-                forgotPasswordForm.resetFields();
-              }}>
-                Hủy
-              </Button>
-              <Button type="primary" htmlType="submit" loading={isSendingEmail}>
-                Gửi
-              </Button>
-            </div>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+    </>
   );
 }
 

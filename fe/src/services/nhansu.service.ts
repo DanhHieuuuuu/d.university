@@ -31,10 +31,11 @@ const find = async (keyword: string) => {
     // Trả về data (object API)
     return res.data;
   } catch (err) {
-    processApiMsgError(err, 'Không thể tìm kiếm nhân sự.'); // 💡 ĐIỂM QUAN TRỌNG: Throws lỗi để Redux Thunk xử lý là rejected action
+    processApiMsgError(err, 'Không thể tìm kiếm nhân sự.');
     throw err;
   }
 };
+
 const createNhanSu = async (body: ICreateNhanSu) => {
   try {
     const res = await axios.post(`${apiNhanSuEndpoint}/create`, body);
