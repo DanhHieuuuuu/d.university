@@ -24,14 +24,17 @@ export function getMenuKeysFromPath(
       if (!item) continue;
       const key = item.routerLink as string;
 
-      // Nếu pathname khớp prefix thì chọn
       if (pathname === key || pathname.startsWith(key + '/')) {
         selectedKeys = [key];
-        if (parentKey) openKeys = [parentKey];
+        if (parentKey) {
+          if (!openKeys.includes(parentKey)) {
+            openKeys.push(parentKey);
+          }
+        }
       }
 
-      if ((item as any).children) {
-        traverse((item as any).children, key);
+      if (item.items && item.items.length) {
+        traverse(item.items, key);
       }
     }
   };

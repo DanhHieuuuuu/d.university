@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Menu, MenuProps } from 'antd';
-import { useNavigate } from '@hooks/navigate';
+
 import { getMenuKeysFromPath, mapToAntdItems } from '@helpers/menu.helper';
 import { IMenu } from '@models/common/menu.model';
+import { useNavigate } from '@hooks/navigate';
 
 type MenuPropsCustom = {
   data: IMenu[];
@@ -35,7 +36,7 @@ const AppMenu: React.FC<MenuPropsCustom> = ({ data }) => {
       items={items}
       openKeys={openKeys}
       selectedKeys={selectedKeys}
-      onOpenChange={(keys) => setOpenKeys(keys as string[])} // cần có
+      onOpenChange={(keys) => setOpenKeys(keys as string[])}
       onClick={onClick}
     />
   );
