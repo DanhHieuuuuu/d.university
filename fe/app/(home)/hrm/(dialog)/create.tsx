@@ -8,7 +8,13 @@ import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
-import { clearSelected, createNhanSu, getDetailNhanSu, getListNhanSu, resetStatusCreate } from '@redux/feature/nhansuSlice';
+import {
+  clearSelected,
+  createNhanSu,
+  getDetailNhanSu,
+  getListNhanSu,
+  resetStatusCreate
+} from '@redux/feature/nhansuSlice';
 import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab)';
 
 type NhanSuModalProps = {

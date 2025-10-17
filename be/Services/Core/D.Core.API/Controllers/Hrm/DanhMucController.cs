@@ -1,5 +1,4 @@
-﻿using d.Shared.Permission;
-using D.ControllerBase;
+﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
@@ -9,6 +8,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
+using d.Shared.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -76,7 +76,48 @@ namespace D.Core.API.Controllers.Hrm
             try
             {
                 await _mediator.Send(dto);
-                return new();
+                return new("Thêm mới chức vụ thành công");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin chức vụ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpPut("chuc-vu/update")]
+        public async Task<ResponseAPI> UpdateDmChucVu([FromBody] UpdateDmChucVuDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new("Đã cập nhật chức vụ thành công!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Xóa mềm chức vụ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpDelete("chuc-vu/delete/{id}")]
+        public async Task<ResponseAPI> DeleteDmChucVu([FromRoute] int id)
+        {
+            try
+            {
+                var dto = new DeleteDmChucVuDto { Id = id };
+                await _mediator.Send(dto);
+                return new("Đã xóa chức vụ.");
             }
             catch (Exception ex)
             {
@@ -186,7 +227,9 @@ namespace D.Core.API.Controllers.Hrm
         /// <returns></returns>
 
         [HttpGet("phong-ban/get-by-id")]
-        public async Task<ResponseAPI> GetDetailDmPhongBan([FromQuery] DmPhongBanGetByIdRequestDto dto)
+        public async Task<ResponseAPI> GetDetailDmPhongBan(
+            [FromQuery] DmPhongBanGetByIdRequestDto dto
+        )
         {
             try
             {
@@ -225,7 +268,9 @@ namespace D.Core.API.Controllers.Hrm
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet("quan-he")]
-        public async Task<ResponseAPI> GetAllQuanHeGiaDinh([FromQuery] DmQuanHeGiaDinhRequestDto dto)
+        public async Task<ResponseAPI> GetAllQuanHeGiaDinh(
+            [FromQuery] DmQuanHeGiaDinhRequestDto dto
+        )
         {
             try
             {

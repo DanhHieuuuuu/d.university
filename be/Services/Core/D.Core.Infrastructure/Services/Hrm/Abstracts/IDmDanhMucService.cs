@@ -24,6 +24,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public PageResultDto<DmToBoMonResponseDto> GetAllDmToBoMon(DmToBoMonRequestDto dto);
         public PageResultDto<DmTonGiaoResponseDto> GetAllDmTonGiao(DmTonGiaoRequestDto dto);
         public void CreateDmChucVu(CreateDmChucVuDto dto);
+        public void UpdateDmChucVu(UpdateDmChucVuDto dto);
+        public void DeleteDmChucVu(int id);
         public void CreateDmPhongBan(CreateDmPhongBanDto dto);
         public void CreateDmToBoMon(CreateDmToBoMonDto dto);
         public Task<DmChucVuResponseDto> GetDmChucVuByIdAsync(int id);

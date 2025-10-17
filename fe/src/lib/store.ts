@@ -22,7 +22,7 @@ export const makeStore = () => {
       loadState: loadingReducer,
       nhanSuState: nhanSuReducer,
       userState: userReducer,
-      danhmucState: danhmucReducer,
+      danhmucState: danhmucReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

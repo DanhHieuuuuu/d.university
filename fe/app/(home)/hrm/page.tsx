@@ -122,11 +122,11 @@ const Page = () => {
   });
 
   useEffect(() => {
-    if (!isModalOpen) {      
+    if (!isModalOpen) {
       dispatch(resetStatusCreate());
       dispatch(getListNhanSu(query));
     }
-  }, [isModalOpen])
+  }, [isModalOpen]);
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ cccd: value });

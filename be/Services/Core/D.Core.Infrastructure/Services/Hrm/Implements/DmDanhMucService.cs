@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
@@ -15,7 +16,6 @@ using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -38,10 +38,15 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         {
             _logger.LogInformation($"{nameof(GetAllDmChucVu)} method called.");
 
-            var query = _unitOfWork.iDmChucVuRepository.TableNoTracking;
+            var query = _unitOfWork.iDmChucVuRepository.TableNoTracking.Where(x =>
+                string.IsNullOrEmpty(dto.Keyword)
+                || x.TenChucVu.ToLower().Contains(dto.Keyword.ToLower())
+            );
 
             var totalCount = query.Count();
-            var items = query.ToList();
+
+            var items = query.Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
+            ;
 
             return new PageResultDto<DmChucVuResponseDto>
             {
@@ -181,7 +186,10 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         {
             _logger.LogInformation($"{nameof(GetAllDmQuocTich)} method called.");
 
-            var query = _unitOfWork.iDmQuocTichRepository.TableNoTracking.OrderBy(x => x.STT == null).ThenBy(x => x.STT); ;
+            var query = _unitOfWork
+                .iDmQuocTichRepository.TableNoTracking.OrderBy(x => x.STT == null)
+                .ThenBy(x => x.STT);
+            ;
 
             var totalCount = query.Count();
             var items = query.ToList();
@@ -261,6 +269,56 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
         }
 
+        public void UpdateDmChucVu(UpdateDmChucVuDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(UpdateDmChucVu)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
+
+            var exist = _unitOfWork.iDmChucVuRepository.TableNoTracking.FirstOrDefault(x =>
+                x.Id == dto.Id
+            );
+            var existMaChucVu = _unitOfWork.iDmChucVuRepository.TableNoTracking.Any(x =>
+                x.MaChucVu == dto.MaChucVu! && x.Id != dto.Id
+            );
+
+            if (exist == null)
+            {
+                throw new Exception($"Không tìm thấy chức vụ này.");
+            }
+            else if (existMaChucVu)
+            {
+                throw new Exception($"Đã tồn tại mã chức vụ \"{dto.MaChucVu}\" trogn csdl.");
+            }
+            else
+            {
+                exist.MaChucVu = dto.MaChucVu;
+                exist.TenChucVu = dto.TenChucVu;
+                exist.HsChucVu = dto.HsChucVu;
+                exist.HsTrachNhiem = dto.HsTrachNhiem;
+
+                _unitOfWork.iDmChucVuRepository.Update(exist);
+                _unitOfWork.iDmChucVuRepository.SaveChange();
+            }
+        }
+
+        public void DeleteDmChucVu(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDmChucVu)} method called. Dto: {id}");
+
+            var exist = _unitOfWork.iDmChucVuRepository.FindById(id);
+
+            if (exist != null)
+            {
+                _unitOfWork.iDmChucVuRepository.Delete(exist);
+                _unitOfWork.iDmChucVuRepository.SaveChange();
+            }
+            else
+            {
+                throw new Exception($"Chức vụ không tồn tại hoặc đã bị xóa");
+            }
+        }
+
         public void CreateDmPhongBan(CreateDmPhongBanDto dto)
         {
             _logger.LogInformation(
@@ -303,6 +361,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         public async Task<DmChucVuResponseDto> GetDmChucVuByIdAsync(int id)
         {
+            _logger.LogInformation($"{nameof(GetDmChucVuByIdAsync)} method called. Id = {id}");
+
             var entity = _unitOfWork.iDmChucVuRepository.FindById(id);
             if (entity == null)
                 return null;

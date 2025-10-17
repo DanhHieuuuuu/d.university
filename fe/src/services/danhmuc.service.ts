@@ -1,7 +1,7 @@
 import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseList, IResponseItem } from '@models/common/response.model';
-import { ICreateChucVu, IQueryChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
+import { ICreateChucVu, IQueryChucVu, IUpdateChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
 import {
   IViewDanToc,
   IViewGioiTinh,
@@ -58,6 +58,26 @@ const getChucVuById = async (idChucVu: number) => {
 const createChucVu = async (body: ICreateChucVu) => {
   try {
     const res = await axios.post(`${apiChucVuEndpoint}/create`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const updateChucVu = async (body: IUpdateChucVu) => {
+  try {
+    const res = await axios.put(`${apiChucVuEndpoint}/update`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const deleteChucVu = async (id: number) => {
+  try {
+    const res = await axios.delete(`${apiChucVuEndpoint}/${id}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -217,6 +237,8 @@ export const DanhMucService = {
   getListChucVu,
   getChucVuById,
   createChucVu,
+  updateChucVu,
+  deleteChucVu,
   getListDanToc,
   getListGioiTinh,
   getListLoaiHopDong,

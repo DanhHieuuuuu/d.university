@@ -16,7 +16,8 @@ namespace D.Core.Infrastructure.Repositories.Hrm
         }
     }
 
-    public interface IDmChucVuRepository : IRepositoryBase<DmChucVu> {
+    public interface IDmChucVuRepository : IRepositoryBase<DmChucVu>
+    {
         bool IsMaChucVuExist(string maChucVu);
     }
 }

@@ -31,7 +31,7 @@ export const createNhanSu = createAsyncThunk('nhansu/create-hd', async (payload:
   } catch (error: any) {
     console.error(error);
   }
-})
+});
 
 interface NhanSuState {
   status: ReduxStatus;
@@ -44,7 +44,7 @@ interface NhanSuState {
   total: number;
   $create: {
     status: ReduxStatus;
-  }
+  };
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
@@ -77,7 +77,7 @@ const nhanSuSlice = createSlice({
     },
     resetStatusCreate: (state) => {
       state.$create = { status: ReduxStatus.IDLE };
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -103,13 +103,13 @@ const nhanSuSlice = createSlice({
         state.selected.status = ReduxStatus.FAILURE;
       })
       .addCase(createNhanSu.pending, (state) => {
-        state.$create.status = ReduxStatus.LOADING
+        state.$create.status = ReduxStatus.LOADING;
       })
       .addCase(createNhanSu.fulfilled, (state) => {
-        state.$create.status = ReduxStatus.SUCCESS
+        state.$create.status = ReduxStatus.SUCCESS;
       })
       .addCase(createNhanSu.rejected, (state) => {
-        state.$create.status = ReduxStatus.FAILURE
+        state.$create.status = ReduxStatus.FAILURE;
       });
   }
 });

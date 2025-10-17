@@ -34,7 +34,6 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-
 interface UserState {
   status: ReduxStatus;
   selected: IUserView | null;
@@ -70,8 +69,7 @@ const userSlice = createSlice({
       .addCase(getAllUser.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
-      .addCase(createUser.fulfilled, (state, action: PayloadAction<any>) => {
-      })
+      .addCase(createUser.fulfilled, (state, action: PayloadAction<any>) => {})
       .addCase(updateUser.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
@@ -79,7 +77,7 @@ const userSlice = createSlice({
         state.status = ReduxStatus.SUCCESS;
         if (state.selected) {
           // Cập nhật list local
-          const index = state.list.findIndex(u => u.id === state.selected?.id);
+          const index = state.list.findIndex((u) => u.id === state.selected?.id);
           if (index !== -1) {
             state.list[index] = { ...state.list[index], email: action.meta.arg.Email ?? state.list[index].email };
           }

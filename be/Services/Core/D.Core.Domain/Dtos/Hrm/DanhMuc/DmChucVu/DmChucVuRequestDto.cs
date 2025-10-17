@@ -3,8 +3,5 @@ using D.DomainBase.Dto;
 
 namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu
 {
-    public class DmChucVuRequestDto : IQuery<PageResultDto<DmChucVuResponseDto>>
-    {
-
-    }
+    public class DmChucVuRequestDto : FilterBaseDto, IQuery<PageResultDto<DmChucVuResponseDto>> { }
 }
