@@ -27,7 +27,15 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public void UpdateDmChucVu(UpdateDmChucVuDto dto);
         public void DeleteDmChucVu(int id);
         public void CreateDmPhongBan(CreateDmPhongBanDto dto);
+
+        #region To Bo Mon
         public void CreateDmToBoMon(CreateDmToBoMonDto dto);
+        public void UpdateDmToBoMon(UpdateDmToBoMonDto dto);
+        public void DeleteDmToBoMon(int id);
+        public Task<DmToBoMonResponseDto> GetDmToBoMonByIdAsync(int id);
+
+        #endregion
+
         public Task<DmChucVuResponseDto> GetDmChucVuByIdAsync(int id);
         public Task<DmPhongBanResponseDto> GetDmPhongBanByIdAsync(int id);
     }

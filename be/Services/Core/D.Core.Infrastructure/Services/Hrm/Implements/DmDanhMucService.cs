@@ -338,6 +338,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 _unitOfWork.iDmPhongBanRepository.SaveChange();
             }
         }
+        #region To Bo Mon
 
         public void CreateDmToBoMon(CreateDmToBoMonDto dto)
         {
@@ -347,17 +348,81 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
             var exist = _unitOfWork.iDmToBoMonRepository.IsMaBoMonExist(dto.MaBoMon!);
             if (exist)
-            {
                 throw new Exception($"Đã tồn tại tổ bộ môn có mã {dto.MaBoMon}");
+            if (dto.IdPhongBan.HasValue)
+            {
+                var existPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                    .Any(x => x.Id == dto.IdPhongBan.Value);
+                if (!existPhongBan)
+                    throw new Exception($"Không tìm thấy phòng ban có Id = {dto.IdPhongBan}");
+            }
+            var newToBoMon = _mapper.Map<DmToBoMon>(dto);
+            _unitOfWork.iDmToBoMonRepository.Add(newToBoMon);
+            _unitOfWork.iDmToBoMonRepository.SaveChange();
+        }
+
+        public void UpdateDmToBoMon(UpdateDmToBoMonDto dto)
+        {
+            _logger.LogInformation(
+        $"{nameof(UpdateDmToBoMon)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+    );
+
+            var exist = _unitOfWork.iDmToBoMonRepository.TableNoTracking
+                .FirstOrDefault(x => x.Id == dto.Id);
+
+            if (exist == null)
+                throw new Exception($"Không tìm thấy tổ bộ môn có Id = {dto.Id}");
+
+            var existMaBoMon = _unitOfWork.iDmToBoMonRepository.TableNoTracking
+                .Any(x => x.MaBoMon == dto.MaBoMon! && x.Id != dto.Id);
+
+            if (existMaBoMon)
+                throw new Exception($"Đã tồn tại tổ bộ môn có mã \"{dto.MaBoMon}\" trong CSDL.");
+
+            if (dto.IdPhongBan.HasValue)
+            {
+                var existPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                    .Any(x => x.Id == dto.IdPhongBan);
+
+                if (!existPhongBan)
+                    throw new Exception($"Không tìm thấy phòng ban có Id = {dto.IdPhongBan}");
+            }
+
+            exist.MaBoMon = dto.MaBoMon;
+            exist.TenBoMon = dto.TenBoMon;
+            exist.NgayThanhLap = dto.NgayThanhLap;
+            exist.IdPhongBan = dto.IdPhongBan;
+            _unitOfWork.iDmToBoMonRepository.Update(exist);
+            _unitOfWork.iDmToBoMonRepository.SaveChange();
+        }
+
+        public void DeleteDmToBoMon(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDmToBoMon)} method called. Dto: {id}");
+
+            var exist = _unitOfWork.iDmToBoMonRepository.FindById(id);
+
+            if (exist != null)
+            {
+                _unitOfWork.iDmToBoMonRepository.Delete(exist);
+                _unitOfWork.iDmToBoMonRepository.SaveChange();
             }
             else
             {
-                var newToBoMon = _mapper.Map<DmToBoMon>(dto);
-
-                _unitOfWork.iDmToBoMonRepository.Add(newToBoMon);
-                _unitOfWork.iDmToBoMonRepository.SaveChange();
+                throw new Exception($"Tổ bộ môn không tồn tại hoặc đã bị xóa");
             }
         }
+
+        public async Task<DmToBoMonResponseDto> GetDmToBoMonByIdAsync(int id)
+        {
+            _logger.LogInformation($"{nameof(GetDmToBoMonByIdAsync)} called with Id = {id}");
+            var  entity =  _unitOfWork.iDmToBoMonRepository.FindById(id);
+            if (entity == null)
+                return null;
+            return _mapper.Map<DmToBoMonResponseDto>(entity);
+        }
+
+        #endregion
 
         public async Task<DmChucVuResponseDto> GetDmChucVuByIdAsync(int id)
         {

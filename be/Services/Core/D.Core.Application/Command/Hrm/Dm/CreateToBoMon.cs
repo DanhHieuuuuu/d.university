@@ -1,15 +1,10 @@
 ﻿using D.ApplicationBase;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Core.Application.Command.Hrm.Dm
 {
-    public class CreateToBoMon : ICommandHandler<CreateDmChucVuDto>
+    public class CreateToBoMon : ICommandHandler<CreateDmToBoMonDto>
     {
         private readonly IDmDanhMucService _service;
 
@@ -18,9 +13,10 @@ namespace D.Core.Application.Command.Hrm.Dm
             _service = service;
         }
 
-        public async Task Handle(CreateDmChucVuDto request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDmToBoMonDto request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _service.CreateDmToBoMon(request);
+            return;
         }
     }
 }
