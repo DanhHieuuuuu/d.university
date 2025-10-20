@@ -30,7 +30,7 @@ namespace D.Core.Domain.Entities.SinhVien
 
         // Thông tin công việc
 
-        public int? KhoaHoc { get; set; }
+        //public int? KhoaHoc { get; set; }
         public int? Khoa { get; set; }
         public int? ChuyenNganh { get; set; }
         public int? LopQL { get; set; }

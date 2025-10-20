@@ -3,6 +3,7 @@ using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
@@ -308,6 +309,64 @@ namespace D.Core.API.Controllers.Hrm
             {
                 var result = await _mediator.Send(dto);
                 return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Danh sách khóa
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("khoa/find")]
+        public async Task<ResponseAPI> GetAllKhoa([FromQuery] DmKhoaRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy khóa theo Id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("khoa/get-by-id")]
+        public async Task<ResponseAPI> GetDetailDmKhoa([FromQuery] DmKhoaGetByIdRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Thêm mới khóa
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpPost("khoa/create")]
+        public async Task<ResponseAPI> CreateDmKhoa([FromBody] CreateDmKhoaDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new();
             }
             catch (Exception ex)
             {

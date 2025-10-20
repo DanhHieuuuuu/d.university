@@ -19,7 +19,7 @@ namespace D.Core.Domain.Dtos.SinhVien
         public string? SoCccd { get; set; }
         public string? SoDienThoai { get; set; }
         public string? Email { get; set; }
-        public int? KhoaHoc { get; set; }
+        //public int? KhoaHoc { get; set; }
         public int? Khoa { get; set; }
         public int? ChuyenNganh { get; set; }
     }

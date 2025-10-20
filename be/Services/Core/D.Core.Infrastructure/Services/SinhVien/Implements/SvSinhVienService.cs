@@ -82,10 +82,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
                     SoCccd = x.SoCccd,
                     SoDienThoai = x.SoDienThoai,
                     Email = x.Email,
-                    KhoaHoc = x.KhoaHoc,
-                    //TenKhoa = x.Khoa.HasValue
-                    //    ? _unitOfWork.iDmKhoaRepository.FindById(x.IdKhoa.Value)?.TenKhoa
-                    //    : null,
+                    Khoa = x.Khoa,
                     //NganhHoc = x.IdNganh.HasValue
                     //    ? _unitOfWork.iDmNganhRepository.FindById(x.IdNganh.Value)?.TenNganh
                     //    : null,
@@ -120,7 +117,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
 
             var newSv = _mapper.Map<SvSinhVien>(dto);
 
-            newSv.Mssv = _unitOfWork.iSvSinhVienRepository.GenerateMssv(dto.KhoaHoc!.Value);
+            newSv.Mssv = _unitOfWork.iSvSinhVienRepository.GenerateMssv(dto.Khoa!.Value);
             newSv.Email2 = _unitOfWork.iSvSinhVienRepository.GenerateEmail(newSv.Mssv!);
             _unitOfWork.iSvSinhVienRepository.AddAsync(newSv);
              _unitOfWork.iSvSinhVienRepository.SaveChange();
@@ -182,10 +179,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
                 SoCccd = sv.SoCccd,
                 SoDienThoai = sv.SoDienThoai,
                 Email = sv.Email,
-                KhoaHoc = sv.KhoaHoc,
-                //TenKhoa = sv.IdKhoa.HasValue
-                //    ? _unitOfWork.iDmKhoaRepository.FindById(sv.IdKhoa.Value)?.TenKhoa
-                //    : null,
+                Khoa = sv.Khoa,
                 //NganhHoc = sv.IdNganh.HasValue
                 //    ? _unitOfWork.iDmNganhRepository.FindById(sv.IdNganh.Value)?.TenNganh
                 //    : null,

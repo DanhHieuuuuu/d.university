@@ -20,11 +20,11 @@ namespace D.Core.Infrastructure.Repositories.SinhVien
             return TableNoTracking.Any(x => x.SoCccd == cccd);
         }
 
-        public string GenerateMssv(int khoaHoc)
+        public string GenerateMssv(int khoa)
         {
-            int currentCount = TableNoTracking.Count(x => x.KhoaHoc == khoaHoc) + 1;
+            int currentCount = TableNoTracking.Count(x => x.Khoa == khoa) + 1;
 
-            string mssv = $"{currentCount:D5}{khoaHoc:D2}";
+            string mssv = $"{currentCount:D5}{khoa:D2}";
 
             return mssv;
         }
@@ -45,7 +45,7 @@ namespace D.Core.Infrastructure.Repositories.SinhVien
     public interface ISvSinhVienRepository : IRepositoryBase<SvSinhVien>
     {
         bool IsSoCccdExits(string cccd);
-        string GenerateMssv(int khoaHoc);
+        string GenerateMssv(int khoa);
         string GenerateEmail(string mssv);
         SvSinhVien? GetByMssv(string mssv);
     }
