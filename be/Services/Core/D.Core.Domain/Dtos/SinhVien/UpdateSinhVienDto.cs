@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using D.DomainBase.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.SinhVien
 {
-    public class SvSinhVienUpdateRequestDto : IRequest<bool>
+    public class UpdateSinhVienDto : ICommand<bool>
     {
-        public int Id { get; set; }
+        public int IdSinhVien { get; set; }
+        public string? Mssv { get; set; }
         public string? HoDem { get; set; }
         public string? Ten { get; set; }
         public DateTime? NgaySinh { get; set; }
@@ -19,5 +20,6 @@ namespace D.Core.Domain.Dtos.SinhVien
         public int? DanToc { get; set; }
         public string? SoCccd { get; set; }
         public string? SoDienThoai { get; set; }
+        public string? Email { get; set; }
     }
 }

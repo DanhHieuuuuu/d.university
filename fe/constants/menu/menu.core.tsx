@@ -27,6 +27,11 @@ export const listMenuCore: IMenu[] = [
     icon: <UserOutlined />
   },
   {
+    label: 'Student',
+    routerLink: '/student/manage',
+    icon: <TeamOutlined />
+  },
+  {
     label: 'Danh mục',
     routerLink: '/list',
     icon: <BarsOutlined />,

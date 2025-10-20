@@ -26,13 +26,15 @@ namespace D.Core.Domain.Entities.SinhVien
         public int? DanToc { get; set; }
         public string? SoCccd { get; set; }
         public string? SoDienThoai { get; set; }
+        public string? Email { get; set; }
 
         // Thông tin công việc
 
+        public int? KhoaHoc { get; set; }
         public int? Khoa { get; set; }
         public int? ChuyenNganh { get; set; }
-        public int? Lop { get; set; }
-        public bool? TrangThaiHoc { get; set; }
+        public int? LopQL { get; set; }
+        public int? TrangThaiHoc { get; set; }
 
         // Thông tin đăng nhập
 

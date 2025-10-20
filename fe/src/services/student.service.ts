@@ -1,0 +1,74 @@
+import { IQueryStudent, IViewStudent, ICreateStudent } from '@models/student/student.model';
+import { IResponseList } from '@models/common/response.model';
+import { processApiMsgError } from '@utils/index';
+import axios from '@utils/axios';
+
+const apiStudentEndpoint = 'student';
+
+const findPaging = async (query: IQueryStudent) => {
+  try {
+    const res = await axios.get(`${apiStudentEndpoint}/find`, {
+      params: {
+        ...query,
+      },
+    });
+
+    const data: IResponseList<IViewStudent> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tải danh sách sinh viên.');
+    return Promise.reject(err);
+  }
+};
+
+const getDetail = async (idStudent: number) => {
+  try {
+    const res = await axios.get(`${apiStudentEndpoint}/detail`, {
+      params: { idStudent },
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tải chi tiết sinh viên.');
+    return Promise.reject(err);
+  }
+};
+
+const create = async (body: ICreateStudent) => {
+  try {
+    const res = await axios.post(`${apiStudentEndpoint}/create`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tạo sinh viên mới.');
+    return Promise.reject(err);
+  }
+};
+
+const update = async (body: Partial<IViewStudent>) => {
+  try {
+    const res = await axios.put(`${apiStudentEndpoint}/update`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật sinh viên.');
+    return Promise.reject(err);
+  }
+};
+
+const remove = async (idStudent: number) => {
+  try {
+    const res = await axios.delete(`${apiStudentEndpoint}/delete`, {
+      data: { idStudent },
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể xóa sinh viên.');
+    return Promise.reject(err);
+  }
+};
+
+export const StudentService = {
+  findPaging,
+  getDetail,
+  create,
+  update,
+  remove,
+};
