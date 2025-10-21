@@ -7,7 +7,7 @@ export type IQueryUser = IQueryPaging & {
 export type IUserView = {
   id?: number;
   maNhanSu?: string;
-  hoDem?: string ;
+  hoDem?: string;
   ten?: string;
   ngaySinh?: Date;
   noiSinh?: string;
@@ -29,7 +29,7 @@ export interface INhanSuData {
   gioiTinh: string | null;
   soCccd: string | null;
   soDienThoai: string | null;
-  email: string | null; 
+  email: string | null;
   tenChucVu: string | null;
   tenPhongBan: string | null;
 }
@@ -38,4 +38,4 @@ export interface IUserCreate {
   maNhanSu: string;
   email2?: string | null;
   password?: string | null;
-};
+}

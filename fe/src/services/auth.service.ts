@@ -23,8 +23,6 @@ const loginApi = async (body: ILogin) => {
   }
 };
 
-
-
 const refreshTokenApi = async (params: { token: string; refreshToken: string }) => {
   try {
     const res = await api.post(`nhansu/refresh-token`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
@@ -57,7 +55,11 @@ const changePasswordApi = async (body: { oldPassword: string; newPassword: strin
 
 const forgotPasswordApi = async (body: { maNhanSu: string }) => {
   try {
-    const { data } = await axios.post('user/reset-password', { MaNhanSu: body.maNhanSu }, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    const { data } = await axios.post(
+      'user/reset-password',
+      { MaNhanSu: body.maNhanSu },
+      { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL }
+    );
     return Promise.resolve(data);
   } catch (err) {
     processApiMsgError(err);

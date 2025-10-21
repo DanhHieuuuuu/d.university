@@ -1,5 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { IViewChucVu } from '@models/danh-muc/chuc-vu.model';
+import { ReduxStatus } from '@redux/const';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ICreateChucVu, IQueryChucVu, IUpdateChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
 import { IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import {
@@ -13,9 +14,45 @@ import {
 } from '@models/danh-muc/common.model';
 import { DanhMucService } from '@services/danhmuc.service';
 
-export const getAllChucVu = createAsyncThunk('danhmuc/list-chucvu', async () => {
+export const getAllChucVu = createAsyncThunk('danhmuc/list-chucvu', async (payload?: IQueryChucVu) => {
   try {
-    const res = await DanhMucService.getListChucVu();
+    const res = await DanhMucService.getListChucVu(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const createChucVu = createAsyncThunk('danhmuc/create-chucvu', async (payload: ICreateChucVu) => {
+  try {
+    const res = await DanhMucService.createChucVu(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const updateChucVu = createAsyncThunk('danhmuc/update-chucvu', async (payload: IUpdateChucVu) => {
+  try {
+    const res = await DanhMucService.updateChucVu(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const deleteChucVu = createAsyncThunk('danhmuc/delete-chucvu', async (payload: number) => {
+  try {
+    const res = await DanhMucService.deleteChucVu(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const getChucVuById = createAsyncThunk('danhmuc/get-chucvu', async (payload: number) => {
+  try {
+    const res = await DanhMucService.getChucVuById(payload);
 
     return res.data;
   } catch (error: any) {
@@ -104,8 +141,30 @@ export const getAllTonGiao = createAsyncThunk('danhmuc/list-tongiao', async () =
   }
 });
 
+interface CRUD<T> {
+  $create: {
+    status: ReduxStatus;
+  };
+  $list: {
+    status: ReduxStatus;
+    data: T[];
+    total?: number;
+  };
+  $update: {
+    status: ReduxStatus;
+  };
+  $delete: {
+    status: ReduxStatus;
+  };
+  $selected: {
+    status: ReduxStatus;
+    id: number | null;
+    data: T | null;
+  };
+}
+
 interface DanhMucState {
-  listChucVu: IViewChucVu[];
+  chucVu: CRUD<IViewChucVu>;
   listDanToc: IViewDanToc[];
   listGioiTinh: IViewGioiTinh[];
   listLoaiHopDong: IViewLoaiHopDong[];
@@ -118,7 +177,13 @@ interface DanhMucState {
 }
 
 const initialState: DanhMucState = {
-  listChucVu: [],
+  chucVu: {
+    $create: { status: ReduxStatus.IDLE },
+    $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
+    $update: { status: ReduxStatus.IDLE },
+    $delete: { status: ReduxStatus.IDLE },
+    $selected: { status: ReduxStatus.IDLE, id: null, data: null }
+  },
   listDanToc: [],
   listGioiTinh: [],
   listLoaiHopDong: [],
@@ -133,11 +198,68 @@ const initialState: DanhMucState = {
 const danhmucSlice = createSlice({
   name: 'danhmuc',
   initialState,
-  reducers: {},
+  reducers: {
+    clearSeletedChucVu: (state) => {
+      state.chucVu.$selected = { status: ReduxStatus.IDLE, id: null, data: null };
+    },
+    setSelectedIdChucVu: (state, action: PayloadAction<number>) => {
+      state.chucVu.$selected.id = action.payload;
+    },
+    resetStatusChucVu: (state) => {
+      state.chucVu.$create.status = ReduxStatus.IDLE;
+      state.chucVu.$update.status = ReduxStatus.IDLE;
+      state.chucVu.$delete.status = ReduxStatus.IDLE;
+    }
+  },
   extraReducers: (buidler) => {
     buidler
+      .addCase(getAllChucVu.pending, (state) => {
+        state.chucVu.$list.status = ReduxStatus.LOADING;
+      })
       .addCase(getAllChucVu.fulfilled, (state, action) => {
-        state.listChucVu = action.payload!.items;
+        state.chucVu.$list.status = ReduxStatus.SUCCESS;
+        state.chucVu.$list.data = action.payload?.items || [];
+        state.chucVu.$list.total = action.payload?.totalItems || 0;
+      })
+      .addCase(getAllChucVu.rejected, (state) => {
+        state.chucVu.$list.status = ReduxStatus.FAILURE;
+      })
+      .addCase(getChucVuById.pending, (state) => {
+        state.chucVu.$selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getChucVuById.fulfilled, (state, action) => {
+        state.chucVu.$selected.status = ReduxStatus.SUCCESS;
+        state.chucVu.$selected.data = action.payload || null;
+      })
+      .addCase(getChucVuById.rejected, (state) => {
+        state.chucVu.$selected.status = ReduxStatus.FAILURE;
+      })
+      .addCase(createChucVu.pending, (state) => {
+        state.chucVu.$create.status = ReduxStatus.LOADING;
+      })
+      .addCase(createChucVu.fulfilled, (state, action) => {
+        state.chucVu.$create.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createChucVu.rejected, (state) => {
+        state.chucVu.$create.status = ReduxStatus.FAILURE;
+      })
+      .addCase(updateChucVu.pending, (state) => {
+        state.chucVu.$update.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateChucVu.fulfilled, (state, action) => {
+        state.chucVu.$update.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateChucVu.rejected, (state) => {
+        state.chucVu.$update.status = ReduxStatus.FAILURE;
+      })
+      .addCase(deleteChucVu.pending, (state) => {
+        state.chucVu.$delete.status = ReduxStatus.LOADING;
+      })
+      .addCase(deleteChucVu.fulfilled, (state, action) => {
+        state.chucVu.$delete.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(deleteChucVu.rejected, (state) => {
+        state.chucVu.$delete.status = ReduxStatus.FAILURE;
       })
       .addCase(getAllDanToc.fulfilled, (state, action) => {
         state.listDanToc = action.payload!.items;
@@ -171,6 +293,6 @@ const danhmucSlice = createSlice({
 
 const danhmucReducer = danhmucSlice.reducer;
 
-export const {} = danhmucSlice.actions;
+export const { clearSeletedChucVu, setSelectedIdChucVu, resetStatusChucVu } = danhmucSlice.actions;
 
 export default danhmucReducer;

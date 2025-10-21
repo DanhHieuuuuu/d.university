@@ -10,7 +10,7 @@ const { TextArea } = Input;
 export default function JobTab() {
   const form = Form.useFormInstance<ICreateHopDongNs>();
   const [probation, setProbation] = useState<boolean>(false);
-  const { listPhongBan, listLoaiHopDong, listChucVu, listToBoMon } = useAppSelector((state) => state.danhmucState);
+  const { listPhongBan, listLoaiHopDong, chucVu, listToBoMon } = useAppSelector((state) => state.danhmucState);
 
   return (
     <div className="grid grid-cols-3 gap-x-5">
@@ -55,7 +55,7 @@ export default function JobTab() {
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <Select
-          options={listChucVu?.map((item) => {
+          options={chucVu.$list.data?.map((item) => {
             return { label: item.tenChucVu, value: item.id };
           })}
         />

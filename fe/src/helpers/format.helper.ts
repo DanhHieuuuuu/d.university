@@ -1,12 +1,11 @@
 // @utils/format.ts
 
-
 export const toKebabCase = (str: string): string => {
   if (!str) return '';
 
   return str
-    .normalize('NFD') 
-    .replace(/[\u0300-\u036f]/g, '') 
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'D')
     .replace(/[ăâàáảãạ]/g, 'a')
@@ -23,26 +22,27 @@ export const toKebabCase = (str: string): string => {
     .replace(/[ỲÝỶỸỴ]/g, 'Y')
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-'); 
+    .replace(/\s+/g, '-');
 };
-
 
 export const generateUsername = (hoDem: string | null, ten: string | null): string => {
   if (!hoDem || !ten) return '';
 
   const cleanedTen = toKebabCase(ten);
   const hoDemParts = hoDem.split(' ').filter(Boolean);
-  const vietTatHoDem = hoDemParts.map(part => toKebabCase(part).charAt(0)).join('');
+  const vietTatHoDem = hoDemParts.map((part) => toKebabCase(part).charAt(0)).join('');
 
   return `${cleanedTen}${vietTatHoDem}`.toLowerCase();
 };
-
 
 export const generateChucVuAbbreviation = (name: string | null): string => {
   if (!name) return '';
 
   const parts = name.split(' ').filter(Boolean);
-  const abbreviation = parts.map(part => toKebabCase(part).charAt(0)).join('').toLowerCase();
+  const abbreviation = parts
+    .map((part) => toKebabCase(part).charAt(0))
+    .join('')
+    .toLowerCase();
 
   if (abbreviation.length === 1 && name.toLowerCase().includes('giám đốc')) {
     return 'gd';
@@ -50,7 +50,6 @@ export const generateChucVuAbbreviation = (name: string | null): string => {
 
   return abbreviation;
 };
-
 
 export const generateHuceEmail = (hoDem: string | null, ten: string | null, tenChucVu: string | null): string => {
   const username = generateUsername(hoDem, ten);

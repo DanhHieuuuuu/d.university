@@ -39,12 +39,12 @@
   }
 
   // Khi hover submenu đã active
-  .ant-menu-submenu-selected>.ant-menu-submenu-title:hover {
+  .ant-menu-submenu-selected > .ant-menu-submenu-title:hover {
     color: $white !important;
     background-color: $primaryLight !important;
   }
 
-  .ant-menu-submenu>.ant-menu-submenu-title:hover {
+  .ant-menu-submenu > .ant-menu-submenu-title:hover {
     color: $white !important;
   }
 }

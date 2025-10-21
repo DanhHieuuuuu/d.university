@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button, Checkbox, Modal, Popover, Space, Table, TableProps } from 'antd';
 import type { CheckboxOptionType } from 'antd';
-import { SettingOutlined, MoreOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { SettingOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { IAction, IColumn } from '@models/common/table.model';
 import '@styles/table.style.scss';
 
@@ -13,20 +13,20 @@ interface AppTableProps<T> extends TableProps<T> {
 }
 
 const AppTable = <T extends object>(props: AppTableProps<T>) => {
-  const [open, setOpen] = useState(false);
+  const [openConfig, setOpenConfig] = useState<boolean>(false);
   const { columns, listActions, ...rest } = props;
 
-  const openPopup = () => {
-    setOpen(true);
+  const openPopupConfig = () => {
+    setOpenConfig(true);
   };
 
-  const closePopup = () => {
-    setOpen(false);
+  const closePopupConfig = () => {
+    setOpenConfig(false);
   };
 
   const configColumn: IColumn<T> = {
     key: 'config',
-    title: <Button type="text" icon={<SettingOutlined />} onClick={openPopup} />,
+    title: <Button type="text" icon={<SettingOutlined />} onClick={openPopupConfig} />,
     dataIndex: '__config',
     width: 50,
     fixed: 'right',
@@ -55,7 +55,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         );
 
         return (
-          <Popover trigger="click" placement="bottomRight" arrow={true} content={content}>
+          <Popover key={index} trigger="click" placement="bottomRight" arrow={true} content={content}>
             <Button type="text" title="Xem thêm" icon={<EllipsisOutlined />} />
           </Popover>
         );
@@ -83,7 +83,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
   return (
     <>
       <Table<T> size="small" columns={newColumns} scroll={{ x: 'max-content' }} {...rest} />
-      <Modal width={250} title="Cấu hình hiển thị" open={open} onCancel={closePopup} footer={null}>
+      <Modal width={250} title="Cấu hình hiển thị" open={openConfig} onCancel={closePopupConfig} footer={null}>
         <Checkbox.Group
           style={{ flexDirection: 'column' }}
           value={checkedList}
