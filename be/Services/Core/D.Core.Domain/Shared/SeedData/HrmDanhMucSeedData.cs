@@ -14,6 +14,7 @@ namespace D.Core.Domain.Shared.SeedData
             modelBuilder.SeedDataDmTonGiao();
             modelBuilder.SeedDataDmLoaiPhongBan();
             modelBuilder.SeedDataDmQuanHeGiaDinh();
+            modelBuilder.SeedDataDmKhoa();
         }
 
         public static void SeedDataDmGioiTinh(this ModelBuilder modelBuilder)
@@ -954,6 +955,38 @@ namespace D.Core.Domain.Shared.SeedData
                         Id = 8,
                         MaQuanHe = "AceVC",
                         TenQuanHe = "Anh/Chị/Em (chồng, vợ)",
+                    }
+                );
+        }
+
+        public static void SeedDataDmKhoa(this ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<DmKhoa>()
+                .HasData(
+                    new DmKhoa
+                    {
+                        Id = 1,
+                        MaKhoa = "K69",
+                        TenKhoa = "Khóa 69 (2024)",
+                        Nam = "2024",
+                        CachViet = "2024 - 2028",
+                    },
+                    new DmKhoa
+                    {
+                        Id = 2,
+                        MaKhoa = "K70",
+                        TenKhoa = "Khóa 70 (2025)",
+                        Nam = "2025",
+                        CachViet = "2025 - 2029",
+                    },
+                    new DmKhoa
+                    {
+                        Id = 3,
+                        MaKhoa = "K71",
+                        TenKhoa = "Khóa 71 (2026)",
+                        Nam = "2026",
+                        CachViet = "2026 - 2030",
                     }
                 );
         }

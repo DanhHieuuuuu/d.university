@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using D.DomainBase.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.SinhVien
 {
-    public class SvSinhVienCreateRequestDto : IRequest<int>
+    public class CreateSinhVienDto : ICommand<SvSinhVienResponseDto>
     {
         public string? HoDem { get; set; }
         public string? Ten { get; set; }
@@ -18,5 +18,9 @@ namespace D.Core.Domain.Dtos.SinhVien
         public int? DanToc { get; set; }
         public string? SoCccd { get; set; }
         public string? SoDienThoai { get; set; }
+        public string? Email { get; set; }
+        //public int? KhoaHoc { get; set; }
+        public int? Khoa { get; set; }
+        public int? ChuyenNganh { get; set; }
     }
 }

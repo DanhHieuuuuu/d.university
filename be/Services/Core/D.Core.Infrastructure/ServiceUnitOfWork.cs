@@ -20,6 +20,7 @@ namespace D.Core.Infrastructure
         private DmQuocTichRepository _dmQuocTichRepository;
         private DmToBoMonRepository _dmToBoMonRepository;
         private DmTonGiaoRepository _dmTonGiaoRepository;
+        private DmKhoaRepository _dmKhoaRepository;
 
         private NsNhanSuRepository _nsNhanSuRepository;
         private NsQuanHeGiaDinhRepository _nsQuanHeGiaDinhRepository;
@@ -224,6 +225,19 @@ namespace D.Core.Infrastructure
                     _dmToBoMonRepository = new DmToBoMonRepository(_dbContext, _httpContext);
                 }
                 return _dmToBoMonRepository;
+            }
+        }
+
+
+        public IDmKhoaRepository iDmKhoaRepository
+        {
+            get
+            {
+                if (_dmKhoaRepository == null)
+                {
+                    _dmKhoaRepository = new DmKhoaRepository(_dbContext, _httpContext);
+                }
+                return _dmKhoaRepository;
             }
         }
     }
