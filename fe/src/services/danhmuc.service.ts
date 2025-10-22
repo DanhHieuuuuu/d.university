@@ -12,7 +12,7 @@ import {
   IViewTonGiao
 } from '@models/danh-muc/common.model';
 import { ICreatePhongBan, IQueryPhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
-import { ICreateToBoMon, IQueryToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
+import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
 
 const apiDanhMucEndpoint = 'danhmuc';
 
@@ -221,6 +221,38 @@ const createToBoMon = async (body: ICreateToBoMon) => {
   }
 };
 
+const updateToBoMon = async (body: IUpdateToBoMon) => {
+  try {
+    const res = await axios.put(`${apiToBoMonEndpoint}/update`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const deleteToBoMon = async (id: number) => {
+  try {
+    const res = await axios.delete(`${apiToBoMonEndpoint}/${id}`);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const getToBoMonById = async (idToBoMon: number) => {
+  try {
+    const res = await axios.get(`${apiToBoMonEndpoint}/get-by-id?Id=${idToBoMon}`);
+
+    const data: IResponseItem<IViewToBoMon> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
 const getListTonGiao = async () => {
   try {
     const res = await axios.get(`${apiTonGiaoEndpoint}`);
@@ -250,5 +282,8 @@ export const DanhMucService = {
   getListQuocTich,
   getListToBoMon,
   createToBoMon,
+  updateToBoMon,
+  deleteToBoMon,
+  getToBoMonById,
   getListTonGiao
 };

@@ -5,6 +5,8 @@ export type IQueryToBoMon = IQueryPaging & {};
 export type IViewToBoMon = {
   id: number;
   tenBoMon: string;
+  ngayThanhLap: Date;
+  phongBan: string;
 };
 
 export type ICreateToBoMon = {
@@ -13,3 +15,10 @@ export type ICreateToBoMon = {
   ngayThanhLap: Date;
   idPhongBan: number;
 };
+
+export type IUpdateToBoMon = ICreateToBoMon & {
+  id: number;
+};
+
+
+

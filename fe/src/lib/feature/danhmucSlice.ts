@@ -1,7 +1,7 @@
 import { ReduxStatus } from '@redux/const';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ICreateChucVu, IQueryChucVu, IUpdateChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
-import { IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
+import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import {
   IViewDanToc,
@@ -122,9 +122,45 @@ export const getAllQuocTich = createAsyncThunk('danhmuc/list-quoctich', async ()
     console.error(error);
   }
 });
-export const getAllToBoMon = createAsyncThunk('danhmuc/list-tobomon', async () => {
+export const getAllToBoMon = createAsyncThunk('danhmuc/list-tobomon', async (payload?: IQueryToBoMon) => {
   try {
     const res = await DanhMucService.getListToBoMon();
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const createToBoMon = createAsyncThunk('danhmuc/create-toBoMon', async (payload: ICreateToBoMon) => {
+  try {
+    const res = await DanhMucService.createToBoMon(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const updateToBoMon = createAsyncThunk('danhmuc/update-toBoMon', async (payload: IUpdateToBoMon) => {
+  try {
+    const res = await DanhMucService.updateToBoMon(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const deleteToBoMon = createAsyncThunk('danhmuc/delete-toBoMon', async (payload: number) => {
+  try {
+    const res = await DanhMucService.deleteToBoMon(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const getToBoMonById = createAsyncThunk('danhmuc/get-toBoMon', async (payload: number) => {
+  try {
+    const res = await DanhMucService.getToBoMonById(payload);
 
     return res.data;
   } catch (error: any) {
@@ -165,6 +201,7 @@ interface CRUD<T> {
 
 interface DanhMucState {
   chucVu: CRUD<IViewChucVu>;
+  toBoMon: CRUD<IViewToBoMon>;
   listDanToc: IViewDanToc[];
   listGioiTinh: IViewGioiTinh[];
   listLoaiHopDong: IViewLoaiHopDong[];
@@ -178,6 +215,13 @@ interface DanhMucState {
 
 const initialState: DanhMucState = {
   chucVu: {
+    $create: { status: ReduxStatus.IDLE },
+    $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
+    $update: { status: ReduxStatus.IDLE },
+    $delete: { status: ReduxStatus.IDLE },
+    $selected: { status: ReduxStatus.IDLE, id: null, data: null }
+  },
+  toBoMon: {
     $create: { status: ReduxStatus.IDLE },
     $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
     $update: { status: ReduxStatus.IDLE },
@@ -209,6 +253,18 @@ const danhmucSlice = createSlice({
       state.chucVu.$create.status = ReduxStatus.IDLE;
       state.chucVu.$update.status = ReduxStatus.IDLE;
       state.chucVu.$delete.status = ReduxStatus.IDLE;
+    },
+
+    clearSeletedToBoMon: (state) => {
+      state.toBoMon.$selected = { status: ReduxStatus.IDLE, id: null, data: null };
+    },
+    setSelectedIdToBoMon: (state, action: PayloadAction<number>) => {
+      state.toBoMon.$selected.id = action.payload;
+    },
+    resetStatusToBoMon: (state) => {
+      state.toBoMon.$create.status = ReduxStatus.IDLE;
+      state.toBoMon.$update.status = ReduxStatus.IDLE;
+      state.toBoMon.$delete.status = ReduxStatus.IDLE;
     }
   },
   extraReducers: (buidler) => {
@@ -282,9 +338,58 @@ const danhmucSlice = createSlice({
       .addCase(getAllQuocTich.fulfilled, (state, action) => {
         state.listQuocTich = action.payload!.items;
       })
-      .addCase(getAllToBoMon.fulfilled, (state, action) => {
-        state.listToBoMon = action.payload!.items;
+      //ToBoMon
+      .addCase(getAllToBoMon.pending, (state) => {
+        state.toBoMon.$list.status = ReduxStatus.LOADING;
       })
+      .addCase(getAllToBoMon.fulfilled, (state, action) => {
+        state.toBoMon.$list.status = ReduxStatus.SUCCESS;
+        state.toBoMon.$list.data = action.payload?.items || [];
+        state.toBoMon.$list.total = action.payload?.totalItems || 0;
+      })
+      .addCase(getAllToBoMon.rejected, (state) => {
+        state.toBoMon.$list.status = ReduxStatus.FAILURE;
+      })
+      .addCase(getToBoMonById.pending, (state) => {
+        state.toBoMon.$selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getToBoMonById.fulfilled, (state, action) => {
+        state.toBoMon.$selected.status = ReduxStatus.SUCCESS;
+        state.toBoMon.$selected.data = action.payload || null;
+      })
+      .addCase(getToBoMonById.rejected, (state) => {
+        state.toBoMon.$selected.status = ReduxStatus.FAILURE;
+      })
+
+      .addCase(createToBoMon.pending, (state) => {
+        state.toBoMon.$create.status = ReduxStatus.LOADING;
+      })
+      .addCase(createToBoMon.fulfilled, (state) => {
+        state.toBoMon.$create.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createToBoMon.rejected, (state) => {
+        state.toBoMon.$create.status = ReduxStatus.FAILURE;
+      })
+      .addCase(updateToBoMon.pending, (state) => {
+        state.toBoMon.$update.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateToBoMon.fulfilled, (state) => {
+        state.toBoMon.$update.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateToBoMon.rejected, (state) => {
+        state.toBoMon.$update.status = ReduxStatus.FAILURE;
+      })
+
+      .addCase(deleteToBoMon.pending, (state) => {
+        state.toBoMon.$delete.status = ReduxStatus.LOADING;
+      })
+      .addCase(deleteToBoMon.fulfilled, (state) => {
+        state.toBoMon.$delete.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(deleteToBoMon.rejected, (state) => {
+        state.toBoMon.$delete.status = ReduxStatus.FAILURE;
+      })
+      //TonGiao
       .addCase(getAllTonGiao.fulfilled, (state, action) => {
         state.listTonGiao = action.payload!.items;
       });
@@ -293,6 +398,13 @@ const danhmucSlice = createSlice({
 
 const danhmucReducer = danhmucSlice.reducer;
 
-export const { clearSeletedChucVu, setSelectedIdChucVu, resetStatusChucVu } = danhmucSlice.actions;
+export const {
+  clearSeletedChucVu,
+  setSelectedIdChucVu,
+  resetStatusChucVu,
+  clearSeletedToBoMon,
+  setSelectedIdToBoMon,
+  resetStatusToBoMon
+} = danhmucSlice.actions;
 
 export default danhmucReducer;

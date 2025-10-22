@@ -419,7 +419,13 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var  entity =  _unitOfWork.iDmToBoMonRepository.FindById(id);
             if (entity == null)
                 return null;
-            return _mapper.Map<DmToBoMonResponseDto>(entity);
+            var phongban = entity.IdPhongBan.HasValue
+                        ? _unitOfWork.iDmPhongBanRepository.FindById(entity.IdPhongBan.Value) 
+                        : null;
+            string? tenPhongBan = phongban?.TenPhongBan;
+            var result = _mapper.Map<DmToBoMonResponseDto>(entity);
+            result.PhongBan = tenPhongBan;
+            return result;
         }
 
         #endregion
