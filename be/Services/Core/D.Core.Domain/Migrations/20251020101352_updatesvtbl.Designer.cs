@@ -4,6 +4,7 @@ using D.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    partial class CoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251020101352_updatesvtbl")]
+    partial class updatesvtbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -637,105 +640,6 @@ namespace D.Core.Domain.Migrations
                             Deleted = false,
                             MaGioiTinh = "Female",
                             TenGioiTinh = "Nữ"
-                        });
-                });
-
-            modelBuilder.Entity("D.Core.Domain.Entities.Hrm.DanhMuc.DmKhoa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CachViet")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsVisible")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MaKhoa")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nam")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("NgayTao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("NguoiTao")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TenKhoa")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DmKhoa", "hrm");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CachViet = "2024 - 2028",
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            IsVisible = true,
-                            MaKhoa = "K69",
-                            Nam = "2024",
-                            TenKhoa = "Khóa 69 (2024)"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CachViet = "2025 - 2029",
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            IsVisible = true,
-                            MaKhoa = "K70",
-                            Nam = "2025",
-                            TenKhoa = "Khóa 70 (2025)"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CachViet = "2026 - 2030",
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            IsVisible = true,
-                            MaKhoa = "K71",
-                            Nam = "2026",
-                            TenKhoa = "Khóa 71 (2026)"
                         });
                 });
 
@@ -2407,6 +2311,9 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Khoa")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KhoaHoc")
                         .HasColumnType("int");
 
                     b.Property<int?>("LopQL")

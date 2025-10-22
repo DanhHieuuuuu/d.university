@@ -3,6 +3,7 @@ using AutoMapper;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
@@ -248,6 +249,22 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             };
         }
 
+        public PageResultDto<DmKhoaResponseDto> GetAllDmKhoa(DmKhoaRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllDmKhoa)} method called.");
+
+            var query = _unitOfWork.iDmKhoaRepository.TableNoTracking;
+
+            var totalCount = query.Count();
+            var items = query.ToList();
+
+            return new PageResultDto<DmKhoaResponseDto>
+            {
+                Items = _mapper.Map<List<DmKhoaResponseDto>>(items),
+                TotalItem = totalCount,
+            };
+        }
+
         public void CreateDmChucVu(CreateDmChucVuDto dto)
         {
             _logger.LogInformation(
@@ -430,6 +447,27 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         #endregion
 
+        public void CreateDmKhoa(CreateDmKhoaDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(CreateDmKhoa)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
+
+            var exist = _unitOfWork.iDmKhoaRepository.IsMaKhoaExist(dto.MaKhoa!);
+
+            if (exist)
+            {
+                throw new Exception($"Đã có khóa với mã {dto.MaKhoa}");
+            }
+            else
+            {
+                var newKhoa = _mapper.Map<DmKhoa>(dto);
+
+                _unitOfWork.iDmKhoaRepository.Add(newKhoa);
+                _unitOfWork.iDmKhoaRepository.SaveChange();
+            }
+        }
+
         public async Task<DmChucVuResponseDto> GetDmChucVuByIdAsync(int id)
         {
             _logger.LogInformation($"{nameof(GetDmChucVuByIdAsync)} method called. Id = {id}");
@@ -446,6 +484,14 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             if (entity == null)
                 return null;
             return _mapper.Map<DmPhongBanResponseDto>(entity);
+        }
+
+        public async Task<DmKhoaResponseDto> GetDmKhoaByIdAsync(int id)
+        {
+            var entity = _unitOfWork.iDmKhoaRepository.FindById(id);
+            if (entity == null)
+                return null;
+            return _mapper.Map<DmKhoaResponseDto>(entity);
         }
     }
 }

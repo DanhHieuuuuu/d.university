@@ -4,6 +4,7 @@ using D.Auth.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Auth.Domain.Migrations
 {
     [DbContext(typeof(AuthDBContext))]
-    partial class AuthDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251022035205_entity_permission")]
+    partial class entity_permission
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,7 +298,7 @@ namespace D.Auth.Domain.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("PermissionId")
+                    b.Property<int>("PermissionId")
                         .HasColumnType("int")
                         .HasColumnName("PermissionId");
 
@@ -378,7 +381,9 @@ namespace D.Auth.Domain.Migrations
                 {
                     b.HasOne("D.Auth.Domain.Entities.Permission", "Permission")
                         .WithMany()
-                        .HasForeignKey("PermissionId");
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("D.Auth.Domain.Entities.Role", "Role")
                         .WithMany("RolePermissions")

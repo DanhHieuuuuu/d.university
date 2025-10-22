@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using D.DomainBase.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.SinhVien
 {
-    public class SvSinhVienDeleteRequestDto : IRequest<bool>
+    public class DeleteSinhVienDto : ICommand<bool>
     {
-        public int Id { get; set; }
+        public string? Mssv { get; set; }
     }
 }
