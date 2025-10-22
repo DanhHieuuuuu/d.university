@@ -124,7 +124,7 @@ export const getAllQuocTich = createAsyncThunk('danhmuc/list-quoctich', async ()
 });
 export const getAllToBoMon = createAsyncThunk('danhmuc/list-tobomon', async (payload?: IQueryToBoMon) => {
   try {
-    const res = await DanhMucService.getListToBoMon();
+    const res = await DanhMucService.getListToBoMon(payload);
 
     return res.data;
   } catch (error: any) {

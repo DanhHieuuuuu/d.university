@@ -205,10 +205,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         public PageResultDto<DmToBoMonResponseDto> GetAllDmToBoMon(DmToBoMonRequestDto dto)
         {
             _logger.LogInformation($"{nameof(GetAllDmToBoMon)} method called.");
-
             var query = _unitOfWork.iDmToBoMonRepository.TableNoTracking.Where(x =>
                 string.IsNullOrEmpty(dto.Keyword)
-                || EF.Functions.Like(x.TenBoMon ?? "", $"%{dto.Keyword}%")
+                || x.TenBoMon.ToLower().Contains(dto.Keyword.ToLower())
             );
 
             var totalCount = query.Count();

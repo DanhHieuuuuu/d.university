@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal } from 'antd';
+import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateToBoMon, IUpdateToBoMon } from '@models/danh-muc/to-bo-mon.model';
 import {
   clearSeletedToBoMon,
   createToBoMon,
+  getAllPhongBan,
   getToBoMonById,
   resetStatusToBoMon,
   updateToBoMon
@@ -31,21 +32,26 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
 
   const { isModalOpen, isUpdate, isView, refreshData, setIsModalOpen } = props;
+  const phongBanList = useAppSelector((state) => state.danhmucState.listPhongBan || []);
 
   useEffect(() => {
-    if (isModalOpen && (isUpdate || isView) && $selected.id) {
-      dispatch(getToBoMonById($selected.id));
+    if (isModalOpen) {
+      dispatch(getAllPhongBan());
+      if ((isUpdate || isView) && $selected.id) dispatch(getToBoMonById($selected.id));
     }
   }, [dispatch, isModalOpen, isUpdate, isView, $selected.id]);
 
   useEffect(() => {
     if ($selected.data) {
+      const selectedData = $selected.data;
+      const idPhongBan = phongBanList.find((pb) => pb.tenPhongBan === selectedData.phongBan)?.id;
       form.setFieldsValue({
-        ...$selected.data,
-        ngayThanhLap: $selected.data.ngayThanhLap ? dayjs($selected.data.ngayThanhLap) : undefined
+        ...selectedData,
+        ngayThanhLap: selectedData.ngayThanhLap ? dayjs(selectedData.ngayThanhLap) : undefined,
+        idPhongBan
       });
     }
-  }, [$selected.data, form]);
+  }, [$selected.data, phongBanList, form]);
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
@@ -135,8 +141,25 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <DatePicker format="DD/MM/YYYY" needConfirm className="!w-full" />
           </Form.Item>
 
-          <Form.Item<ICreateToBoMon> label="Phòng ban" name="idPhongBan">
-            <InputNumber className="!w-full" min={0} step={0.01} stringMode precision={2} />
+          <Form.Item<ICreateToBoMon>
+            label="Phòng ban"
+            name="idPhongBan"
+            rules={[{ required: true, message: 'Vui lòng chọn phòng ban' }]}
+          >
+            <Select
+              placeholder="Chọn phòng ban"
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.children as unknown as string).toLowerCase().includes(input.toLowerCase())
+              }
+            >
+              {phongBanList.map((pb) => (
+                <Select.Option key={pb.id} value={pb.id}>
+                  {pb.tenPhongBan}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </div>
       </Form>

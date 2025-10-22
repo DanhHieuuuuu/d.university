@@ -90,8 +90,8 @@ const Page = () => {
       dataIndex: 'ngayThanhLap',
       title: 'Ngày thành lập',
       render: (value) => {
-              const date = formatDateView(value);
-              return <p>{date}</p>;
+        const date = formatDateView(value);
+        return <p>{date}</p>;
       }
     },
     {
@@ -173,7 +173,6 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
-
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
