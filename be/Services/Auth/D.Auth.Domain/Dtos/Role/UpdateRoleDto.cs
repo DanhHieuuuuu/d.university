@@ -1,10 +1,10 @@
-﻿using D.Auth.Domain.Dtos.Permission;
-using D.DomainBase.Common;
+﻿using D.DomainBase.Common;
 
 namespace D.Auth.Domain.Dtos.Role
 {
-    public class CreateRoleRequestDto : ICommand<bool>
+    public class UpdateRoleDto : ICommand
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
     }

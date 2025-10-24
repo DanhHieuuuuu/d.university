@@ -13,5 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Library\D.ControllerBase\D.ControllerBase.csproj" />
+    <ProjectReference Include="..\..\Auth\D.Auth.Domain\D.Auth.Domain.csproj" />
   </ItemGroup>
 </Project>

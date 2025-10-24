@@ -14,12 +14,6 @@ namespace D.Auth.Domain.Entities
         [Column("PermissionId"), Description("Id của permission.")]
         public int? PermissionId { get; set; }
 
-        [Column("PermissonKey"), MaxLength(255), Description("Mã permission.")]
-        public string PermissonKey { get; set; }
-
-        [Column("PermissionName"), MaxLength(255), Description("Tên của permisson.")]
-        public string PermissionName { get; set; }
-
         [ForeignKey(nameof(RoleId))]
         public Role Role { get; set; }
 

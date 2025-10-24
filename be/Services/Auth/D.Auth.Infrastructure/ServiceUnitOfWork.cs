@@ -1,11 +1,8 @@
-﻿using D.Auth.Infrastructure.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using D.Auth.Infrastructure.Repositories;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Auth.Infrastructure
 {
@@ -25,11 +22,12 @@ namespace D.Auth.Infrastructure
         private RolePermissionRepository _rolePermissionRepository;
         private UserRoleRepository _userRoleRepository;
         private UserRepository _userRepository;
+        private PermissionRepository _permissionRepository;
         public INsNhanSuRepository iNsNhanSuRepository
         {
             get
             {
-                if(_nsNhanSuRepository == null)
+                if (_nsNhanSuRepository == null)
                 {
                     _nsNhanSuRepository = new NsNhanSuRepository(_dbContext, _httpContext);
                 }
@@ -55,7 +53,10 @@ namespace D.Auth.Infrastructure
             {
                 if (_rolePermissionRepository == null)
                 {
-                    _rolePermissionRepository = new RolePermissionRepository(_dbContext, _httpContext);
+                    _rolePermissionRepository = new RolePermissionRepository(
+                        _dbContext,
+                        _httpContext
+                    );
                 }
                 return _rolePermissionRepository;
             }
@@ -82,6 +83,18 @@ namespace D.Auth.Infrastructure
                     _userRepository = new UserRepository(_dbContext, _httpContext);
                 }
                 return _userRepository;
+            }
+        }
+
+        public IPermissionRepository iPermissionRepository
+        {
+            get
+            {
+                if (_permissionRepository == null)
+                {
+                    _permissionRepository = new PermissionRepository(_dbContext, _httpContext);
+                }
+                return _permissionRepository;
             }
         }
     }

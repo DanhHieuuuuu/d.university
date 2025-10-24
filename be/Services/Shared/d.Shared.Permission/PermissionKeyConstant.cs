@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace d.Shared.Permission
+﻿namespace d.Shared.Permission
 {
     public static class PermissionKeyConstant
     {
         public const string Admin = "admin";
+    }
+
+    public static class PermissionPrefixKeys
+    {
+        public const string Menu = "menu_";
+        public const string Table = "table_";
+        public const string Button = "btn_";
     }
 }
