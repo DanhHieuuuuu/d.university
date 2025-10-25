@@ -12,9 +12,9 @@ export const getListStudent = createAsyncThunk('student/list', async (args: IQue
   }
 });
 
-export const getDetailStudent = createAsyncThunk('student/detail', async (idStudent: number) => {
+export const getDetailStudent = createAsyncThunk('student/detail', async (keyword: string) => {
   try {
-    const res = await StudentService.getDetail(idStudent);
+    const res = await StudentService.find(keyword);
     return res.data;
   } catch (error: any) {
     console.error(error);
@@ -23,7 +23,7 @@ export const getDetailStudent = createAsyncThunk('student/detail', async (idStud
 
 export const createStudent = createAsyncThunk('student/create', async (body: ICreateStudent) => {
   try {
-    const res = await StudentService.create(body);
+    const res = await StudentService.createSinhVien(body);
     return res.data;
   } catch (error: any) {
     console.error(error);

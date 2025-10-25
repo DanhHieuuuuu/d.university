@@ -3,7 +3,7 @@ import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
 
-const apiStudentEndpoint = 'student';
+const apiStudentEndpoint = 'sinhvien';
 
 const findPaging = async (query: IQueryStudent) => {
   try {
@@ -21,19 +21,22 @@ const findPaging = async (query: IQueryStudent) => {
   }
 };
 
-const getDetail = async (idStudent: number) => {
+const find = async (keyword: string) => {
   try {
-    const res = await axios.get(`${apiStudentEndpoint}/detail`, {
-      params: { idStudent },
+    const res = await axios.get(`${apiStudentEndpoint}/get`, {
+      params: {
+        keyword: keyword
+      }
     });
-    return Promise.resolve(res.data);
+    // Trả về data (object API)
+    return res.data;
   } catch (err) {
-    processApiMsgError(err, 'Không thể tải chi tiết sinh viên.');
-    return Promise.reject(err);
+    processApiMsgError(err, 'Không thể tìm kiếm sinh viên.');
+    throw err;
   }
 };
 
-const create = async (body: ICreateStudent) => {
+const createSinhVien = async (body: ICreateStudent) => {
   try {
     const res = await axios.post(`${apiStudentEndpoint}/create`, body);
     return Promise.resolve(res.data);
@@ -67,8 +70,8 @@ const remove = async (idStudent: number) => {
 
 export const StudentService = {
   findPaging,
-  getDetail,
-  create,
+  find,
+  createSinhVien,
   update,
   remove,
 };

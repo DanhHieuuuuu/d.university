@@ -354,6 +354,63 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 _unitOfWork.iDmPhongBanRepository.SaveChange();
             }
         }
+
+        public void UpdateDmPhongBan(UpdateDmPhongBanDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(UpdateDmPhongBan)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
+
+            var exist = _unitOfWork.iDmPhongBanRepository.TableNoTracking.FirstOrDefault(x =>
+                x.Id == dto.Id
+            );
+            var existMaPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking.Any(x =>
+                x.MaPhongBan == dto.MaPhongBan! && x.Id != dto.Id
+            );
+
+            if (exist == null)
+            {
+                throw new Exception($"Không tìm thấy phòng ban này.");
+            }
+            else if (existMaPhongBan)
+            {
+                throw new Exception($"Đã tồn tại mã phòng ban \"{dto.MaPhongBan}\" trogn csdl.");
+            }
+            else
+            {
+                exist.MaPhongBan = dto.MaPhongBan;
+                exist.TenPhongBan = dto.TenPhongBan;
+                exist.IdLoaiPhongBan = dto.IdLoaiPhongBan;
+                exist.DiaChi = dto.DiaChi;
+                exist.Hotline = dto.Hotline;
+                exist.Fax = dto.Fax;
+                exist.NgayThanhLap = dto.NgayThanhLap;
+                exist.STT = dto.STT;
+                exist.ChucVuNguoiDaiDien = dto.ChucVuNguoiDaiDien;
+                exist.NguoiDaiDien = dto.NguoiDaiDien;
+
+                _unitOfWork.iDmPhongBanRepository.Update(exist);
+                _unitOfWork.iDmPhongBanRepository.SaveChange();
+            }
+        }
+
+        public void DeleteDmPhongBan(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDmPhongBan)} method called. Dto: {id}");
+
+            var exist = _unitOfWork.iDmPhongBanRepository.FindById(id);
+
+            if (exist != null)
+            {
+                _unitOfWork.iDmPhongBanRepository.Delete(exist);
+                _unitOfWork.iDmPhongBanRepository.SaveChange();
+            }
+            else
+            {
+                throw new Exception($"Chức vụ không tồn tại hoặc đã bị xóa");
+            }
+        }
+
         #region To Bo Mon
 
         public void CreateDmToBoMon(CreateDmToBoMonDto dto)

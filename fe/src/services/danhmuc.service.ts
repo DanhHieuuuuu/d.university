@@ -11,7 +11,7 @@ import {
   IViewQuocTich,
   IViewTonGiao
 } from '@models/danh-muc/common.model';
-import { ICreatePhongBan, IQueryPhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
+import { ICreatePhongBan, IQueryPhongBan, IUpdatePhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
 
 const apiDanhMucEndpoint = 'danhmuc';
@@ -171,6 +171,26 @@ const createPhongBan = async (body: ICreatePhongBan) => {
   }
 };
 
+const updatePhongBan = async (body: IUpdatePhongBan) => {
+  try {
+    const res = await axios.put(`${apiPhongBanEndpoint}/update`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const deletePhongBan = async (id: number) => {
+  try {
+    const res = await axios.delete(`${apiPhongBanEndpoint}/${id}`);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
 const getListQuanHeGiaDinh = async () => {
   try {
     const res = await axios.get(`${apiQuanHeEndpoint}`);
@@ -278,6 +298,8 @@ export const DanhMucService = {
   getListPhongBan,
   getPhongBanById,
   createPhongBan,
+  updatePhongBan,
+  deletePhongBan,
   getListQuanHeGiaDinh,
   getListQuocTich,
   getListToBoMon,
