@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Library\D.ApplicationBase\D.ApplicationBase.csproj" />
     <ProjectReference Include="..\..\..\Library\D.ControllerBase\D.ControllerBase.csproj" />
+    <ProjectReference Include="..\..\..\Library\D.S3Bucket\D.S3Bucket.csproj" />
     <ProjectReference Include="..\..\Shared\d.Shared.Permission\d.Shared.Permission.csproj" />
     <ProjectReference Include="..\D.Auth.Application\D.Auth.Application.csproj" />
     <ProjectReference Include="..\D.Auth.Domain\D.Auth.Domain.csproj" />
