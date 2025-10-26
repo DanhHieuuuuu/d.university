@@ -1,4 +1,4 @@
-namespace D.S3Bucket.Dtos
+﻿namespace D.S3Bucket.Dtos
 {
     public class ResponseS3FileDto
     {

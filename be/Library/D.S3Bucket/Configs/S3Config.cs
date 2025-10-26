@@ -1,4 +1,4 @@
-namespace D.S3Bucket.Configs
+﻿namespace D.S3Bucket.Configs
 {
     public class S3Config
     {

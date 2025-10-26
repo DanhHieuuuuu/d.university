@@ -1,4 +1,4 @@
-using D.ControllerBase.Exceptions;
+﻿using D.ControllerBase.Exceptions;
 
 namespace D.S3Bucket.Exceptions
 {

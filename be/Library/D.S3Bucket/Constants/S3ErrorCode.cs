@@ -1,4 +1,4 @@
-namespace D.S3Bucket.Constants
+﻿namespace D.S3Bucket.Constants
 {
     public static class S3ErrorCode
     {
