@@ -5,6 +5,7 @@ using D.Auth.Domain.Dtos.User.Password;
 using D.ControllerBase;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 namespace D.Auth.API.Controllers
 {
@@ -102,16 +103,16 @@ namespace D.Auth.API.Controllers
         /// <returns></returns>
         //[PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpPut("update-image-user")]
-        public async Task<ResponseAPI> UpdateImageUser(UpdateImageUserDto dto)
+        public async Task<IActionResult> UpdateImageUser(UpdateImageUserDto dto)
         {
             try
             {
                 var result = await _mediator.Send(dto);
-                return new(result);
+                return FileByStream(result, dto.File.FileName);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
     }

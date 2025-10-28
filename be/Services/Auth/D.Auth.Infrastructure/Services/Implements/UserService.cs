@@ -200,7 +200,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             return true;
         }
 
-        public async Task<bool> UpdateUserImage(UpdateImageUserDto request)
+        public async Task<Stream> UpdateUserImage(UpdateImageUserDto request)
         {
             _logger.LogInformation($"{nameof(UpdateUser)} method called. Dto: {request}");
 
@@ -214,9 +214,9 @@ namespace D.Auth.Infrastructure.Services.Implements
             var fileName = $"{Guid.NewGuid()}{fileExtension}";
 
             ns.ImageLink = fileName;
-            var result = await _s3ManagerFile.UploadFileAsync(fileName, request.File);
+            var uploadFile = await _s3ManagerFile.UploadFileAsync(fileName, request.File);
 
-            if (result == null)
+            if (uploadFile == null)
             {
                 throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "File lưu không thành công.");
             }
@@ -225,7 +225,9 @@ namespace D.Auth.Infrastructure.Services.Implements
 
             await _unitOfWork.iUserRepository.SaveChangeAsync();
 
-            return true;
+            var result = await _s3ManagerFile.ReadFileAsync(fileName);
+
+            return result;
         }
 
     }

@@ -14,6 +14,6 @@ namespace D.Auth.Infrastructure.Services.Abstracts
         Task<CreateUserResponseDto> CreateUser(CreateUserRequestDto request);
         Task<bool> UpdateUser(UpdateUserRequestDto request);
         Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request);
-        Task<bool> UpdateUserImage(UpdateImageUserDto request);
+        Task<Stream> UpdateUserImage(UpdateImageUserDto request);
     }
 }

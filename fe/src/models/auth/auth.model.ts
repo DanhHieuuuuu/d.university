@@ -19,4 +19,5 @@ export type IUser = {
   hoDem: string | null;
   ten: string | null;
   email: string | null;
+  imageLink?: string | null;
 };

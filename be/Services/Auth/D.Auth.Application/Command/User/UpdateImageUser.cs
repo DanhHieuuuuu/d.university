@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace D.Auth.Application.Command.User
 {
-    public class UpdateImageUser : ICommandHandler<UpdateImageUserDto, bool>
+    public class UpdateImageUser : ICommandHandler<UpdateImageUserDto, Stream>
     {
         private readonly IUserService _userService;
         public UpdateImageUser(IUserService userService)
         {
             _userService = userService;
         }
-        public async Task<bool> Handle(UpdateImageUserDto request, CancellationToken cancellationToken)
+        public async Task<Stream> Handle(UpdateImageUserDto request, CancellationToken cancellationToken)
         {
             return await _userService.UpdateUserImage(request);
         }
