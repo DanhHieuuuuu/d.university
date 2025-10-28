@@ -5,6 +5,7 @@ using D.Auth.Domain.Dtos.User.Password;
 using D.ControllerBase;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 namespace D.Auth.API.Controllers
 {
@@ -92,6 +93,26 @@ namespace D.Auth.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật ảnh đại diện
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        //[PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpPut("update-image-user")]
+        public async Task<IActionResult> UpdateImageUser(UpdateImageUserDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return FileByStream(result, dto.File.FileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }
