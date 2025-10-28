@@ -94,5 +94,25 @@ namespace D.Auth.API.Controllers
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Cập nhật ảnh đại diện
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        //[PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpPut("update-image-user")]
+        public async Task<ResponseAPI> UpdateImageUser(UpdateImageUserDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
