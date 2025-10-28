@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@redux/hooks';
-import { refreshToken } from '@redux/feature/authSlice';
+import { myPermission, refreshToken } from '@redux/feature/authSlice';
 import { processApiMsgError } from '@utils/index';
 import { clearToken, getValidToken } from '@utils/token-storage';
 
@@ -34,6 +34,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       }
     } else {
       // token còn hạn → có thể gọi API getMe
+      dispatch(myPermission());
       console.log('Đã xem trang');
     }
   };

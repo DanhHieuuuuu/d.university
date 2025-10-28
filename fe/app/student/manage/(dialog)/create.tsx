@@ -22,7 +22,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({ open, onClose
     try {
       const formattedValues: ICreateStudent = {
         ...values,
-        ngaySinh: values.ngaySinh ? dayjs(values.ngaySinh).toDate() : undefined,
+        ngaySinh: values.ngaySinh ? dayjs(values.ngaySinh).toDate() : undefined
       };
 
       await dispatch(createStudent(formattedValues)).unwrap();
@@ -78,7 +78,7 @@ const CreateStudentDialog: React.FC<CreateStudentDialogProps> = ({ open, onClose
             placeholder="Chọn giới tính"
             options={[
               { label: 'Nam', value: 1 },
-              { label: 'Nữ', value: 0 },
+              { label: 'Nữ', value: 0 }
             ]}
           />
         </Form.Item>

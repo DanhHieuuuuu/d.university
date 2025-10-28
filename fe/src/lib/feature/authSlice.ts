@@ -1,24 +1,21 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthService } from '@services/auth.service';
 import { ILogin, IUser } from '@models/auth/auth.model';
-import { IRole } from '@models/role';
 import { setItem as setToken, clearToken, getItem } from '@utils/token-storage';
+import { RoleService } from '@services/role.service';
 
-export const login = createAsyncThunk(
-  `${process.env.NEXT_PUBLIC_LOGIN_API}`,
-  async (args: ILogin, { rejectWithValue }) => {
-    try {
-      const res = await AuthService.loginApi(args);
-      return res;
-    } catch (error: any) {
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+export const login = createAsyncThunk(`auth/login`, async (args: ILogin, { rejectWithValue }) => {
+  try {
+    const res = await AuthService.loginApi(args);
+    return res;
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});
 
 export const refreshToken = createAsyncThunk('auth/refresh', async (_, { rejectWithValue }) => {
   try {
@@ -42,12 +39,19 @@ export const refreshToken = createAsyncThunk('auth/refresh', async (_, { rejectW
   }
 });
 
+export const myPermission = createAsyncThunk('auth/permission', async () => {
+  try {
+    const res = await RoleService.getMyPermission();
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+
 interface AuthState {
   user: IUser | null;
   status: string | number | null;
   permissions: string[];
-  role: IRole;
-  roleId: number;
   isAuthenticated: boolean;
   $login: {
     loading?: boolean;
@@ -59,8 +63,6 @@ const initialState: AuthState = {
   user: null,
   status: null,
   permissions: [],
-  role: {},
-  roleId: 0,
   isAuthenticated: false,
   $login: {
     loading: false,
@@ -73,8 +75,7 @@ const authSlice = createSlice({
   initialState,
   selectors: {
     isGranted: (state: AuthState, permission: string) => {
-      const permissions = state.role?.permissions?.map((x) => x.permissionName) || [];
-      return permissions.includes(permission);
+      return state.permissions.includes(permission);
     }
   },
   reducers: {
@@ -135,6 +136,9 @@ const authSlice = createSlice({
       })
       .addCase(refreshToken.rejected, (state) => {
         state.$login.loading = false;
+      })
+      .addCase(myPermission.fulfilled, (state, action) => {
+        state.permissions = action.payload || [];
       });
   }
 });

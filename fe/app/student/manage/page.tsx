@@ -27,12 +27,12 @@ const StudentPage = () => {
     initialQuery: {
       SkipCount: 0,
       MaxResultCount: 10,
-      mssv: '',
+      mssv: ''
     },
     onQueryChange: (newQuery) => {
       dispatch(getListStudent(newQuery));
     },
-    triggerFirstLoad: true,
+    triggerFirstLoad: true
   });
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
@@ -56,7 +56,7 @@ const StudentPage = () => {
       key: 'gioiTinh',
       dataIndex: 'gioiTinh',
       title: 'Giới tính',
-      render: (value) => (value === 1 ? 'Nam' : 'Nữ'),
+      render: (value) => (value === 1 ? 'Nam' : 'Nữ')
     },
     { key: 'quocTich', dataIndex: 'quocTich', title: 'Quốc tịch' },
     { key: 'danToc', dataIndex: 'danToc', title: 'Dân tộc' },
@@ -64,9 +64,8 @@ const StudentPage = () => {
       key: 'trangThai',
       dataIndex: 'trangThai',
       title: 'Trạng thái',
-      render: (val: boolean) =>
-        val ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Khóa</Tag>,
-    },
+      render: (val: boolean) => (val ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Khóa</Tag>)
+    }
   ];
 
   const actions: IAction[] = [
@@ -77,7 +76,7 @@ const StudentPage = () => {
       command: (record: IViewStudent) => {
         setSelectedStudent(record);
         setIsEditModalOpen(true);
-      },
+      }
     },
     {
       label: 'Xóa',
@@ -91,8 +90,8 @@ const StudentPage = () => {
         } catch {
           toast.error('Xóa sinh viên thất bại');
         }
-      },
-    },
+      }
+    }
   ];
 
   const onClickAdd = () => {

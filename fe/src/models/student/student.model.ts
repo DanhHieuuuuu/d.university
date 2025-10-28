@@ -33,5 +33,3 @@ export type ICreateStudent = {
   soDienThoai?: string;
   email?: string;
 };
-
-

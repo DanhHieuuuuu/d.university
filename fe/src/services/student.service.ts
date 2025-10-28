@@ -9,8 +9,8 @@ const findPaging = async (query: IQueryStudent) => {
   try {
     const res = await axios.get(`${apiStudentEndpoint}/find`, {
       params: {
-        ...query,
-      },
+        ...query
+      }
     });
 
     const data: IResponseList<IViewStudent> = res.data;
@@ -24,7 +24,7 @@ const findPaging = async (query: IQueryStudent) => {
 const getDetail = async (idStudent: number) => {
   try {
     const res = await axios.get(`${apiStudentEndpoint}/detail`, {
-      params: { idStudent },
+      params: { idStudent }
     });
     return Promise.resolve(res.data);
   } catch (err) {
@@ -56,7 +56,7 @@ const update = async (body: Partial<IViewStudent>) => {
 const remove = async (idStudent: number) => {
   try {
     const res = await axios.delete(`${apiStudentEndpoint}/delete`, {
-      data: { idStudent },
+      data: { idStudent }
     });
     return Promise.resolve(res.data);
   } catch (err) {
@@ -70,5 +70,5 @@ export const StudentService = {
   getDetail,
   create,
   update,
-  remove,
+  remove
 };

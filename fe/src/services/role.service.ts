@@ -1,32 +1,67 @@
+import axios from 'axios';
+import { TOKEN } from '@/constants/base.const';
 import { processApiMsgError } from '@utils/index';
-import axios from '@utils/axios';
-import { ICreateRole } from '@models/role';
+import { ICreateRole, IQueryRole, IRole, IUpdateRole, IUpdateRolePermission } from '@models/role';
+import { IResponseItem, IResponseList } from '@models/common/response.model';
+import { IPermissionTree } from '@models/permission';
+
+/**
+ * Cấu hình riêng axios cho role service
+ */
+
+const _axios = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+_axios.interceptors.request.use(
+  (config) => {
+    // Lấy token từ  sessionStorage trước, nếu không có thì lấy từ localStorage
+    const token = sessionStorage.getItem(TOKEN) || localStorage.getItem(TOKEN);
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 const apiRoleEndpoint = 'role';
 
-const getAllRoles = async () => {
+const findPaging = async (query: IQueryRole) => {
   try {
-    const res = await axios.get(`${apiRoleEndpoint}/get-all-role`, {
-      baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
+    const res = await _axios.get(`${apiRoleEndpoint}/find`, {
+      params: {
+        ...query
+      }
     });
 
-    // Response structure: { status: 1, data: ["admin","all2","string"], code: 200, message: "Ok" }
-    if (res.data.status === 1 && res.data.data) {
-      return Promise.resolve(res.data.data);
-    }
-
-    return Promise.reject(new Error('Không lấy được danh sách role.'));
+    const data: IResponseList<IRole> = res.data;
+    return Promise.resolve(data);
   } catch (err) {
-    processApiMsgError(err, 'Lỗi khi lấy danh sách role');
+    processApiMsgError(err, '');
     return Promise.reject(err);
   }
 };
 
-const createRole = async (body: ICreateRole) => {
+const findById = async (id: number) => {
   try {
-    const res = await axios.post(`${apiRoleEndpoint}/create-role`, body, {
-      baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
-    });
+    const res = await _axios.get(`${apiRoleEndpoint}/${id}`);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+const create = async (body: ICreateRole) => {
+  try {
+    const res = await _axios.post(`${apiRoleEndpoint}/create-role`, body);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Không thể tạo role mới');
@@ -34,4 +69,54 @@ const createRole = async (body: ICreateRole) => {
   }
 };
 
-export const RoleService = { getAllRoles, createRole };
+const update = async (body: IUpdateRole) => {
+  try {
+    const res = await _axios.put(`${apiRoleEndpoint}/${body.id}`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật role');
+    return Promise.reject(err);
+  }
+};
+
+const updatePermission = async (body: IUpdateRolePermission) => {
+  try {
+    const res = await _axios.post(`${apiRoleEndpoint}/${body.roleId}/permissions`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật permission cho role');
+    return Promise.reject(err);
+  }
+};
+
+const getPermissionTree = async () => {
+  try {
+    const res = await _axios.get(`${apiRoleEndpoint}/tree-permissions`);
+    const data: IResponseItem<IPermissionTree[]> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật role');
+    return Promise.reject(err);
+  }
+};
+
+const getMyPermission = async () => {
+  try {
+    const res = await _axios.get(`${apiRoleEndpoint}/my-permissions`);
+    const data: IResponseItem<string[]> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật role');
+    return Promise.reject(err);
+  }
+};
+
+export const RoleService = {
+  findPaging,
+  findById,
+  create,
+  update,
+  updatePermission,
+  getPermissionTree,
+  getMyPermission
+};

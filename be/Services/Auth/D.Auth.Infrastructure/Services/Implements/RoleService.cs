@@ -46,12 +46,13 @@ namespace D.Auth.Infrastructure.Services.Implements
                 $"{nameof(UpdateRole)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var existRole = _unitOfWork.iRoleRepository.TableNoTracking.Any(r => r.Id == dto.Id);
-            if (existRole)
+            var existRole = _unitOfWork.iRoleRepository.TableNoTracking.FirstOrDefault(r => r.Id == dto.Id);
+            if (existRole != null)
             {
-                var entity = _mapper.Map<Role>(dto);
+                existRole.Name = dto.Name;
+                existRole.Description = dto.Description;
 
-                _unitOfWork.iRoleRepository.Update(entity);
+                _unitOfWork.iRoleRepository.Update(existRole);
                 _unitOfWork.iRoleRepository.SaveChange();
             }
             else
@@ -119,6 +120,10 @@ namespace D.Auth.Infrastructure.Services.Implements
                             !string.IsNullOrEmpty(r.Description)
                             && r.Description.ToLower().Contains(dto.Keyword.ToLower())
                         )
+                        || (
+                            !string.IsNullOrEmpty(r.Name)
+                            && r.Name.ToLower().Contains(dto.Keyword.ToLower())
+                        )
                     )
                 select new RoleResponseDto
                 {
@@ -134,6 +139,37 @@ namespace D.Auth.Infrastructure.Services.Implements
             var items = query.Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
 
             return new PageResultDto<RoleResponseDto> { Items = items, TotalItem = totalCount };
+        }
+
+        public RoleFindByIdResponseDto FindRoleById(int id)
+        {
+            _logger.LogInformation($"{nameof(FindRoleById)} method called. RoleId = {id}");
+
+            var exist = _unitOfWork.iRoleRepository.TableNoTracking.FirstOrDefault(r => r.Id == id);
+
+            if (exist != null)
+            {
+                var query =
+                    from rp in _unitOfWork.iRolePermissionRepository.TableNoTracking
+                    join p in _unitOfWork.iPermissionRepository.TableNoTracking
+                        on rp.PermissionId equals p.Id
+                    where rp.RoleId == id
+                    select p.PermissionKey;
+
+                var result = new RoleFindByIdResponseDto
+                {
+                    Id = id,
+                    Name = exist.Name,
+                    Description = exist.Description,
+                    Permissions = query.Distinct().ToList(),
+                };
+
+                return result;
+            }
+            else
+            {
+                throw new Exception($"RoleId không tồn tại hoặc đã bị xóa");
+            }
         }
     }
 }

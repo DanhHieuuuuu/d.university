@@ -1,7 +1,5 @@
 const Page = () => {
-  return ( 
-    <div>Trang quản lý phòng ban</div>
-   );
-}
- 
+  return <div>Trang quản lý phòng ban</div>;
+};
+
 export default Page;

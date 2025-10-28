@@ -64,17 +64,17 @@ const initialState: StudentState = {
   selected: {
     status: ReduxStatus.IDLE,
     idStudent: null,
-    data: null,
+    data: null
   },
   list: [],
-  total: 0,
+  total: 0
 };
 
 const studentSlice = createSlice({
   name: 'student',
   initialState,
   selectors: {
-    studentSelected: (state: StudentState) => state.selected,
+    studentSelected: (state: StudentState) => state.selected
   },
   reducers: {
     selectStudentId: (state, action: PayloadAction<number>) => {
@@ -82,7 +82,7 @@ const studentSlice = createSlice({
     },
     clearSelected: (state) => {
       state.selected = { idStudent: null, status: ReduxStatus.IDLE, data: null };
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -120,7 +120,7 @@ const studentSlice = createSlice({
       .addCase(deleteStudent.fulfilled, (state) => {
         state.status = ReduxStatus.SUCCESS;
       });
-  },
+  }
 });
 
 // export const { selectMssv, clearSelected } = studentSlice.actions;

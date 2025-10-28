@@ -2,9 +2,9 @@
 {
     public class PermissionTreeResponseDto
     {
+        public int Id { get; set; }
         public string? Key { get; set; }
         public string? Label { get; set; }
-        public string? ParentKey { get; set; }
         public List<PermissionTreeResponseDto> Children { get; set; } = new();
     }
 }

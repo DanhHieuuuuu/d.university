@@ -10,5 +10,6 @@ namespace D.Auth.Infrastructure.Services.Abstracts
         void UpdateRole(UpdateRoleDto request);
         PageResultDto<RoleResponseDto> GetAllRole(FindPagingRoleRequestDto dto);
         void UpdateRolePermission(UpdateRolePermissionDto dto);
+        RoleFindByIdResponseDto FindRoleById(int id);
     }
 }

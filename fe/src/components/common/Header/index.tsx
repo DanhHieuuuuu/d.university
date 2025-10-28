@@ -25,7 +25,7 @@ const AppHeader = () => {
   const [passwordForm] = Form.useForm();
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const { avatarUrl, loading: avatarLoading, updateAvatar } = useUserAvatar(user?.imageLink);
 
   const handleProfileClick = () => {
@@ -106,8 +106,6 @@ const AppHeader = () => {
     }
   };
 
-
-
   const menuItems = [
     {
       key: 'profile',
@@ -151,19 +149,10 @@ const AppHeader = () => {
           </div>
 
           <div style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)' }}>
-            <Dropdown
-            menu={{ items: menuItems }}
-            placement="bottomRight"
-            trigger={['click']}
-          >
-            <div className="flex items-center cursor-pointer hover:bg-gray-100 rounded-lg p-2 transition-colors gap-2">
-              <Avatar 
-                size="large" 
-                src={avatarUrl}
-                icon={!avatarUrl && <UserOutlined />}
-                className="mr-3"
-              />
-              <span className="font-medium">{userDisplayName}</span>
+            <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
+              <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-100">
+                <Avatar size="large" src={avatarUrl} icon={!avatarUrl && <UserOutlined />} className="mr-3" />
+                <span className="font-medium">{userDisplayName}</span>
               </div>
             </Dropdown>
           </div>
@@ -184,11 +173,7 @@ const AppHeader = () => {
       >
         <div className="flex flex-col items-center">
           <div className="relative mb-4">
-            <Avatar 
-              size={120} 
-              src={avatarUrl || undefined}
-              icon={!avatarUrl && <UserOutlined />}
-            />
+            <Avatar size={120} src={avatarUrl || undefined} icon={!avatarUrl && <UserOutlined />} />
             <input
               ref={fileInputRef}
               type="file"

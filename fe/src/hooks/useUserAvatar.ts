@@ -10,18 +10,21 @@ export const useUserAvatar = (imageLink?: string | null) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const refresh = useCallback(() => {
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
   }, []);
 
-  const updateAvatar = useCallback((blob: Blob) => {
-    // Revoke URL cũ nếu có
-    if (avatarUrl) {
-      URL.revokeObjectURL(avatarUrl);
-    }
-    // Tạo URL mới từ blob
-    const url = URL.createObjectURL(blob);
-    setAvatarUrl(url);
-  }, [avatarUrl]);
+  const updateAvatar = useCallback(
+    (blob: Blob) => {
+      // Revoke URL cũ nếu có
+      if (avatarUrl) {
+        URL.revokeObjectURL(avatarUrl);
+      }
+      // Tạo URL mới từ blob
+      const url = URL.createObjectURL(blob);
+      setAvatarUrl(url);
+    },
+    [avatarUrl]
+  );
 
   useEffect(() => {
     let objectUrl: string | null = null;

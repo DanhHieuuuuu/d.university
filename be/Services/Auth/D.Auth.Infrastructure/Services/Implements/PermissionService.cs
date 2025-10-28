@@ -36,7 +36,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             // Tạm lưu key -> id
             var keyIdMap = new Dictionary<string, int>();
 
-            // 1️⃣ Thêm các permission không có cha
+            // 1️. Thêm các permission không có cha
             foreach (var kv in permissionDict.Values.Where(x => x.ParentKey == null))
             {
                 if (
@@ -44,7 +44,11 @@ namespace D.Auth.Infrastructure.Services.Implements
                         p.PermissionKey == kv.PermissonKey
                     )
                 )
+                {
+                    var exist  = await _unitOfWork.iPermissionRepository.TableNoTracking.FirstOrDefaultAsync(p => p.PermissionKey == kv.PermissonKey);
+                    keyIdMap[kv.PermissonKey] = exist!.Id;
                     continue;
+                }
 
                 var entity = new Permission
                 {
@@ -59,7 +63,7 @@ namespace D.Auth.Infrastructure.Services.Implements
                 keyIdMap[kv.PermissonKey] = entity.Id;
             }
 
-            // 2️⃣ Thêm các permission có cha
+            // 2️. Thêm các permission có cha
             foreach (var kv in permissionDict.Values.Where(x => x.ParentKey != null))
             {
                 if (
@@ -152,13 +156,13 @@ namespace D.Auth.Infrastructure.Services.Implements
             _logger.LogInformation($"{nameof(GetPermissionTree)}");
 
             // 1) Lấy toàn bộ quyền (chỉ 1 query)
-            var permissions = _unitOfWork.iPermissionRepository.TableNoTracking
-                .Select(p => new
+            var permissions = _unitOfWork
+                .iPermissionRepository.TableNoTracking.Select(p => new
                 {
                     p.Id,
                     p.PermissionKey,
                     p.PermissionName,
-                    p.ParentID
+                    p.ParentID,
                 })
                 .ToList();
 
@@ -167,10 +171,11 @@ namespace D.Auth.Infrastructure.Services.Implements
                 p => p.Id,
                 p => new PermissionTreeResponseDto
                 {
+                    Id = p.Id,
                     Key = p.PermissionKey,
                     Label = p.PermissionName,
-                    ParentKey = null
-                });
+                }
+            );
 
             // 3) Nối node con vào node cha
             foreach (var p in permissions)
@@ -178,7 +183,7 @@ namespace D.Auth.Infrastructure.Services.Implements
                 if (p.ParentID.HasValue && dict.TryGetValue(p.ParentID.Value, out var parentNode))
                 {
                     var childNode = dict[p.Id];
-                    childNode.ParentKey = parentNode.Key;
+                    childNode.Id = p.Id;
                     parentNode.Children.Add(childNode);
                 }
             }
