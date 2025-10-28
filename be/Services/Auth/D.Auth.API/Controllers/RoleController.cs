@@ -128,6 +128,26 @@ namespace D.Auth.API.Controllers
         }
 
         /// <summary>
+        /// Xoá role (soft delete)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<ResponseAPI> DeleteRole([FromRoute] int id)
+        {
+            try
+            {
+                var req = new DeleteRoleDto { RoleId = id };
+                await _mediator.Send(req);
+                return new("Xóa role thành công");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Cập nhật permission cho role
         /// </summary>
         /// <param name="id"></param>

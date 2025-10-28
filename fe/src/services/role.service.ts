@@ -79,6 +79,16 @@ const update = async (body: IUpdateRole) => {
   }
 };
 
+const deleteRole = async (roleId: number) => {
+  try {
+    const res = await _axios.delete(`${apiRoleEndpoint}/${roleId}`);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật role');
+    return Promise.reject(err);
+  }
+};
+
 const updatePermission = async (body: IUpdateRolePermission) => {
   try {
     const res = await _axios.post(`${apiRoleEndpoint}/${body.roleId}/permissions`, body);
@@ -116,6 +126,7 @@ export const RoleService = {
   findById,
   create,
   update,
+  deleteRole,
   updatePermission,
   getPermissionTree,
   getMyPermission

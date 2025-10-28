@@ -5,7 +5,7 @@
         #region HRM - Nhân sự
         public const string CoreMenuNhanSu = $"{PermissionPrefixKeys.Menu}hrm";
         public const string CoreButtonCreateNhanSu = $"{PermissionPrefixKeys.Button}hrm_create_nhansu";
-        public const string CoreButtonUpdateNhanSu = $"{PermissionPrefixKeys.Button}hrm_update_nahnsu";
+        public const string CoreButtonUpdateNhanSu = $"{PermissionPrefixKeys.Button}hrm_update_nhansu";
         public const string CoreButtonDeleteNhanSu = $"{PermissionPrefixKeys.Button}hrm_delete_nhansu";
         #endregion
 

@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ReduxStatus } from '@redux/const';
 import { CRUD } from '@models/common/common';
-import { ICreateRole, IQueryRole, IRole, IRoleDetail, IUpdateRole } from '@models/role';
+import { ICreateRole, IQueryRole, IRole, IRoleDetail, IUpdateRole, IUpdateRolePermission } from '@models/role';
 import { RoleService } from '@services/role.service';
+import { IPermissionTree } from '@models/permission';
 
 export const getListRole = createAsyncThunk('role-config/list', async (args: IQueryRole) => {
   try {
@@ -44,12 +45,49 @@ export const updateRole = createAsyncThunk('role-config/update', async (args: IU
   }
 });
 
+export const deleteRole = createAsyncThunk('role-config/delete', async (args: number) => {
+  try {
+    const res = await RoleService.deleteRole(args);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+
+export const getListPermissionTree = createAsyncThunk('role-config/permission-tree', async () => {
+  try {
+    const res = await RoleService.getPermissionTree();
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+
+export const updateRolePermisison = createAsyncThunk(
+  'role-config/permission-update',
+  async (args: IUpdateRolePermission) => {
+    try {
+      const res = await RoleService.updatePermission(args);
+
+      return res.data;
+    } catch (error: any) {
+      console.error(error);
+    }
+  }
+);
+
 interface RoleConfigState {
   roleGroup: CRUD<IRole>;
   selected: {
     status: ReduxStatus;
     data: IRoleDetail | null;
     id: number | null;
+  };
+  permissionTree: IPermissionTree[];
+  $updateRolePermission: {
+    status: ReduxStatus;
   };
 }
 
@@ -61,7 +99,11 @@ const initialState: RoleConfigState = {
     $delete: { status: ReduxStatus.IDLE },
     $selected: { status: ReduxStatus.IDLE, id: null, data: null }
   },
-  selected: { status: ReduxStatus.IDLE, id: null, data: null }
+  selected: { status: ReduxStatus.IDLE, id: null, data: null },
+  permissionTree: [],
+  $updateRolePermission: {
+    status: ReduxStatus.IDLE
+  }
 };
 
 const roleConfigSlice = createSlice({
@@ -78,6 +120,7 @@ const roleConfigSlice = createSlice({
       state.roleGroup.$create.status = ReduxStatus.IDLE;
       state.roleGroup.$update.status = ReduxStatus.IDLE;
       state.roleGroup.$delete.status = ReduxStatus.IDLE;
+      state.$updateRolePermission.status = ReduxStatus.IDLE;
     }
   },
   extraReducers: (builder) => {
@@ -111,6 +154,15 @@ const roleConfigSlice = createSlice({
       .addCase(updateRole.rejected, (state) => {
         state.roleGroup.$update.status = ReduxStatus.FAILURE;
       })
+      .addCase(deleteRole.pending, (state) => {
+        state.roleGroup.$delete.status = ReduxStatus.LOADING;
+      })
+      .addCase(deleteRole.fulfilled, (state) => {
+        state.roleGroup.$delete.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(deleteRole.rejected, (state) => {
+        state.roleGroup.$delete.status = ReduxStatus.FAILURE;
+      })
       .addCase(getDetailRole.pending, (state) => {
         state.selected.status = ReduxStatus.LOADING;
       })
@@ -120,12 +172,28 @@ const roleConfigSlice = createSlice({
       })
       .addCase(getDetailRole.rejected, (state) => {
         state.selected.status = ReduxStatus.FAILURE;
+      })
+      .addCase(getListPermissionTree.fulfilled, (state, action) => {
+        state.permissionTree = action.payload || [];
+      })
+      .addCase(updateRolePermisison.pending, (state) => {
+        state.$updateRolePermission.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateRolePermisison.fulfilled, (state) => {
+        state.$updateRolePermission.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateRolePermisison.rejected, (state) => {
+        state.$updateRolePermission.status = ReduxStatus.FAILURE;
       });
   }
 });
 
 const roleConfigReducer = roleConfigSlice.reducer;
 
-export const { setSelectedRoleId, clearSelected: clearSelectedRole, resetStatus: resetStatusRole } = roleConfigSlice.actions;
+export const {
+  setSelectedRoleId,
+  clearSelected: clearSelectedRole,
+  resetStatus: resetStatusRole
+} = roleConfigSlice.actions;
 
 export default roleConfigReducer;

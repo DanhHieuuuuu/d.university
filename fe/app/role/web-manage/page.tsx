@@ -11,7 +11,7 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 
 import { IQueryRole, IRole } from '@models/role';
-import { getListRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
+import { getListPermissionTree, getListRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
 import CreateRoleModal from './(dialog)/create-or-update';
 import RolePermissionModal from './(dialog)/update-permission';
 
@@ -38,6 +38,12 @@ const Page = () => {
     open: false,
     isUpdate: false
   });
+
+  useEffect(() => {
+    (async () => {
+      dispatch(getListPermissionTree());
+    })();
+  }, []);
 
   const [openPermission, setOpenModalPermission] = useState<boolean>(false);
   const { query, pagination, onFilterChange } = usePaginationWithFilter({

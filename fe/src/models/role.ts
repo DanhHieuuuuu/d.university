@@ -23,7 +23,7 @@ export type IRoleDetail = {
   id?: number;
   name?: string;
   description?: string;
-  permission?: string[];
+  permissionIds?: number[];
 };
 
 export type IUpdateRolePermission = {

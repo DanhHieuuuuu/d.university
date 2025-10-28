@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Form, FormProps, Input, Modal, TreeSelect } from 'antd';
 import { IUpdateRolePermission } from '@models/role';
-import { RoleService } from '@services/role.service';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getDetailRole } from '@redux/feature/roleConfigSlice';
+import { getDetailRole, resetStatusRole, updateRolePermisison } from '@redux/feature/roleConfigSlice';
 
 type RolePermissionModalProps = {
   isModalOpen: boolean;
@@ -15,7 +14,7 @@ type RolePermissionModalProps = {
 const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { selected } = useAppSelector((state) => state.roleConfigState);
+  const { selected, permissionTree } = useAppSelector((state) => state.roleConfigState);
 
   const [treeData, setTreeData] = useState<any[]>([]);
 
@@ -46,14 +45,15 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
     }));
   };
 
-  const initPermission = async () => {
-    try {
-      const res = await RoleService.getPermissionTree();
-      const transformed = transformToTreeData(res.data || []);
-      setTreeData(transformed);
-    } catch (error) {
-      console.error(error);
-    }
+  const initPermission = () => {
+    const transformed = transformToTreeData(permissionTree);
+    setTreeData(transformed);
+  };
+
+  const onCloseModal = () => {
+    dispatch(resetStatusRole());
+    form.resetFields();
+    props.setIsModalOpen(false);
   };
 
   const handleSubmit: FormProps<IUpdateRolePermission>['onFinish'] = async (values) => {
@@ -61,7 +61,18 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
       roleId: selected.id!,
       permissionIds: values.permissionIds
     };
-    console.log('Submit:', body);
+
+    try {
+      const res = await dispatch(updateRolePermisison(body)).unwrap();
+      if (res != undefined) {
+        toast.success(res?.message || `Đã cập nhật quyền cho nhóm ${selected.data?.name}`);
+      }
+
+      props.refreshData();
+      onCloseModal();
+    } catch (error: any) {
+      toast.error(error?.message || `Không thể cập nhật quyền cho nhóm ${selected.data?.name}`);
+    }
   };
 
   return (

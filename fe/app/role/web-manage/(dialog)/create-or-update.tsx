@@ -4,7 +4,13 @@ import { Form, FormProps, Input, Modal } from 'antd';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 
 import { ICreateRole } from '@models/role';
-import { clearSelectedRole, createRole, getDetailRole, resetStatusRole, updateRole } from '@redux/feature/roleConfigSlice';
+import {
+  clearSelectedRole,
+  createRole,
+  getDetailRole,
+  resetStatusRole,
+  updateRole
+} from '@redux/feature/roleConfigSlice';
 
 type CreateRoleModalProps = {
   isModalOpen: boolean;
@@ -55,7 +61,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = (props) => {
         }
       } else {
         const result = await dispatch(createRole(values)).unwrap();
-        if (result) {
+        if (result != undefined) {
           toast.success(result?.message || 'Tạo nhóm quyền thành công');
         }
       }

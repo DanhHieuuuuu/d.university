@@ -6,10 +6,11 @@ namespace D.Auth.Infrastructure.Services.Abstracts
 {
     public interface IRoleService
     {
-        bool CreateRole(CreateRoleRequestDto request);
-        void UpdateRole(UpdateRoleDto request);
         PageResultDto<RoleResponseDto> GetAllRole(FindPagingRoleRequestDto dto);
-        void UpdateRolePermission(UpdateRolePermissionDto dto);
         RoleFindByIdResponseDto FindRoleById(int id);
+        bool CreateRole(CreateRoleRequestDto dto);
+        void UpdateRole(UpdateRoleDto dto);
+        void DeleteRole(int id);
+        void UpdateRolePermission(UpdateRolePermissionDto dto);
     }
 }
