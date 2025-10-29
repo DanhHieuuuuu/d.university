@@ -30,3 +30,7 @@ export type ICreatePhongBan = {
   chucVuNguoiDaiDien: string | null;
   nguoiDaiDien: string;
 };
+
+export type IUpdatePhongBan = ICreatePhongBan & {
+  id: number;
+};

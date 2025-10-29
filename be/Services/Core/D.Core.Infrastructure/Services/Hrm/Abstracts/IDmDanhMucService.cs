@@ -29,6 +29,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public void UpdateDmChucVu(UpdateDmChucVuDto dto);
         public void DeleteDmChucVu(int id);
         public void CreateDmPhongBan(CreateDmPhongBanDto dto);
+        public void UpdateDmPhongBan(UpdateDmPhongBanDto dto);
+        public void DeleteDmPhongBan(int id);
 
         public void CreateDmKhoa(CreateDmKhoaDto dto);
         #region To Bo Mon

@@ -116,7 +116,7 @@ namespace D.Core.API.Controllers.Hrm
         {
             try
             {
-                var dto = new DeleteDmChucVuDto { Id = id };
+                var dto = new DeleteDmPhongBanDto { Id = id };
                 await _mediator.Send(dto);
                 return new("Đã xóa chức vụ.");
             }
@@ -264,6 +264,47 @@ namespace D.Core.API.Controllers.Hrm
         }
 
         /// <summary>
+        /// Cập nhật phòng ban
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpPut("phong-ban/update")]
+        public async Task<ResponseAPI> UpdateDmPhongBan([FromBody] UpdateDmPhongBanDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new("Đã cập nhật phòng ban thành công!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Xóa phòng ban
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [HttpDelete("phong-ban/delete/{id}")]
+        public async Task<ResponseAPI> DeleteDmPhongBan([FromRoute] int id)
+        {
+            try
+            {
+                var dto = new DeleteDmPhongBanDto { Id = id };
+                await _mediator.Send(dto);
+                return new("Đã xóa phòng ban.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Danh sách các mối quan hệ gia đình
         /// </summary>
         /// <param name="dto"></param>
@@ -302,7 +343,7 @@ namespace D.Core.API.Controllers.Hrm
                 return BadRequest(ex);
             }
         }
-        #region To Bo Mon
+
         /// <summary>
         /// Danh sách tổ bộ môn
         /// </summary>
@@ -341,67 +382,7 @@ namespace D.Core.API.Controllers.Hrm
                 return BadRequest(ex);
             }
         }
-        /// <summary>
-        /// Cập nhật tổ bộ môn
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
-        [HttpPut("to-bo-mon/update")]
-        public async Task<ResponseAPI> UpdateDmToBoMon([FromBody] UpdateDmToBoMonDto dto)
-        {
-            try
-            {
-                await _mediator.Send(dto);
-                return new("Đã cập nhật tổ bộ môn thành công!");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
 
-        /// <summary>
-        /// Xóa tổ bộ môn
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
-        [HttpDelete("to-bo-mon/delete/{id}")]
-        public async Task<ResponseAPI> DeleteDmToBoMon([FromRoute] int id)
-        {
-            try
-            {
-                var dto = new DeleteDmToBoMonDto { Id = id };
-                await _mediator.Send(dto);
-                return new("Đã xóa tổ bộ môn.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
-
-        /// <summary>
-        /// Lấy bộ môn theo Id
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpGet("to-bo-mon/get-by-id")]
-        public async Task<ResponseAPI> GetDetailDmToBoMon([FromQuery] DmToBoMonGetByIdRequestDto dto)
-        {
-            try
-            {
-                var result = await _mediator.Send(dto);
-                return new(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
-
-        #endregion
         /// <summary>
         /// Danh sách tôn giáo
         /// </summary>
