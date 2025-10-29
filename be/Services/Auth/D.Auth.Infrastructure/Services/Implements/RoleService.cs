@@ -144,14 +144,15 @@ namespace D.Auth.Infrastructure.Services.Implements
                     join p in _unitOfWork.iPermissionRepository.TableNoTracking
                         on rp.PermissionId equals p.Id
                     where rp.RoleId == id
-                    select p.Id;
+                    select new { p.Id, p.PermissionKey };
 
                 var result = new RoleFindByIdResponseDto
                 {
                     Id = id,
                     Name = exist.Name,
                     Description = exist.Description,
-                    PermissionIds = query.Distinct().ToList(),
+                    Permissions = query.Select(p => p.PermissionKey).Distinct().ToList(),
+                    PermissionIds = query.Select(p => p.Id).Distinct().ToList(),
                 };
 
                 return result;

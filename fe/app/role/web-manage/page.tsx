@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Breadcrumb, Button, Card, Form, Input, TableProps } from 'antd';
+import { Breadcrumb, Button, Card, Form, Input, Modal, TableProps } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
 import { KeyIcon } from '@components/custom-icon';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -11,9 +11,10 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 
 import { IQueryRole, IRole } from '@models/role';
-import { getListPermissionTree, getListRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
+import { deleteRole, getListPermissionTree, getListRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
 import CreateRoleModal from './(dialog)/create-or-update';
 import RolePermissionModal from './(dialog)/update-permission';
+import { toast } from 'react-toastify';
 
 const breadcrumbItems = [
   {
@@ -71,9 +72,30 @@ const Page = () => {
     setModalState({ open: true, isUpdate: true });
   };
 
+  const onClickDelete = (role: IRole) => {
+    Modal.confirm({
+      title: 'Xác nhận xóa nhóm quyền',
+      content: `Bạn có chắc muốn xóa nhóm quyền "${role.name}"?`,
+      okText: 'Xóa',
+      okButtonProps: { danger: true },
+      cancelText: 'Hủy',
+      onOk: () => {
+        handleDeleteRole(role.id!);
+      }
+    });
+  };
+
   const onClickUpdatePermission = (data: IRole) => {
     dispatch(setSelectedRoleId(data.id!));
     setOpenModalPermission(true);
+  };
+
+  const handleDeleteRole = async (roleId: number) => {
+    const result = await dispatch(deleteRole(roleId)).unwrap();
+    if (result != undefined) {
+      toast.success(result?.message || 'Xóa nhóm thành công');
+      onFilterChange({})
+    }
   };
 
   const columns: IColumn<IRole>[] = [
@@ -120,7 +142,7 @@ const Page = () => {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IRole) => console.log('delete', record)
+      command: (record: IRole) => onClickDelete(record)
     }
   ];
 
