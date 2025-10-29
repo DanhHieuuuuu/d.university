@@ -33,3 +33,9 @@ export type ICreateStudent = {
   soDienThoai?: string;
   email?: string;
 };
+
+export type IUpdateStudent = ICreateStudent & {
+  idStudent: number;
+};
+
+

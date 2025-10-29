@@ -3,7 +3,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CRUD } from '@models/common/common';
 import { ICreateChucVu, IQueryChucVu, IUpdateChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
 import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
-import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
+import { ICreatePhongBan, IQueryPhongBan, IUpdatePhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
+
 import {
   IViewDanToc,
   IViewGioiTinh,
@@ -96,9 +97,45 @@ export const getAllLoaiPhongBan = createAsyncThunk('danhmuc/list-loaiphongban', 
     console.error(error);
   }
 });
-export const getAllPhongBan = createAsyncThunk('danhmuc/list-phongban', async () => {
+export const getAllPhongBan = createAsyncThunk('danhmuc/list-phongban', async (payload?: IQueryPhongBan) => {
   try {
-    const res = await DanhMucService.getListPhongBan();
+    const res = await DanhMucService.getListPhongBan(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const createPhongBan = createAsyncThunk('danhmuc/create-phongban', async (payload: ICreatePhongBan) => {
+  try {
+    const res = await DanhMucService.createPhongBan(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const updatePhongBan = createAsyncThunk('danhmuc/update-phongban', async (payload: IUpdatePhongBan) => {
+  try {
+    const res = await DanhMucService.updatePhongBan(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const deletePhongBan = createAsyncThunk('danhmuc/delete-phongban', async (payload: number) => {
+  try {
+    const res = await DanhMucService.deletePhongBan(payload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const getPhongBanById = createAsyncThunk('danhmuc/get-phongban', async (payload: number) => {
+  try {
+    const res = await DanhMucService.getPhongBanById(payload);
 
     return res.data;
   } catch (error: any) {
@@ -168,6 +205,7 @@ export const getToBoMonById = createAsyncThunk('danhmuc/get-toBoMon', async (pay
     console.error(error);
   }
 });
+
 export const getAllTonGiao = createAsyncThunk('danhmuc/list-tongiao', async () => {
   try {
     const res = await DanhMucService.getListTonGiao();
@@ -181,11 +219,11 @@ export const getAllTonGiao = createAsyncThunk('danhmuc/list-tongiao', async () =
 interface DanhMucState {
   chucVu: CRUD<IViewChucVu>;
   toBoMon: CRUD<IViewToBoMon>;
+  phongBan: CRUD<IViewPhongBan>;
   listDanToc: IViewDanToc[];
   listGioiTinh: IViewGioiTinh[];
   listLoaiHopDong: IViewLoaiHopDong[];
   listLoaiPhongBan: IViewLoaiPhongBan[];
-  listPhongBan: IViewPhongBan[];
   listQuanHe: IViewQuanHeGiaDinh[];
   listQuocTich: IViewQuocTich[];
   listToBoMon: IViewToBoMon[];
@@ -194,6 +232,13 @@ interface DanhMucState {
 
 const initialState: DanhMucState = {
   chucVu: {
+    $create: { status: ReduxStatus.IDLE },
+    $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
+    $update: { status: ReduxStatus.IDLE },
+    $delete: { status: ReduxStatus.IDLE },
+    $selected: { status: ReduxStatus.IDLE, id: null, data: null }
+  },
+  phongBan: {
     $create: { status: ReduxStatus.IDLE },
     $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
     $update: { status: ReduxStatus.IDLE },
@@ -211,7 +256,6 @@ const initialState: DanhMucState = {
   listGioiTinh: [],
   listLoaiHopDong: [],
   listLoaiPhongBan: [],
-  listPhongBan: [],
   listQuanHe: [],
   listQuocTich: [],
   listToBoMon: [],
@@ -232,6 +276,18 @@ const danhmucSlice = createSlice({
       state.chucVu.$create.status = ReduxStatus.IDLE;
       state.chucVu.$update.status = ReduxStatus.IDLE;
       state.chucVu.$delete.status = ReduxStatus.IDLE;
+    },
+
+    clearSelectedPhongBan: (state) => {
+      state.phongBan.$selected = { status: ReduxStatus.IDLE, id: null, data: null };
+    },
+    setSelectedIdPhongBan: (state, action: PayloadAction<number>) => {
+      state.phongBan.$selected.id = action.payload;
+    },
+    resetStatusPhongBan: (state) => {
+      state.phongBan.$create.status = ReduxStatus.IDLE;
+      state.phongBan.$update.status = ReduxStatus.IDLE;
+      state.phongBan.$delete.status = ReduxStatus.IDLE;
     },
 
     clearSeletedToBoMon: (state) => {
@@ -308,8 +364,53 @@ const danhmucSlice = createSlice({
       .addCase(getAllLoaiPhongBan.fulfilled, (state, action) => {
         state.listLoaiPhongBan = action.payload!.items;
       })
+      .addCase(getAllPhongBan.pending, (state) => {
+        state.phongBan.$list.status = ReduxStatus.LOADING;
+      })
       .addCase(getAllPhongBan.fulfilled, (state, action) => {
-        state.listPhongBan = action.payload!.items;
+        state.phongBan.$list.status = ReduxStatus.SUCCESS;
+        state.phongBan.$list.data = action.payload?.items || [];
+        state.phongBan.$list.total = action.payload?.totalItems || 0;
+      })
+      .addCase(getAllPhongBan.rejected, (state) => {
+        state.phongBan.$list.status = ReduxStatus.FAILURE;
+      })
+      .addCase(getPhongBanById.pending, (state) => {
+        state.phongBan.$selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getPhongBanById.fulfilled, (state, action) => {
+        state.phongBan.$selected.status = ReduxStatus.SUCCESS;
+        state.phongBan.$selected.data = action.payload || null;
+      })
+      .addCase(getPhongBanById.rejected, (state) => {
+        state.phongBan.$selected.status = ReduxStatus.FAILURE;
+      })
+      .addCase(createPhongBan.pending, (state) => {
+        state.phongBan.$create.status = ReduxStatus.LOADING;
+      })
+      .addCase(createPhongBan.fulfilled, (state, action) => {
+        state.phongBan.$create.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createPhongBan.rejected, (state) => {
+        state.phongBan.$create.status = ReduxStatus.FAILURE;
+      })
+      .addCase(updatePhongBan.pending, (state) => {
+        state.phongBan.$update.status = ReduxStatus.LOADING;
+      })
+      .addCase(updatePhongBan.fulfilled, (state, action) => {
+        state.phongBan.$update.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updatePhongBan.rejected, (state) => {
+        state.phongBan.$update.status = ReduxStatus.FAILURE;
+      })
+      .addCase(deletePhongBan.pending, (state) => {
+        state.phongBan.$delete.status = ReduxStatus.LOADING;
+      })
+      .addCase(deletePhongBan.fulfilled, (state, action) => {
+        state.phongBan.$delete.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(deletePhongBan.rejected, (state) => {
+        state.phongBan.$delete.status = ReduxStatus.FAILURE;
       })
       .addCase(getAllQuanHeGiaDinh.fulfilled, (state, action) => {
         state.listQuanHe = action.payload!.items;
@@ -381,6 +482,9 @@ export const {
   clearSeletedChucVu,
   setSelectedIdChucVu,
   resetStatusChucVu,
+  clearSelectedPhongBan,
+  setSelectedIdPhongBan,
+  resetStatusPhongBan,
   clearSeletedToBoMon,
   setSelectedIdToBoMon,
   resetStatusToBoMon

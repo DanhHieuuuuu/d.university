@@ -32,7 +32,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
 
   const { isModalOpen, isUpdate, isView, refreshData, setIsModalOpen } = props;
-  const phongBanList = useAppSelector((state) => state.danhmucState.listPhongBan || []);
+  const phongBanList = useAppSelector((state) => state.danhmucState.phongBan.$list.data || []);
 
   useEffect(() => {
     if (isModalOpen) {
