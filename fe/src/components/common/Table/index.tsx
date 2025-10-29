@@ -14,6 +14,7 @@ interface AppTableProps<T> extends TableProps<T> {
 
 const AppTable = <T extends object>(props: AppTableProps<T>) => {
   const [openConfig, setOpenConfig] = useState<boolean>(false);
+  const [openActionIndex, setOpenActionIndex] = useState<number | null>(null);
   const { columns, listActions, ...rest } = props;
 
   const openPopupConfig = () => {
@@ -35,13 +36,16 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         const actions = listActions.map((act, idx) => {
           return (
             <Button
-              size="middle"
               key={idx}
+              size="middle"
               title={act?.tooltip ?? act.label}
               color={act.color ?? 'default'}
               variant="dashed"
               icon={act.icon}
-              onClick={() => act.command(record)}
+              onClick={() => {
+                act.command(record);
+                setOpenActionIndex(null);
+              }}
             >
               {act.label}
             </Button>
@@ -55,8 +59,17 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         );
 
         return (
-          <Popover key={index} trigger="click" placement="bottomRight" arrow={true} content={content}>
-            <Button type="text" title="Xem thêm" icon={<EllipsisOutlined />} />
+          <Popover
+            key={index}
+            className="actions"
+            trigger="click"
+            open={openActionIndex === index}
+            onOpenChange={(visible) => setOpenActionIndex(visible ? index : null)}
+            placement="bottomRight"
+            arrow={true}
+            content={content}
+          >
+            <Button className="btn-more-action" type="text" title="Xem thêm" icon={<EllipsisOutlined />} />
           </Popover>
         );
       }
