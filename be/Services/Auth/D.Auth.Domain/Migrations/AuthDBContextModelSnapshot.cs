@@ -84,6 +84,9 @@ namespace D.Auth.Domain.Migrations
                     b.Property<int?>("IdHopDong")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool?>("IsThoiViec")
                         .HasColumnType("bit");
 

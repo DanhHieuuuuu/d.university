@@ -1,3 +1,5 @@
+import { ReduxStatus } from '@redux/const';
+
 export const genderE: Record<string, number> = {
   male: 1,
   female: 2,
@@ -25,4 +27,26 @@ export enum EnvironmentE {
 export enum EStatusResonse {
   SUCCESS = 1,
   ERROR = 0
+}
+
+export interface CRUD<T> {
+  $create: {
+    status: ReduxStatus;
+  };
+  $list: {
+    status: ReduxStatus;
+    data: T[];
+    total: number;
+  };
+  $update: {
+    status: ReduxStatus;
+  };
+  $delete: {
+    status: ReduxStatus;
+  };
+  $selected: {
+    status: ReduxStatus;
+    id: number | null;
+    data: T | null;
+  };
 }

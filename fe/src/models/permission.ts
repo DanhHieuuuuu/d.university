@@ -1,6 +1,14 @@
 export type IPermission = {
   permissonKey: string;
   permissionName: string;
+  parentKey?: string;
+};
+
+export type IPermissionTree = {
+  id: number;
+  key?: string;
+  label?: string;
+  children?: IPermissionTree[];
 };
 
 export type IPermissionGroupByEntity = {

@@ -1,23 +1,33 @@
 import type { IQueryPaging } from '@models/common/model.common';
-import type { IPermission } from '@models/permission';
 
 export type IRole = {
-  id?: string;
+  id?: number;
   name?: string;
   description?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  permissions?: IPermission[];
+  status?: number;
+  totalUser?: number;
 };
 
-export type IQueryPagingRoles = IQueryPaging & {};
+export type IQueryRole = IQueryPaging & {};
 
 export type ICreateRole = {
   name: string;
   description?: string;
-  rolePermissions?: IPermission[];
 };
 
 export type IUpdateRole = ICreateRole & {
-  id?: string | null;
+  id: number | null;
+};
+
+export type IRoleDetail = {
+  id?: number;
+  name?: string;
+  description?: string;
+  permissions?: string[]
+  permissionIds?: number[];
+};
+
+export type IUpdateRolePermission = {
+  roleId: number;
+  permissionIds: number[];
 };

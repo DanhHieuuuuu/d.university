@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IQueryStudent, IViewStudent, ICreateStudent } from '@models/student/student.model';
+import { IQueryStudent, IViewStudent, ICreateStudent, IUpdateStudent } from '@models/student/student.model';
 import { StudentService } from '@services/student.service';
 import { ReduxStatus } from '@redux/const';
 
@@ -30,7 +30,7 @@ export const createStudent = createAsyncThunk('student/create', async (body: ICr
   }
 });
 
-export const updateStudent = createAsyncThunk('student/update', async (body: Partial<IViewStudent>) => {
+export const updateStudent = createAsyncThunk('student/update', async (body: Partial<IUpdateStudent>) => {
   try {
     const res = await StudentService.update(body);
     return res.data;
@@ -52,7 +52,7 @@ interface StudentState {
   status: ReduxStatus;
   selected: {
     status: ReduxStatus;
-    studentId: string;
+    studentId: string | null;
     data: any | null;
   };
   list: IViewStudent[];
@@ -71,7 +71,7 @@ const initialState: StudentState = {
   status: ReduxStatus.IDLE,
   selected: {
     status: ReduxStatus.IDLE,
-    studentId: '',
+    studentId: null,
     data: null
   },
   list: [],
@@ -91,7 +91,7 @@ const studentSlice = createSlice({
   name: 'student',
   initialState,
   selectors: {
-    studentSelected: (state: StudentState) => state.selected,
+    studentSelected: (state: StudentState) => state.selected
   },
   reducers: {
       selectStudentId: (state, action: PayloadAction<string>) => {

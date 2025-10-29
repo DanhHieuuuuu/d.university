@@ -11,6 +11,5 @@ export const listMenuStudent: IMenu[] = [
     label: 'Quản lý sinh viên',
     routerLink: '/student/student-list',
     icon: <GlobalOutlined />
-  },
-
+  }
 ];

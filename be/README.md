@@ -3,6 +3,10 @@
 - C# .NET 9
 - SQL Server
 - Entity Framework Core (EF Core)
+- MediatR (CQRS Pattern)
+- AutoMapper
+- Redis (Caching)
+- MinIO/S3 (File Storage)
 
 ---
 

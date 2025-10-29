@@ -7,8 +7,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@redux/store';
 import { clearUser } from '@redux/feature/authSlice';
 import { AuthService } from '@services/auth.service';
-import { useState, useEffect, useRef } from 'react';
-import { AvatarStorage } from '@utils/avatar-storage';
+import { useState, useRef } from 'react';
+import { useUserAvatar } from '@hooks/useUserAvatar';
+import { ImageService } from '@services/image.service';
 import '@src/styles/globals.scss';
 
 const { Header } = Layout;
@@ -22,16 +23,10 @@ const AppHeader = () => {
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
   const [passwordForm] = Form.useForm();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (user?.maNhanSu) {
-      const savedAvatar = AvatarStorage.getAvatar(user.maNhanSu);
-      setAvatarUrl(savedAvatar);
-    }
-  }, [user?.maNhanSu]);
+  const { avatarUrl, loading: avatarLoading, updateAvatar } = useUserAvatar(user?.imageLink);
 
   const handleProfileClick = () => {
     setProfileModalVisible(true);
@@ -81,17 +76,25 @@ const AppHeader = () => {
     const file = event.target.files?.[0];
     if (!file || !user?.maNhanSu) return;
 
-    const validation = AvatarStorage.validateImageFile(file);
-    if (!validation.valid) {
-      message.error(validation.error);
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!validTypes.includes(file.type)) {
+      message.error('Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF hoặc WebP');
+      return;
+    }
+
+    if (file.size > maxSize) {
+      message.error('Kích thước ảnh không được vượt quá 5MB');
       return;
     }
 
     setUploadingAvatar(true);
     try {
-      const base64String = await AvatarStorage.saveAvatar(user.maNhanSu, file);
-      setAvatarUrl(base64String);
+      const imageBlob = await ImageService.updateUserImage(user.maNhanSu, file);
       message.success('Cập nhật ảnh đại diện thành công!');
+      // Sử dụng luôn ảnh trả về từ API
+      updateAvatar(imageBlob);
     } catch (error) {
       console.error('Avatar upload error:', error);
       message.error('Không thể tải lên ảnh đại diện!');
@@ -146,19 +149,10 @@ const AppHeader = () => {
           </div>
 
           <div style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)' }}>
-            <Dropdown
-            menu={{ items: menuItems }}
-            placement="bottomRight"
-            trigger={['click']}
-          >
-            <div className="flex items-center cursor-pointer hover:bg-gray-100 rounded-lg p-2 transition-colors gap-2">
-              <Avatar 
-                size="large" 
-                src={avatarUrl}
-                icon={!avatarUrl && <UserOutlined />}
-                className="mr-3"
-              />
-              <span className="font-medium">{userDisplayName}</span>
+            <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
+              <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-100">
+                <Avatar size="large" src={avatarUrl} icon={!avatarUrl && <UserOutlined />} className="mr-3" />
+                <span className="font-medium">{userDisplayName}</span>
               </div>
             </Dropdown>
           </div>
@@ -179,11 +173,7 @@ const AppHeader = () => {
       >
         <div className="flex flex-col items-center">
           <div className="relative mb-4">
-            <Avatar 
-              size={120} 
-              src={avatarUrl}
-              icon={!avatarUrl && <UserOutlined />}
-            />
+            <Avatar size={120} src={avatarUrl || undefined} icon={!avatarUrl && <UserOutlined />} />
             <input
               ref={fileInputRef}
               type="file"

@@ -19,6 +19,3 @@ export type ICreateToBoMon = {
 export type IUpdateToBoMon = ICreateToBoMon & {
   id: number;
 };
-
-
-

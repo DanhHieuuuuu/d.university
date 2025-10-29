@@ -7,6 +7,7 @@ import nhanSuReducer from './feature/nhansuSlice';
 import userReducer from './feature/userSlice';
 import danhmucReducer from './feature/danhmucSlice';
 import studentReducer from './feature/studentSlice';
+import roleConfigReducer from './feature/roleConfigSlice';
 
 const persistConfig = {
   key: 'auth',
@@ -25,6 +26,7 @@ export const makeStore = () => {
       userState: userReducer,
       danhmucState: danhmucReducer,
       studentState: studentReducer,
+      roleConfigState: roleConfigReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

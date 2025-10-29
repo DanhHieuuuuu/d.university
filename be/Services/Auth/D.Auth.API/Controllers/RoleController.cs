@@ -40,6 +40,26 @@ namespace D.Auth.API.Controllers
         }
 
         /// <summary>
+        /// Thông tin của role
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<ResponseAPI> GetRoleById([FromRoute] int id)
+        {
+            try
+            {
+                var req = new RoleFindByIdRequestDto { Id = id };
+                var result = await _mediator.Send(req);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Tạo role
         /// </summary>
         /// <param name="dto"></param>
@@ -108,6 +128,26 @@ namespace D.Auth.API.Controllers
         }
 
         /// <summary>
+        /// Xoá role (soft delete)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<ResponseAPI> DeleteRole([FromRoute] int id)
+        {
+            try
+            {
+                var req = new DeleteRoleDto { RoleId = id };
+                await _mediator.Send(req);
+                return new("Xóa role thành công");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Cập nhật permission cho role
         /// </summary>
         /// <param name="id"></param>
@@ -160,7 +200,9 @@ namespace D.Auth.API.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet("tree-permissions")]
-        public async Task<ResponseAPI> GetAllPermissionTree([FromQuery] PermissionTreeRequestDto dto)
+        public async Task<ResponseAPI> GetAllPermissionTree(
+            [FromQuery] PermissionTreeRequestDto dto
+        )
         {
             try
             {

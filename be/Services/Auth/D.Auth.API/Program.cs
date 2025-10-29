@@ -2,6 +2,7 @@ using D.Auth.Application;
 using D.Auth.Domain;
 using D.Auth.Infrastructure;
 using D.ControllerBase;
+using D.S3Bucket.Configs;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System.Reflection;
@@ -28,6 +29,7 @@ namespace D.Auth.API
             builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
             builder.Services.AddMediatRServices();
             builder.ConfigureCors();
+            builder.ConfigureS3();
 
             builder.ConfigureJwtAuthentication();
             var app = builder.Build();

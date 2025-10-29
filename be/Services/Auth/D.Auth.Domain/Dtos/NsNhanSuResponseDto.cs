@@ -67,5 +67,6 @@ namespace D.Auth.Domain.Dtos
         public bool? DaVeHuu { get; set; }
 
         public bool? IsThoiViec { get; set; }
+        public string? ImageLink { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 import { ReduxStatus } from '@redux/const';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { CRUD } from '@models/common/common';
 import { ICreateChucVu, IQueryChucVu, IUpdateChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
 import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
 import { ICreatePhongBan, IQueryPhongBan, IUpdatePhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
@@ -214,28 +215,6 @@ export const getAllTonGiao = createAsyncThunk('danhmuc/list-tongiao', async () =
     console.error(error);
   }
 });
-
-interface CRUD<T> {
-  $create: {
-    status: ReduxStatus;
-  };
-  $list: {
-    status: ReduxStatus;
-    data: T[];
-    total?: number;
-  };
-  $update: {
-    status: ReduxStatus;
-  };
-  $delete: {
-    status: ReduxStatus;
-  };
-  $selected: {
-    status: ReduxStatus;
-    id: number | null;
-    data: T | null;
-  };
-}
 
 interface DanhMucState {
   chucVu: CRUD<IViewChucVu>;
