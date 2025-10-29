@@ -11,10 +11,7 @@ import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
 import {
   clearSelected,
   createNhanSu,
-  getDetailNhanSu,
-  getListNhanSu,
-  resetStatusCreate
-} from '@redux/feature/nhansuSlice';
+  getDetailNhanSu} from '@redux/feature/nhansuSlice';
 import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab)';
 
 type NhanSuModalProps = {
