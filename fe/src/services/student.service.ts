@@ -1,4 +1,4 @@
-import { IQueryStudent, IViewStudent, ICreateStudent } from '@models/student/student.model';
+import { IQueryStudent, IViewStudent, ICreateStudent, IUpdateStudent } from '@models/student/student.model';
 import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
@@ -46,7 +46,7 @@ const createSinhVien = async (body: ICreateStudent) => {
   }
 };
 
-const update = async (body: Partial<IViewStudent>) => {
+const update = async (body: Partial<IUpdateStudent>) => {
   try {
     const res = await axios.put(`${apiStudentEndpoint}/update`, body);
     return Promise.resolve(res.data);

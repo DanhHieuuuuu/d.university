@@ -1,7 +1,7 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input, Tag } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Modal, Tag } from 'antd';
+import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, StopOutlined, EyeOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ReduxStatus } from '@redux/const';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -11,7 +11,7 @@ import { IQueryStudent, IViewStudent } from '@models/student/student.model';
 import { getListStudent, deleteStudent } from '@redux/feature/studentSlice';
 import { toast } from 'react-toastify';
 import AppTable from '@components/common/Table';
-import CreateStudentDialog from './(dialog)/create';
+import CreateStudentDialog from './(dialog)/create-or-update';
 
 const StudentPage = () => {
   const [form] = Form.useForm();
@@ -21,6 +21,9 @@ const StudentPage = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedStudent, setSelectedStudent] = useState<IViewStudent | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [isView, setIsView] = useState(false);
+
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryStudent>({
     total: total,
@@ -71,31 +74,53 @@ const StudentPage = () => {
 
   const actions: IAction[] = [
     {
+      label: 'Xem',
+      tooltip: 'Xem thông tin sinh viên',
+      icon: <EyeOutlined />,
+      command: (record: IViewStudent) => {
+        setSelectedStudent(record);
+        setIsView(true);
+        setIsModalOpen(true);
+      },
+    },
+    {
       label: 'Sửa',
       tooltip: 'Sửa thông tin sinh viên',
       icon: <EditOutlined />,
       command: (record: IViewStudent) => {
         setSelectedStudent(record);
-        setIsEditModalOpen(true);
+        setIsView(false);
+        setIsModalOpen(true);
       },
     },
     {
       label: 'Xóa',
       color: 'red',
       icon: <StopOutlined />,
-      command: async (record: IViewStudent) => {
-        try {
-          await dispatch(deleteStudent(record.idStudent)).unwrap();
-          toast.success('Xóa sinh viên thành công');
-          dispatch(getListStudent(query));
-        } catch {
-          toast.error('Xóa sinh viên thất bại');
-        }
-      },
+      command: (record: IViewStudent) => {
+        Modal.confirm({
+          title: 'Xác nhận xóa',
+          content: 'Bạn có chắc chắn muốn xóa sinh viên này?',
+          okText: 'Xóa',
+          okButtonProps: { danger: true },
+          cancelText: 'Hủy',
+          onOk: async () => {
+            try {
+              await dispatch(deleteStudent(record.idStudent)).unwrap();
+              toast.success('Xóa sinh viên thành công');
+              dispatch(getListStudent(query));
+            } catch {
+              toast.error('Xóa sinh viên thất bại');
+            }
+          }
+        });
+      }
     },
   ];
 
   const onClickAdd = () => {
+    setSelectedStudent(null);
+    setIsView(false);
     setIsModalOpen(true);
   };
 
@@ -144,19 +169,19 @@ const StudentPage = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      {/* 🧩 Dialog thêm mới */}
       <CreateStudentDialog
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={() => dispatch(getListStudent(query))}
-      />
-
-      {/* <EditStudentDialog
-        open={isEditModalOpen}
         student={selectedStudent}
-        onClose={() => setIsEditModalOpen(false)}
-        onSuccess={() => dispatch(getListStudent(query))}
-      /> */}
+        isView={isView}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedStudent(null);
+          setIsView(false);
+        }}
+        onSuccess={() => {
+          dispatch(getListStudent(query));
+        }}
+      />
     </Card>
   );
 };

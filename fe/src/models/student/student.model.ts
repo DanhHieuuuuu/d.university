@@ -34,4 +34,8 @@ export type ICreateStudent = {
   email?: string;
 };
 
+export type IUpdateStudent = ICreateStudent & {
+  idStudent: number;
+};
+
 

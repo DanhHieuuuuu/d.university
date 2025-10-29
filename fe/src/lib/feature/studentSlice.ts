@@ -12,7 +12,7 @@ export const getListStudent = createAsyncThunk('student/list', async (args: IQue
   }
 });
 
-export const getDetailStudent = createAsyncThunk('student/detail', async (keyword: string) => {
+export const getDetailStudent = createAsyncThunk('student/find', async (keyword: string) => {
   try {
     const res = await StudentService.find(keyword);
     return res.data;
@@ -52,22 +52,39 @@ interface StudentState {
   status: ReduxStatus;
   selected: {
     status: ReduxStatus;
-    idStudent: number | null;
-    data: IViewStudent | null;
+    studentId: string;
+    data: any | null;
   };
   list: IViewStudent[];
   total: number;
+  $create: {
+    status: ReduxStatus;
+  };
+  $update: {
+    status: ReduxStatus;
+  };
+  $delete: {
+    status: ReduxStatus;
+  };
 }
-
 const initialState: StudentState = {
   status: ReduxStatus.IDLE,
   selected: {
     status: ReduxStatus.IDLE,
-    idStudent: null,
-    data: null,
+    studentId: '',
+    data: null
   },
   list: [],
   total: 0,
+  $create: {
+    status: ReduxStatus.IDLE
+  },
+  $update: {
+    status: ReduxStatus.IDLE
+  },
+  $delete: {
+    status: ReduxStatus.IDLE
+  }
 };
 
 const studentSlice = createSlice({
@@ -77,56 +94,71 @@ const studentSlice = createSlice({
     studentSelected: (state: StudentState) => state.selected,
   },
   reducers: {
-    selectStudentId: (state, action: PayloadAction<number>) => {
-      state.selected.idStudent = action.payload;
+      selectStudentId: (state, action: PayloadAction<string>) => {
+        state.selected.studentId = action.payload;
+      },
+      clearSelected: (state) => {
+        state.selected = { studentId: '', status: ReduxStatus.IDLE, data: null };
+      },
+      resetStatusCreate: (state) => {
+        state.$create = { status: ReduxStatus.IDLE };
+      }
     },
-    clearSelected: (state) => {
-      state.selected = { idStudent: null, status: ReduxStatus.IDLE, data: null };
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(getListStudent.pending, (state) => {
-        state.status = ReduxStatus.LOADING;
-      })
-      .addCase(getListStudent.fulfilled, (state, action: PayloadAction<any>) => {
-        state.status = ReduxStatus.SUCCESS;
-        state.list = action.payload?.items || [];
-        state.total = action.payload?.totalItems || 0;
-      })
-      .addCase(getListStudent.rejected, (state) => {
-        state.status = ReduxStatus.FAILURE;
-      })
-
-      .addCase(getDetailStudent.pending, (state) => {
-        state.selected.status = ReduxStatus.LOADING;
-      })
-      .addCase(getDetailStudent.fulfilled, (state, action: PayloadAction<IViewStudent | null>) => {
-        state.selected.status = ReduxStatus.SUCCESS;
-        state.selected.data = action.payload;
-      })
-      .addCase(getDetailStudent.rejected, (state) => {
-        state.selected.status = ReduxStatus.FAILURE;
-      })
-
-      .addCase(createStudent.fulfilled, (state) => {
-        state.status = ReduxStatus.SUCCESS;
-      })
-
-      .addCase(updateStudent.fulfilled, (state) => {
-        state.status = ReduxStatus.SUCCESS;
-      })
-
-      .addCase(deleteStudent.fulfilled, (state) => {
-        state.status = ReduxStatus.SUCCESS;
+    extraReducers: (builder) => {
+      builder
+        .addCase(getListStudent.pending, (state) => {
+          state.status = ReduxStatus.LOADING;
+        })
+        .addCase(getListStudent.fulfilled, (state, action: PayloadAction<any>) => {
+          state.status = ReduxStatus.SUCCESS;
+          state.list = action.payload?.items;
+          state.total = action.payload?.totalItems;
+        })
+        .addCase(getListStudent.rejected, (state) => {
+          state.status = ReduxStatus.FAILURE;
+        })
+        .addCase(getDetailStudent.pending, (state) => {
+          state.selected.status = ReduxStatus.LOADING;
+        })
+        .addCase(getDetailStudent.fulfilled, (state, action: PayloadAction<any>) => {
+          state.selected.status = ReduxStatus.SUCCESS;
+          state.selected.data = action.payload;
+        })
+        .addCase(getDetailStudent.rejected, (state) => {
+          state.selected.status = ReduxStatus.FAILURE;
+        })
+        .addCase(createStudent.pending, (state) => {
+          state.$create.status = ReduxStatus.LOADING;
+        })
+        .addCase(createStudent.fulfilled, (state) => {
+          state.$create.status = ReduxStatus.SUCCESS;
+        })
+        .addCase(createStudent.rejected, (state) => {
+          state.$create.status = ReduxStatus.FAILURE;
+        })
+        .addCase(updateStudent.pending, (state) => {
+          state.$update = { status: ReduxStatus.LOADING };
+        })
+        .addCase(updateStudent.fulfilled, (state) => {
+          state.$update = { status: ReduxStatus.SUCCESS };
+        })
+        .addCase(updateStudent.rejected, (state) => {
+          state.$update = { status: ReduxStatus.FAILURE };
+        })
+        .addCase(deleteStudent.pending, (state) => {
+          state.$delete = { status: ReduxStatus.LOADING };
+        })
+        .addCase(deleteStudent.fulfilled, (state) => {
+          state.$delete = { status: ReduxStatus.SUCCESS };
+        })
+        .addCase(deleteStudent.rejected, (state) => {
+          state.$delete = { status: ReduxStatus.FAILURE };
+        });
+        }
       });
-  },
-});
-
-// export const { selectMssv, clearSelected } = studentSlice.actions;
-// export const { studentSelected } = studentSlice.selectors;
-// export default studentSlice.reducer;
-
-const studentReducer = studentSlice.reducer;
-export const { selectStudentId, clearSelected } = studentSlice.actions;
-export default studentReducer;
+  
+  const studentReducer = studentSlice.reducer;
+  
+  export const { selectStudentId, clearSelected, resetStatusCreate } = studentSlice.actions;
+  
+  export default studentReducer;
