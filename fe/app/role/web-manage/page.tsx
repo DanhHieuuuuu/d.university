@@ -11,7 +11,7 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 
 import { IQueryRole, IRole } from '@models/role';
-import { deleteRole, getListPermissionTree, getListRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
+import { deleteRole, getListPermissionTree, getListRole, resetStatusRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
 import CreateRoleModal from './(dialog)/create-or-update';
 import RolePermissionModal from './(dialog)/update-permission';
 import { toast } from 'react-toastify';
@@ -76,6 +76,7 @@ const Page = () => {
     Modal.confirm({
       title: 'Xác nhận xóa nhóm quyền',
       content: `Bạn có chắc muốn xóa nhóm quyền "${role.name}"?`,
+      centered: true,
       okText: 'Xóa',
       okButtonProps: { danger: true },
       cancelText: 'Hủy',
@@ -94,7 +95,8 @@ const Page = () => {
     const result = await dispatch(deleteRole(roleId)).unwrap();
     if (result != undefined) {
       toast.success(result?.message || 'Xóa nhóm thành công');
-      onFilterChange({})
+      dispatch(resetStatusRole());
+      onFilterChange(query)
     }
   };
 
@@ -199,13 +201,13 @@ const Page = () => {
         isModalOpen={modalState.open}
         isUpdate={modalState.isUpdate}
         setIsModalOpen={(open) => setModalState((prev) => ({ ...prev, open }))}
-        refreshData={() => onFilterChange({})}
+        refreshData={() => onFilterChange(query)}
       />
 
       <RolePermissionModal
         isModalOpen={openPermission}
         setIsModalOpen={setOpenModalPermission}
-        refreshData={() => onFilterChange({})}
+        refreshData={() => onFilterChange(query)}
       />
     </div>
   );
