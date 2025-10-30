@@ -1,5 +1,5 @@
 const Index = () => {
-  return <div>Trang chủ phân quyền</div>;
+  return <div>Trang chủ Admin</div>;
 };
 
 export default Index;

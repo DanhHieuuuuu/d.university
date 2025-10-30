@@ -1,20 +1,48 @@
-import { GlobalOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  ContainerOutlined,
+  FileOutlined,
+  GlobalOutlined,
+  HomeOutlined,
+  NotificationOutlined,
+  TeamOutlined
+} from '@ant-design/icons';
 import { IMenu } from '@models/common/menu.model';
 
-export const listMenuRole: IMenu[] = [
+export const listMenuManager: IMenu[] = [
   {
     label: 'Tổng quan',
-    routerLink: '/role',
-    icon: <HomeOutlined />
+    routerLink: '/manager',
+    icon: <HomeOutlined />,
+    hidden: false
   },
   {
     label: 'Phân quyền website',
-    routerLink: '/role/web-manage',
-    icon: <GlobalOutlined />
+    routerLink: '/manager/role',
+    icon: <GlobalOutlined />,
+    hidden: false
   },
   {
     label: 'Quản lý tài khoản',
-    routerLink: '/role/user-manage',
-    icon: <TeamOutlined />
+    routerLink: '/manager/user',
+    icon: <TeamOutlined />,
+    hidden: false
+  },
+  {
+    label: 'Quản lý thông báo',
+    routerLink: '/manager/notification',
+    icon: <NotificationOutlined />,
+    hidden: false
+  },
+  {
+    label: 'Quản lý log',
+    routerLink: '/manager/log',
+    icon: <ContainerOutlined />,
+    hidden: false
+  },
+  {
+    label: 'Quản lý file',
+    routerLink: '/manager/file',
+    icon: <FileOutlined />,
+    hidden: false
   }
 ];

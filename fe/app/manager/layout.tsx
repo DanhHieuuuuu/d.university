@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Layout } from 'antd';
-import RoleMenuComponent from '@components/menu/menu-role';
+import RoleMenuComponent from '@components/menu/menu-manager';
 import AppHeader from '@components/common/Header';
 
 const { Content } = Layout;

@@ -19,11 +19,11 @@ import { toast } from 'react-toastify';
 const breadcrumbItems = [
   {
     title: 'Tổng quan',
-    href: '/role'
+    href: '/manager'
   },
   {
     title: 'Phân quyền website',
-    href: '/role/web-manage'
+    href: '/manager/role'
   },
   {
     title: 'Danh sách'

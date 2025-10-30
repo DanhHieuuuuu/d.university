@@ -3,7 +3,7 @@
 import { Layout } from 'antd';
 import { useTheme } from 'next-themes';
 
-import { listMenuRole } from '@/constants/menu/menu.role';
+import { listMenuManager } from '@/constants/menu/menu.role';
 import AppMenu from '@components/common/Menu';
 import '@styles/menu.style.scss';
 
@@ -15,7 +15,7 @@ const RoleMenuComponent = () => {
 
   return (
     <Sider width="20%" theme={siderTheme} className="role-menu">
-      <AppMenu data={listMenuRole} />
+      <AppMenu data={listMenuManager} />
     </Sider>
   );
 };

@@ -3,12 +3,11 @@ import {
   ApartmentOutlined,
   BarsOutlined,
   DeploymentUnitOutlined,
-  FileOutlined,
   HomeOutlined,
   PartitionOutlined,
-  TeamOutlined,
-  UserOutlined
+  TeamOutlined
 } from '@ant-design/icons';
+import { AdminIcon, StudentIcon } from '@components/custom-icon';
 
 export const listMenuCore: IMenu[] = [
   {
@@ -22,14 +21,9 @@ export const listMenuCore: IMenu[] = [
     icon: <TeamOutlined />
   },
   {
-    label: 'User',
-    routerLink: '/role/user-manage',
-    icon: <UserOutlined />
-  },
-  {
     label: 'Student',
     routerLink: '/student/manage',
-    icon: <TeamOutlined />
+    icon: <StudentIcon />
   },
   {
     label: 'Danh mục',
@@ -54,8 +48,8 @@ export const listMenuCore: IMenu[] = [
     ]
   },
   {
-    label: 'Files',
-    routerLink: '9',
-    icon: <FileOutlined />
+    label: 'Admin',
+    routerLink: '/manager',
+    icon: <AdminIcon />
   }
 ];
