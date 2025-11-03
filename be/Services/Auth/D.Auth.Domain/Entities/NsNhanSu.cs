@@ -69,4 +69,5 @@ public partial class NsNhanSu : EntityBase
 
     public string? PasswordKey { get; set; }
     public string? ImageLink { get; set; }
+    public bool? Status { get; set; }
 }

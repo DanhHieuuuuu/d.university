@@ -16,6 +16,7 @@ export type IUserView = {
   tenChucVu?: string;
   tenPhongBan?: string;
   trangThai?: string;
+  roleIds?: number[];
 };
 
 export interface INhanSuData {
@@ -32,6 +33,7 @@ export interface INhanSuData {
   email: string | null;
   tenChucVu: string | null;
   tenPhongBan: string | null;
+  roleIds?: number[];
 }
 
 export interface IUserCreate {

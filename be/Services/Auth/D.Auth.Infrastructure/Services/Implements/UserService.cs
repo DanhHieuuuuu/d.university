@@ -3,6 +3,7 @@ using Azure.Core;
 using d.Shared.Permission.Error;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
+using D.Auth.Domain.Dtos.UserRole;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
 using D.ControllerBase.Exceptions;
@@ -11,6 +12,7 @@ using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using D.S3Bucket;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -228,6 +230,80 @@ namespace D.Auth.Infrastructure.Services.Implements
             var result = await _s3ManagerFile.ReadFileAsync(fileName);
 
             return result;
+        }
+
+        public async Task<GetUserRolesByUserIdResponseDto> GetUserRolesByUserId(int nhanSuId)
+        {
+            _logger.LogInformation($"[{nameof(GetUserRolesByUserId)}] Lấy role hiện tại của user {nhanSuId}");
+
+            var roleIds = await _unitOfWork.iUserRoleRepository.TableNoTracking
+                .Where(ur => ur.NhanSuId == nhanSuId)
+                .Select(ur => ur.RoleId)
+                .ToListAsync();
+
+            return new GetUserRolesByUserIdResponseDto
+            {
+                NhanSuId = nhanSuId,
+                RoleIds = roleIds
+            };
+        }
+
+        public async Task<bool> UpdateUserRoles(UpdateUserRoleDto dto)
+        {
+            _logger.LogInformation(
+                $"[{nameof(UpdateUserRoles)}] Cập nhật role cho user {dto.NhanSuId}. RoleIds: {string.Join(',', dto.RoleIds ?? new List<int>())}"
+            );
+
+            var existingRoles = await _unitOfWork.iUserRoleRepository.Table
+                .Where(ur => ur.NhanSuId == dto.NhanSuId)
+                .ToListAsync();
+
+            var newRoleIds = dto.RoleIds ?? new List<int>();
+
+            var rolesToRemove = existingRoles.Where(r => !newRoleIds.Contains(r.RoleId)).ToList();
+            if (rolesToRemove.Any())
+            {
+                _unitOfWork.iUserRoleRepository.RemoveRange(rolesToRemove);
+                _logger.LogInformation($"Xóa {rolesToRemove.Count} role không còn: {string.Join(',', rolesToRemove.Select(r => r.RoleId))}");
+            }
+
+            var existingRoleIds = existingRoles.Select(r => r.RoleId).ToHashSet();
+            var rolesToAdd = newRoleIds.Where(rid => !existingRoleIds.Contains(rid))
+                                       .Select(rid => new UserRole
+                                       {
+                                           NhanSuId = dto.NhanSuId,
+                                           RoleId = rid
+                                       })
+                                       .ToList();
+
+            if (rolesToAdd.Any())
+            {
+                _unitOfWork.iUserRoleRepository.AddRange(rolesToAdd);
+                _logger.LogInformation($"Thêm {rolesToAdd.Count} role mới: {string.Join(',', rolesToAdd.Select(r => r.RoleId))}");
+            }
+
+            await _unitOfWork.iUserRoleRepository.SaveChangeAsync();
+            _logger.LogInformation($"[{nameof(UpdateUserRoles)}] Hoàn tất cập nhật role cho user {dto.NhanSuId}");
+
+            return true;
+        }
+
+        public async Task<bool> ChangeStatusUser(int nhanSuId)
+        {
+            _logger.LogInformation($"[{nameof(ChangeStatusUser)}] Đang thay đổi trạng thái người dùng Id={nhanSuId}");
+
+            var ns = await _unitOfWork.iNsNhanSuRepository.Table.FirstOrDefaultAsync(x => x.Id == nhanSuId);
+            if (ns == null)
+                throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "Người dùng không tồn tại.");
+
+            ns.Status = !(ns.Status ?? true);
+
+            _unitOfWork.iNsNhanSuRepository.Update(ns);
+            await _unitOfWork.iNsNhanSuRepository.SaveChangeAsync();
+
+            _logger.LogInformation($"[{nameof(ChangeStatusUser)}] Đã {(ns.Status == true ? "kích hoạt" : "vô hiệu hóa")} người dùng Id={nhanSuId}");
+
+            return ns.Status ?? false;
         }
 
     }

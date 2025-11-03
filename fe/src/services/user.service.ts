@@ -9,6 +9,8 @@ const getAll = async (query: IQueryUser) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/get-all`, { params: query });
 
+    console.log('Raw response:', res); // xem toàn bộ AxiosResponse
+    console.log('res.data:', res.data); // xem đúng dữ liệu server trả về
     const data: IResponseList<IUserView> = res.data;
 
     // map hoTen từ hoDem + ten
@@ -65,5 +67,44 @@ const getNhanSuByMaNhanSu = async (maNhanSu: string): Promise<INhanSuData> => {
     return Promise.reject(err);
   }
 };
+const updateRolesToUser = async (userId: number, roleIds: number[]) => {
+  try {
+    const res = await axios.post(
+      'user/update-roles-to-user',
+      { NhanSuId: userId, RoleIds: roleIds },
+      { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL }
+    );
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật nhóm quyền cho user');
+    return Promise.reject(err);
+  }
+};
+const getRolesOfUser = async (userId: number) => {
+  try {
+    const res = await axios.get(`user/${userId}`, {
+      baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
+    });
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không lấy được quyền của user');
+    return Promise.reject(err);
+  }
+};
+const changeStatusUser = async (userId: number) => {
+  try {
+    const res = await axios.post(
+      `user/${userId}/change-status`,
+      {}, 
+      {
+        baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
+      }
+    );
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không đổi trạng thái được');
+    return Promise.reject(err);
+  }
+};
 
-export const UserService = { getAll, createUser, updateUser, getNhanSuByMaNhanSu };
+export const UserService = { getAll, createUser, updateUser, getNhanSuByMaNhanSu, updateRolesToUser, getRolesOfUser, changeStatusUser };

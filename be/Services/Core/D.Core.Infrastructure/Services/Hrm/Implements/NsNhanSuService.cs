@@ -110,7 +110,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                         ? _unitOfWork.iDmChucVuRepository.FindById(x.HienTaiChucVu.Value)?.TenChucVu
                         : null,
                     TrangThai =
-                        x.IsThoiViec == true ? "Thôi việc"
+                        x.Status == false ? "Vô hiệu hóa"
+                        : x.IsThoiViec == true ? "Thôi việc"
                         : x.DaVeHuu == true ? "Nghỉ hưu"
                         : x.DaChamDutHopDong == true ? "Chấm dứt HĐ"
                         : "Đang hoạt động",
@@ -269,6 +270,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 || dto.Keyword == x.SoDienThoai
                 || dto.Keyword == x.MaNhanSu
             );
+            if (nhanSu == null)
+            {
+                _logger.LogWarning($"Không tìm thấy nhân sự với Keyword = {dto.Keyword}");
+                return null;
+            }
 
             var result = new NsNhanSuResponseDto
             {

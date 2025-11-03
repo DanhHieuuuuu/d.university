@@ -1,5 +1,6 @@
 ﻿using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
+using D.Auth.Domain.Dtos.UserRole;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,8 @@ namespace D.Auth.Infrastructure.Services.Abstracts
         Task<bool> UpdateUser(UpdateUserRequestDto request);
         Task<bool> ResetPasswordAsync(ResetPasswordRequestDto request);
         Task<Stream> UpdateUserImage(UpdateImageUserDto request);
+        Task<GetUserRolesByUserIdResponseDto> GetUserRolesByUserId(int nhanSuId);
+        Task<bool> UpdateUserRoles(UpdateUserRoleDto dto);
+        Task<bool> ChangeStatusUser(int nhanSuId);
     }
 }

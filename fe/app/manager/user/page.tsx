@@ -1,11 +1,11 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, KeyOutlined } from '@ant-design/icons';
 import EditUserModal from './(dialog)/edit';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllUser } from '@redux/feature/userSlice';
+import { changeStatusUserThunk, getAllUser } from '@redux/feature/userSlice';
 
 import { IQueryUser, IUserView } from '@models/user/user.model';
 import AppTable from '@components/common/Table';
@@ -14,6 +14,8 @@ import { formatDateView } from '@utils/index';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import CreateNhanSuModal from './(dialog)/create';
+import UserRoleModal from './(dialog)/user-role';
+import { toast } from 'react-toastify';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -22,6 +24,7 @@ const Page = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [openUserRoleModal, setOpenUserRoleModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IUserView | null>(null);
 
   const onClickAdd = () => setIsModalOpen(true);
@@ -95,8 +98,15 @@ const Page = () => {
   ];
   const actions: IAction[] = [
     {
+      label: 'Cập nhật nhóm quyền',
+      icon: <KeyOutlined />,
+      command: (record: IUserView) => {
+        setSelectedUser(record);
+        setOpenUserRoleModal(true);
+      }
+    },
+    {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin nhân viên',
       icon: <EditOutlined />,
       command: (record: IUserView) => {
         setSelectedUser(record);
@@ -104,12 +114,21 @@ const Page = () => {
       }
     },
     {
-      label: 'Vô hiệu hóa',
-      color: 'red',
-      icon: <StopOutlined />,
+      label: 'Đổi trạng thái', 
+      color: 'primary', 
+      icon: <SyncOutlined />, 
       command: (record: IUserView) => {
+        if (!record.id) return;
         setSelectedUser(record);
-        setIsEditModalOpen(true);
+        dispatch(changeStatusUserThunk(record.id))
+          .unwrap()
+          .then(() => {
+            toast.success('Cập nhật trạng thái thành công');
+          })
+          .catch((err) => {
+            console.error(err);
+            toast.error('Không đổi trạng thái được');
+          });
       }
     }
   ];
@@ -189,6 +208,12 @@ const Page = () => {
         setIsModalOpen={setIsEditModalOpen}
         user={selectedUser}
         onSuccess={() => dispatch(getAllUser(query))}
+      />
+      <UserRoleModal
+        isModalOpen={openUserRoleModal}
+        setIsModalOpen={setOpenUserRoleModal}
+        userId={selectedUser?.id || null}
+        refreshData={() => onFilterChange(query)}
       />
     </Card>
   );

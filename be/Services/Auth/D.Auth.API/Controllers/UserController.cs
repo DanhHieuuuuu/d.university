@@ -2,6 +2,7 @@
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
+using D.Auth.Domain.Dtos.UserRole;
 using D.ControllerBase;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -115,5 +116,65 @@ namespace D.Auth.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Update nhóm quyền cho User
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("update-roles-to-user")]
+        public async Task<ResponseAPI> UpdateRoleToUser(UpdateUserRoleDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Thông tin của Role của User
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{nhanSuId}")]
+        public async Task<ResponseAPI> GetUserRolesByUserId([FromRoute] int nhanSuId)
+        {
+            try
+            {
+                var req = new GetUserRolesByUserIdRequestDto { NhanSuId = nhanSuId };
+                var result = await _mediator.Send(req);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Vô hiệu hóa hoặc kích hoạt trạng thái tài khoản
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost("{nhanSuId}/change-status")]
+        public async Task<ResponseAPI> ChangeStatusUser([FromRoute] int nhanSuId)
+        {
+            try
+            {
+                var req = new ChangeStatusUserDto { NhanSuId = nhanSuId };
+                var result = await _mediator.Send(req);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }

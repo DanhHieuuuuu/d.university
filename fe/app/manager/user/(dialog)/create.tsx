@@ -48,10 +48,16 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
             form.setFieldValue('ten', '');
           }
         } catch (error: any) {
-          // Xử lý lỗi (ví dụ: không tìm thấy nhân sự)
-          const errorMessage = error?.message || 'Lỗi khi lấy thông tin nhân sự';
+          const errorMessage =
+            error?.response?.data?.message ||
+            (error?.message?.includes('500') ? 'Không tìm thấy nhân sự' : error?.message) ||
+            'Lỗi khi lấy thông tin nhân sự';
+
           toast.error(errorMessage);
+
           form.setFieldValue('email2', '');
+          form.setFieldValue('hoDem', '');
+          form.setFieldValue('ten', '');
         } finally {
           setIsFetchingNhanSu(false);
         }

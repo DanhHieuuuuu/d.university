@@ -48,5 +48,6 @@ namespace D.Core.Domain.Entities.Hrm.NhanSu
         public string? Email2 { get; set; }
         public string? Password { get; set; }
         public string? PasswordKey { get; set; }
+        public bool? Status { get; set; }
     }
 }
