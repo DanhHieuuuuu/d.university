@@ -1,4 +1,5 @@
-﻿using D.Core.Domain.Entities.Hrm.DanhMuc;
+﻿using D.Core.Domain.Entities.File;
+using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Shared.SeedData;
@@ -58,6 +59,10 @@ namespace D.Core.Domain
 
         DbSet<SvSinhVien> SvSinhViens { get; set; }
 
+        #endregion
+
+        #region file
+        DbSet<FileManagement> FileManagements { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

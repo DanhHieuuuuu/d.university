@@ -7,6 +7,7 @@
         public const string Auth = "auth";
         public const string Hrm = "hrm";
         public const string Sv = "sv";
+        public const string File = "file";
         public const string Delegation = "dio";
     }
 }
