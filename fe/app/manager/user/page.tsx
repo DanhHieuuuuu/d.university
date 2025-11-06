@@ -66,6 +66,16 @@ const Page = () => {
       title: 'Email'
     },
     {
+      key: 'email2',
+      dataIndex: 'email2',
+      title: 'Email2'
+    },
+    {
+      key: 'soCccd',
+      dataIndex: 'soCccd',
+      title: 'Số CCCD'
+    },
+    {
       key: 'soDienThoai',
       dataIndex: 'soDienThoai',
       title: 'Số điện thoại'
@@ -114,9 +124,9 @@ const Page = () => {
       }
     },
     {
-      label: 'Đổi trạng thái', 
-      color: 'primary', 
-      icon: <SyncOutlined />, 
+      label: 'Đổi trạng thái',
+      color: 'primary',
+      icon: <SyncOutlined />,
       command: (record: IUserView) => {
         if (!record.id) return;
         setSelectedUser(record);
@@ -147,7 +157,7 @@ const Page = () => {
   });
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
-    onFilterChange({ maNhanSu: value });
+    onFilterChange({ Keyword: value });
   }, 500);
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
@@ -166,8 +176,8 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryUser> label="Mã nhân sự:" name="maNhanSu">
-            <Input onChange={(e) => handleSearch(e)} />
+          <Form.Item<IQueryUser> label="Tìm kiếm:" name="Keyword">
+            <Input placeholder='Nhập họ tên/CCCD/Mã nhân sự' onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
         <Form.Item>

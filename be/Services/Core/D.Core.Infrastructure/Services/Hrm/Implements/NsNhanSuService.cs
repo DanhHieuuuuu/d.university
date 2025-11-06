@@ -82,7 +82,10 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             );
 
             var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking.Where(x =>
-                string.IsNullOrEmpty(dto.MaNhanSu) || x.MaNhanSu == dto.MaNhanSu
+               !string.IsNullOrEmpty(x.Password) 
+               && (string.IsNullOrEmpty(dto.Keyword) || x.MaNhanSu.Contains(dto.Keyword) 
+               || (x.HoDem + " " + x.Ten).Contains(dto.Keyword) 
+               || x.SoCccd.Contains(dto.Keyword))
             );
 
             var totalCount = query.Count();
@@ -101,6 +104,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     NoiSinh = x.NoiSinh,
                     SoDienThoai = x.SoDienThoai,
                     Email = x.Email,
+                    Email2 = x.Email2,
+                    SoCccd = x.SoCccd,
+
                     TenPhongBan = x.HienTaiPhongBan.HasValue
                         ? _unitOfWork
                             .iDmPhongBanRepository.FindById(x.HienTaiPhongBan.Value)

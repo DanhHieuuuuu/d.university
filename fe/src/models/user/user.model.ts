@@ -1,7 +1,7 @@
 import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryUser = IQueryPaging & {
-  maNhanSu?: string;
+  Keyword?: string;
 };
 
 export type IUserView = {
@@ -13,28 +13,30 @@ export type IUserView = {
   noiSinh?: string;
   soDienThoai?: string;
   email?: string;
+  email2?:string;
+  soCccd?: string;
   tenChucVu?: string;
   tenPhongBan?: string;
   trangThai?: string;
   roleIds?: number[];
 };
 
-export interface INhanSuData {
-  idNhanSu: number | null;
-  maNhanSu: string;
-  hoDem: string | null;
-  ten: string | null;
-  hoTen: string | null;
-  ngaySinh: string | null;
-  noiSinh: string | null;
-  gioiTinh: string | null;
-  soCccd: string | null;
-  soDienThoai: string | null;
-  email: string | null;
-  tenChucVu: string | null;
-  tenPhongBan: string | null;
-  roleIds?: number[];
-}
+// export interface INhanSuData {
+//   idNhanSu: number | null;
+//   maNhanSu: string;
+//   hoDem: string | null;
+//   ten: string | null;
+//   hoTen: string | null;
+//   ngaySinh: string | null;
+//   noiSinh: string | null;
+//   gioiTinh: string | null;
+//   soCccd: string | null;
+//   soDienThoai: string | null;
+//   email: string | null;
+//   tenChucVu: string | null;
+//   tenPhongBan: string | null;
+//   roleIds?: number[];
+// }
 
 export interface IUserCreate {
   maNhanSu: string;

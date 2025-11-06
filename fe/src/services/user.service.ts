@@ -1,7 +1,7 @@
 import { processApiMsgError } from '@utils/index';
 import { IResponseList } from '@models/common/response.model';
 import axios from '@utils/axios';
-import { INhanSuData, IQueryUser, IUserCreate, IUserView } from '@models/user/user.model';
+import { IQueryUser, IUserCreate, IUserView } from '@models/user/user.model';
 
 const apiNhanSuEndpoint = 'nhansu';
 
@@ -9,11 +9,10 @@ const getAll = async (query: IQueryUser) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/get-all`, { params: query });
 
-    console.log('Raw response:', res); // xem toàn bộ AxiosResponse
-    console.log('res.data:', res.data); // xem đúng dữ liệu server trả về
+    console.log('Raw response:', res); 
+    console.log('res.data:', res.data); 
     const data: IResponseList<IUserView> = res.data;
 
-    // map hoTen từ hoDem + ten
     data.data.items = data.data.items.map((x: IUserView) => ({
       ...x,
       hoTen: `${x.hoDem ?? ''} ${x.ten ?? ''}`.trim()
@@ -50,13 +49,13 @@ const updateUser = async (body: { Id: number; Email?: string; NewPassword?: stri
   }
 };
 
-const getNhanSuByMaNhanSu = async (maNhanSu: string): Promise<INhanSuData> => {
+const getNhanSuByMaNhanSu = async (maNhanSu: string): Promise<IUserView> => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/get`, { params: { keyword: maNhanSu } });
 
     // Kiểm tra cấu trúc response: { status: 1, data: INhanSuData, ... }
     if (res.data.status === 1 && res.data.data) {
-      return Promise.resolve(res.data.data as INhanSuData);
+      return Promise.resolve(res.data.data as IUserView);
     }
 
     // Nếu API trả về thành công nhưng không có dữ liệu nhân sự

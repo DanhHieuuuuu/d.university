@@ -11,7 +11,7 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {
     public class NsNhanSuGetAllRequestDto : FilterBaseDto, IQuery<PageResultDto<NsNhanSuGetAllResponseDto>>
     {
-        [FromQuery(Name = "manhansu")]
-        public string? MaNhanSu { get; set; }
+        [FromQuery(Name = "keyword")]
+        public string? Keyword { get; set; }
     }
 }

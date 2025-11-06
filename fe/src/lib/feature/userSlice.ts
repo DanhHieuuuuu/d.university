@@ -6,7 +6,7 @@ import { ReduxStatus } from '@redux/const';
 export const getAllUser = createAsyncThunk('user/getAll', async (args: IQueryUser) => {
   try {
     const res = await UserService.getAll(args);
-    return res.data; // { items, totalItem }
+    return res.data; 
   } catch (error: any) {
     console.error(error);
   }

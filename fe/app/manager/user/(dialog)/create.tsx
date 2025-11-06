@@ -5,7 +5,7 @@ import { Button, Col, Form, Input, Modal, Row, Space, Switch } from 'antd';
 import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch } from '@redux/hooks';
 import { createUser } from '@redux/feature/userSlice';
-import { IUserCreate, INhanSuData } from '@models/user/user.model';
+import { IUserCreate, IUserView } from '@models/user/user.model';
 import { generateHuceEmail } from '@helpers/format.helper';
 import { UserService } from '@services/user.service';
 
@@ -34,7 +34,7 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
         form.setFieldValue('email2', 'Đang tạo...');
 
         try {
-          const data: INhanSuData = await UserService.getNhanSuByMaNhanSu(maNhanSuValue);
+          const data: IUserView = await UserService.getNhanSuByMaNhanSu(maNhanSuValue);
 
           if (data.hoDem && data.ten && data.tenChucVu) {
             const newEmail = generateHuceEmail(data.hoDem, data.ten, data.tenChucVu);
@@ -95,14 +95,18 @@ const CreateUser: React.FC<CreateUserModalProps> = ({ isModalOpen, setIsModalOpe
         email2: values.email2 || null
       };
 
-      await dispatch(createUser(dataToCreate)).unwrap();
-      toast.success('Tạo mới thành công');
-      onSuccess?.();
-      setIsModalOpen(false);
-      form.resetFields();
-      setAutoPassword(true);
-    } catch {
-      toast.error('Tạo user thất bại');
+      const res = await dispatch(createUser(dataToCreate)).unwrap();
+      if (res) {
+        toast.success('Tạo mới thành công');
+        onSuccess?.();
+        setIsModalOpen(false);
+        form.resetFields();
+        setAutoPassword(true);
+      } else {
+        toast.error(res?.message || 'Tài khoản đã tồn tại hoặc không tạo được');
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Tạo user thất bại');
     }
   };
 
