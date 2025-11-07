@@ -9,5 +9,6 @@
         public const string Sv = "sv";
         public const string File = "file";
         public const string Delegation = "dio";
+        public const string Notification = "noti";
     }
 }

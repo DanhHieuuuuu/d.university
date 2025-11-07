@@ -1,0 +1,26 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace D.Notification.Domain.Common
+{
+    public class PagingRequestDto
+    {
+        [FromQuery(Name = "pageIndex")]
+        public int PageIndex { get; set; } = 1;
+
+        [FromQuery(Name = "pageSize")]
+        public int PageSize { get; set; } = 10;
+
+        private string? _keyword;
+        [FromQuery(Name = "keyword")]
+        public string? Keyword
+        {
+            get => _keyword;
+            set => _keyword = value?.Trim();
+        }
+
+        public int SkipCount()
+        {
+            return (PageIndex - 1) * PageSize;
+        }
+    }
+}
