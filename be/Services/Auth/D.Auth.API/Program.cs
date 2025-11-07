@@ -1,11 +1,10 @@
+using System.Reflection;
 using D.Auth.Application;
 using D.Auth.Domain;
 using D.Auth.Infrastructure;
 using D.ControllerBase;
+using D.Notification.ApplicationService.Configs;
 using D.S3Bucket.Configs;
-using Microsoft.OpenApi.Models;
-using StackExchange.Redis;
-using System.Reflection;
 
 namespace D.Auth.API
 {
@@ -25,6 +24,7 @@ namespace D.Auth.API
 
             // connection redis
             builder.ConfigureRedis();
+            builder.ConfigureNotification(typeof(Program).Namespace);
 
             builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
             builder.Services.AddMediatRServices();

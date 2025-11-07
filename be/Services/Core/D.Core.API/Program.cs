@@ -1,10 +1,9 @@
-﻿
+﻿using System.Reflection;
 using D.ControllerBase;
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
+using D.Notification.ApplicationService.Configs;
 
 namespace D.Core.API
 {
@@ -24,6 +23,7 @@ namespace D.Core.API
 
             // connection redis
             builder.ConfigureRedis();
+            builder.ConfigureNotification(typeof(Program).Namespace);
 
             builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
             builder.Services.AddMediatRServices();

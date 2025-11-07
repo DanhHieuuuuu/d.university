@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using d.Shared.Permission.Error;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
@@ -10,16 +9,12 @@ using D.ControllerBase.Exceptions;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
+using D.Notification.ApplicationService.Abstracts;
 using D.S3Bucket;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Auth.Infrastructure.Services.Implements
 {
@@ -28,18 +23,21 @@ namespace D.Auth.Infrastructure.Services.Implements
         private readonly ServiceUnitOfWork _unitOfWork;
         private IConfiguration _configuration;
         private readonly IS3ManagerFile _s3ManagerFile;
+        private readonly INotificationService _notiService;
         public UserService(
                 ILogger<UserService> logger,
                 IHttpContextAccessor contextAccessor,
                 IMapper mapper,
                 ServiceUnitOfWork unitOfWork,
                 IConfiguration configuration,
-                IS3ManagerFile s3ManagerFile
+                IS3ManagerFile s3ManagerFile,
+                INotificationService notiService
             ) : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
             _s3ManagerFile = s3ManagerFile;
+            _notiService = notiService;
         }
         public async Task<CreateUserResponseDto> CreateUser(CreateUserRequestDto request)
         {
@@ -93,6 +91,13 @@ namespace D.Auth.Infrastructure.Services.Implements
                         };
 
                         await SendNotification.SendEmail(mailDto);
+                        //await _notiService.SendAsync(new Notification.Dtos.NotificationMessage
+                        //{
+                        //    Title = "Thông tin tài khoản",
+                        //    Channel = Notification.Domain.Enums.NotificationChannel.Email,
+                        //    Receiver = new Notification.Dtos.Receiver { Email = ns.Email },
+                        //    Content = body,
+                        //});
                     }
                     catch (Exception ex)
                     {
