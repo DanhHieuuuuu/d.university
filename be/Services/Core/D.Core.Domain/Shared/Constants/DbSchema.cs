@@ -10,5 +10,6 @@
         public const string File = "file";
         public const string Delegation = "dio";
         public const string Notification = "noti";
+        public const string Dt = "dt";
     }
 }
