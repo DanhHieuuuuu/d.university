@@ -24,7 +24,7 @@ namespace D.Auth.API
 
             // connection redis
             builder.ConfigureRedis();
-            builder.ConfigureNotification(typeof(Program).Namespace);
+            builder.ConfigureNotification("D.Auth.Domain");
 
             builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
             builder.Services.AddMediatRServices();
