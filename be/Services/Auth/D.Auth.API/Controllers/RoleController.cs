@@ -102,6 +102,7 @@ namespace D.Auth.API.Controllers
         /// <summary>
         /// Cập nhật thông tin role
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]

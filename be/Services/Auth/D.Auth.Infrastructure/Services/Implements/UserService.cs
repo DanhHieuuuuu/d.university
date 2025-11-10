@@ -1,16 +1,17 @@
 ﻿using AutoMapper;
-using d.Shared.Permission.Error;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
 using D.Auth.Domain.Dtos.UserRole;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
 using D.ControllerBase.Exceptions;
-using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
 using D.S3Bucket;
+using d.Shared.Permission.Error;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -68,41 +69,51 @@ namespace D.Auth.Infrastructure.Services.Implements
 
             if (!string.IsNullOrWhiteSpace(ns.Email))
             {
-                _ = Task.Run(async () =>
+                //_ = Task.Run(async () =>
+                //{
+                //    try
+                //    {
+                //        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+                //        string body = await File.ReadAllTextAsync(templatePath);
+
+                //        body = body.Replace("{{fullName}}", $"{ns.HoDem} {ns.Ten}")
+                //                   .Replace("{{userName}}", ns.MaNhanSu)
+                //                   .Replace("{{newPassword}}", rawPassword)
+                //                   .Replace("{{year}}", DateTime.Now.Year.ToString());
+
+                //        var mailDto = new SendEmailDto
+                //        {
+                //            EmailFrom = _configuration["Email_Configuration:Email"],
+                //            Password = _configuration["Email_Configuration:Password"],
+                //            Host = _configuration["Email_Configuration:Host"],
+                //            Post = int.Parse(_configuration["Email_Configuration:Port"]),
+                //            Title = "Thông tin tài khoản",
+                //            EmailTo = ns.Email,
+                //            Body = body
+                //        };
+
+                //        await SendNotification.SendEmail(mailDto);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        _logger.LogError(ex, "Gửi email thất bại cho {MaNhanSu}", ns.MaNhanSu);
+                //    }
+                //});
+
+                string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+                string body = await File.ReadAllTextAsync(templatePath);
+
+                body = body.Replace("{{fullName}}", $"{ns.HoDem} {ns.Ten}")
+                           .Replace("{{userName}}", ns.MaNhanSu)
+                           .Replace("{{newPassword}}", rawPassword)
+                           .Replace("{{year}}", DateTime.Now.Year.ToString());
+
+                await _notiService.SendAsync(new NotificationMessage
                 {
-                    try
-                    {
-                        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
-                        string body = await File.ReadAllTextAsync(templatePath);
-
-                        body = body.Replace("{{userName}}", $"{ns.HoDem} {ns.Ten}")
-                                   .Replace("{{newPassword}}", rawPassword)
-                                   .Replace("{{year}}", DateTime.Now.Year.ToString());
-
-                        var mailDto = new SendEmailDto
-                        {
-                            EmailFrom = _configuration["Email_Configuration:Email"],
-                            Password = _configuration["Email_Configuration:Password"],
-                            Host = _configuration["Email_Configuration:Host"],
-                            Post = int.Parse(_configuration["Email_Configuration:Port"]),
-                            Title = "Thông tin tài khoản",
-                            EmailTo = ns.Email,
-                            Body = body
-                        };
-
-                        await SendNotification.SendEmail(mailDto);
-                        //await _notiService.SendAsync(new Notification.Dtos.NotificationMessage
-                        //{
-                        //    Title = "Thông tin tài khoản",
-                        //    Channel = Notification.Domain.Enums.NotificationChannel.Email,
-                        //    Receiver = new Notification.Dtos.Receiver { Email = ns.Email },
-                        //    Content = body,
-                        //});
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Gửi email thất bại cho {MaNhanSu}", ns.MaNhanSu);
-                    }
+                    Title = "Thông tin tài khoản",
+                    Channel = NotificationChannel.Email,
+                    Receiver = new Receiver { Email = ns.Email, UserId = ns.Id },
+                    Content = body,
                 });
             }
 
@@ -183,26 +194,43 @@ namespace D.Auth.Infrastructure.Services.Implements
             _unitOfWork.iNsNhanSuRepository.SaveChange();
 
 
-            _ = Task.Run(async () => 
-            {
-                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
-                string body = await System.IO.File.ReadAllTextAsync(filePath);
-                body = body.Replace("{{userName}}", $"{ns.HoDem} {ns.Ten}")
-                           .Replace("{{newPassword}}", newPassword)
-                           .Replace("{{year}}", DateTime.Now.Year.ToString());
+            //_ = Task.Run(async () =>
+            //{
+            //    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+            //    string body = await System.IO.File.ReadAllTextAsync(filePath);
+            //    body = body.Replace("{{fullName}}", $"{ns.HoDem} {ns.Ten}")
+            //               .Replace("{{userName}}", ns.MaNhanSu)
+            //               .Replace("{{newPassword}}", newPassword)
+            //               .Replace("{{year}}", DateTime.Now.Year.ToString());
 
-                SendEmailDto dto = new SendEmailDto()
+            //    SendEmailDto dto = new SendEmailDto()
+            //    {
+            //        EmailFrom = _configuration["Email_Configuration:Email"],
+            //        Password = _configuration["Email_Configuration:Password"],
+            //        Host = _configuration["Email_Configuration:Host"],
+            //        Post = int.Parse(_configuration["Email_Configuration:Port"]),
+            //        Title = "Mật khẩu mới",
+            //        EmailTo = ns.Email,
+            //        Body = body
+            //    };
+            //    await SendNotification.SendEmail(dto);
+            //});
+
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+            string body = await System.IO.File.ReadAllTextAsync(filePath);
+
+            body = body.Replace("{{fullName}}", $"{ns.HoDem} {ns.Ten}")
+                       .Replace("{{userName}}", ns.MaNhanSu)
+                       .Replace("{{newPassword}}", newPassword)
+                       .Replace("{{year}}", DateTime.Now.Year.ToString());
+
+            await _notiService.SendAsync(new NotificationMessage
                 {
-                    EmailFrom = _configuration["Email_Configuration:Email"],
-                    Password = _configuration["Email_Configuration:Password"],
-                    Host = _configuration["Email_Configuration:Host"],
-                    Post = int.Parse(_configuration["Email_Configuration:Port"]),
                     Title = "Mật khẩu mới",
-                    EmailTo = ns.Email,
-                    Body = body
-                };
-                await SendNotification.SendEmail(dto);
-            });
+                    Channel = NotificationChannel.Email,
+                    Receiver = new Receiver { Email = ns.Email, UserId = ns.Id },
+                    Content = body,
+                });
 
             return true;
         }

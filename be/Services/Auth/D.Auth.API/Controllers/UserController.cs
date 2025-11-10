@@ -139,7 +139,7 @@ namespace D.Auth.API.Controllers
         /// <summary>
         /// Thông tin của Role của User
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="nhanSuId"></param>
         /// <returns></returns>
         [HttpGet("{nhanSuId}")]
         public async Task<ResponseAPI> GetUserRolesByUserId([FromRoute] int nhanSuId)
@@ -159,7 +159,7 @@ namespace D.Auth.API.Controllers
         /// <summary>
         /// Vô hiệu hóa hoặc kích hoạt trạng thái tài khoản
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="nhanSuId"></param>
         /// <returns></returns>
         [HttpPost("{nhanSuId}/change-status")]
         public async Task<ResponseAPI> ChangeStatusUser([FromRoute] int nhanSuId)

@@ -47,7 +47,11 @@ namespace D.Notification.ApplicationService.Configs
             );
 
             // Đăng ký Config vào DI Container
-            builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("Notification:SmtpConfig"));
+            builder
+                .Services.AddOptions<SmtpConfig>()
+                .Bind(builder.Configuration.GetSection("Notification:SmtpConfig"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationLogRepository, NotificationLogRepository>();
