@@ -27,6 +27,7 @@ namespace D.Notification.ApplicationService.Implements.Logging
             };
 
             await _repository.AddAsync(log);
+            await _repository.SaveChangesAsync();
         }
 
         public async Task LogFailureAsync(int notificationId, string receiver, int errorCode)
@@ -42,6 +43,7 @@ namespace D.Notification.ApplicationService.Implements.Logging
             };
 
             await _repository.AddAsync(log);
+            await _repository.SaveChangesAsync();
         }
     }
 }

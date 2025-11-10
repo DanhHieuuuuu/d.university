@@ -10,5 +10,6 @@ namespace D.Notification.Domain.Repositories
         Task<IEnumerable<NotiNotificationDetail>> GetUserNotificationsAsync(int userId, PagingRequestDto dto);
         Task MarkAsReadAsync(int notificationId);
         Task MarkAllAsReadAsync(int userId);
+        Task SaveChangesAsync();
     }
 }

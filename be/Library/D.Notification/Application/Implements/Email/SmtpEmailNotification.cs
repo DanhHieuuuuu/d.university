@@ -71,8 +71,11 @@ namespace D.Notification.ApplicationService.Implements.Email
                 Content = dto.Content,
                 IsRead = false,
                 Receiver = dto.Receiver.Email,
+                ReceiverId = dto.Receiver.UserId ?? 0,
             };
+
             await _notificationRepository.AddAsync(notificationEntity);
+            await _notificationRepository.SaveChangesAsync();
 
             try
             {

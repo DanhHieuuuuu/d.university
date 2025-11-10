@@ -39,5 +39,10 @@ namespace D.Notification.Infrastructures.Repositories
                 .Take(dto.PageSize)
                 .ToListAsync();
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

@@ -56,5 +56,10 @@ namespace D.Notification.Infrastructures.Repositories
                 .Notifications.Where(x => x.ReceiverId == userId && !x.IsRead)
                 .ExecuteUpdateAsync(setters => setters.SetProperty(n => n.IsRead, true));
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

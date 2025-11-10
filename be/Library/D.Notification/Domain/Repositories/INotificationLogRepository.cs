@@ -13,5 +13,6 @@ namespace D.Notification.Domain.Repositories
         Task AddAsync(NotiNotificationLog log);
         Task<IEnumerable<NotiNotificationLog>> GetByNotificationIdAsync(int notificationId);
         Task<IEnumerable<NotiNotificationLog>> FindPaging(PagingRequestDto dto);
+        Task SaveChangesAsync();
     }
 }
