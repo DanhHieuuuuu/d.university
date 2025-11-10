@@ -68,7 +68,7 @@ namespace D.Notification.ApplicationService.Implements.Email
             var notificationEntity = new NotiNotificationDetail
             {
                 Title = dto.Title,
-                Content = dto.Content,
+                Content = dto.AltContent,
                 IsRead = false,
                 Receiver = dto.Receiver.Email,
                 ReceiverId = dto.Receiver.UserId ?? 0,

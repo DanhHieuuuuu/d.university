@@ -114,6 +114,7 @@ namespace D.Auth.Infrastructure.Services.Implements
                     Channel = NotificationChannel.Email,
                     Receiver = new Receiver { Email = ns.Email, UserId = ns.Id },
                     Content = body,
+                    AltContent = "Tài khoản đăng nhập đã được khởi tạo."
                 });
             }
 
@@ -230,6 +231,7 @@ namespace D.Auth.Infrastructure.Services.Implements
                     Channel = NotificationChannel.Email,
                     Receiver = new Receiver { Email = ns.Email, UserId = ns.Id },
                     Content = body,
+                    AltContent = "Mật khẩu đăng nhập đã được cập nhật. Vui lòng kiểm tra email."
                 });
 
             return true;

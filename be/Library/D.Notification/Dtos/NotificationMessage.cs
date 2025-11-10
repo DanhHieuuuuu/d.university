@@ -4,9 +4,29 @@ namespace D.Notification.Dtos
 {
     public class NotificationMessage
     {
+        /// <summary>
+        /// Người nhận
+        /// </summary>
         public Receiver Receiver { get; set; }
+
+        /// <summary>
+        /// Tiêu đề
+        /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        /// Nội dung thông báo
+        /// </summary>
         public string Content { get; set; }
+
+        /// <summary>
+        /// Nội dung thông báo (lưu vào db)
+        /// </summary>
+        public string AltContent { get; set; }
+
+        /// <summary>
+        /// Kênh truyền tin
+        /// </summary>
         public NotificationChannel Channel { get; set; }
     }
 

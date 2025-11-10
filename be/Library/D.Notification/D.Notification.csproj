@@ -6,11 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Dtos\Responses\" />
-    <Folder Include="Dtos\Requests\" />
-  </ItemGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\..\Services\Core\D.Core.Domain\D.Core.Domain.csproj" />
 		<ProjectReference Include="..\D.ControllerBase\D.ControllerBase.csproj" />
