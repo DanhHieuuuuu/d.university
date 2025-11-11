@@ -18,6 +18,7 @@ namespace D.Core.API
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
+                .Enrich.WithProperty("ServiceName", "CoreAPI")
                 .CreateLogger();
 
             try
