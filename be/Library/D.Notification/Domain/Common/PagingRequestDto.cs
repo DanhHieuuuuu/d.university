@@ -10,14 +10,6 @@ namespace D.Notification.Domain.Common
         [FromQuery(Name = "pageSize")]
         public int PageSize { get; set; } = 10;
 
-        private string? _keyword;
-        [FromQuery(Name = "keyword")]
-        public string? Keyword
-        {
-            get => _keyword;
-            set => _keyword = value?.Trim();
-        }
-
         public int SkipCount()
         {
             return (PageIndex - 1) * PageSize;
