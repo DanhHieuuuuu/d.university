@@ -59,12 +59,12 @@ namespace D.Core.API
                 app.UseAuthorization();
                 app.MapControllers();
 
-                Log.Information("Khởi động ứng dụng thành công.");
+                Log.Information("Core started successfully.");
                 app.Run();
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Ứng dụng lỗi không thể khởi động");
+                Log.Fatal(ex, "Core application failed to start");
             }
             finally
             {
