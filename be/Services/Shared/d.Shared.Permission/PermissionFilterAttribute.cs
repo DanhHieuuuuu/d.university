@@ -31,7 +31,7 @@ namespace d.Shared.Permission
             httpClient.DefaultRequestHeaders.Add("Authorization", token);
 
             // Gọi sang service Auth để check quyền
-            var response = await httpClient.GetAsync("http://localhost:5268/api/role/get-all-role");
+            var response = await httpClient.GetAsync("http://localhost:5268/api/role/my-permissions");
 
             if((int)response.StatusCode == 401)
             {
