@@ -1,7 +1,5 @@
 ﻿using D.ApplicationBase;
 using D.Core.Domain.Dtos.Noti;
-using D.DomainBase.Common;
-using D.DomainBase.Dto;
 using D.InfrastructureBase.Shared;
 using D.Notification.ApplicationService.Abstracts;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 namespace D.Core.Application.Query.Noti
 {
     public class FindPagingMyNotification
-        : IQueryHandler<NotiRequestDto, PageResultDto<NotiResponseDto>>
+        : IQueryHandler<NotiRequestDto, PageResultNotificationDto<NotiResponseDto>>
     {
         private readonly INotificationService _notiService;
         private readonly IHttpContextAccessor _httpContext;
@@ -23,13 +21,18 @@ namespace D.Core.Application.Query.Noti
             _httpContext = httpContext;
         }
 
-        public async Task<PageResultDto<NotiResponseDto>> Handle(
+        public async Task<PageResultNotificationDto<NotiResponseDto>> Handle(
             NotiRequestDto request,
             CancellationToken cancellationToken
         )
         {
             var userId = CommonUntil.GetCurrentUserId(_httpContext);
             var query = await _notiService.GetUserNotificationsAsync(userId);
+
+            var result = new PageResultNotificationDto<NotiResponseDto>();
+
+            result.TotalUnread = query.Where(n => !n.IsRead).Count();
+            result.TotalItem = query.Count();
 
             if (request.Short)
             {
@@ -50,9 +53,6 @@ namespace D.Core.Application.Query.Noti
                 })
                 .ToList();
 
-            var result = new PageResultDto<NotiResponseDto>();
-
-            result.TotalItem = query.Count();
             result.Items = items;
 
             return result;
