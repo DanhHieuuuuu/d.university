@@ -1,15 +1,17 @@
 'use client';
 
+import { useState, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Layout, Typography, Dropdown, Avatar, Modal, Form, Input, Button, Space, message } from 'antd';
 import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined, EditOutlined } from '@ant-design/icons';
 import { useNavigate } from '@hooks/navigate';
-import { useSelector, useDispatch } from 'react-redux';
+import { useUserAvatar } from '@hooks/useUserAvatar';
 import { RootState } from '@redux/store';
 import { clearUser } from '@redux/feature/authSlice';
 import { AuthService } from '@services/auth.service';
-import { useState, useRef } from 'react';
-import { useUserAvatar } from '@hooks/useUserAvatar';
 import { ImageService } from '@services/image.service';
+
+import NotificationComponent from '@components/common/Notification';
 import '@src/styles/globals.scss';
 
 const { Header } = Layout;
@@ -141,14 +143,15 @@ const AppHeader = () => {
           paddingInline: 0
         }}
       >
-        <div className="flex h-full w-full items-center" style={{ padding: '0 20px', position: 'relative' }}>
-          <div>
+        <div className="flex h-full w-full items-center justify-between" style={{ padding: '0 20px' }}>
+          <div className='left-header'>
             <Title level={2} style={{ cursor: 'pointer', margin: 0 }} onClick={() => navigateTo('/home')}>
               University
             </Title>
           </div>
 
-          <div style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)' }}>
+          <div className='right-header flex items-center gap-4'>
+            <NotificationComponent />
             <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
               <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-100">
                 <Avatar size="large" src={avatarUrl} icon={!avatarUrl && <UserOutlined />} className="mr-3" />
