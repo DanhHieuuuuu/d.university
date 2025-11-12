@@ -14,5 +14,6 @@ namespace d.Shared.Permission.Error
         public const int PasswordOrCodeWrong = 1008; // Không đúng mật khẩu hoặc tài khoản.
         public const int CodeExits = 1009; // Mã nhân sự đã tồn tại
         public const int CodeNotFound = 1010; // Không tìm thấy mã nhân sự
+        public const int AccountDisabled = 1011; // Tài khoản bị vô hiệu hóa
     }
 }
