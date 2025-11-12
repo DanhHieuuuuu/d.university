@@ -60,13 +60,13 @@ namespace D.Core.API.Controllers.Notification
         /// <summary>
         /// Đánh dấu tất cả là đã đọc
         /// </summary>
-        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("mark-all-as-read")]
-        public async Task<ResponseAPI> MarkAllAsReadNotification(MarkAllAsReadDto dto)
+        public async Task<ResponseAPI> MarkAllAsReadNotification()
         {
             try
             {
+                var dto = new MarkAllAsReadDto();
                 await _mediator.Send(dto);
                 return new();
             }

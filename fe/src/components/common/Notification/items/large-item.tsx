@@ -4,12 +4,13 @@ import { formatDate } from '@utils/index';
 import { IViewNotification } from '@models/notice/notification.model';
 import { useAppDispatch } from '@redux/hooks';
 import { $markAsRead } from '@redux/feature/noticeSlice';
+import { BellIcon } from '@components/custom-icon';
 
 interface SmallNotificationItemProps {
   item: IViewNotification;
 }
 
-const SmallNotificationItem: React.FC<SmallNotificationItemProps> = (props) => {
+const NotificationItem: React.FC<SmallNotificationItemProps> = (props) => {
   const { item } = props;
   const dispatch = useAppDispatch();
 
@@ -24,9 +25,10 @@ const SmallNotificationItem: React.FC<SmallNotificationItemProps> = (props) => {
 
   return (
     <div
-      className={`notification-item small ${item.isRead ? 'read' : 'unread'}`}
+      className={`notification-item large ${item.isRead ? 'read' : 'unread'}`}
       onClick={!item.isRead ? handleOnClick : undefined}
     >
+      <BellIcon />
       <div className="notification-content">
         <p className="notification-title">{item.title}</p>
         <span className="notification-timestamp">{formatedDate}</span>
@@ -36,4 +38,4 @@ const SmallNotificationItem: React.FC<SmallNotificationItemProps> = (props) => {
   );
 };
 
-export default SmallNotificationItem;
+export default NotificationItem;
