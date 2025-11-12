@@ -4,7 +4,7 @@ export interface IResponseList<Item> {
   code: number;
   data: {
     items: Item[];
-    totalItems: number;
+    totalItem: number;
   };
   message: string;
   status: EStatusResonse;

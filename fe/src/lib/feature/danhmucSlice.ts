@@ -310,7 +310,7 @@ const danhmucSlice = createSlice({
       .addCase(getAllChucVu.fulfilled, (state, action) => {
         state.chucVu.$list.status = ReduxStatus.SUCCESS;
         state.chucVu.$list.data = action.payload?.items || [];
-        state.chucVu.$list.total = action.payload?.totalItems || 0;
+        state.chucVu.$list.total = action.payload?.totalItem || 0;
       })
       .addCase(getAllChucVu.rejected, (state) => {
         state.chucVu.$list.status = ReduxStatus.FAILURE;
@@ -370,7 +370,7 @@ const danhmucSlice = createSlice({
       .addCase(getAllPhongBan.fulfilled, (state, action) => {
         state.phongBan.$list.status = ReduxStatus.SUCCESS;
         state.phongBan.$list.data = action.payload?.items || [];
-        state.phongBan.$list.total = action.payload?.totalItems || 0;
+        state.phongBan.$list.total = action.payload?.totalItem || 0;
       })
       .addCase(getAllPhongBan.rejected, (state) => {
         state.phongBan.$list.status = ReduxStatus.FAILURE;
@@ -425,7 +425,7 @@ const danhmucSlice = createSlice({
       .addCase(getAllToBoMon.fulfilled, (state, action) => {
         state.toBoMon.$list.status = ReduxStatus.SUCCESS;
         state.toBoMon.$list.data = action.payload?.items || [];
-        state.toBoMon.$list.total = action.payload?.totalItems || 0;
+        state.toBoMon.$list.total = action.payload?.totalItem || 0;
       })
       .addCase(getAllToBoMon.rejected, (state) => {
         state.toBoMon.$list.status = ReduxStatus.FAILURE;
