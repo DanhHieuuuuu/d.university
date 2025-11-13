@@ -1,27 +1,27 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import type { RootState } from '@redux/store';
 import React from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAppSelector } from '@redux/hooks';
+import { selectorPermissions, selectorUser } from '@redux/feature/auth/authSelectors';
 
-export function withAuth(WrappedComponent: React.ComponentType, requiredPermission: string) {
+export function withAuthGuard(WrappedComponent: React.ComponentType, requiredPermission: string) {
   const GuardedComponent = (props: any) => {
     const router = useRouter();
-    const userId = useSelector((state: RootState) => state.authState.user?.id);
-    const permissions =
-      useSelector((state: RootState) => state.authState.permissions?.map((x: any) => x.name)) || [];
+
+    const user = useAppSelector(selectorUser);
+    const permissions = useAppSelector(selectorPermissions);
+
+    const hasAccess = permissions.includes(requiredPermission);
 
     useEffect(() => {
-      if (userId && !permissions.includes(requiredPermission)) {
+      if (user?.id && !hasAccess) {
         router.replace('/forbidden');
       }
     }, [router, permissions]);
 
-    if (!permissions.includes(requiredPermission)) {
-      return null; // or a spinner/loading state while redirecting
-    }
+    if (!hasAccess) return null;
 
     return <WrappedComponent {...props} />;
   };

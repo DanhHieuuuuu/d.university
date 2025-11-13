@@ -2,6 +2,6 @@ export interface IMenu {
   label: string;
   routerLink: string;
   icon?: React.ReactNode;
-  hidden?: boolean;
+  permissionKeys?: string[];
   items?: IMenu[];
 }
