@@ -75,6 +75,10 @@ namespace D.Auth.Infrastructure.Services.Implements
             {
                 throw new UserFriendlyException(ErrorCodeConstant.PasswordOrCodeWrong, "Không đúng mật khẩu hoặc tài khoản.");
             }
+            if (ns.Status == false)
+            {
+                throw new UserFriendlyException(ErrorCodeConstant.AccountDisabled, "Tài khoản đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
+            }
 
             if (string.IsNullOrEmpty(ns.Password) || string.IsNullOrEmpty(ns.PasswordKey))
             {
