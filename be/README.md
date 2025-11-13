@@ -66,9 +66,9 @@ sudo systemctl start redis-server
 
 ## Flow từ entity => controller
 
-1. Tạo `entity` extends `EntityBase` (khai báo `DbSet`)
+#### 1. Tạo `entity` extends `EntityBase` (khai báo `DbSet`)
 
-2. Tạo repository để lấy dữ liệu từ db
+#### 2. Tạo repository để lấy dữ liệu từ db
 
 ví dụ:
 
@@ -98,7 +98,7 @@ namespace D.Auth.Infrastructure.Repositories
 
 Inject chúng vào trong file `DependencyInjection` ngay dưới.
 
-3. Tạo file `service` và `iService` để viết logic nghiệp vụ
+#### 3. Tạo file `service` và `iService` để viết logic nghiệp vụ
 
 Ví dụ:
 
@@ -133,7 +133,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
 Khai báo các biến như trên và inject vào `DependencyInjection`
 
-4. Khai báo dto cho MediatR
+#### 4. Khai báo dto cho MediatR
 
 Ví dụ:
 
@@ -151,7 +151,7 @@ Request nào thì phải implement Response đó, có thể khai báo kiểu `IQ
   <img src="overview_cqrs.png" alt="CQRS Design Pattern in Microservices Architectures" />
 </div>
 
-5. Xử lý truy vấn MediatR gọi đến
+#### 5. Xử lý truy vấn MediatR gọi đến
 
 Ví dụ:
 
@@ -187,23 +187,93 @@ namespace D.Core.Application.Query.Hrm.NsNhanSu
 
 Sử dụng `IQueryHandler` hoặc `ICommandHandler` của namespace `D.ApplicationBase` để service biết resquest, response là gì
 
-6. Viết controller
+#### 6. Viết controller
 
 Ví dụ:
 
 ```xml
-        public async Task<ResponseAPI> GetListNhanSu(NsNhanSuRequestDto dto)
+    public async Task<ResponseAPI> GetListNhanSu(NsNhanSuRequestDto dto)
+    {
+        try
         {
-            try
-            {
-                var result = await _mediator.Send(dto);
-                return new(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
+            var result = await _mediator.Send(dto);
+            return new(result);
         }
+        catch (Exception ex)
+        {
+            return BadRequest(ex);
+        }
+    }
+```
+
+hoặc:
+
+```xml
+    public async Task<ResponseAPI> MarkAsReadNotification([FromRoute] int id)
+    {
+        try
+        {
+            var dto = new MarkAsReadDto { NotificationId = id };
+            await _mediator.Send(dto);
+            return new();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex);
+        }
+    }
 ```
 
 Chỉ cần truyền Request vào thì mediator sẽ biết response là gì => mỗi api đều cần 1 request riêng biệt
+
+## Cấu hình Permission
+
+#### 1. Thêm PermissionKey
+
+File: `Services/Shared/d.Shared.Permission/Permission/PermissionCoreKeys.cs`
+
+Để tạo quyền mới, thêm một dòng theo mẫu sau:
+
+```csharp
+public const string CoreMenuNhanSu = $"{PermissionPrefixKeys.Menu}hrm";
+```
+
+File: `PermissionConfig.cs`
+
+- Nếu **không có parent**, thêm dòng như sau:
+
+```csharp
+{
+    PermissionCoreKeys.CoreMenuNhanSu,
+    new CreatePermissionRequestDto
+    {
+        PermissonKey = PermissionCoreKeys.CoreMenuNhanSu,
+        PermissionName = "Quản lý nhân sự",
+        ParentKey = null
+    }
+},
+```
+
+- Nếu **có parent**, thêm dòng như sau:
+
+```csharp
+{
+    PermissionCoreKeys.CoreButtonCreateNhanSu,
+    new CreatePermissionRequestDto
+    {
+        PermissonKey = PermissionCoreKeys.CoreButtonCreateNhanSu,
+        PermissionName = "Thêm nhân sự",
+        ParentKey = PermissionCoreKeys.CoreMenuNhanSu
+    }
+},
+```
+
+#### 2. Thêm key vào file tương ứng
+
+- Sau khi khai báo xong, cần add key vào file cấu hình liên quan để đảm bảo hệ thống nhận diện được quyền mới.
+
+#### 3. Chạy project và khởi tạo quyền
+
+- Khởi động project.
+
+- Gọi API `fetch-permissions` trong `RoleController` để đồng bộ các quyền mới vào hệ thống.

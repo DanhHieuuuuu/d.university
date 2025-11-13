@@ -1,6 +1,6 @@
 ﻿namespace d.Shared.Permission.Permission
 {
-    public static class PermissionKeys
+    public static class PermissionCoreKeys
     {
         #region HRM - Nhân sự
         public const string CoreMenuNhanSu = $"{PermissionPrefixKeys.Menu}hrm";
