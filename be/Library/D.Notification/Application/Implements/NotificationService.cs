@@ -27,7 +27,8 @@ namespace D.Notification.ApplicationService.Implements
             ISmsNotification sms,
             IPushNotification push,
             IRealtimeNotification realtime,
-            INotificationRepository repository
+            INotificationRepository repository,
+            ILogger<NotificationService> logger
         )
         {
             _email = email;
@@ -35,6 +36,7 @@ namespace D.Notification.ApplicationService.Implements
             _push = push;
             _realtime = realtime;
             _repository = repository;
+            _logger = logger;
         }
 
         public async Task<NotiNotificationDetail?> GetByIdAsync(int notiId)
@@ -42,15 +44,10 @@ namespace D.Notification.ApplicationService.Implements
             return await _repository.GetByIdAsync(notiId);
         }
 
-        public async Task<IEnumerable<NotiNotificationDetail>> GetUserNotificationsAsync(
-            int userId,
-            PagingRequestDto dto
-        )
+        public async Task<IEnumerable<NotiNotificationDetail>> GetUserNotificationsAsync(int userId)
         {
-            _logger.LogInformation(
-                $"{nameof(GetUserNotificationsAsync)} method called. Dto: {JsonSerializer.Serialize(dto)}"
-            );
-            return await _repository.GetUserNotificationsAsync(userId, dto);
+            _logger.LogInformation($"{nameof(GetUserNotificationsAsync)} method called.");
+            return await _repository.GetUserNotificationsAsync(userId);
         }
 
         public async Task MarkAllAsReadAsync(int userId)

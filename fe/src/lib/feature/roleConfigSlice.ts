@@ -131,7 +131,7 @@ const roleConfigSlice = createSlice({
       .addCase(getListRole.fulfilled, (state, action) => {
         state.roleGroup.$list.status = ReduxStatus.SUCCESS;
         state.roleGroup.$list.data = action.payload?.items || [];
-        state.roleGroup.$list.total = action.payload?.totalItems || 0;
+        state.roleGroup.$list.total = action.payload?.totalItem || 0;
       })
       .addCase(getListRole.rejected, (state) => {
         state.roleGroup.$list.status = ReduxStatus.FAILURE;

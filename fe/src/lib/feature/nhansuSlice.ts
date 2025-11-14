@@ -87,7 +87,7 @@ const nhanSuSlice = createSlice({
       .addCase(getListNhanSu.fulfilled, (state, action: PayloadAction<any>) => {
         state.status = ReduxStatus.SUCCESS;
         state.list = action.payload?.items;
-        state.total = action.payload?.totalItems;
+        state.total = action.payload?.totalItem;
       })
       .addCase(getListNhanSu.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;

@@ -1,13 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import authReducer from './feature/authSlice';
+import authReducer from './feature/auth/authSlice';
 import loadingReducer from './feature/loadingSlice';
 import nhanSuReducer from './feature/nhansuSlice';
 import userReducer from './feature/userSlice';
 import danhmucReducer from './feature/danhmucSlice';
 import studentReducer from './feature/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
+import noticeReducer from './feature/noticeSlice';
 
 const persistConfig = {
   key: 'auth',
@@ -26,7 +27,8 @@ export const makeStore = () => {
       userState: userReducer,
       danhmucState: danhmucReducer,
       studentState: studentReducer,
-      roleConfigState: roleConfigReducer
+      roleConfigState: roleConfigReducer,
+      noticeState: noticeReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

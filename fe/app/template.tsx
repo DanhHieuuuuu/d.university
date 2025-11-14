@@ -3,9 +3,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@redux/hooks';
-import { myPermission, refreshToken } from '@redux/feature/authSlice';
+import { myPermission, refreshToken } from '@redux/feature/auth/authThunk';
 import { processApiMsgError } from '@utils/index';
 import { clearToken, getValidToken } from '@utils/token-storage';
+import { $fetchNotification } from '@redux/feature/noticeSlice';
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     } else {
       // token còn hạn → có thể gọi API getMe
       dispatch(myPermission());
+      dispatch($fetchNotification({ short: true }));
       console.log('Đã xem trang');
     }
   };

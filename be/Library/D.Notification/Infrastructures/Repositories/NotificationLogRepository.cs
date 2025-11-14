@@ -31,12 +31,10 @@ namespace D.Notification.Infrastructures.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<NotiNotificationLog>> FindPaging(PagingRequestDto dto)
+        public async Task<IEnumerable<NotiNotificationLog>> GetListAsync()
         {
             return await _dbContext
                 .NotificationLogs.OrderByDescending(x => x.Timestamp)
-                .Skip(dto.SkipCount())
-                .Take(dto.PageSize)
                 .ToListAsync();
         }
 

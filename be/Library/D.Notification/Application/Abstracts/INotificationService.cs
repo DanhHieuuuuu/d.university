@@ -8,7 +8,7 @@ namespace D.Notification.ApplicationService.Abstracts
     {
         Task SendAsync(NotificationMessage message);
         Task<NotiNotificationDetail?> GetByIdAsync(int notiId);
-        Task<IEnumerable<NotiNotificationDetail>> GetUserNotificationsAsync(int userId, PagingRequestDto dto);
+        Task<IEnumerable<NotiNotificationDetail>> GetUserNotificationsAsync(int userId);
         Task MarkAsReadAsync(int notiId);
         Task MarkAllAsReadAsync(int userId);
     }

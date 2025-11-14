@@ -1,14 +1,22 @@
 import { MenuProps } from 'antd';
 import { IMenu } from '@models/common/menu.model';
 
-export function mapToAntdItems(data: IMenu[]): MenuProps['items'] {
+export function mapToAntdItems(data: IMenu[], validate: (permissionKey: string) => boolean): MenuProps['items'] {
   return data
-    .filter((item) => !item.hidden)
+    .filter((item) => {
+      if (!item.permissionKeys || item.permissionKeys.length === 0) return true;
+
+      // Hiển thị nếu có ít nhất 1 quyền
+      return item.permissionKeys.some((p) => validate(p));
+
+      // Nếu muốn yêu cầu tất cả quyền, dùng:
+      // return item.permissionKeys.every((p) => validate(p));
+    })
     .map((item) => ({
       key: item.routerLink,
       label: item.label,
       icon: item.icon,
-      children: item.items ? mapToAntdItems(item.items) : undefined
+      children: item.items ? mapToAntdItems(item.items, validate) : undefined
     }));
 }
 

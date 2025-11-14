@@ -1,5 +1,4 @@
-﻿using D.Notification.Domain.Common;
-using D.Notification.Domain.Entities;
+﻿using D.Notification.Domain.Entities;
 using D.Notification.Domain.Repositories;
 using D.Notification.Infrastructures.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -25,17 +24,14 @@ namespace D.Notification.Infrastructures.Repositories
             return await _dbContext.Notifications.FirstOrDefaultAsync(x => x.Id == notificationId);
         }
 
-        public async Task<IEnumerable<NotiNotificationDetail>> GetUserNotificationsAsync(
-            int userId,
-            PagingRequestDto dto
-        )
+        public async Task<IEnumerable<NotiNotificationDetail>> GetUserNotificationsAsync(int userId)
         {
             var query = _dbContext
                 .Notifications.Where(x => x.ReceiverId == userId)
                 .OrderByDescending(x => x.CreatedAt)
                 .AsQueryable();
 
-            return await query.Skip(dto.SkipCount()).Take(dto.PageSize).ToListAsync();
+            return await query.ToListAsync();
         }
 
         public async Task MarkAsReadAsync(int notificationId)
@@ -48,6 +44,7 @@ namespace D.Notification.Infrastructures.Repositories
             {
                 noti.IsRead = true;
             }
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task MarkAllAsReadAsync(int userId)

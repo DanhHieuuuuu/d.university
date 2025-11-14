@@ -63,6 +63,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             ns.Email2 = request.Email2;
             ns.Password = hash;
             ns.PasswordKey = salt;
+            ns.Status = true;
 
             _unitOfWork.iNsNhanSuRepository.Update(ns);
             await _unitOfWork.iNsNhanSuRepository.SaveChangeAsync();
