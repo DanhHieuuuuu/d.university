@@ -15,4 +15,13 @@ export class PermissionCoreConst {
 
   // Đoàn vào / ra
   public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}delegation`;
+
+
+  // Quản lý tài khoản
+  public static readonly UserMenuAccountManager = `${PermissionCoreConst.Menu}account_manager`;
+  public static readonly UserButtonAccountManagerAdd = `${PermissionCoreConst.Button}add_account`;
+  public static readonly UserTableAccountManager = `${PermissionCoreConst.Table}account`;
+  public static readonly UserButtonAccountManagerUpdatePermission = `${PermissionCoreConst.Button}update_permission_account`;
+  public static readonly UserButtonAccountManagerUpdate = `${PermissionCoreConst.Button}update_account`;
+  public static readonly UserButtonAccountManagerLock = `${PermissionCoreConst.Button}lock_account`;
 }

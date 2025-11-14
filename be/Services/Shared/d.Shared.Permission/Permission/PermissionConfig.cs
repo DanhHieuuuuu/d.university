@@ -8,20 +8,20 @@ namespace d.Shared.Permission.Permission
         {
             #region User
             #region Phân quyền website
-            { PermissionKeys.UserMenuPermission,new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserMenuPermission, PermissionName = "Phân quyền website", ParentKey = null } },
-            { PermissionKeys.UserTableRolePermission, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserTableRolePermission, PermissionName = "Danh sách nhóm quyền", ParentKey = PermissionKeys.UserMenuPermission } },
-            { PermissionKeys.UserButtonPermissionSetting, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonPermissionSetting, PermissionName = "Setting nhóm quyền", ParentKey = PermissionKeys.UserMenuPermission } },
-            { PermissionKeys.UserButtonPermissionAdd, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonPermissionAdd, PermissionName = "Thêm nhóm quyền", ParentKey = PermissionKeys.UserButtonPermissionSetting } },
-            { PermissionKeys.UserButtonRolePermissionUpdate,  new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonRolePermissionUpdate, PermissionName = "Chỉnh sửa nhóm quyền", ParentKey = PermissionKeys.UserButtonPermissionSetting } },
-            { PermissionKeys.UserButtonRolePermissionDelete, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonRolePermissionDelete, PermissionName = "Xóa nhóm quyền", ParentKey = PermissionKeys.UserButtonPermissionSetting } },
+            { PermissionCoreKeys.UserMenuPermission,new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserMenuPermission, PermissionName = "Phân quyền website", ParentKey = null } },
+            { PermissionCoreKeys.UserTableRolePermission, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserTableRolePermission, PermissionName = "Danh sách nhóm quyền", ParentKey = PermissionCoreKeys.UserMenuPermission } },
+            { PermissionCoreKeys.UserButtonPermissionSetting, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonPermissionSetting, PermissionName = "Setting nhóm quyền", ParentKey = PermissionCoreKeys.UserMenuPermission } },
+            { PermissionCoreKeys.UserButtonPermissionAdd, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonPermissionAdd, PermissionName = "Thêm nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSetting } },
+            { PermissionCoreKeys.UserButtonRolePermissionUpdate,  new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRolePermissionUpdate, PermissionName = "Chỉnh sửa nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSetting } },
+            { PermissionCoreKeys.UserButtonRolePermissionDelete, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRolePermissionDelete, PermissionName = "Xóa nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSetting } },
             #endregion
             #region Quản lý tài khoản
-            { PermissionKeys.UserMenuAccountManager, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserMenuAccountManager, PermissionName = "Quản lý tài khoản", ParentKey = null } },
-            { PermissionKeys.UserButtonAccountManagerAdd,  new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonAccountManagerAdd, PermissionName = "Thêm tài khoản", ParentKey = PermissionKeys.UserMenuAccountManager } },
-            { PermissionKeys.UserTableAccountManager, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserTableAccountManager, PermissionName = "Danh sách tài khoản", ParentKey = PermissionKeys.UserMenuAccountManager } },
-            { PermissionKeys.UserButtonAccountManagerUpdatePermission, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonAccountManagerUpdatePermission, PermissionName = "Cập nhật quyền", ParentKey = PermissionKeys.UserMenuAccountManager } },
-            { PermissionKeys.UserButtonAccountManagerUpdate, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonAccountManagerUpdate, PermissionName = "Cập nhật tài khoản", ParentKey = PermissionKeys.UserMenuAccountManager } },
-            { PermissionKeys.UserButtonAccountManagerLock, new CreatePermissionRequestDto {  PermissonKey = PermissionKeys.UserButtonAccountManagerLock, PermissionName = "Khóa tài khoản", ParentKey = PermissionKeys.UserMenuAccountManager } },
+            { PermissionCoreKeys.UserMenuAccountManager, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserMenuAccountManager, PermissionName = "Quản lý tài khoản", ParentKey = null } },
+            { PermissionCoreKeys.UserButtonAccountManagerAdd,  new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonAccountManagerAdd, PermissionName = "Thêm tài khoản", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
+            { PermissionCoreKeys.UserTableAccountManager, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserTableAccountManager, PermissionName = "Danh sách tài khoản", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
+            { PermissionCoreKeys.UserButtonAccountManagerUpdatePermission, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonAccountManagerUpdatePermission, PermissionName = "Cập nhật quyền", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
+            { PermissionCoreKeys.UserButtonAccountManagerUpdate, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonAccountManagerUpdate, PermissionName = "Cập nhật tài khoản", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
+            { PermissionCoreKeys.UserButtonAccountManagerLock, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonAccountManagerLock, PermissionName = "Khóa tài khoản", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
             #endregion
             #endregion
             #region Hrm nhân sự
