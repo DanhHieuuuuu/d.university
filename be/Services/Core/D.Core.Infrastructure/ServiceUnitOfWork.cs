@@ -1,7 +1,10 @@
-﻿using D.Core.Infrastructure.Repositories.Hrm;
+﻿using D.Core.Infrastructure.Repositories.File;
+using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.SinhVien;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure
 {
@@ -28,6 +31,8 @@ namespace D.Core.Infrastructure
         private NsHopDongChiTietRepository _nsHopDongChiTietRepository;
 
         private SvSinhVienRepository _svSinhVienRepository;
+
+        private FileRepository _fileRepository;
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
         {
@@ -240,5 +245,24 @@ namespace D.Core.Infrastructure
                 return _dmKhoaRepository;
             }
         }
+
+        public IFileRepository iFileRepository
+        {
+            get
+            {
+                if (_fileRepository == null)
+                {
+                    _fileRepository = new FileRepository(_dbContext, _httpContext);
+                }
+                return _fileRepository;
+            }
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync();
+        }
+
+        public DatabaseFacade Database => _dbContext.Database;
     }
 }
