@@ -16,6 +16,8 @@ using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
+using D.Core.Domain.Entities.File;
+using D.Core.Domain.Dtos.File;
 
 namespace D.Core.Domain
 {
@@ -73,6 +75,14 @@ namespace D.Core.Domain
             #region sv
 
             CreateMap<SvSinhVien, SvSinhVienResponseDto>();
+
+            #endregion
+
+            #region file
+
+            CreateMap<FileManagement, FileResponseDto>();
+            CreateMap<CreateFileDto, FileManagement>()
+                .ForMember(dest => dest.Link, opt => opt.Ignore());
 
             #endregion
         }

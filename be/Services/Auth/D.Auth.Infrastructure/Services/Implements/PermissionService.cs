@@ -32,23 +32,18 @@ namespace D.Auth.Infrastructure.Services.Implements
             _logger.LogInformation("=== Bắt đầu import dữ liệu Permission ===");
 
             var permissionDict = PermissionConfig.CoreConfigs;
-
-            // Tạm lưu key -> id
             var keyIdMap = new Dictionary<string, int>();
+
+            // Load trước DB
+            var existing = await _unitOfWork.iPermissionRepository.TableNoTracking.ToListAsync();
+            foreach (var ex in existing)
+                keyIdMap[ex.PermissionKey] = ex.Id;
 
             // 1️. Thêm các permission không có cha
             foreach (var kv in permissionDict.Values.Where(x => x.ParentKey == null))
             {
-                if (
-                    await _unitOfWork.iPermissionRepository.TableNoTracking.AnyAsync(p =>
-                        p.PermissionKey == kv.PermissonKey
-                    )
-                )
-                {
-                    var exist  = await _unitOfWork.iPermissionRepository.TableNoTracking.FirstOrDefaultAsync(p => p.PermissionKey == kv.PermissonKey);
-                    keyIdMap[kv.PermissonKey] = exist!.Id;
+                if (keyIdMap.ContainsKey(kv.PermissonKey))
                     continue;
-                }
 
                 var entity = new Permission
                 {
@@ -60,38 +55,58 @@ namespace D.Auth.Infrastructure.Services.Implements
 
                 _unitOfWork.iPermissionRepository.Add(entity);
                 await _unitOfWork.iPermissionRepository.SaveChangeAsync();
+
                 keyIdMap[kv.PermissonKey] = entity.Id;
             }
 
-            // 2️. Thêm các permission có cha
-            foreach (var kv in permissionDict.Values.Where(x => x.ParentKey != null))
-            {
-                if (
-                    await _unitOfWork.iPermissionRepository.TableNoTracking.AnyAsync(p =>
-                        p.PermissionKey == kv.PermissonKey
-                    )
-                )
-                    continue;
+            var remain = permissionDict.Values.Where(x => x.ParentKey != null).ToList();
 
-                if (!keyIdMap.ContainsKey(kv.ParentKey!))
+            while (remain.Any())
+            {
+                bool added = false;
+
+                foreach (var kv in remain.ToList())
                 {
-                    _logger.LogWarning(
-                        $"Không tìm thấy parent key: {kv.ParentKey} cho permission {kv.PermissonKey}"
-                    );
-                    continue;
+                    // Nếu đã có rồi thì bỏ
+                    if (keyIdMap.ContainsKey(kv.PermissonKey))
+                    {
+                        remain.Remove(kv);
+                        continue;
+                    }
+
+                    // Nếu cha chưa có trong map -> chưa tới lượt import
+                    if (!keyIdMap.ContainsKey(kv.ParentKey!))
+                        continue;
+
+                    // ADD
+                    var entity = new Permission
+                    {
+                        PermissionKey = kv.PermissonKey,
+                        PermissionName = kv.PermissionName,
+                        ParentID = keyIdMap[kv.ParentKey!],
+                        CreatedDate = DateTime.Now,
+                        CreatedBy = "system",
+                    };
+
+                    _unitOfWork.iPermissionRepository.Add(entity);
+                    await _unitOfWork.iPermissionRepository.SaveChangeAsync();
+
+                    keyIdMap[kv.PermissonKey] = entity.Id;
+
+                    remain.Remove(kv);
+                    added = true;
                 }
 
-                var entity = new Permission
+                // Nếu không import -> lỗi parent
+                if (!added)
                 {
-                    PermissionKey = kv.PermissonKey,
-                    PermissionName = kv.PermissionName,
-                    ParentID = keyIdMap[kv.ParentKey!],
-                };
+                    _logger.LogError("Có permission không import được vì thiếu parent!");
+                    foreach (var r in remain)
+                        _logger.LogError($" - Permission lỗi: {r.PermissonKey}, Parent: {r.ParentKey}");
 
-                _unitOfWork.iPermissionRepository.Add(entity);
+                    throw new Exception("Không thể import permission do thiếu ParentID.");
+                }
             }
-
-            await _unitOfWork.iPermissionRepository.SaveChangeAsync();
 
             _logger.LogInformation("=== Import Permission hoàn tất ===");
         }

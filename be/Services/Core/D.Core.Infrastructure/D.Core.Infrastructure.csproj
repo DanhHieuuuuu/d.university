@@ -10,6 +10,7 @@
 	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Library\D.InfrastructureBase\D.InfrastructureBase.csproj" />
+    <ProjectReference Include="..\..\..\Library\D.S3Bucket\D.S3Bucket.csproj" />
     <ProjectReference Include="..\D.Core.Domain\D.Core.Domain.csproj" />
   </ItemGroup>
 

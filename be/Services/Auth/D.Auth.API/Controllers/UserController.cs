@@ -1,4 +1,5 @@
 ﻿using d.Shared.Permission;
+using d.Shared.Permission.Permission;
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
@@ -25,7 +26,8 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-            [PermissionFilter(PermissionKeyConstant.Admin)]
+            [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerAdd)]
+
             [HttpPost("create-user")]
             public async Task<ResponseAPI> CreateUser([FromBody] CreateUserRequestDto dto)
             {
@@ -45,7 +47,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerUpdate)]
         [HttpPut("update-user")]
         public async Task<ResponseAPI> UpdateUser(UpdateUserRequestDto dto)
         {
@@ -64,7 +66,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto">request</param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerUpdate)]
         [HttpPost("change-password")]
         public async Task<ResponseAPI> ChangePassword(ChangePasswordRequestDto dto)
         {
@@ -122,6 +124,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerUpdatePermission)]
         [HttpPost("update-roles-to-user")]
         public async Task<ResponseAPI> UpdateRoleToUser(UpdateUserRoleDto dto)
         {
@@ -161,6 +164,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="nhanSuId"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerLock)]
         [HttpPost("{nhanSuId}/change-status")]
         public async Task<ResponseAPI> ChangeStatusUser([FromRoute] int nhanSuId)
         {
