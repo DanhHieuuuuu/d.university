@@ -62,7 +62,7 @@ namespace D.Core.API.Controllers.File
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("update")]
+        [HttpPut("update")]
         public async Task<ResponseAPI> UpdateFile([FromForm] UpdateFileDto dto)
         {
             try
