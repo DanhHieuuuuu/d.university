@@ -1,6 +1,6 @@
 ﻿namespace d.Shared.Permission.Permission
 {
-    public static class PermissionKeys
+    public static class PermissionCoreKeys
     {
         #region User Management - Quản lý người dùng
         #region Phân quyền website

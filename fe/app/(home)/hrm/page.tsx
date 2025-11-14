@@ -21,6 +21,8 @@ import { IAction, IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import CreateNhanSuModal from './(dialog)/create';
 
@@ -211,4 +213,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuNhanSu);

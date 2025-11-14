@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { GraduationCap } from 'lucide-react';
 
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { login } from '@redux/feature/authSlice';
+import { login } from '@redux/feature/auth/authThunk';
 import { ILogin } from '@models/auth/auth.model';
 import { userStatusE } from '@models/common/common';
 

@@ -1,52 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthService } from '@services/auth.service';
-import { ILogin, IUser } from '@models/auth/auth.model';
-import { setItem as setToken, clearToken, getItem } from '@utils/token-storage';
-import { RoleService } from '@services/role.service';
-
-export const login = createAsyncThunk(`auth/login`, async (args: ILogin, { rejectWithValue }) => {
-  try {
-    const res = await AuthService.loginApi(args);
-    return res;
-  } catch (error: any) {
-    return rejectWithValue({
-      message: error.message,
-      code: error.code,
-      response: error.response?.data
-    });
-  }
-});
-
-export const refreshToken = createAsyncThunk('auth/refresh', async (_, { rejectWithValue }) => {
-  try {
-    const { accessToken, refreshToken } = getItem();
-
-    if (!accessToken || !refreshToken) {
-      return rejectWithValue('Không có token');
-    }
-
-    const res = await AuthService.refreshTokenApi({
-      token: accessToken,
-      refreshToken
-    });
-    return res;
-  } catch (error: any) {
-    return rejectWithValue({
-      message: error.message,
-      code: error.code,
-      response: error.response?.data
-    });
-  }
-});
-
-export const myPermission = createAsyncThunk('auth/permission', async () => {
-  try {
-    const res = await RoleService.getMyPermission();
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { login, refreshToken, myPermission } from './authThunk';
+import { setItem as setToken, clearToken } from '@utils/token-storage';
+import { IUser } from '@models/auth/auth.model';
 
 interface AuthState {
   user: IUser | null;
@@ -73,11 +28,6 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  selectors: {
-    isGranted: (state: AuthState, permission: string) => {
-      return state.permissions.includes(permission);
-    }
-  },
   reducers: {
     setUser(state, action: PayloadAction<Omit<AuthState, 'isAuthenticated'>>) {
       return {

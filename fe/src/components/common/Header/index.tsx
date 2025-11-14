@@ -7,7 +7,7 @@ import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined, EditOut
 import { useNavigate } from '@hooks/navigate';
 import { useUserAvatar } from '@hooks/useUserAvatar';
 import { RootState } from '@redux/store';
-import { clearUser } from '@redux/feature/authSlice';
+import { clearUser } from '@redux/feature/auth/authSlice';
 import { AuthService } from '@services/auth.service';
 import { ImageService } from '@services/image.service';
 

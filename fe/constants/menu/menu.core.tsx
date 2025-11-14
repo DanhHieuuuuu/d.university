@@ -7,6 +7,7 @@ import {
   PartitionOutlined,
   TeamOutlined
 } from '@ant-design/icons';
+import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, StudentIcon } from '@components/custom-icon';
 
 export const listMenuCore: IMenu[] = [
@@ -16,12 +17,13 @@ export const listMenuCore: IMenu[] = [
     icon: <HomeOutlined />
   },
   {
-    label: 'Nhân sự',
+    label: 'Quán lý nhân sự',
     routerLink: '/hrm',
+    // permissionKeys: [PermissionCoreConst.CoreMenuNhanSu],
     icon: <TeamOutlined />
   },
   {
-    label: 'Student',
+    label: 'Quản lý sinh viên',
     routerLink: '/student/manage',
     icon: <StudentIcon />
   },
