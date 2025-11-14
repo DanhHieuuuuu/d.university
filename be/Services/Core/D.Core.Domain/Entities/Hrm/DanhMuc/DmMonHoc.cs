@@ -25,7 +25,7 @@ namespace D.Core.Domain.Entities.Hrm.DanhMuc
         public int? ToBoMonId { get; set; }
 
         public virtual ICollection<DmChuongTrinhKhungMon> ChuongTrinhKhungMons { get; set; }
-        public virtual ICollection<DmMonTienQuyet> MonTienQuyetCuaToi { get; set; }
-        public virtual ICollection<DmMonTienQuyet> LaTienQuyetChoMon { get; set; }
+        public virtual ICollection<DmMonTienQuyet> MonTienQuyet { get; set; }
+        public virtual ICollection<DmMonTienQuyet> LaTienQuyetMon { get; set; }
     }
 }

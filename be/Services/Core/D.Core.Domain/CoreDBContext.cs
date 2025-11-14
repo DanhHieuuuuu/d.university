@@ -45,6 +45,10 @@ namespace D.Core.Domain
         DbSet<DmToBoMon> DmToBoMon { get; set; }
         DbSet<DmTonGiao> DmTonGiaos { get; set; }
         DbSet<DmKhoa> DmKhoas { get; set; }
+        DbSet<DmMonHoc> DmMonHocs { get; set; }
+        DbSet<DmChuongTrinhKhung> DmChuongTrinhKhungs { get; set; }
+        DbSet<DmMonTienQuyet> DmMonTienQuyets { get; set; }
+        DbSet<DmChuongTrinhKhungMon> DmChuongTrinhKhungMons { get; set; }
 
         // Nhân sự
         DbSet<NsNhanSu> NsNhanSus { get; set; }
@@ -76,6 +80,39 @@ namespace D.Core.Domain
                                 .HasDefaultValueSql("GETDATE()");
                 }
             }
+
+            modelBuilder.Entity<DmChuongTrinhKhungMon>(entity =>
+            {
+                entity.HasKey(e => new { e.ChuongTrinhKhungId, e.MonHocId });
+
+                entity.HasOne(e => e.ChuongTrinhKhung)
+                      .WithMany(khung => khung.ChuongTrinhKhungMons)
+                      .HasForeignKey(e => e.ChuongTrinhKhungId)
+                      .OnDelete(DeleteBehavior.Restrict); 
+
+                entity.HasOne(e => e.MonHoc)
+                      .WithMany(monHoc => monHoc.ChuongTrinhKhungMons)
+                      .HasForeignKey(e => e.MonHocId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<DmMonTienQuyet>(entity =>
+            {
+                entity.HasKey(e => new { e.MonHocId, e.MonTienQuyetId });
+            });
+
+            modelBuilder.Entity<DmMonHoc>(entity =>
+            {
+                entity.HasMany(monHoc => monHoc.MonTienQuyet)
+                      .WithOne(tienQuyet => tienQuyet.MonHoc)
+                      .HasForeignKey(tienQuyet => tienQuyet.MonHocId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasMany(monHoc => monHoc.LaTienQuyetMon)
+                      .WithOne(tienQuyet => tienQuyet.MonTienQuyet)
+                      .HasForeignKey(tienQuyet => tienQuyet.MonTienQuyetId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
 
             modelBuilder.SeedDataHrm();
             base.OnModelCreating(modelBuilder);
