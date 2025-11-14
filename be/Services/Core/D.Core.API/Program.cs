@@ -4,6 +4,7 @@ using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
 using D.Notification.ApplicationService.Configs;
+using D.S3Bucket.Configs;
 
 namespace D.Core.API
 {
@@ -28,6 +29,7 @@ namespace D.Core.API
             builder.Services.AddAutoMapperProfile().AddServices().AddRepositories();
             builder.Services.AddMediatRServices();
             builder.ConfigureCors();
+            builder.ConfigureS3();
 
             var app = builder.Build();
 
