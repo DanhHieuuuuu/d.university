@@ -12,7 +12,7 @@ export type IViewStudent = {
   hoTen?: string;
   ngaySinh?: Date;
   noiSinh?: string;
-  gioiTinh?: number;
+  gioiTinh?: boolean;
   quocTich?: number;
   danToc?: number;
   soCccd?: string;
@@ -26,7 +26,7 @@ export type ICreateStudent = {
   ten?: string;
   ngaySinh?: Date;
   noiSinh?: string;
-  gioiTinh?: number;
+  gioiTinh?: boolean;
   quocTich?: number;
   danToc?: number;
   soCccd?: string;

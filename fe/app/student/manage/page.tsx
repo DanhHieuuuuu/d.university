@@ -10,6 +10,7 @@ import { IColumn, IAction } from '@models/common/table.model';
 import { IQueryStudent, IViewStudent } from '@models/student/student.model';
 import { getListStudent, deleteStudent } from '@redux/feature/studentSlice';
 import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
 import AppTable from '@components/common/Table';
 import StudentDialog from './(dialog)/create-or-update';
 
@@ -51,7 +52,12 @@ const StudentPage = () => {
     { key: 'mssv', dataIndex: 'mssv', title: 'MSSV' },
     { key: 'hoTen', dataIndex: 'hoTen', title: 'Họ tên' },
     { key: 'soCccd', dataIndex: 'soCccs', title: 'CCCD' },
-    { key: 'ngaySinh', dataIndex: 'ngaySinh', title: 'Ngày sinh' },
+    {
+      key: 'ngaySinh',
+      dataIndex: 'ngaySinh',
+      title: 'Ngày sinh',
+      render: (value) => (value ? dayjs(value).format('DD-MM-YYYY') : '')
+    },
     { key: 'noiSinh', dataIndex: 'noiSinh', title: 'Nơi sinh' },
     { key: 'email', dataIndex: 'email', title: 'Email' },
     { key: 'soDienThoai', dataIndex: 'soDienThoai', title: 'Số điện thoại' },
@@ -59,7 +65,7 @@ const StudentPage = () => {
       key: 'gioiTinh',
       dataIndex: 'gioiTinh',
       title: 'Giới tính',
-      render: (value) => (value === 1 ? 'Nam' : 'Nữ')
+      render: (value) => (value ? 'Nam' : 'Nữ')
     },
     { key: 'quocTich', dataIndex: 'quocTich', title: 'Quốc tịch' },
     { key: 'danToc', dataIndex: 'danToc', title: 'Dân tộc' },

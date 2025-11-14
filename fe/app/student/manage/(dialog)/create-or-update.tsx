@@ -34,7 +34,6 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
     $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const title = student ? (isView ? 'Xem sinh viên' : 'Cập nhật sinh viên') : 'Thêm sinh viên mới';
 
-  // 🔹 Nạp dữ liệu khi mở modal để chỉnh sửa hoặc xem
   useEffect(() => {
     if (open && student) {
       form.setFieldsValue({
@@ -54,44 +53,54 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
     }
   }, [open, student, form]);
 
-  const onFinish = async (values: ICreateStudent) => {
-    try {
-      const formattedDate = values.ngaySinh ? dayjs(values.ngaySinh).format('YYYY-MM-DD') : undefined;
+  const onFinish = (values: ICreateStudent) => {
+    const formattedDate = values.ngaySinh ? dayjs(values.ngaySinh).format('YYYY-MM-DD') : undefined;
 
-      if (student?.idStudent) {
-        const updatePayload: Partial<IViewStudent> = {
-          idStudent: student.idStudent,
-          hoDem: values.hoDem,
-          ten: values.ten,
-          ngaySinh: formattedDate ? new Date(formattedDate) : undefined,
-          noiSinh: values.noiSinh,
-          gioiTinh: values.gioiTinh,
-          quocTich: values.quocTich,
-          danToc: values.danToc,
-          soCccd: values.soCccd,
-          soDienThoai: values.soDienThoai,
-          email: values.email,
-          mssv: values.mssv || undefined
-        };
+    if (student?.idStudent) {
+      const updatePayload: Partial<IViewStudent> = {
+        idStudent: student.idStudent,
+        hoDem: values.hoDem,
+        ten: values.ten,
+        ngaySinh: formattedDate ? new Date(formattedDate) : undefined,
+        noiSinh: values.noiSinh,
+        gioiTinh: values.gioiTinh,
+        quocTich: values.quocTich,
+        danToc: values.danToc,
+        soCccd: values.soCccd,
+        soDienThoai: values.soDienThoai,
+        email: values.email,
+        mssv: values.mssv || undefined,
+      };
 
-        await dispatch(updateStudent(updatePayload)).unwrap();
-        toast.success('Cập nhật sinh viên thành công');
-      } else {
-        const createPayload: ICreateStudent = {
-          ...values,
-          ngaySinh: formattedDate ? new Date(formattedDate) : undefined,
-          mssv: values.mssv || undefined,
-        };
+      dispatch(updateStudent(updatePayload))
+        .unwrap()
+        .then(() => {
+          toast.success('Cập nhật sinh viên thành công');
+          onSuccess?.();
+          onClose();
+          form.resetFields();
+        })
+        .catch(() => {
+          toast.error('Cập nhật sinh viên thất bại');
+        });
+    } else {
+      const createPayload: ICreateStudent = {
+        ...values,
+        ngaySinh: formattedDate ? new Date(formattedDate) : undefined,
+        mssv: values.mssv || undefined,
+      };
 
-        await dispatch(createStudent(createPayload)).unwrap();
-        toast.success('Thêm sinh viên thành công');
-      }
-
-      onSuccess?.();
-      onClose();
-      form.resetFields();
-    } catch {
-      toast.error(student ? 'Cập nhật sinh viên thất bại' : 'Tạo sinh viên thất bại');
+      dispatch(createStudent(createPayload))
+        .unwrap()
+        .then(() => {
+          toast.success('Thêm sinh viên thành công');
+          onSuccess?.();
+          onClose();
+          form.resetFields();
+        })
+        .catch(() => {
+          toast.error('Tạo sinh viên thất bại');
+        });
     }
   };
 
@@ -127,7 +136,6 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
         disabled={isView}
       >
         <div className="grid grid-cols-4 gap-x-5">
-          {/* ==== Thông tin cá nhân ==== */}
           <Form.Item
             label="Họ đệm"
             name="hoDem"
@@ -152,13 +160,12 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
             <Input placeholder="Nhập tỉnh/thành phố" />
           </Form.Item>
 
-          {/* ==== Danh mục liên quan ==== */}
           <Form.Item label="Giới tính" name="gioiTinh">
             <Select
               placeholder="Chọn giới tính"
               options={(listGioiTinh || []).map((i: any) => ({
                 label: i.tenGioiTinh || i.name || i.label,
-                value: i.id,
+                value: i.id === 1,
               }))}
             />
           </Form.Item>
@@ -183,7 +190,6 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
             />
           </Form.Item>
 
-          {/* ==== Liên hệ ==== */}
           <Form.Item label="Số CCCD" name="soCccd">
             <Input placeholder="Nhập số CCCD" maxLength={12} />
           </Form.Item>
