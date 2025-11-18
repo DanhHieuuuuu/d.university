@@ -9,7 +9,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [error]);
 
   return (
-    <div>
+    <div className="flex h-[100vh] flex-col items-center justify-center gap-8">
       <h2>Something went wrong!</h2>
       <button
         onClick={
