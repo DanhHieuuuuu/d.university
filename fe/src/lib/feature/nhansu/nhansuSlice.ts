@@ -1,43 +1,13 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ICreateHopDongNs, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
-import { NhanSuService } from '@services/nhansu.service';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-
-export const getListNhanSu = createAsyncThunk('nhansu/list', async (args: IQueryNhanSu) => {
-  try {
-    const res = await NhanSuService.findPaging(args);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-
-export const getDetailNhanSu = createAsyncThunk('nhansu/get', async (keyword: string) => {
-  try {
-    const res = await NhanSuService.find(keyword);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-
-export const createNhanSu = createAsyncThunk('nhansu/create-hd', async (payload: ICreateHopDongNs) => {
-  try {
-    const res = await NhanSuService.createHopDong(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
+import { getListNhanSu, createNhanSu, getDetailNhanSu } from './nhansuThunk';
 
 interface NhanSuState {
   status: ReduxStatus;
   selected: {
     status: ReduxStatus;
-    maNhanSu: string;
+    idNhanSu: number;
     data: any | null;
   };
   list: IViewNhanSu[];
@@ -50,7 +20,7 @@ const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
   selected: {
     status: ReduxStatus.IDLE,
-    maNhanSu: '',
+    idNhanSu: 0,
     data: null
   },
   list: [],
@@ -69,11 +39,11 @@ const nhanSuSlice = createSlice({
     }
   },
   reducers: {
-    selectMaNhanSu: (state, action: PayloadAction<string>) => {
-      state.selected.maNhanSu = action.payload;
+    selectMaNhanSu: (state, action: PayloadAction<number>) => {
+      state.selected.idNhanSu = action.payload;
     },
     clearSelected: (state) => {
-      state.selected = { maNhanSu: '', status: ReduxStatus.IDLE, data: null };
+      state.selected = { idNhanSu: 0, status: ReduxStatus.IDLE, data: null };
     },
     resetStatusCreate: (state) => {
       state.$create = { status: ReduxStatus.IDLE };

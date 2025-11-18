@@ -5,11 +5,6 @@ using D.Auth.Domain.Dtos.Permission;
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Auth.Domain
 {

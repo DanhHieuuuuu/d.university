@@ -61,7 +61,8 @@ export default function RootLayout({
                     },
                     Table: {
                       cellPaddingInlineSM: 16,
-                      headerBg: '#ebecf0'
+                      headerBg: '#1976D2',
+                      headerColor: '#ffffff'
                     }
                   }
                 }}

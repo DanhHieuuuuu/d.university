@@ -1,6 +1,5 @@
 ﻿using d.Shared.Permission;
 using d.Shared.Permission.Permission;
-using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
 using D.Auth.Domain.Dtos.UserRole;
@@ -8,7 +7,6 @@ using D.ControllerBase;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 
 namespace D.Auth.API.Controllers
 {
@@ -28,21 +26,21 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-            [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerAdd)]
+        [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerAdd)]
 
-            [HttpPost("create-user")]
-            public async Task<ResponseAPI> CreateUser([FromBody] CreateUserRequestDto dto)
+        [HttpPost("create-user")]
+        public async Task<ResponseAPI> CreateUser([FromBody] CreateUserRequestDto dto)
+        {
+            try
             {
-                try
-                {
-                    var result = await _mediator.Send(dto);
-                    return new(result);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex);
-                }
+                var result = await _mediator.Send(dto);
+                return new(result);
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
         /// <summary>
         /// Thay đổi người dùng

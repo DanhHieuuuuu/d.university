@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using d.Shared.Permission.Error;
 using D.Auth.Domain.Dtos;
 using D.Auth.Domain.Dtos.Login;
@@ -19,11 +10,15 @@ using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace D.Auth.Infrastructure.Services.Implements
 {
@@ -97,7 +92,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             result.Token = GenerateToken(ns);
             result.ExpiredToken = date.AddMinutes(int.Parse(_configuration["JwtSettings:ExpiryMinutes"]));
             await SaveAccessTokenAsync(result.Token, ns.Id, TimeSpan.FromMinutes(int.Parse(_configuration["JwtSettings:ExpiryMinutes"])));
-            
+
             result.RefreshToken = GenerateRefreshToken();
             result.ExpiredRefreshToken = date.AddDays(7);
             await SaveRefreshTokenAsync(result.Token, result.RefreshToken, TimeSpan.FromDays(7));
@@ -139,7 +134,8 @@ namespace D.Auth.Infrastructure.Services.Implements
             if (claim == null)
             {
                 throw new UserFriendlyException(ErrorCode.Unauthorized, "Token không hợp lệ.")
-;           }
+;
+            }
 
             var checkRefresh = await ValidateRefreshTokenAsync(refreshToken.Token, refreshToken.RefreshToken);
 
@@ -192,7 +188,7 @@ namespace D.Auth.Infrastructure.Services.Implements
         public async Task<bool> ValidateTokenAsync()
         {
             var token = CommonUntil.GetToken(_contextAccessor);
-            string key =  $"token:{token}";
+            string key = $"token:{token}";
             return await _database.KeyExistsAsync(key);
         }
 

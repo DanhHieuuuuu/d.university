@@ -3,12 +3,6 @@ using D.ControllerBase.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace D.ControllerBase
 {
@@ -87,7 +81,8 @@ namespace D.ControllerBase
                 if (userFriendlyException.Message != null)
                 {
                     message = userFriendlyException.Message;
-                }else
+                }
+                else
                 {
                     message = "Lỗi không xác định.";
                 }

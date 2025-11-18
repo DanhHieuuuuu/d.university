@@ -1,6 +1,4 @@
 ﻿using D.DomainBase.Entity;
-using System;
-using System.Collections.Generic;
 
 namespace D.Auth.Domain.Entities;
 

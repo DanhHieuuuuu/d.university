@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
@@ -15,8 +14,8 @@ using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -489,11 +488,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         public async Task<DmToBoMonResponseDto> GetDmToBoMonByIdAsync(int id)
         {
             _logger.LogInformation($"{nameof(GetDmToBoMonByIdAsync)} called with Id = {id}");
-            var  entity =  _unitOfWork.iDmToBoMonRepository.FindById(id);
+            var entity = _unitOfWork.iDmToBoMonRepository.FindById(id);
             if (entity == null)
                 return null;
             var phongban = entity.IdPhongBan.HasValue
-                        ? _unitOfWork.iDmPhongBanRepository.FindById(entity.IdPhongBan.Value) 
+                        ? _unitOfWork.iDmPhongBanRepository.FindById(entity.IdPhongBan.Value)
                         : null;
             string? tenPhongBan = phongban?.TenPhongBan;
             var result = _mapper.Map<DmToBoMonResponseDto>(entity);

@@ -1,7 +1,7 @@
-﻿using D.Auth.Domain.Dtos.Permission;
+﻿using d.Shared.Permission;
+using D.Auth.Domain.Dtos.Permission;
 using D.Auth.Domain.Dtos.Role;
 using D.ControllerBase;
-using d.Shared.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

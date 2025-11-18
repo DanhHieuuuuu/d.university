@@ -27,7 +27,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
 
   const configColumn: IColumn<T> = {
     key: 'config',
-    title: <Button type="text" icon={<SettingOutlined />} onClick={openPopupConfig} />,
+    title: <Button type="text" icon={<SettingOutlined style={{ color: 'white' }} />} onClick={openPopupConfig} />,
     dataIndex: '__config',
     width: 50,
     fixed: 'right',

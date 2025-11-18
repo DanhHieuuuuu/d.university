@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useTheme } from 'next-themes';
 import { Button, Layout, Space } from 'antd';
 import { MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
@@ -14,11 +13,8 @@ const { Sider } = Layout;
 const MenuComponent = () => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
-  const { resolvedTheme } = useTheme();
-  const siderTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'dark' : 'light';
-
   return (
-    <Sider theme={siderTheme} width="20%" collapsible collapsed={collapsed} trigger={null} className="menu-core">
+    <Sider width="20%" collapsible collapsed={collapsed} trigger={null} className="menu-core">
       <div style={{ display: 'flex', padding: 8, justifyContent: collapsed ? 'center' : 'space-between' }}>
         <div className={`menu-title ${collapsed ? 'collapsed' : ''}`}>
           <MenuOutlined className="menu-icon" />

@@ -1,23 +1,23 @@
 ﻿using System.Reflection;
 using AutoMapper;
+using D.Core.Domain.Dtos.File;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
-using D.Core.Domain.Entities.File;
-using D.Core.Domain.Dtos.File;
 
 namespace D.Core.Domain
 {
@@ -69,6 +69,9 @@ namespace D.Core.Domain
                         TrimAllStringProperties(src);
                     }
                 );
+
+            CreateMap<NsNhanSu, NsNhanSuFindByIdResponseDto>()
+                .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id));
 
             #endregion
 

@@ -41,9 +41,9 @@ const Index = ({ children }: { children: React.ReactNode }) => {
   return (
     <Layout hasSider style={{ minHeight: '100vh' }}>
       <MenuComponent />
-      <Layout>
+      <Layout style={{ background: '#F5F5F5' }}>
         <AppHeader />
-        <Content style={{ margin: 16, height: '100%' }}>{children}</Content>
+        <Content style={{ margin: 16, height: '100%', background: '#F5F5F5' }}>{children}</Content>
       </Layout>
     </Layout>
   );

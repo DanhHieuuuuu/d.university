@@ -4,11 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
-using System;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace d.Shared.Permission
 {
@@ -33,7 +29,7 @@ namespace d.Shared.Permission
             // Gọi sang service Auth để check quyền
             var response = await httpClient.GetAsync("http://localhost:5268/api/role/my-permissions");
 
-            if((int)response.StatusCode == 401)
+            if ((int)response.StatusCode == 401)
             {
                 context.Result = new UnauthorizedObjectResult(new { message = "Token hết hạn." });
                 return;

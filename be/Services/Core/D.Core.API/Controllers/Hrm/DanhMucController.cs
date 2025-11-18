@@ -1,4 +1,5 @@
-﻿using D.ControllerBase;
+﻿using d.Shared.Permission;
+using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
@@ -9,7 +10,6 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
-using d.Shared.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
