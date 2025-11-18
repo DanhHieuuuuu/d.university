@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
-using D.DomainBase.Common;
+﻿using D.DomainBase.Common;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 
 namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {

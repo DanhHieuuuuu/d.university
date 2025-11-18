@@ -1,5 +1,4 @@
 ﻿using D.DomainBase.Common;
-using Microsoft.EntityFrameworkCore;
 
 namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon
 {

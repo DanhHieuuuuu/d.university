@@ -1,8 +1,6 @@
 ﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.File;
-using D.Core.Domain.Dtos.SinhVien;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace D.Core.API.Controllers.File

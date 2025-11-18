@@ -115,5 +115,25 @@ namespace D.Core.API.Controllers.Hrm
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Lấy thông tin nhân sự theo id
+        /// </summary>
+        /// <param name="idNhanSu"></param>
+        /// <returns></returns>
+        [HttpGet("{idNhanSu}")]
+        public async Task<ResponseAPI> FindByIdNhanSu(int idNhanSu)
+        {
+            try
+            {
+                var dto = new NsNhanSuFindByIdRequestDto { IdNhanSu = idNhanSu };
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

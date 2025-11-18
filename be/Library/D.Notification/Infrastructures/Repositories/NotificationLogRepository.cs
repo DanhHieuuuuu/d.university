@@ -1,5 +1,4 @@
-﻿using D.Notification.Domain.Common;
-using D.Notification.Domain.Entities;
+﻿using D.Notification.Domain.Entities;
 using D.Notification.Domain.Repositories;
 using D.Notification.Infrastructures.Persistence;
 using Microsoft.EntityFrameworkCore;

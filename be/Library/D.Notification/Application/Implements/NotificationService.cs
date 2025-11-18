@@ -1,10 +1,8 @@
-﻿using System.Text.Json;
-using D.Notification.Application.Abstracts.Email;
+﻿using D.Notification.Application.Abstracts.Email;
 using D.Notification.Application.Abstracts.Push;
 using D.Notification.Application.Abstracts.Realtime;
 using D.Notification.Application.Abstracts.Sms;
 using D.Notification.ApplicationService.Abstracts;
-using D.Notification.Domain.Common;
 using D.Notification.Domain.Entities;
 using D.Notification.Domain.Enums;
 using D.Notification.Domain.Repositories;

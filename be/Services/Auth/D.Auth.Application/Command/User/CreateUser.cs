@@ -1,13 +1,6 @@
 ﻿using D.ApplicationBase;
-using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Infrastructure.Services.Abstracts;
-using D.Auth.Infrastructure.Services.Implements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Auth.Application.Command.User
 {

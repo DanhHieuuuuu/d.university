@@ -1,5 +1,4 @@
-﻿using D.Notification.Domain.Common;
-using D.Notification.Domain.Entities;
+﻿using D.Notification.Domain.Entities;
 
 namespace D.Notification.Domain.Repositories
 {

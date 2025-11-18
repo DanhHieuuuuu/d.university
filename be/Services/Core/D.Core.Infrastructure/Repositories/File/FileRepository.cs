@@ -1,14 +1,7 @@
 ﻿using D.Core.Domain.Entities.File;
-using D.Core.Domain.Entities.SinhVien;
-using D.Core.Infrastructure.Repositories.SinhVien;
 using D.InfrastructureBase.Database;
 using D.InfrastructureBase.Repository;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure.Repositories.File
 {

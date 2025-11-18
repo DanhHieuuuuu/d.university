@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using d.Shared.Permission.Error;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Dtos.User.Password;
 using D.Auth.Domain.Dtos.UserRole;
@@ -11,7 +12,6 @@ using D.Notification.ApplicationService.Abstracts;
 using D.Notification.Domain.Enums;
 using D.Notification.Dtos;
 using D.S3Bucket;
-using d.Shared.Permission.Error;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -163,16 +163,16 @@ namespace D.Auth.Infrastructure.Services.Implements
 
             NsNhanSu ns = _unitOfWork.iNsNhanSuRepository.FindById(userId);
 
-            if(ns == null)
+            if (ns == null)
             {
                 return false;
             }
 
             bool checkPassword = PasswordHelper.VerifyPassword(request.OldPassword, ns.Password, ns.PasswordKey);
 
-            if(!checkPassword)
+            if (!checkPassword)
                 throw new UserFriendlyException(ErrorCodeConstant.PasswordWrong, "Sai mật khẩu.");
-            
+
             ns.Password = PasswordHelper.HashPassword(request.NewPassword, ns.PasswordKey);
 
             _unitOfWork.iNsNhanSuRepository.Update(ns);
@@ -227,13 +227,13 @@ namespace D.Auth.Infrastructure.Services.Implements
                        .Replace("{{year}}", DateTime.Now.Year.ToString());
 
             await _notiService.SendAsync(new NotificationMessage
-                {
-                    Title = "Mật khẩu mới",
-                    Channel = NotificationChannel.Email,
-                    Receiver = new Receiver { Email = ns.Email, UserId = ns.Id },
-                    Content = body,
-                    AltContent = "Mật khẩu đăng nhập đã được cập nhật. Vui lòng kiểm tra email."
-                });
+            {
+                Title = "Mật khẩu mới",
+                Channel = NotificationChannel.Email,
+                Receiver = new Receiver { Email = ns.Email, UserId = ns.Id },
+                Content = body,
+                AltContent = "Mật khẩu đăng nhập đã được cập nhật. Vui lòng kiểm tra email."
+            });
 
             return true;
         }

@@ -1,5 +1,4 @@
-﻿using D.Auth.Domain.Dtos.Permission;
-using D.Auth.Domain.Dtos.Role;
+﻿using D.Auth.Domain.Dtos.Role;
 using D.DomainBase.Dto;
 
 namespace D.Auth.Infrastructure.Services.Abstracts

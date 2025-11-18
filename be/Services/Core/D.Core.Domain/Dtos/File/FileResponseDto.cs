@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace D.Core.Domain.Dtos.File
+﻿namespace D.Core.Domain.Dtos.File
 {
     public class FileResponseDto
     {

@@ -1,11 +1,6 @@
 ﻿using D.Core.Domain.Shared.Constants;
 using D.DomainBase.Entity;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Core.Domain.Entities.Hrm.DanhMuc
 {

@@ -1,11 +1,11 @@
-﻿using System.Reflection;
-using D.ControllerBase;
+﻿using D.ControllerBase;
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
 using D.Notification.ApplicationService.Configs;
-using Serilog;
 using D.S3Bucket.Configs;
+using Serilog;
+using System.Reflection;
 
 namespace D.Core.API
 {

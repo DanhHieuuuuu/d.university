@@ -94,13 +94,13 @@ const Page = () => {
     {
       label: 'Hồ sơ nhân sự',
       icon: <EyeOutlined />,
-      command: (record: IViewNhanSu) => console.log('view', record)
+      command: (record: IViewNhanSu) => onClickView(record)
     },
     {
       label: 'Sửa',
       tooltip: 'Sửa thông tin nhân viên',
       icon: <EditOutlined />,
-      command: (record: IViewNhanSu) => console.log('edit', record)
+      command: (record: IViewNhanSu) => onClickUpdate(record)
     },
     {
       label: 'Xóa',
@@ -145,14 +145,14 @@ const Page = () => {
   };
 
   const onClickView = (data: IViewNhanSu) => {
-    dispatch(selectMaNhanSu(data.maNhanSu!));
+    dispatch(selectMaNhanSu(data.idNhanSu));
     setIsModalView(true);
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
 
   const onClickUpdate = (data: IViewNhanSu) => {
-    dispatch(selectMaNhanSu(data.maNhanSu!));
+    dispatch(selectMaNhanSu(data.idNhanSu));
     setIsModalView(false);
     setIsModalUpdate(true);
     setIsModalOpen(true);
@@ -213,4 +213,5 @@ const Page = () => {
   );
 };
 
-export default withAuthGuard(Page, PermissionCoreConst.CoreMenuNhanSu);
+// export default withAuthGuard(Page, PermissionCoreConst.CoreMenuNhanSu);
+export default Page;

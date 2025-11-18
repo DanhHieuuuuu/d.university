@@ -1,8 +1,4 @@
-﻿using System.Net;
-using System.Net.Mail;
-using System.Security.Authentication;
-using System.Text.Json;
-using D.Notification.Application.Abstracts.Email;
+﻿using D.Notification.Application.Abstracts.Email;
 using D.Notification.Application.Abstracts.Logging;
 using D.Notification.ApplicationService.Configs;
 using D.Notification.Domain.Entities;
@@ -11,6 +7,10 @@ using D.Notification.Domain.Repositories;
 using D.Notification.Dtos;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net;
+using System.Net.Mail;
+using System.Security.Authentication;
+using System.Text.Json;
 
 namespace D.Notification.ApplicationService.Implements.Email
 {

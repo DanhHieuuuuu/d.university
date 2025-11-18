@@ -2,11 +2,6 @@
 using D.Auth.Domain.Dtos;
 using D.Auth.Infrastructure.Services.Abstracts;
 using D.DomainBase.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Auth.Application.Query.NsNhanSu
 {

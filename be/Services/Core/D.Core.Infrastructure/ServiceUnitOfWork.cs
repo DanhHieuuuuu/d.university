@@ -4,7 +4,6 @@ using D.Core.Infrastructure.Repositories.SinhVien;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure
 {

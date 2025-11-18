@@ -1,13 +1,12 @@
-﻿using System.Text.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
-using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace D.Auth.Infrastructure.Services.Implements
 {

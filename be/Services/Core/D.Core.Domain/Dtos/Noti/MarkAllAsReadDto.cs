@@ -2,7 +2,7 @@
 
 namespace D.Core.Domain.Dtos.Noti
 {
-    public class MarkAllAsReadDto: ICommand
+    public class MarkAllAsReadDto : ICommand
     {
     }
 }

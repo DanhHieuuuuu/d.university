@@ -1,10 +1,4 @@
-﻿using D.Auth.Domain.Dtos.Role;
-using D.DomainBase.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using D.DomainBase.Common;
 
 namespace D.Auth.Domain.Dtos.UserRole
 {

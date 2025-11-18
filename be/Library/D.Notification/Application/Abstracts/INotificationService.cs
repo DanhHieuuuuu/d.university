@@ -1,5 +1,4 @@
-﻿using D.Notification.Domain.Common;
-using D.Notification.Domain.Entities;
+﻿using D.Notification.Domain.Entities;
 using D.Notification.Dtos;
 
 namespace D.Notification.ApplicationService.Abstracts
