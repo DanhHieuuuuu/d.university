@@ -62,5 +62,6 @@
 
         public bool? IsThoiViec { get; set; }
         public string? ImageLink { get; set; }
+        public int? UserType { get; set; }
     }
 }

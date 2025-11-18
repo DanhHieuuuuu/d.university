@@ -64,6 +64,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             ns.Password = hash;
             ns.PasswordKey = salt;
             ns.Status = true;
+            ns.UserType = 3;
 
             _unitOfWork.iNsNhanSuRepository.Update(ns);
             await _unitOfWork.iNsNhanSuRepository.SaveChangeAsync();

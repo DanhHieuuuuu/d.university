@@ -4,6 +4,7 @@ import { Modal, Form, Input, message } from 'antd';
 import { useAppDispatch } from '@redux/hooks';
 import { updateUser } from '@redux/feature/userSlice';
 import { IUserView } from '@models/user/user.model';
+import { toast } from 'react-toastify';
 
 type EditUserModalProps = {
   isModalOpen: boolean;
@@ -38,11 +39,11 @@ const EditUserModal = ({ isModalOpen, setIsModalOpen, user, onSuccess }: EditUse
         })
       ).unwrap();
 
-      message.success('Cập nhật thành công');
+      toast.success('Cập nhật thành công');
       onSuccess?.();
       setIsModalOpen(false);
     } catch {
-      message.error('Cập nhật thất bại');
+      toast.error('Cập nhật thất bại');
     }
   };
 

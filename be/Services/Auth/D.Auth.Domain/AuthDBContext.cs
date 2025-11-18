@@ -36,7 +36,7 @@ namespace D.Auth.Domain
             modelBuilder.Entity<NsNhanSu>(entity =>
             {
                 entity.ToTable("NsNhanSu", "hrm");
-
+                entity.Property(e => e.UserType).HasColumnName("UserType").HasDefaultValue(0);
                 entity.Property(e => e.CreatedBy).HasMaxLength(255);
                 entity.Property(e => e.DeletedBy).HasMaxLength(255);
                 entity.Property(e => e.ModifiedBy).HasMaxLength(255);
