@@ -15,7 +15,7 @@ const RoleLayout = ({ children }: { children: React.ReactNode }) => {
         <RoleMenuComponent />
         <Content
           style={{
-            background: 'var(--background)',
+            background: '#F5F5F5',
             color: 'var(--foreground)',
             padding: 16
           }}

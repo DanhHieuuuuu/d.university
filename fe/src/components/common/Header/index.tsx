@@ -139,13 +139,13 @@ const AppHeader = () => {
       <Header
         style={{
           background: 'var(--background-header)',
-          color: 'var(--foreground)',
+          color: '#FFFFFF',
           paddingInline: 0
         }}
       >
         <div className="flex h-full w-full items-center justify-between" style={{ padding: '0 20px' }}>
           <div className='left-header'>
-            <Title level={2} style={{ cursor: 'pointer', margin: 0 }} onClick={() => navigateTo('/home')}>
+            <Title level={2} style={{ cursor: 'pointer', margin: 0, color: '#FFFFFF' }} onClick={() => navigateTo('/home')}>
               University
             </Title>
           </div>
@@ -153,9 +153,9 @@ const AppHeader = () => {
           <div className='right-header flex items-center gap-4'>
             <NotificationComponent />
             <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
-              <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-100">
+              <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-opacity-20 hover:bg-white">
                 <Avatar size="large" src={avatarUrl} icon={!avatarUrl && <UserOutlined />} className="mr-3" />
-                <span className="font-medium">{userDisplayName}</span>
+                <span className="font-medium" style={{ color: '#FFFFFF' }}>{userDisplayName}</span>
               </div>
             </Dropdown>
           </div>
