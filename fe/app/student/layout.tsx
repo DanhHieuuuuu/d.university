@@ -15,7 +15,7 @@ const StudentLayout = ({ children }: { children: React.ReactNode }) => {
         <StudentMenuComponent />
         <Content
           style={{
-            background: 'var(--background)',
+            background: '#F5F5F5',
             color: 'var(--foreground)',
             padding: 16
           }}

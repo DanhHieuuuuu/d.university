@@ -1,6 +1,7 @@
 @import './_colors.scss';
 
-.role-menu {
+.role-menu,
+.student-menu {
   font-weight: 500;
   overflow: auto;
   height: 90vh;
@@ -10,23 +11,109 @@
   bottom: 0;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+  background-color: $primaryNavyDark !important;
+  
+  // Menu items - màu text mặc định
+  .ant-menu {
+    background-color: transparent !important;
+    color: $white;
+    
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      color: rgba(255, 255, 255, 0.85) !important;
+      
+      .ant-menu-item-icon,
+      .anticon {
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+  }
+
+  // Menu item khi hover
+  .ant-menu-item:hover,
+  .ant-menu-submenu-title:hover {
+    color: $white !important;
+    background-color: rgba(33, 150, 243, 0.15) !important;
+    
+    .ant-menu-item-icon,
+    .anticon {
+      color: $primaryLight !important;
+    }
+  }
+
+  // Menu item khi được chọn (active)
+  .ant-menu-item-selected {
+    background-color: $primaryLight !important;
+    color: $white !important;
+    
+    .ant-menu-item-icon,
+    .anticon {
+      color: $white !important;
+    }
+    
+    &:hover {
+      background-color: #42A5F5 !important;
+    }
+  }
+
+  // Submenu khi được chọn
+  .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: $primaryLight !important;
+    background-color: rgba(33, 150, 243, 0.1) !important;
+    
+    .ant-menu-item-icon,
+    .anticon {
+      color: $primaryLight !important;
+    }
+  }
+
+  // Submenu khi hover và đã active
+  .ant-menu-submenu-selected > .ant-menu-submenu-title:hover {
+    color: $white !important;
+    background-color: rgba(33, 150, 243, 0.2) !important;
+  }
+
+  // Submenu mở ra (items bên trong)
+  .ant-menu-sub {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+  }
+
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
 }
 
 .menu-core {
   font-weight: 500;
-
+  background-color: $primaryNavyDark !important;
+  
   .menu-title {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: $primary;
+    color: $white;
     font-weight: 600;
     font-size: 18px;
     overflow: hidden;
-    transition: all 0.3s ease; // mượt hơn
+    transition: all 0.3s ease;
 
     .menu-icon {
       font-size: 20px;
+      color: $primaryLight;
     }
 
     .menu-text {
@@ -38,13 +125,86 @@
     }
   }
 
-  // Khi hover submenu đã active
-  .ant-menu-submenu-selected > .ant-menu-submenu-title:hover {
-    color: $white !important;
-    background-color: $primaryLight !important;
+  // Menu items - màu text mặc định
+  .ant-menu {
+    background-color: transparent !important;
+    color: $white;
+    
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      color: rgba(255, 255, 255, 0.85) !important;
+      
+      .ant-menu-item-icon,
+      .anticon {
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
   }
 
-  .ant-menu-submenu > .ant-menu-submenu-title:hover {
+  // Menu item khi hover
+  .ant-menu-item:hover,
+  .ant-menu-submenu-title:hover {
     color: $white !important;
+    background-color: rgba(33, 150, 243, 0.15) !important;
+    
+    .ant-menu-item-icon,
+    .anticon {
+      color: $primaryLight !important;
+    }
+  }
+
+  // Menu item khi được chọn (active)
+  .ant-menu-item-selected {
+    background-color: $primaryLight !important;
+    color: $white !important;
+    
+    .ant-menu-item-icon,
+    .anticon {
+      color: $white !important;
+    }
+    
+    &:hover {
+      background-color: #42A5F5 !important;
+    }
+  }
+
+  // Submenu khi được chọn
+  .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: $primaryLight !important;
+    background-color: rgba(33, 150, 243, 0.1) !important;
+    
+    .ant-menu-item-icon,
+    .anticon {
+      color: $primaryLight !important;
+    }
+  }
+
+  // Submenu khi hover và đã active
+  .ant-menu-submenu-selected > .ant-menu-submenu-title:hover {
+    color: $white !important;
+    background-color: rgba(33, 150, 243, 0.2) !important;
+  }
+
+  // Submenu mở ra (items bên trong)
+  .ant-menu-sub {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+  }
+
+  // Scrollbar cho menu
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
   }
 }
