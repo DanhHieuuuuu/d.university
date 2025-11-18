@@ -3,12 +3,6 @@ using D.InfrastructureBase.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Auth.Domain
 {
@@ -20,7 +14,7 @@ namespace D.Auth.Domain
         public new DbSet<TEntity> Set<TEntity>()
                     where TEntity : class => base.Set<TEntity>();
 
-        public new EntityEntry  Entry(object entity) => base.Entry(entity);
+        public new EntityEntry Entry(object entity) => base.Entry(entity);
 
         public new ChangeTracker ChangeTracker => base.ChangeTracker;
 

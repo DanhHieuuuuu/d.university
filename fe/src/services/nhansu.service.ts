@@ -25,10 +25,20 @@ const find = async (keyword: string) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/get`, {
       params: {
-        keyword: keyword
+        key: keyword
       }
     });
     // Trả về data (object API)
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tìm kiếm nhân sự.');
+    throw err;
+  }
+};
+const findById = async (id: number) => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/${id}`);
+    
     return res.data;
   } catch (err) {
     processApiMsgError(err, 'Không thể tìm kiếm nhân sự.');
@@ -56,4 +66,4 @@ const createHopDong = async (body: ICreateHopDongNs) => {
   }
 };
 
-export const NhanSuService = { findPaging, find, createNhanSu, createHopDong };
+export const NhanSuService = { findPaging, find, findById, createNhanSu, createHopDong };

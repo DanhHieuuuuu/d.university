@@ -1,5 +1,4 @@
 ﻿using D.ControllerBase;
-using D.Core.Application.Query.Noti;
 using D.Core.Domain.Dtos.Noti;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

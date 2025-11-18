@@ -1,12 +1,7 @@
 ﻿using D.Auth.Infrastructure.Services.Abstracts;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Auth.Infrastructure.Services.Implements
 {

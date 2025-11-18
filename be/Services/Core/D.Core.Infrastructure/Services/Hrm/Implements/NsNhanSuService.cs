@@ -1,13 +1,16 @@
 ﻿using System.Text.Json;
 using AutoMapper;
+using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
+using d.Shared.Permission.Error;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using NsNhanSuEntity = D.Core.Domain.Entities.Hrm.NhanSu.NsNhanSu;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -26,22 +29,32 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             _unitOfWork = unitOfWork;
         }
 
+        #region Public API
+
         public PageResultDto<NsNhanSuResponseDto> FindPagingNsNhanSu(NsNhanSuRequestDto dto)
         {
             _logger.LogInformation(
                 $"{nameof(FindPagingNsNhanSu)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking.Where(x =>
-                string.IsNullOrEmpty(dto.Cccd) || dto.Cccd == x.SoCccd
-            );
+            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking.AsQueryable();
+
+            // Filter
+            if (!string.IsNullOrEmpty(dto.Cccd))
+            {
+                query = query.Where(x => dto.Cccd == x.SoCccd);
+            }
 
             var totalCount = query.Count();
 
             var items = query
+                .OrderBy(x => x.Id) // cố định thứ tự
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ToList();
+
+            // Lấy tên phòng ban, chức vụ 
+            var (pbDict, cvDict) = GetPhongBanChucVuDict(items);
 
             var result = items
                 .Select(x => new NsNhanSuResponseDto
@@ -55,16 +68,18 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     SoDienThoai = x.SoDienThoai,
                     Email = x.Email,
                     GioiTinh = x.GioiTinh,
-                    HoTen = x.HoDem + " " + x.Ten,
+                    HoTen = (x.HoDem ?? "") + " " + (x.Ten ?? ""),
                     SoCccd = x.SoCccd,
-                    TenPhongBan = x.HienTaiPhongBan.HasValue
-                        ? _unitOfWork
-                            .iDmPhongBanRepository.FindById(x.HienTaiPhongBan.Value)
-                            ?.TenPhongBan
-                        : null,
-                    TenChucVu = x.HienTaiChucVu.HasValue
-                        ? _unitOfWork.iDmChucVuRepository.FindById(x.HienTaiChucVu.Value)?.TenChucVu
-                        : null,
+                    TenPhongBan =
+                        x.HienTaiPhongBan.HasValue
+                        && pbDict.TryGetValue(x.HienTaiPhongBan.Value, out var pbName)
+                            ? pbName
+                            : null,
+                    TenChucVu =
+                        x.HienTaiChucVu.HasValue
+                        && cvDict.TryGetValue(x.HienTaiChucVu.Value, out var cvName)
+                            ? cvName
+                            : null,
                 })
                 .ToList();
 
@@ -78,21 +93,30 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         public PageResultDto<NsNhanSuGetAllResponseDto> GetAllNhanSu(NsNhanSuGetAllRequestDto dto)
         {
             _logger.LogInformation(
-                $"{nameof(FindPagingNsNhanSu)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+                $"{nameof(GetAllNhanSu)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking.Where(x =>
-               !string.IsNullOrEmpty(x.Password) 
-               && (string.IsNullOrEmpty(dto.Keyword) || x.MaNhanSu.Contains(dto.Keyword) 
-               || (x.HoDem + " " + x.Ten).Contains(dto.Keyword) 
-               || x.SoCccd.Contains(dto.Keyword))
-            );
+            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking.AsQueryable();
+
+            // Chỉ lấy user có password
+            query = query.Where(x => !string.IsNullOrEmpty(x.Password));
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                var kw = dto.Keyword;
+                query = query.Where(x =>
+                    x.MaNhanSu.Contains(kw)
+                    || ((x.HoDem ?? "") + " " + (x.Ten ?? "")).Contains(kw)
+                    || (x.SoCccd ?? "").Contains(kw)
+                );
+            }
 
             var totalCount = query.Count();
 
-            var items = query.Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
+            var items = query.OrderBy(x => x.Id).Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
 
-            // Map dữ liệu trả về
+            var (pbDict, cvDict) = GetPhongBanChucVuDict(items);
+
             var result = items
                 .Select(x => new NsNhanSuGetAllResponseDto
                 {
@@ -106,21 +130,17 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     Email = x.Email,
                     Email2 = x.Email2,
                     SoCccd = x.SoCccd,
-
-                    TenPhongBan = x.HienTaiPhongBan.HasValue
-                        ? _unitOfWork
-                            .iDmPhongBanRepository.FindById(x.HienTaiPhongBan.Value)
-                            ?.TenPhongBan
-                        : null,
-                    TenChucVu = x.HienTaiChucVu.HasValue
-                        ? _unitOfWork.iDmChucVuRepository.FindById(x.HienTaiChucVu.Value)?.TenChucVu
-                        : null,
-                    TrangThai =
-                        x.Status == false ? "Vô hiệu hóa"
-                        : x.IsThoiViec == true ? "Thôi việc"
-                        : x.DaVeHuu == true ? "Nghỉ hưu"
-                        : x.DaChamDutHopDong == true ? "Chấm dứt HĐ"
-                        : "Đang hoạt động",
+                    TenPhongBan =
+                        x.HienTaiPhongBan.HasValue
+                        && pbDict.TryGetValue(x.HienTaiPhongBan.Value, out var pbName)
+                            ? pbName
+                            : null,
+                    TenChucVu =
+                        x.HienTaiChucVu.HasValue
+                        && cvDict.TryGetValue(x.HienTaiChucVu.Value, out var cvName)
+                            ? cvName
+                            : null,
+                    TrangThai = GetTrangThaiText(x),
                 })
                 .ToList();
 
@@ -142,28 +162,23 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             );
 
             if (exist)
-            {
-                //throw new Exception("Đã tồn tại trong db");
                 return;
-            }
-            else
-            {
-                var nsGiaDinh = new NsQuanHeGiaDinh
-                {
-                    IdNhanSu = idNhanSu,
-                    HoTen = dto.HoTen,
-                    NgaySinh = dto.NgaySinh,
-                    DonViCongTac = dto.DonViCongTac,
-                    QuanHe = dto.QuanHe,
-                    QuocTich = dto.QuocTich,
-                    SoDienThoai = dto.SoDienThoai,
-                    NgheNghiep = dto.NgheNghiep,
-                    QueQuan = dto.QueQuan,
-                };
 
-                _unitOfWork.iNsQuanHeGiaDinhRepository.Add(nsGiaDinh);
-                _unitOfWork.iNsQuanHeGiaDinhRepository.SaveChange();
-            }
+            var nsGiaDinh = new NsQuanHeGiaDinh
+            {
+                IdNhanSu = idNhanSu,
+                HoTen = dto.HoTen,
+                NgaySinh = dto.NgaySinh,
+                DonViCongTac = dto.DonViCongTac,
+                QuanHe = dto.QuanHe,
+                QuocTich = dto.QuocTich,
+                SoDienThoai = dto.SoDienThoai,
+                NgheNghiep = dto.NgheNghiep,
+                QueQuan = dto.QueQuan,
+            };
+
+            _unitOfWork.iNsQuanHeGiaDinhRepository.Add(nsGiaDinh);
+            _unitOfWork.iNsQuanHeGiaDinhRepository.SaveChange();
         }
 
         public NsNhanSuResponseDto CreateNhanSu(CreateNhanSuDto dto)
@@ -172,52 +187,18 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"{nameof(CreateNhanSu)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var exist = _unitOfWork.iNsNhanSuRepository.IsMaNhanSuExist(dto.MaNhanSu!);
+            ValidateMaNhanSu(dto.MaNhanSu!);
 
-            if (exist)
+            // Tạo entity nhân sự
+            var newNhanSu = CreateNewNhanSu(dto);
+
+            // Thêm gia đình (nếu có) — gom lại và gọi SaveChange 1 lần cho repository gia đình
+            if (HasFamilyInfo(dto))
             {
-                throw new Exception("Đã tồn tại mã nhân sự này trong CSDL. Vui lòng nhập mã khác.");
+                AddGiaDinh(newNhanSu.Id, dto.ThongTinGiaDinh!);
             }
-            else
-            {
-                var newNhanSu = _mapper.Map<NsNhanSu>(dto);
 
-                _unitOfWork.iNsNhanSuRepository.Add(newNhanSu);
-                _unitOfWork.iNsNhanSuRepository.SaveChange();
-
-                if (dto.ThongTinGiaDinh != null && dto.ThongTinGiaDinh.Count > 0)
-                {
-                    // Lấy danh sách thành viên đã tồn tại của Nhân sự này
-                    var existed = _unitOfWork
-                        .iNsQuanHeGiaDinhRepository.TableNoTracking.Where(x =>
-                            x.IdNhanSu == newNhanSu.Id
-                        )
-                        .Select(x => x.HoTen)
-                        .ToHashSet();
-
-                    // Lọc ra những thành viên chưa có trong DB
-                    var listGiaDinh = dto
-                        .ThongTinGiaDinh.Where(thanhvien => !existed.Contains(thanhvien.HoTen))
-                        .Select(thanhvien => new NsQuanHeGiaDinh
-                        {
-                            IdNhanSu = newNhanSu.Id,
-                            HoTen = thanhvien.HoTen,
-                            NgaySinh = thanhvien.NgaySinh,
-                            DonViCongTac = thanhvien.DonViCongTac,
-                            QuanHe = thanhvien.QuanHe,
-                            QuocTich = thanhvien.QuocTich,
-                            SoDienThoai = thanhvien.SoDienThoai,
-                            NgheNghiep = thanhvien.NgheNghiep,
-                            QueQuan = thanhvien.QueQuan,
-                        })
-                        .ToList();
-
-                    _unitOfWork.iNsQuanHeGiaDinhRepository.AddRange(listGiaDinh);
-                    _unitOfWork.iNsQuanHeGiaDinhRepository.SaveChange();
-                }
-
-                return _mapper.Map<NsNhanSuResponseDto>(newNhanSu);
-            }
+            return _mapper.Map<NsNhanSuResponseDto>(newNhanSu);
         }
 
         public void CreateHopDong(CreateHopDongDto dto)
@@ -226,43 +207,50 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"Method {nameof(CreateHopDong)} called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
+            // Tạo hợp đồng
             var newHd = _mapper.Map<NsHopDong>(dto);
-
             _unitOfWork.iNsHopDongRepository.Add(newHd);
             _unitOfWork.iNsHopDongRepository.SaveChange();
 
-            if (dto.ThongTinNhanSu != null)
+            if (dto.ThongTinNhanSu == null)
+                return;
+
+            // Tạo nhân sự kèm theo
+            var newNhanSuDto = dto.ThongTinNhanSu;
+            var newNhanSu = CreateNhanSu(newNhanSuDto);
+
+            // Lấy HsChucVu 
+            var hsChucVu = _unitOfWork.iDmChucVuRepository.FindById(dto.IdChucVu)?.HsChucVu;
+
+            var chiTietHopDong = new NsHopDongChiTiet
             {
-                var newNhanSu = CreateNhanSu(dto.ThongTinNhanSu);
+                IdHopDong = newHd.Id,
+                IdNhanSu = newNhanSu.IdNhanSu,
+                MaNhanSu = newNhanSu.MaNhanSu,
+                IdChucVu = dto.IdChucVu,
+                IdPhongBan = dto.IdPhongBan,
+                IdToBoMon = dto.IdToBoMon,
+                LuongCoBan = dto.LuongCoBan,
+                HsChucVu = hsChucVu,
+                GhiChu = dto.GhiChu,
+            };
 
-                var chiTietHopDong = new NsHopDongChiTiet
-                {
-                    IdHopDong = newHd.Id,
-                    IdNhanSu = newNhanSu.IdNhanSu,
-                    MaNhanSu = newNhanSu.MaNhanSu,
-                    IdChucVu = dto.IdChucVu,
-                    IdPhongBan = dto.IdPhongBan,
-                    IdToBoMon = dto.IdToBoMon,
-                    LuongCoBan = dto.LuongCoBan,
-                    HsChucVu = _unitOfWork.iDmChucVuRepository.FindById(dto.IdChucVu).HsChucVu,
-                    GhiChu = dto.GhiChu,
-                };
+            newHd.IdNhanSu = newNhanSu.IdNhanSu;
 
-                newHd.IdNhanSu = newNhanSu.IdNhanSu;
-
-                var nhansu = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x => x.Id == newNhanSu.IdNhanSu);
-
-                if (nhansu != null)
-                {
-                    nhansu.HienTaiChucVu = dto.IdChucVu;
-                    nhansu.HienTaiPhongBan = dto.IdPhongBan;
-
-                    _unitOfWork.iNsNhanSuRepository.Update(nhansu);
-                }
-
-                _unitOfWork.iNsHopDongChiTietRepository.Add(chiTietHopDong);
-                _unitOfWork.iNsHopDongChiTietRepository.SaveChange();
+            // Update nhân sự: chỉ update 2 field nếu cần
+            var nhansu = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x =>
+                x.Id == newNhanSu.IdNhanSu
+            );
+            if (nhansu != null)
+            {
+                nhansu.HienTaiChucVu = dto.IdChucVu;
+                nhansu.HienTaiPhongBan = dto.IdPhongBan;
+                _unitOfWork.iNsNhanSuRepository.Update(nhansu);
+                _unitOfWork.iNsNhanSuRepository.SaveChange();
             }
+
+            _unitOfWork.iNsHopDongChiTietRepository.Add(chiTietHopDong);
+            _unitOfWork.iNsHopDongChiTietRepository.SaveChange();
         }
 
         public NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto)
@@ -276,11 +264,17 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 || dto.Keyword == x.SoDienThoai
                 || dto.Keyword == x.MaNhanSu
             );
+
             if (nhanSu == null)
             {
-                _logger.LogWarning($"Không tìm thấy nhân sự với Keyword = {dto.Keyword}");
-                return null;
+                throw new UserFriendlyException(
+                    ErrorCodeConstant.CodeNotFound,
+                    $"Không tìm thấy nhân sự với từ khóa: {dto.Keyword}"
+                );
             }
+
+            // Gán tên phòng ban & chức vụ 
+            var (pbDict, cvDict) = GetPhongBanChucVuDict(new[] { nhanSu });
 
             var result = new NsNhanSuResponseDto
             {
@@ -291,18 +285,163 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 NoiSinh = nhanSu.NoiSinh,
                 SoDienThoai = nhanSu.SoDienThoai,
                 Email = nhanSu.Email,
-                TenPhongBan = nhanSu.HienTaiPhongBan.HasValue
-                        ? _unitOfWork
-                            .iDmPhongBanRepository.FindById(nhanSu.HienTaiPhongBan.Value)
-                            ?.TenPhongBan
+                TenPhongBan =
+                    nhanSu.HienTaiPhongBan.HasValue
+                    && pbDict.TryGetValue(nhanSu.HienTaiPhongBan.Value, out var pbName)
+                        ? pbName
                         : null,
-                TenChucVu = nhanSu.HienTaiChucVu.HasValue
-                        ? _unitOfWork.iDmChucVuRepository.FindById(nhanSu.HienTaiChucVu.Value)?.TenChucVu
+                TenChucVu =
+                    nhanSu.HienTaiChucVu.HasValue
+                    && cvDict.TryGetValue(nhanSu.HienTaiChucVu.Value, out var cvName)
+                        ? cvName
                         : null,
             };
 
+            return result;
+        }
+
+        public NsNhanSuFindByIdResponseDto FindById(int idNhanSu)
+        {
+            _logger.LogInformation($"{nameof(FindById)} method called. IdNhanSu: {idNhanSu}");
+
+            var nhanSu = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x =>
+                idNhanSu == x.Id
+            );
+
+            if (nhanSu == null)
+            {
+                throw new UserFriendlyException(
+                    ErrorCodeConstant.CodeNotFound,
+                    $"Không tìm thấy nhân sự với Id: {idNhanSu}"
+                );
+            }
+
+            var result = _mapper.Map<NsNhanSuFindByIdResponseDto>(nhanSu);
+
+            var (pbDict, cvDict) = GetPhongBanChucVuDict(new[] { nhanSu });
+
+            result.TenPhongBan =
+                nhanSu.HienTaiPhongBan.HasValue
+                && pbDict.TryGetValue(nhanSu.HienTaiPhongBan.Value, out var pbName)
+                    ? pbName
+                    : null;
+            result.TenChucVu =
+                nhanSu.HienTaiChucVu.HasValue
+                && cvDict.TryGetValue(nhanSu.HienTaiChucVu.Value, out var cvName)
+                    ? cvName
+                    : null;
+
+            var hopDongChiTiet =
+                _unitOfWork.iNsHopDongChiTietRepository.TableNoTracking.FirstOrDefault(d =>
+                    d.IdNhanSu == idNhanSu
+                );
+            result.IdToBoMon = hopDongChiTiet?.IdToBoMon;
 
             return result;
         }
+
+        #endregion
+
+        #region Private helpers
+
+        private void ValidateMaNhanSu(string maNhanSu)
+        {
+            if (_unitOfWork.iNsNhanSuRepository.IsMaNhanSuExist(maNhanSu))
+            {
+                throw new UserFriendlyException(
+                    ErrorCodeConstant.UserExists,
+                    "Đã tồn tại mã nhân sự này trong CSDL. Vui lòng nhập mã khác."
+                );
+            }
+        }
+
+        private NsNhanSuEntity CreateNewNhanSu(CreateNhanSuDto dto)
+        {
+            var entity = _mapper.Map<NsNhanSuEntity>(dto);
+
+            _unitOfWork.iNsNhanSuRepository.Add(entity);
+            _unitOfWork.iNsNhanSuRepository.SaveChange();
+
+            return entity;
+        }
+
+        private bool HasFamilyInfo(CreateNhanSuDto dto) =>
+            dto.ThongTinGiaDinh != null && dto.ThongTinGiaDinh.Any();
+
+        private void AddGiaDinh(int idNhanSu, IEnumerable<CreateNsQuanHeGiaDinhDto> listGiaDinhDto)
+        {
+            var existedNames = _unitOfWork
+                .iNsQuanHeGiaDinhRepository.TableNoTracking.Where(x => x.IdNhanSu == idNhanSu)
+                .Select(x => x.HoTen)
+                .ToHashSet();
+
+            var newMembers = listGiaDinhDto
+                .Where(x => !existedNames.Contains(x.HoTen))
+                .Select(x => new NsQuanHeGiaDinh
+                {
+                    IdNhanSu = idNhanSu,
+                    HoTen = x.HoTen,
+                    NgaySinh = x.NgaySinh,
+                    DonViCongTac = x.DonViCongTac,
+                    QuanHe = x.QuanHe,
+                    QuocTich = x.QuocTich,
+                    SoDienThoai = x.SoDienThoai,
+                    NgheNghiep = x.NgheNghiep,
+                    QueQuan = x.QueQuan,
+                })
+                .ToList();
+
+            if (!newMembers.Any())
+                return;
+
+            _unitOfWork.iNsQuanHeGiaDinhRepository.AddRange(newMembers);
+            _unitOfWork.iNsQuanHeGiaDinhRepository.SaveChange();
+        }
+
+        private (
+            Dictionary<int, string> pbDict,
+            Dictionary<int, string> cvDict
+        ) GetPhongBanChucVuDict(IEnumerable<NsNhanSuEntity> list)
+        {
+            var pbIds = list.Where(x => x.HienTaiPhongBan.HasValue)
+                .Select(x => x.HienTaiPhongBan!.Value)
+                .Distinct()
+                .ToList();
+
+            var cvIds = list.Where(x => x.HienTaiChucVu.HasValue)
+                .Select(x => x.HienTaiChucVu!.Value)
+                .Distinct()
+                .ToList();
+
+            Dictionary<int, string> pbDict = new();
+            Dictionary<int, string> cvDict = new();
+
+            if (pbIds.Any())
+            {
+                pbDict = _unitOfWork
+                    .iDmPhongBanRepository.TableNoTracking.Where(x => pbIds.Contains(x.Id))
+                    .ToDictionary(x => x.Id, x => x.TenPhongBan);
+            }
+
+            if (cvIds.Any())
+            {
+                cvDict = _unitOfWork
+                    .iDmChucVuRepository.TableNoTracking.Where(x => cvIds.Contains(x.Id))
+                    .ToDictionary(x => x.Id, x => x.TenChucVu);
+            }
+
+            return (pbDict, cvDict);
+        }
+
+        private string GetTrangThaiText(NsNhanSuEntity x)
+        {
+            return x.Status == false ? "Vô hiệu hóa"
+                : x.IsThoiViec == true ? "Thôi việc"
+                : x.DaVeHuu == true ? "Nghỉ hưu"
+                : x.DaChamDutHopDong == true ? "Chấm dứt HĐ"
+                : "Đang hoạt động";
+        }
+
+        #endregion
     }
 }

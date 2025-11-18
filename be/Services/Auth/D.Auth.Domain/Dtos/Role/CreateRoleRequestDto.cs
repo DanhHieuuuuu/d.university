@@ -1,5 +1,4 @@
-﻿using D.Auth.Domain.Dtos.Permission;
-using D.DomainBase.Common;
+﻿using D.DomainBase.Common;
 
 namespace D.Auth.Domain.Dtos.Role
 {

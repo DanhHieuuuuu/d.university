@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace D.ControllerBase
+﻿namespace D.ControllerBase
 {
     public class ResponseAPI
     {

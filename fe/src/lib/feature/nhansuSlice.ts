@@ -13,9 +13,9 @@ export const getListNhanSu = createAsyncThunk('nhansu/list', async (args: IQuery
   }
 });
 
-export const getDetailNhanSu = createAsyncThunk('nhansu/get', async (keyword: string) => {
+export const getDetailNhanSu = createAsyncThunk('nhansu/get', async (idNhanSu: number) => {
   try {
-    const res = await NhanSuService.find(keyword);
+    const res = await NhanSuService.findById(idNhanSu);
 
     return res.data;
   } catch (error: any) {
@@ -37,7 +37,7 @@ interface NhanSuState {
   status: ReduxStatus;
   selected: {
     status: ReduxStatus;
-    maNhanSu: string;
+    idNhanSu: number;
     data: any | null;
   };
   list: IViewNhanSu[];
@@ -50,7 +50,7 @@ const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
   selected: {
     status: ReduxStatus.IDLE,
-    maNhanSu: '',
+    idNhanSu: 0,
     data: null
   },
   list: [],
@@ -69,11 +69,11 @@ const nhanSuSlice = createSlice({
     }
   },
   reducers: {
-    selectMaNhanSu: (state, action: PayloadAction<string>) => {
-      state.selected.maNhanSu = action.payload;
+    selectMaNhanSu: (state, action: PayloadAction<number>) => {
+      state.selected.idNhanSu = action.payload;
     },
     clearSelected: (state) => {
-      state.selected = { maNhanSu: '', status: ReduxStatus.IDLE, data: null };
+      state.selected = { idNhanSu: 0, status: ReduxStatus.IDLE, data: null };
     },
     resetStatusCreate: (state) => {
       state.$create = { status: ReduxStatus.IDLE };

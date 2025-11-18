@@ -1,10 +1,4 @@
-﻿using D.Notification.Domain.Common;
-using D.Notification.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using D.Notification.Domain.Entities;
 
 namespace D.Notification.Domain.Repositories
 {

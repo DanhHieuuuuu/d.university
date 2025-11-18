@@ -1,7 +1,6 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using D.DomainBase.Entity;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using D.DomainBase.Entity;
 
 namespace D.Auth.Domain.Entities
 {

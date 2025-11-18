@@ -1,5 +1,4 @@
 ﻿using D.ControllerBase;
-using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

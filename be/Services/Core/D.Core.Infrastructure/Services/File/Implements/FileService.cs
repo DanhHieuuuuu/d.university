@@ -1,24 +1,14 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using D.Core.Domain.Dtos.File;
-using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Entities.File;
-using D.Core.Domain.Entities.SinhVien;
 using D.Core.Infrastructure.Services.File.Abstracts;
-using D.Core.Infrastructure.Services.SinhVien.Implements;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.S3Bucket;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure.Services.File.Implements
 {
@@ -61,7 +51,7 @@ namespace D.Core.Infrastructure.Services.File.Implements
             return new PageResultDto<FileResponseDto> { Items = items, TotalItem = totalCount };
         }
 
-        public async Task<FileResponseDto> CreateFile (CreateFileDto dto)
+        public async Task<FileResponseDto> CreateFile(CreateFileDto dto)
         {
             _logger.LogInformation(
                 $"{nameof(CreateFile)} method called. Dto: {JsonSerializer.Serialize(dto)}"
@@ -76,11 +66,11 @@ namespace D.Core.Infrastructure.Services.File.Implements
                 throw new Exception("Tên file đã tồn tại trong hệ thống.");
 
             await using var transaction = await _unitOfWork.Database.BeginTransactionAsync();
-            
+
             try
             {
                 var newFile = _mapper.Map<FileManagement>(dto);
-                
+
                 _unitOfWork.iFileRepository.Add(newFile);
                 await _unitOfWork.SaveChangesAsync();
 

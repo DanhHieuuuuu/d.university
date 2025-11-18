@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using D.Core.Domain.Shared.Constants;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using D.Core.Domain.Shared.Constants;
 
 namespace D.Notification.Domain.Entities
 {

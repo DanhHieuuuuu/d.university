@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
-using D.Core.Domain.Shared.Constants;
+﻿using D.Core.Domain.Shared.Constants;
 using D.DomainBase.Entity;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace D.Core.Domain.Entities.Hrm.DanhMuc
 {

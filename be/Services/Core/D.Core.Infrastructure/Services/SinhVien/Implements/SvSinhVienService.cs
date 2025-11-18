@@ -6,14 +6,8 @@ using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure.Services.SinhVien.Implements
 {
@@ -120,12 +114,12 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
             newSv.Mssv = _unitOfWork.iSvSinhVienRepository.GenerateMssv(dto.Khoa!.Value);
             newSv.Email2 = _unitOfWork.iSvSinhVienRepository.GenerateEmail(newSv.Mssv!);
             _unitOfWork.iSvSinhVienRepository.AddAsync(newSv);
-             _unitOfWork.iSvSinhVienRepository.SaveChange();
+            _unitOfWork.iSvSinhVienRepository.SaveChange();
 
             return _mapper.Map<SvSinhVienResponseDto>(newSv);
         }
 
- 
+
         public async Task<bool> UpdateSinhVien(UpdateSinhVienDto dto)
         {
             var sv = _unitOfWork.iSvSinhVienRepository.GetByMssv(dto.Mssv!);
@@ -139,7 +133,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
             sv.QuocTich = dto.QuocTich;
             sv.DanToc = dto.DanToc;
             sv.SoCccd = dto.SoCccd;
-            sv.SoDienThoai = dto.SoDienThoai;  
+            sv.SoDienThoai = dto.SoDienThoai;
 
             _unitOfWork.iSvSinhVienRepository.Update(sv);
             await _unitOfWork.iSvSinhVienRepository.SaveChangeAsync();

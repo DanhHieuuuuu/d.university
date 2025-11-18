@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using D.Auth.Infrastructure.Repositories;
+﻿using D.Auth.Infrastructure.Repositories;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
 

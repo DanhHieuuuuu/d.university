@@ -69,9 +69,13 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
     }
   ];
 
-  const initData = () => {
-    dispatch(getDetailNhanSu(selected.maNhanSu));
-    form.setFieldsValue(selected.data);
+  const initData = async () => {
+    await dispatch(getDetailNhanSu(selected.idNhanSu));  
+    
+    if (selected.status === ReduxStatus.SUCCESS) {
+      console.log(selected.data);
+      form.setFieldsValue(selected.data);
+    }     
   };
 
   const onCloseModal = () => {
