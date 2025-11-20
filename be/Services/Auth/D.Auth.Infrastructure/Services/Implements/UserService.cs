@@ -6,6 +6,8 @@ using D.Auth.Domain.Dtos.UserRole;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
 using D.ControllerBase.Exceptions;
+using D.Core.Domain.Dtos.File;
+using D.Core.Infrastructure.Services.File.Abstracts;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using D.Notification.ApplicationService.Abstracts;
@@ -16,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Any;
 
 namespace D.Auth.Infrastructure.Services.Implements
 {
@@ -25,6 +28,7 @@ namespace D.Auth.Infrastructure.Services.Implements
         private IConfiguration _configuration;
         private readonly IS3ManagerFile _s3ManagerFile;
         private readonly INotificationService _notiService;
+        private readonly IFileService _fileService;
         public UserService(
                 ILogger<UserService> logger,
                 IHttpContextAccessor contextAccessor,
@@ -32,13 +36,16 @@ namespace D.Auth.Infrastructure.Services.Implements
                 ServiceUnitOfWork unitOfWork,
                 IConfiguration configuration,
                 IS3ManagerFile s3ManagerFile,
-                INotificationService notiService
+                INotificationService notiService,
+                IFileService fileService
+
             ) : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
             _s3ManagerFile = s3ManagerFile;
             _notiService = notiService;
+            _fileService = fileService;
         }
         public async Task<CreateUserResponseDto> CreateUser(CreateUserRequestDto request)
         {
@@ -252,19 +259,55 @@ namespace D.Auth.Infrastructure.Services.Implements
             var fileExtension = Path.GetExtension(request.File.FileName);
             var fileName = $"{Guid.NewGuid()}{fileExtension}";
 
-            ns.ImageLink = fileName;
-            var uploadFile = await _s3ManagerFile.UploadFileAsync(fileName, request.File);
+            object? imageExist = null;
+            int imageId;
+            if (!string.IsNullOrEmpty(ns.ImageLink) && int.TryParse(ns.ImageLink, out imageId))
+            {
+                imageExist = _fileService.GetFileById(imageId);
+            }
+                
+            if (imageExist != null && int.TryParse(ns.ImageLink, out imageId))
+            {
+                var updateDto = new UpdateFileDto
+                {
+                    Id = imageId,
+                    File = request.File,
+                };
+                var updateFile = await _fileService.UpdateFile(updateDto);
+                if (!updateFile)
+                {
+                    throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "File lưu không thành công.");
+                }
+                var fileInfo_ = _fileService.GetFileById(imageId);
 
-            if (uploadFile == null)
+                var result_update = await _s3ManagerFile.ReadFileAsync(fileInfo_.Link);
+
+                return result_update;
+
+            }
+
+            var createDto = new CreateFileDto
+            {
+                Name = "Ảnh đại diện",
+                Description = $"Ảnh đại diện của {ns.Ten}",
+                File = request.File,
+                ApplicationField = $"Auth/Anh_dai_dien/{ns.MaNhanSu}"
+            };
+            var createFile = await _fileService.CreateFile(createDto);
+            if (createFile == null)
             {
                 throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "File lưu không thành công.");
             }
+
+            ns.ImageLink = createFile.Id.ToString();
 
             _unitOfWork.iNsNhanSuRepository.Update(ns);
 
             await _unitOfWork.iUserRepository.SaveChangeAsync();
 
-            var result = await _s3ManagerFile.ReadFileAsync(fileName);
+            var fileInfo = _fileService.GetFileById(createFile.Id);
+
+            var result = await _s3ManagerFile.ReadFileAsync(fileInfo.Link);
 
             return result;
         }

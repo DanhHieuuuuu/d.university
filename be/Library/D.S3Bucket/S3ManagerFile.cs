@@ -65,7 +65,7 @@ namespace D.S3Bucket
             }
         }
 
-        public async Task<ResponseS3FileDto> UploadFileAsync(string? fileName, params IFormFile[] files)
+        public async Task<ResponseS3FileDto> UploadFileAsync(string? folderPath, params IFormFile[] files)
         {
             _logger.LogInformation($"UploadFileAsync: Uploading {files.Length} file(s)");
 
@@ -81,7 +81,32 @@ namespace D.S3Bucket
                 try
                 {
                     var bucketName = _config.BucketName;
-                    var objectName = BuildFullPath(fileName ?? file.FileName);
+                    
+                    // Xây dựng đường dẫn đầy đủ
+                    string objectName;
+                    if (!string.IsNullOrWhiteSpace(folderPath))
+                    {
+                        var cleanPath = folderPath.Trim().Trim('/');
+                        var hasExtension = Path.HasExtension(cleanPath);
+                        
+                        // Nếu có extension hoặc không chứa "/", coi như là tên file đầy đủ (backward compatible)
+                        if (hasExtension || !cleanPath.Contains("/"))
+                        {
+                            objectName = cleanPath;
+                        }
+                        else
+                        {
+                            // Nếu là folder path (có "/" và không có extension), kết hợp với tên file gốc
+                            objectName = $"{cleanPath}/{file.FileName}";
+                        }
+                    }
+                    else
+                    {
+                        // Nếu null, sử dụng tên file gốc
+                        objectName = file.FileName;
+                    }
+                    
+                    objectName = BuildFullPath(objectName);
                     var fileExtension = Path.GetExtension(objectName).ToLower();
 
                     // Determine content type
@@ -269,6 +294,63 @@ namespace D.S3Bucket
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        public async Task<List<string>> ListFoldersAsync(string? prefix = null)
+        {
+            _logger.LogInformation($"ListFoldersAsync: Listing folders with prefix '{prefix}'");
+
+            try
+            {
+                var bucketName = _config.BucketName;
+                var folders = new HashSet<string>();
+
+                // Xây dựng prefix đầy đủ
+                var fullPrefix = string.IsNullOrWhiteSpace(prefix) 
+                    ? _config.FolderPrefix?.TrimEnd('/') + "/" 
+                    : BuildFullPath(prefix.TrimEnd('/') + "/");
+
+                // List tất cả objects với prefix
+                var listArgs = new ListObjectsArgs()
+                    .WithBucket(bucketName)
+                    .WithPrefix(fullPrefix)
+                    .WithRecursive(true);
+
+                var observable = _minioClient.ListObjectsEnumAsync(listArgs);
+                
+                await foreach (var item in observable)
+                {
+                    if (!string.IsNullOrEmpty(item.Key))
+                    {
+                        // Lấy đường dẫn tương đối so với fullPrefix
+                        var relativePath = item.Key;
+                        if (!string.IsNullOrWhiteSpace(fullPrefix) && relativePath.StartsWith(fullPrefix))
+                        {
+                            relativePath = relativePath.Substring(fullPrefix.Length);
+                        }
+
+                        // Lấy phần folder đầu tiên
+                        var parts = relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length > 0)
+                        {
+                            // Xây dựng lại đường dẫn folder
+                            var folderPath = string.IsNullOrWhiteSpace(prefix) 
+                                ? parts[0] 
+                                : $"{prefix.TrimEnd('/')}/{parts[0]}";
+                            
+                            folders.Add(folderPath);
+                        }
+                    }
+                }
+
+                _logger.LogInformation($"Found {folders.Count} folders");
+                return folders.OrderBy(f => f).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to list folders from MinIO");
+                throw new S3Exception(S3ErrorCode.ReadError, $"Failed to list folders: {ex.Message}");
             }
         }
     }

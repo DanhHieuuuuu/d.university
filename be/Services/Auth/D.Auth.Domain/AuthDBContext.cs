@@ -1,4 +1,5 @@
 ﻿using D.Auth.Domain.Entities;
+using D.Core.Domain.Entities.File;
 using D.InfrastructureBase.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -28,6 +29,7 @@ namespace D.Auth.Domain
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<FileManagement> FileManagements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

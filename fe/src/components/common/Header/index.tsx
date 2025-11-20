@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Layout, Typography, Dropdown, Avatar, Modal, Form, Input, Button, Space, message } from 'antd';
-import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined, EditOutlined } from '@ant-design/icons';
+import { Layout, Typography, Dropdown, Modal, Form, Input, Button, Space, message } from 'antd';
+import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { useNavigate } from '@hooks/navigate';
-import { useUserAvatar } from '@hooks/useUserAvatar';
 import { RootState } from '@redux/store';
 import { clearUser } from '@redux/feature/auth/authSlice';
 import { AuthService } from '@services/auth.service';
-import { ImageService } from '@services/image.service';
 
 import NotificationComponent from '@components/common/Notification';
+import UserAvatar from '@components/common/UserAvatar';
 import '@src/styles/globals.scss';
 
 const { Header } = Layout;
@@ -25,10 +24,13 @@ const AppHeader = () => {
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
   const [passwordForm] = Form.useForm();
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
 
-  const { avatarUrl, loading: avatarLoading, updateAvatar } = useUserAvatar(user?.imageLink);
+  const handleAvatarUploadSuccess = (blob: Blob, timestamp: number) => {
+    // Sau khi upload thành công, API đã trả về blob và ảnh trong modal đã được cập nhật
+    // Trigger refresh cho avatar trong header bằng cách thay đổi key để fetch ảnh mới từ server
+    setAvatarRefreshKey(timestamp);
+  };
 
   const handleProfileClick = () => {
     setProfileModalVisible(true);
@@ -67,44 +69,6 @@ const AppHeader = () => {
     } catch (error) {
       console.error('Change password error:', error);
       message.error('Đổi mật khẩu thất bại! Vui lòng kiểm tra lại mật khẩu hiện tại.');
-    }
-  };
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user?.maNhanSu) return;
-
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    if (!validTypes.includes(file.type)) {
-      message.error('Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF hoặc WebP');
-      return;
-    }
-
-    if (file.size > maxSize) {
-      message.error('Kích thước ảnh không được vượt quá 5MB');
-      return;
-    }
-
-    setUploadingAvatar(true);
-    try {
-      const imageBlob = await ImageService.updateUserImage(user.maNhanSu, file);
-      message.success('Cập nhật ảnh đại diện thành công!');
-      // Sử dụng luôn ảnh trả về từ API
-      updateAvatar(imageBlob);
-    } catch (error) {
-      console.error('Avatar upload error:', error);
-      message.error('Không thể tải lên ảnh đại diện!');
-    } finally {
-      setUploadingAvatar(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
@@ -154,7 +118,13 @@ const AppHeader = () => {
             <NotificationComponent />
             <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
               <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-opacity-20 hover:bg-white">
-                <Avatar size="large" src={avatarUrl} icon={!avatarUrl && <UserOutlined />} className="mr-3" />
+                <UserAvatar 
+                  key={`header-avatar-${avatarRefreshKey}`}
+                  imageLink={user?.imageLink}
+                  maNhanSu={user?.maNhanSu}
+                  size="large"
+                  className="mr-3"
+                />
                 <span className="font-medium" style={{ color: '#FFFFFF' }}>{userDisplayName}</span>
               </div>
             </Dropdown>
@@ -175,25 +145,17 @@ const AppHeader = () => {
         width={500}
       >
         <div className="flex flex-col items-center">
-          <div className="relative mb-4">
-            <Avatar size={120} src={avatarUrl || undefined} icon={!avatarUrl && <UserOutlined />} />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-          </div>
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            onClick={handleAvatarClick}
-            loading={uploadingAvatar}
-            className="mb-4"
-          >
-            Đổi ảnh đại diện
-          </Button>
+          <UserAvatar 
+            key={`modal-avatar-${avatarRefreshKey}`}
+            imageLink={user?.imageLink}
+            maNhanSu={user?.maNhanSu}
+            tenNhanSu={user?.ten}
+            size={120}
+            editable={true}
+            showEditButton={true}
+            onUploadSuccess={handleAvatarUploadSuccess}
+            className="mb-4 flex flex-col items-center"
+          />
           <div className="w-full space-y-3">
             <div className="flex justify-between border-b py-2">
               <span className="font-medium">Mã nhân viên:</span>
