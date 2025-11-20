@@ -5,6 +5,7 @@ using D.Auth.Domain.Dtos.User.Password;
 using D.Auth.Domain.Dtos.UserRole;
 using D.ControllerBase;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace D.Auth.API.Controllers
@@ -12,6 +13,7 @@ namespace D.Auth.API.Controllers
 
     [Route("/api/user")]
     [ApiController]
+    [Authorize]
     public class UserController : APIControllerBase
     {
         private IMediator _mediator;

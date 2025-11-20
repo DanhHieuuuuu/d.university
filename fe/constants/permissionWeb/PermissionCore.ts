@@ -17,6 +17,15 @@ export class PermissionCoreConst {
   public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}delegation`;
 
 
+  // Admin
+  public static readonly UserMenuAdmin = `${PermissionCoreConst.Menu}admin_permission`;
+  //Phân quyền Website
+  public static readonly UserMenuPermission = `${PermissionCoreConst.Menu}user_permission`;
+  public static readonly UserTableRolePermission = `${PermissionCoreConst.Table}user_role_permission`;
+  public static readonly UserButtonPermissionSetting = `${PermissionCoreConst.Button}user_permission_setting`;
+  public static readonly UserButtonPermissionAdd = `${PermissionCoreConst.Button}user_permission_add`;
+  public static readonly UserButtonRolePermissionUpdate = `${PermissionCoreConst.Button}user_role_permission_update`;
+  public static readonly UserButtonRolePermissionDelete = `${PermissionCoreConst.Button}user_role_permission_delete`;
   // Quản lý tài khoản
   public static readonly UserMenuAccountManager = `${PermissionCoreConst.Menu}account_manager`;
   public static readonly UserButtonAccountManagerAdd = `${PermissionCoreConst.Button}add_account`;

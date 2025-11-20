@@ -6,5 +6,6 @@
         public const string FirstName = "firstName";
         public const string LastName = "lastName";
         public const string DateOfBirth = "dateOfBirth";
+        public const string UserType = "userType";
     }
 }

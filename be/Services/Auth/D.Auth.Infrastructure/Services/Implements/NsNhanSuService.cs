@@ -241,6 +241,8 @@ namespace D.Auth.Infrastructure.Services.Implements
                 new Claim(CustomClaimType.FirstName, nsNhanSu.HoDem),
                 new Claim(CustomClaimType.LastName, nsNhanSu.Ten),
                 new Claim(CustomClaimType.DateOfBirth, nsNhanSu.NgaySinh.ToString()),
+                new Claim(CustomClaimType.UserType, nsNhanSu.UserType.ToString()),
+
             };
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"])
