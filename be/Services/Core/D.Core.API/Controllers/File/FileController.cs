@@ -37,6 +37,25 @@ namespace D.Core.API.Controllers.File
         }
 
         /// <summary>
+        /// Lấy thông tin file theo Id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get")]
+        public async Task<ResponseAPI> GetFileById([FromQuery] GetFileByIdDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Tạo mới file và upload lên MinIO
         /// </summary>
         /// <param name="dto"></param>

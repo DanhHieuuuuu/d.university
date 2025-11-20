@@ -49,7 +49,7 @@ const Page = () => {
     initialQuery: {
       SkipCount: 0,
       MaxResultCount: 10,
-      Keyword: ''
+      Name: ''
     },
     onQueryChange: async (newQuery) => {
       await fetchFiles(newQuery);
@@ -70,8 +70,21 @@ const Page = () => {
     }
   };
 
+  // Sync form values với query hiện tại
+  useEffect(() => {
+    form.setFieldsValue({
+      Name: query.Name || ''
+    });
+  }, [query.Name, form]);
+
   const onSearch = (values: IQueryFile) => {
-    onFilterChange(values);
+    // Reset về trang đầu tiên khi search và trim name
+    const searchQuery = {
+      ...values,
+      Name: values.Name?.trim() || '',
+      SkipCount: 0
+    };
+    onFilterChange(searchQuery);
   };
   
   const onClickAdd = () => {
@@ -181,10 +194,10 @@ const Page = () => {
           </Button>
         }
       >
-        <Form form={form} layout="horizontal" onFinish={onSearch}>
+        <Form form={form} layout="horizontal" onFinish={onSearch} initialValues={{ Name: '' }}>
           <div className="grid grid-cols-2">
-            <Form.Item<IQueryFile> label="Từ khóa:" name="Keyword">
-              <Input className="h-9 !w-full" placeholder="Nhập tên file hoặc mô tả" allowClear />
+            <Form.Item<IQueryFile> label="Tên file:" name="Name">
+              <Input className="h-9 !w-full" placeholder="Nhập tên file" allowClear />
             </Form.Item>
           </div>
           <Form.Item>
