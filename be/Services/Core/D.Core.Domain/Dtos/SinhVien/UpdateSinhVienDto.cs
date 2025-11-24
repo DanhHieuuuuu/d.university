@@ -10,7 +10,7 @@ namespace D.Core.Domain.Dtos.SinhVien
         public string? Ten { get; set; }
         public DateTime? NgaySinh { get; set; }
         public string? NoiSinh { get; set; }
-        public bool? GioiTinh { get; set; }
+        public int? GioiTinh { get; set; }
         public int? QuocTich { get; set; }
         public int? DanToc { get; set; }
         public string? SoCccd { get; set; }

@@ -1,10 +1,10 @@
-﻿namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa
+﻿namespace D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoaHoc
 {
-    public class DmKhoaResponseDto
+    public class DmKhoaHocResponseDto
     {
         public int Id { get; set; }
-        public string? MaKhoa { get; set; }
-        public string? TenKhoa { get; set; }
+        public string? MaKhoaHoc { get; set; }
+        public string? TenKhoaHoc { get; set; }
         public string? Nam { get; set; }
         public string? CachViet { get; set; }
         public int? NguoiTao { get; set; }

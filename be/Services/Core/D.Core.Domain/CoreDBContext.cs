@@ -45,7 +45,7 @@ namespace D.Core.Domain
         DbSet<DmQuocTich> DmQuocTiches { get; set; }
         DbSet<DmToBoMon> DmToBoMon { get; set; }
         DbSet<DmTonGiao> DmTonGiaos { get; set; }
-        DbSet<DmKhoa> DmKhoas { get; set; }
+        DbSet<DmKhoaHoc> DmKhoaHocs { get; set; }
         DbSet<DmMonHoc> DmMonHocs { get; set; }
         DbSet<DmChuongTrinhKhung> DmChuongTrinhKhungs { get; set; }
         DbSet<DmMonTienQuyet> DmMonTienQuyets { get; set; }

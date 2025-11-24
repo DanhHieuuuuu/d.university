@@ -1,7 +1,7 @@
 ﻿using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoaHoc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
@@ -20,7 +20,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public PageResultDto<DmLoaiHopDongResponseDto> GetAllDmLoaiHopDong(DmLoaiHopDongRequestDto dto);
         public PageResultDto<DmLoaiPhongBanResponseDto> GetAllDmLoaiPhongBan(DmLoaiPhongBanRequestDto dto);
         public PageResultDto<DmPhongBanResponseDto> GetAllDmPhongBan(DmPhongBanRequestDto dto);
-        public PageResultDto<DmKhoaResponseDto> GetAllDmKhoa(DmKhoaRequestDto dto);
+        public PageResultDto<DmKhoaHocResponseDto> GetAllDmKhoaHoc(DmKhoaHocRequestDto dto);
         public PageResultDto<DmQuanHeGiaDinhResponseDto> GetAllDmQuanHeGiaDinh(DmQuanHeGiaDinhRequestDto dto);
         public PageResultDto<DmQuocTichResponseDto> GetAllDmQuocTich(DmQuocTichRequestDto dto);
         public PageResultDto<DmToBoMonResponseDto> GetAllDmToBoMon(DmToBoMonRequestDto dto);
@@ -32,7 +32,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public void UpdateDmPhongBan(UpdateDmPhongBanDto dto);
         public void DeleteDmPhongBan(int id);
 
-        public void CreateDmKhoa(CreateDmKhoaDto dto);
+        public void CreateDmKhoaHoc(CreateDmKhoaHocDto dto);
         #region To Bo Mon
         public void CreateDmToBoMon(CreateDmToBoMonDto dto);
         public void UpdateDmToBoMon(UpdateDmToBoMonDto dto);
@@ -43,6 +43,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
 
         public Task<DmChucVuResponseDto> GetDmChucVuByIdAsync(int id);
         public Task<DmPhongBanResponseDto> GetDmPhongBanByIdAsync(int id);
-        public Task<DmKhoaResponseDto> GetDmKhoaByIdAsync(int id);
+        public Task<DmKhoaHocResponseDto> GetDmKhoaHocByIdAsync(int id);
     }
 }
