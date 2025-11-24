@@ -2,7 +2,7 @@
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoaHoc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
@@ -247,18 +247,18 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             };
         }
 
-        public PageResultDto<DmKhoaResponseDto> GetAllDmKhoa(DmKhoaRequestDto dto)
+        public PageResultDto<DmKhoaHocResponseDto> GetAllDmKhoaHoc(DmKhoaHocRequestDto dto)
         {
-            _logger.LogInformation($"{nameof(GetAllDmKhoa)} method called.");
+            _logger.LogInformation($"{nameof(GetAllDmKhoaHoc)} method called.");
 
-            var query = _unitOfWork.iDmKhoaRepository.TableNoTracking;
+            var query = _unitOfWork.iDmKhoaHocRepository.TableNoTracking;
 
             var totalCount = query.Count();
             var items = query.ToList();
 
-            return new PageResultDto<DmKhoaResponseDto>
+            return new PageResultDto<DmKhoaHocResponseDto>
             {
-                Items = _mapper.Map<List<DmKhoaResponseDto>>(items),
+                Items = _mapper.Map<List<DmKhoaHocResponseDto>>(items),
                 TotalItem = totalCount,
             };
         }
@@ -502,24 +502,24 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         #endregion
 
-        public void CreateDmKhoa(CreateDmKhoaDto dto)
+        public void CreateDmKhoaHoc(CreateDmKhoaHocDto dto)
         {
             _logger.LogInformation(
-                $"{nameof(CreateDmKhoa)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+                $"{nameof(CreateDmKhoaHoc)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var exist = _unitOfWork.iDmKhoaRepository.IsMaKhoaExist(dto.MaKhoa!);
+            var exist = _unitOfWork.iDmKhoaHocRepository.IsMaKhoaHocExist(dto.MaKhoaHoc!);
 
             if (exist)
             {
-                throw new Exception($"Đã có khóa với mã {dto.MaKhoa}");
+                throw new Exception($"Đã có khóa với mã {dto.MaKhoaHoc}");
             }
             else
             {
-                var newKhoa = _mapper.Map<DmKhoa>(dto);
+                var newKhoaHoc = _mapper.Map<DmKhoaHoc>(dto);
 
-                _unitOfWork.iDmKhoaRepository.Add(newKhoa);
-                _unitOfWork.iDmKhoaRepository.SaveChange();
+                _unitOfWork.iDmKhoaHocRepository.Add(newKhoaHoc);
+                _unitOfWork.iDmKhoaHocRepository.SaveChange();
             }
         }
 
@@ -541,12 +541,12 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             return _mapper.Map<DmPhongBanResponseDto>(entity);
         }
 
-        public async Task<DmKhoaResponseDto> GetDmKhoaByIdAsync(int id)
+        public async Task<DmKhoaHocResponseDto> GetDmKhoaHocByIdAsync(int id)
         {
-            var entity = _unitOfWork.iDmKhoaRepository.FindById(id);
+            var entity = _unitOfWork.iDmKhoaHocRepository.FindById(id);
             if (entity == null)
                 return null;
-            return _mapper.Map<DmKhoaResponseDto>(entity);
+            return _mapper.Map<DmKhoaHocResponseDto>(entity);
         }
     }
 }

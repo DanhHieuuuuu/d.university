@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace D.Core.Domain.Entities.Hrm.DanhMuc
 {
-    [Table(nameof(DmKhoa), Schema = DbSchema.Hrm)]
-    public class DmKhoa : EntityBase
+    [Table(nameof(DmKhoaHoc), Schema = DbSchema.Hrm)]
+    public class DmKhoaHoc : EntityBase
     {
-        public string? MaKhoa { get; set; }
-        public string? TenKhoa { get; set; }
+        public string? MaKhoaHoc { get; set; }
+        public string? TenKhoaHoc { get; set; }
         public string? Nam { get; set; }
         public string? CachViet { get; set; }
         public bool? IsVisible { get; set; } = true;

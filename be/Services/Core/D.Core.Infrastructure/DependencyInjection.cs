@@ -37,7 +37,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IDmQuocTichRepository, DmQuocTichRepository>()
                 .AddScoped<IDmToBoMonRepository, DmToBoMonRepository>()
                 .AddScoped<IDmTonGiaoRepository, DmTonGiaoRepository>()
-                .AddScoped<IDmKhoaRepository, DmKhoaRepository>()
+                .AddScoped<IDmKhoaHocRepository, DmKhoaHocRepository>()
                 .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
                 .AddScoped<INsQuanHeGiaDinhRepository, NsQuanHeGiaDinhRepository>()
                 .AddScoped<INsHopDongRepository, NsHopDongRepository>()

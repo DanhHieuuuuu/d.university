@@ -3,7 +3,7 @@ using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoaHoc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
@@ -407,8 +407,8 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("khoa/find")]
-        public async Task<ResponseAPI> GetAllKhoa([FromQuery] DmKhoaRequestDto dto)
+        [HttpGet("khoa-hoc/find")]
+        public async Task<ResponseAPI> GetAllKhoa([FromQuery] DmKhoaHocRequestDto dto)
         {
             try
             {
@@ -426,8 +426,8 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("khoa/get-by-id")]
-        public async Task<ResponseAPI> GetDetailDmKhoa([FromQuery] DmKhoaGetByIdRequestDto dto)
+        [HttpGet("khoa-hoc/get-by-id")]
+        public async Task<ResponseAPI> GetDetailDmKhoaHoc([FromQuery] DmKhoaHocGetByIdRequestDto dto)
         {
             try
             {
@@ -446,8 +446,8 @@ namespace D.Core.API.Controllers.Hrm
         /// <param name="dto"></param>
         /// <returns></returns>
         [PermissionFilter(PermissionKeyConstant.Admin)]
-        [HttpPost("khoa/create")]
-        public async Task<ResponseAPI> CreateDmKhoa([FromBody] CreateDmKhoaDto dto)
+        [HttpPost("khoa-hoc/create")]
+        public async Task<ResponseAPI> CreateDmKhoaHoc([FromBody] CreateDmKhoaHocDto dto)
         {
             try
             {

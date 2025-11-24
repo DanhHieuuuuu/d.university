@@ -5,7 +5,7 @@ using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoa;
+using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoaHoc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmLoaiHopDong;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuanHeGiaDinh;
@@ -43,7 +43,7 @@ namespace D.Core.Domain
             CreateMap<CreateDmPhongBanDto, DmPhongBan>();
             CreateMap<CreateDmChucVuDto, DmChucVu>();
             CreateMap<CreateDmToBoMonDto, DmToBoMon>();
-            CreateMap<CreateDmKhoaDto, DmKhoa>();
+            CreateMap<CreateDmKhoaHocDto, DmKhoaHoc>();
 
             CreateMap<CreateHopDongDto, NsHopDong>();
             CreateMap<NsNhanSu, NsNhanSuResponseDto>()

@@ -14,7 +14,7 @@ namespace D.Core.Domain.Shared.SeedData
             modelBuilder.SeedDataDmTonGiao();
             modelBuilder.SeedDataDmLoaiPhongBan();
             modelBuilder.SeedDataDmQuanHeGiaDinh();
-            modelBuilder.SeedDataDmKhoa();
+            modelBuilder.SeedDataDmKhoaHoc();
         }
 
         public static void SeedDataDmGioiTinh(this ModelBuilder modelBuilder)
@@ -397,8 +397,8 @@ namespace D.Core.Domain.Shared.SeedData
                     new DmLoaiPhongBan
                     {
                         Id = 2,
-                        MaLoaiPhongBan = "KHOA",
-                        TenLoaiPhongBan = "Khoa",
+                        MaLoaiPhongBan = "KhoaHoc",
+                        TenLoaiPhongBan = "KhoaHoc",
                     },
                     new DmLoaiPhongBan
                     {
@@ -959,32 +959,32 @@ namespace D.Core.Domain.Shared.SeedData
                 );
         }
 
-        public static void SeedDataDmKhoa(this ModelBuilder modelBuilder)
+        public static void SeedDataDmKhoaHoc(this ModelBuilder modelBuilder)
         {
             modelBuilder
-                .Entity<DmKhoa>()
+                .Entity<DmKhoaHoc>()
                 .HasData(
-                    new DmKhoa
+                    new DmKhoaHoc
                     {
                         Id = 1,
-                        MaKhoa = "K69",
-                        TenKhoa = "Khóa 69 (2024)",
+                        MaKhoaHoc = "K69",
+                        TenKhoaHoc = "Khóa 69 (2024)",
                         Nam = "2024",
                         CachViet = "2024 - 2028",
                     },
-                    new DmKhoa
+                    new DmKhoaHoc
                     {
                         Id = 2,
-                        MaKhoa = "K70",
-                        TenKhoa = "Khóa 70 (2025)",
+                        MaKhoaHoc = "K70",
+                        TenKhoaHoc = "Khóa 70 (2025)",
                         Nam = "2025",
                         CachViet = "2025 - 2029",
                     },
-                    new DmKhoa
+                    new DmKhoaHoc
                     {
                         Id = 3,
-                        MaKhoa = "K71",
-                        TenKhoa = "Khóa 71 (2026)",
+                        MaKhoaHoc = "K71",
+                        TenKhoaHoc = "Khóa 71 (2026)",
                         Nam = "2026",
                         CachViet = "2026 - 2030",
                     }
