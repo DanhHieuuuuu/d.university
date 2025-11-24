@@ -1,4 +1,5 @@
-﻿using D.Core.Domain.Entities.File;
+﻿using D.Core.Domain.Entities.Delegation.Incoming;
+using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
@@ -65,6 +66,16 @@ namespace D.Core.Domain
         DbSet<FileManagement> FileManagements { get; set; }
         #endregion
 
+        #region Delegation
+        public DbSet<DelegationIncoming> DelegationIncomings { get; set; }
+        public DbSet<DepartmentSupport> DepartmentSupports { get; set; }
+        public DbSet<DetailDelegationIncoming> DetailDelegationIncomings { get; set; }
+        public DbSet<LogReceptionTime> LogReceptionTimes { get; set; }
+        public DbSet<LogStatus> LogStatuses { get; set; }
+        public DbSet<Prepare> Prepares { get; set; }
+        public DbSet<ReceptionTime> ReceptionTimes { get; set; }
+        public DbSet<Supporter> Supporters { get; set; }
+        #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
