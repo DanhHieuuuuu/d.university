@@ -40,5 +40,17 @@ namespace D.InfrastructureBase.Shared
             return token;
         }
 
+        public static int GetCurrentUserType(IHttpContextAccessor httpContextAccessor)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(GetToken(httpContextAccessor));
+
+            var userTypeClaim = jwt.Claims.FirstOrDefault(c => c.Type == CustomClaimType.UserType);
+            if (userTypeClaim == null)
+                throw new Exception($"Token không chứa claim \"{CustomClaimType.UserType}\"");
+
+            return int.Parse(userTypeClaim.Value);
+        }
+
     }
 }

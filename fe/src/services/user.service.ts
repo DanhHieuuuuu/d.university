@@ -30,6 +30,9 @@ const createUser = async (body: IUserCreate) => {
     const res = await axios.post('user/create-user', body, {
       baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
     });
+    if (res.data.status !== 1) {
+      return Promise.reject(new Error(res.data.message || 'Tạo user thất bại'));
+    }
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Không tạo được user');

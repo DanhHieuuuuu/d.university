@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\..\Library\D.Notification\D.Notification.csproj" />
     <ProjectReference Include="..\..\..\Library\D.S3Bucket\D.S3Bucket.csproj" />
     <ProjectReference Include="..\..\Core\D.Core.Domain\D.Core.Domain.csproj" />
+    <ProjectReference Include="..\..\Core\D.Core.Infrastructure\D.Core.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\d.Shared.Permission\d.Shared.Permission.csproj" />
     <ProjectReference Include="..\D.Auth.Domain\D.Auth.Domain.csproj" />
   </ItemGroup>

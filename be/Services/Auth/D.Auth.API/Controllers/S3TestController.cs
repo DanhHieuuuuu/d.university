@@ -57,10 +57,11 @@ namespace D.Auth.API.Controllers
         /// Upload file lên MinIO
         /// </summary>
         /// <param name="file">File cần upload</param>
+        /// <param name="folderPath">Đường dẫn thư mục lưu file (vd: auth/anh_dai_dien/khoa). Nếu null sẽ lưu vào thư mục mặc định</param>
         /// <returns></returns>
         [HttpPost("upload")]
         [AllowAnonymous]
-        public async Task<ResponseAPI> UploadFile(IFormFile file)
+        public async Task<ResponseAPI> UploadFile(IFormFile file, [FromForm] string? folderPath)
         {
             try
             {
@@ -74,7 +75,7 @@ namespace D.Auth.API.Controllers
                     );
                 }
 
-                var result = await _s3ManagerFile.UploadFileAsync(null, file);
+                var result = await _s3ManagerFile.UploadFileAsync(folderPath, file);
                 return new ResponseAPI(
                     ControllerBase.StatusCode.Success,
                     result,
@@ -92,10 +93,11 @@ namespace D.Auth.API.Controllers
         /// Upload nhiều file lên MinIO
         /// </summary>
         /// <param name="files">Danh sách file cần upload</param>
+        /// <param name="folderPath">Đường dẫn thư mục lưu file (vd: auth/anh_dai_dien/khoa). Nếu null sẽ lưu vào thư mục mặc định</param>
         /// <returns></returns>
         [HttpPost("upload-multiple")]
         [AllowAnonymous]
-        public async Task<ResponseAPI> UploadMultipleFiles([FromForm] List<IFormFile> files)
+        public async Task<ResponseAPI> UploadMultipleFiles([FromForm] List<IFormFile> files, [FromForm] string? folderPath)
         {
             try
             {
@@ -109,7 +111,7 @@ namespace D.Auth.API.Controllers
                     );
                 }
 
-                var result = await _s3ManagerFile.UploadFileAsync(null, files.ToArray());
+                var result = await _s3ManagerFile.UploadFileAsync(folderPath, files.ToArray());
                 return new ResponseAPI(
                     ControllerBase.StatusCode.Success,
                     result,
@@ -215,6 +217,31 @@ namespace D.Auth.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách folder trong MinIO
+        /// </summary>
+        /// <param name="prefix">Đường dẫn prefix để lọc (vd: auth/anh_dai_dien). Nếu null sẽ lấy từ thư mục gốc</param>
+        /// <returns></returns>
+        [HttpGet("folders")]
+        [AllowAnonymous]
+        public async Task<ResponseAPI> GetFolders([FromQuery] string? prefix)
+        {
+            try
+            {
+                var folders = await _s3ManagerFile.ListFoldersAsync(prefix);
+                return new ResponseAPI(
+                    ControllerBase.StatusCode.Success,
+                    new { Folders = folders, Count = folders.Count },
+                    200,
+                    $"Tìm thấy {folders.Count} folder(s)"
+                );
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
             }
         }
     }

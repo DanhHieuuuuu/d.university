@@ -20,4 +20,5 @@ export type IUser = {
   ten: string | null;
   email: string | null;
   imageLink?: string | null;
+  userType?: number;
 };

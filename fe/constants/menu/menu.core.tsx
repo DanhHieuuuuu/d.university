@@ -52,7 +52,7 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Admin',
     routerLink: '/manager',
-    permissionKeys: [PermissionCoreConst.UserButtonAccountManagerAdd],
+    permissionKeys: [PermissionCoreConst.UserMenuAdmin],
     icon: <AdminIcon />
   }
 ];

@@ -1,12 +1,19 @@
-﻿using D.DomainBase.Entity;
+﻿using D.Core.Domain.Shared.Constants;
+using D.DomainBase.Entity;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace D.Core.Domain.Entities.Delegation.Incoming
 {
+    [Table(nameof(DelegationIncoming), Schema = DbSchema.Delegation)]
     public class DelegationIncoming : EntityBase
     {
+        [Column("Code")]
+        [Description("Mã đoàn vào")]
+        [MaxLength(255)]
+        public string Code { get; set; }
+
         [Column("Name")]
         [Description("Tên đoàn vào")]
         [MaxLength(255)]
@@ -26,9 +33,9 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [MaxLength(255)]
         public string? Location { get; set; }
 
-        [Column("IdNhanSuReception")]
+        [Column("IdStaffReception")]
         [Description("Id của nhân sự tiếp đón")]
-        public int IdNhanSuReception { get; set; }
+        public int IdStaffReception { get; set; }
 
         [Column("TotalPerson")]
         [Description("Tổng số người tham gia")]
@@ -39,18 +46,24 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [MaxLength(255)]
         public string? PhoneNumber { get; set; }
 
-        [Column("ShuttleService")]
-        [Description("Dịch vụ đưa đón")]
-        [MaxLength(255)]
-        public string? ShuttleService { get; set; }
-
         [Column("Status")]
         [Description("Trạng thái")]
         public int Status { get; set; }
 
-        [Column("Gift")]
-        [Description("Quà")]
-        [MaxLength(255)]
-        public string Gift { get; set; }
+        [Column("RequestDate")]
+        [Description("Ngày yêu cầu")]
+        public int RequestDate { get; set; }
+
+        [Column("ReceptionDate")]
+        [Description("Ngày tiếp nhận")]
+        public int ReceptionDate { get; set; }
+        [Column("TotalMoney")]
+        [Description("Tổng chi phí")]
+        public decimal TotalMoney { get; set; }
+
+        public virtual ICollection<DetailDelegationIncoming>? DelegationDetails { get; set; }
+        public virtual ICollection<ReceptionTime>? ReceptionTimes { get; set; }
+        public virtual ICollection<DepartmentSupport>? DepartmentSupports { get; set; }
+
     }
 }

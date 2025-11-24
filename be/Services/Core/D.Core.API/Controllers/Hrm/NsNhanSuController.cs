@@ -1,7 +1,8 @@
-﻿using d.Shared.Permission;
-using D.ControllerBase;
+﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
+using d.Shared.Permission;
+using d.Shared.Permission.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,6 +63,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateNhanSu)]
         [HttpPost("create")]
         public async Task<ResponseAPI> CreateNhanSu(CreateNhanSuDto dto)
         {
@@ -81,7 +83,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateNhanSu)]
         [HttpPost("create-hd")]
         public async Task<ResponseAPI> CreateHopDong(CreateHopDongDto dto)
         {
@@ -101,7 +103,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        //[PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
         [HttpGet("get")]
         public async Task<ResponseAPI> FindByMaNsSdt(FindByMaNsSdtDto dto)
         {
@@ -121,6 +123,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="idNhanSu"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
         [HttpGet("{idNhanSu}")]
         public async Task<ResponseAPI> FindByIdNhanSu(int idNhanSu)
         {

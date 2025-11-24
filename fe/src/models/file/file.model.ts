@@ -15,7 +15,9 @@ export type ICreateFile = {
   applicationField?: string;
 };
 
-export type IQueryFile = IQueryPaging & {};
+export type IQueryFile = IQueryPaging & {
+  Name?: string;
+};
 
 export type IUpdateFile = ICreateFile & {
   id: number | null;

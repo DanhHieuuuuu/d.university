@@ -36,6 +36,11 @@ const authSlice = createSlice({
         isAuthenticated: true
       };
     },
+    updateUserImageLink(state, action: PayloadAction<string>) {
+      if (state.user) {
+        state.user.imageLink = action.payload;
+      }
+    },
     clearUser() {
       clearToken();
       return { ...initialState };
@@ -95,6 +100,6 @@ const authSlice = createSlice({
 
 const authReducer = authSlice.reducer;
 
-export const { setUser, clearUser } = authSlice.actions;
+export const { setUser, updateUserImageLink, clearUser } = authSlice.actions;
 
 export default authReducer;

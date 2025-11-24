@@ -1,7 +1,7 @@
 'use client';
 
 import { BellIcon } from '@components/custom-icon';
-import { Badge, Button, ConfigProvider, Popover } from 'antd';
+import { Badge, Button, Popover } from 'antd';
 import { useAppSelector } from '@redux/hooks';
 import { useNavigate } from '@hooks/navigate';
 
@@ -37,7 +37,7 @@ const NotificationComponent = () => {
     <Popover content={content} placement="bottomRight" trigger={['click']}>
       <div className="btn-notification">
         <Badge text="" showZero count={totalUnread} overflowCount={9} offset={[-4, 8]}>
-          <Button type="text" shape="circle" size="large" icon={<BellIcon />} />
+          <Button type="text" shape="circle" size="large" icon={<BellIcon style={{ color: 'white' }} />} />
         </Badge>
       </div>
     </Popover>

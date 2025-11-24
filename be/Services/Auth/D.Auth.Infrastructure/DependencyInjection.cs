@@ -11,6 +11,10 @@ namespace D.Auth.Infrastructure
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             return services
+                // Core Services
+                .AddScoped<D.Core.Infrastructure.ServiceUnitOfWork>()
+                .AddScoped<D.Core.Infrastructure.Services.File.Abstracts.IFileService, D.Core.Infrastructure.Services.File.Implements.FileService>()
+                // Auth Services
                 .AddScoped<ServiceUnitOfWork>()
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
                 .AddScoped<IRoleService, RoleService>()
@@ -22,6 +26,9 @@ namespace D.Auth.Infrastructure
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             return services
+                // Core Repositories
+                .AddScoped<D.Core.Infrastructure.Repositories.File.IFileRepository, D.Core.Infrastructure.Repositories.File.FileRepository>()
+                // Auth Repositories
                 .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
                 .AddScoped<IRoleRepository, RoleRepository>()
                 .AddScoped<IRolePermissionRepository, RolePermissionRepository>()

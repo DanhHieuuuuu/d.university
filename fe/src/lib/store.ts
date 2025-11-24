@@ -3,7 +3,7 @@ import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import storage from 'redux-persist/lib/storage';
 import authReducer from './feature/auth/authSlice';
 import loadingReducer from './feature/loadingSlice';
-import nhanSuReducer from './feature/nhansuSlice';
+import nhanSuReducer from './feature/nhansu/nhansuSlice';
 import userReducer from './feature/userSlice';
 import danhmucReducer from './feature/danhmucSlice';
 import studentReducer from './feature/studentSlice';

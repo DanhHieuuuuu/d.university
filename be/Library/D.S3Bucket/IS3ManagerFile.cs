@@ -11,7 +11,9 @@ namespace D.S3Bucket
         /// <summary>
         /// Upload file lên MinIO
         /// </summary>
-        Task<ResponseS3FileDto> UploadFileAsync(string? fileName, params IFormFile[] files);
+        /// <param name="folderPath">Đường dẫn thư mục lưu file (vd: auth/anh_dai_dien/khoa). Nếu null sẽ lưu vào thư mục mặc định</param>
+        /// <param name="files">Danh sách file cần upload</param>
+        Task<ResponseS3FileDto> UploadFileAsync(string? folderPath, params IFormFile[] files);
 
         /// <summary>
         /// Upload stream lên MinIO
@@ -37,5 +39,11 @@ namespace D.S3Bucket
         /// Test kết nối với MinIO
         /// </summary>
         Task<bool> TestConnectionAsync();
+
+        /// <summary>
+        /// Lấy danh sách folder trong MinIO
+        /// </summary>
+        /// <param name="prefix">Đường dẫn prefix để lọc (vd: auth/anh_dai_dien/). Nếu null sẽ lấy từ thư mục gốc</param>
+        Task<List<string>> ListFoldersAsync(string? prefix = null);
     }
 }

@@ -51,6 +51,20 @@ namespace D.Core.Infrastructure.Services.File.Implements
             return new PageResultDto<FileResponseDto> { Items = items, TotalItem = totalCount };
         }
 
+        public FileResponseDto GetFileById(int id)
+        {
+            _logger.LogInformation(
+                $"{nameof(GetFileById)} method called. Id: {id}"
+            );
+
+            var file = _unitOfWork.iFileRepository.GetById(id);
+            
+            if (file == null)
+                throw new Exception("File không tồn tại trong hệ thống.");
+
+            return _mapper.Map<FileResponseDto>(file);
+        }
+
         public async Task<FileResponseDto> CreateFile(CreateFileDto dto)
         {
             _logger.LogInformation(
@@ -59,11 +73,6 @@ namespace D.Core.Infrastructure.Services.File.Implements
 
             if (dto.File == null)
                 throw new Exception("File không được để trống.");
-
-            var exist = _unitOfWork.iFileRepository.IsNameExist(dto.Name!);
-
-            if (exist)
-                throw new Exception("Tên file đã tồn tại trong hệ thống.");
 
             await using var transaction = await _unitOfWork.Database.BeginTransactionAsync();
 
@@ -77,12 +86,25 @@ namespace D.Core.Infrastructure.Services.File.Implements
                 var fileExtension = Path.GetExtension(dto.File.FileName);
                 var uuid = Guid.NewGuid().ToString();
                 var fileName = $"{uuid}{fileExtension}";
-                var uploadResult = await _s3ManagerFile.UploadFileAsync(fileName, dto.File);
+                
+                // Sử dụng ApplicationField như folderPath để chỉ định đường dẫn lưu file
+                string? folderPath = null;
+                if (!string.IsNullOrWhiteSpace(dto.ApplicationField))
+                {
+                    var cleanPath = dto.ApplicationField.Trim().Trim('/');
+                    folderPath = $"{cleanPath}/{fileName}";
+                }
+                else
+                {
+                    folderPath = fileName;
+                }
+                
+                var uploadResult = await _s3ManagerFile.UploadFileAsync(folderPath, dto.File);
 
                 if (uploadResult?.Files?.FirstOrDefault() == null)
                     throw new Exception("Upload file lên MinIO thất bại.");
 
-                newFile.Link = fileName;
+                newFile.Link = folderPath;
                 await _unitOfWork.SaveChangesAsync();
 
                 await transaction.CommitAsync();
@@ -103,12 +125,7 @@ namespace D.Core.Infrastructure.Services.File.Implements
             if (file == null)
                 throw new Exception("File không tồn tại trong hệ thống.");
 
-            var NameExist = _unitOfWork.iFileRepository.IsNameExist(dto.Name!);
-            if (NameExist)
-                throw new Exception("Tên File đã tồn tại trong hệ thống.");
-
             await using var transaction = await _unitOfWork.Database.BeginTransactionAsync();
-            var uuid = Guid.NewGuid().ToString();
 
             try
             {
@@ -124,13 +141,27 @@ namespace D.Core.Infrastructure.Services.File.Implements
                 if (dto.File != null)
                 {
                     var fileExtension = Path.GetExtension(dto.File.FileName);
+                    var uuid = Guid.NewGuid().ToString();
                     var fileName = $"{uuid}{fileExtension}";
-                    var uploadResult = await _s3ManagerFile.UploadFileAsync(fileName, dto.File);
+                    
+                    // Sử dụng ApplicationField như folderPath để chỉ định đường dẫn lưu file
+                    string? folderPath = null;
+                    if (!string.IsNullOrWhiteSpace(file.ApplicationField))
+                    {
+                        var cleanPath = file.ApplicationField.Trim().Trim('/');
+                        folderPath = $"{cleanPath}/{fileName}";
+                    }
+                    else
+                    {
+                        folderPath = fileName;
+                    }
+                    
+                    var uploadResult = await _s3ManagerFile.UploadFileAsync(folderPath, dto.File);
 
                     if (uploadResult?.Files?.FirstOrDefault() == null)
                         throw new Exception("Upload file lên MinIO thất bại.");
 
-                    file.Link = fileName;
+                    file.Link = folderPath;
                 }
 
                 _unitOfWork.iFileRepository.Update(file);
@@ -151,17 +182,16 @@ namespace D.Core.Infrastructure.Services.File.Implements
 
         public async Task<bool> DeleteFile(DeleteFileDto dto)
         {
-            var file = _unitOfWork.iFileRepository.GetById(dto.Id!);
+            var file = _unitOfWork.iFileRepository.GetById(dto.Id);
             if (file == null)
                 throw new Exception("File không tồn tại trong hệ thống.");
-            else
-            {
-                file.Deleted = true;
-                file.DeletedDate = DateTime.Now;
-                _unitOfWork.iFileRepository.Update(file);
-                await _unitOfWork.iFileRepository.SaveChangeAsync();
-                return true;
-            }
+
+            file.Deleted = true;
+            file.DeletedDate = DateTime.Now;
+            _unitOfWork.iFileRepository.Update(file);
+            await _unitOfWork.SaveChangesAsync();
+            
+            return true;
         }
     }
 }

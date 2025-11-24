@@ -109,6 +109,9 @@
     color: $primary;
     font-weight: 600;
     font-size: 16px;
+
+    padding-top: 8px;
+    border-top: solid 1px black;
   }
 }
 
@@ -183,8 +186,8 @@
 
           .dot {
             position: absolute;
-            top: 8px;
-            right: 12px;
+            top: 16px;
+            left: 24px;
           }
 
         }

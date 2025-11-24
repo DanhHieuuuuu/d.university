@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using d.Shared.Permission.Auth;
 using d.Shared.Permission.Permission;
 using d.Shared.Permission.Role;
 using D.Auth.Domain.Dtos.Permission;
@@ -29,57 +30,79 @@ namespace D.Auth.Infrastructure.Services.Implements
 
         public async Task ImportPermission(ImportPermissionCommand dto)
         {
-            _logger.LogInformation("=== Bắt đầu import dữ liệu Permission ===");
+            _logger.LogInformation("Bắt đầu import dữ liệu Permission");
 
             var permissionDict = PermissionConfig.CoreConfigs;
             var keyIdMap = new Dictionary<string, int>();
 
-            // Load trước DB
+            // Load tất cả permission hiện có trong DB
             var existing = await _unitOfWork.iPermissionRepository.TableNoTracking.ToListAsync();
             foreach (var ex in existing)
                 keyIdMap[ex.PermissionKey] = ex.Id;
 
-            // 1️. Thêm các permission không có cha
-            foreach (var kv in permissionDict.Values.Where(x => x.ParentKey == null))
-            {
-                if (keyIdMap.ContainsKey(kv.PermissonKey))
-                    continue;
+            // 2Tách permission có cha và không có cha
+            var noParent = permissionDict.Values.Where(x => x.ParentKey == null).ToList();
+            var withParent = permissionDict.Values.Where(x => x.ParentKey != null).ToList();
 
-                var entity = new Permission
+            // Thêm hoặc cập nhật permission 
+            foreach (var kv in noParent)
+            {
+                if (keyIdMap.TryGetValue(kv.PermissonKey, out var id))
+                {
+                    // Đã tồn tại -> kiểm tra xem ParentID có khác null không
+                    var entity = existing.First(e => e.Id == id);
+                    if (entity.ParentID != null)
+                    {
+                        entity.ParentID = null;
+                        _unitOfWork.iPermissionRepository.Update(entity);
+                        await _unitOfWork.iPermissionRepository.SaveChangeAsync();
+                    }
+                    continue;
+                }
+
+                // Thêm mới
+                var newEntity = new Permission
                 {
                     PermissionKey = kv.PermissonKey,
                     PermissionName = kv.PermissionName,
                     CreatedDate = DateTime.Now,
                     CreatedBy = "system",
                 };
-
-                _unitOfWork.iPermissionRepository.Add(entity);
+                _unitOfWork.iPermissionRepository.Add(newEntity);
                 await _unitOfWork.iPermissionRepository.SaveChangeAsync();
-
-                keyIdMap[kv.PermissonKey] = entity.Id;
+                keyIdMap[kv.PermissonKey] = newEntity.Id;
+                existing.Add(newEntity);
             }
 
-            var remain = permissionDict.Values.Where(x => x.ParentKey != null).ToList();
-
+            // 4Thêm hoặc cập nhật permission có cha
+            var remain = withParent.ToList();
             while (remain.Any())
             {
                 bool added = false;
 
                 foreach (var kv in remain.ToList())
                 {
-                    // Nếu đã có rồi thì bỏ
-                    if (keyIdMap.ContainsKey(kv.PermissonKey))
+                    if (!keyIdMap.ContainsKey(kv.ParentKey!))
+                        continue; 
+
+                    if (keyIdMap.TryGetValue(kv.PermissonKey, out var id))
                     {
+                        // Đã tồn tại -> cập nhật ParentID 
+                        var entity = existing.First(e => e.Id == id);
+                        var newParentId = keyIdMap[kv.ParentKey!];
+                        if (entity.ParentID != newParentId)
+                        {
+                            entity.ParentID = newParentId;
+                            _unitOfWork.iPermissionRepository.Update(entity);
+                            await _unitOfWork.iPermissionRepository.SaveChangeAsync();
+                        }
                         remain.Remove(kv);
+                        added = true;
                         continue;
                     }
 
-                    // Nếu cha chưa có trong map -> chưa tới lượt import
-                    if (!keyIdMap.ContainsKey(kv.ParentKey!))
-                        continue;
-
-                    // ADD
-                    var entity = new Permission
+                    // Thêm mới
+                    var newEntity = new Permission
                     {
                         PermissionKey = kv.PermissonKey,
                         PermissionName = kv.PermissionName,
@@ -87,29 +110,28 @@ namespace D.Auth.Infrastructure.Services.Implements
                         CreatedDate = DateTime.Now,
                         CreatedBy = "system",
                     };
-
-                    _unitOfWork.iPermissionRepository.Add(entity);
+                    _unitOfWork.iPermissionRepository.Add(newEntity);
                     await _unitOfWork.iPermissionRepository.SaveChangeAsync();
 
-                    keyIdMap[kv.PermissonKey] = entity.Id;
+                    keyIdMap[kv.PermissonKey] = newEntity.Id;
+                    existing.Add(newEntity);
 
                     remain.Remove(kv);
                     added = true;
                 }
 
-                // Nếu không import -> lỗi parent
                 if (!added)
                 {
-                    _logger.LogError("Có permission không import được vì thiếu parent!");
+                    _logger.LogError("Có permission không import được do thiếu parent!");
                     foreach (var r in remain)
                         _logger.LogError($" - Permission lỗi: {r.PermissonKey}, Parent: {r.ParentKey}");
-
                     throw new Exception("Không thể import permission do thiếu ParentID.");
                 }
             }
 
-            _logger.LogInformation("=== Import Permission hoàn tất ===");
+            _logger.LogInformation("Import Permission hoàn tất");
         }
+
 
         public List<PermissionResponseDto> GetAllPermission(PermissionRequestDto dto)
         {
@@ -149,6 +171,17 @@ namespace D.Auth.Infrastructure.Services.Implements
             _logger.LogInformation($"{nameof(GetPermissionsByNhanSu)}.");
 
             var nsId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var userType = CommonUntil.GetCurrentUserType(_contextAccessor);
+
+            if (userType == UserTypeConstant.SUPER_ADMIN)
+            {
+                // trả về tất cả permission
+                var allPermissions = _unitOfWork.iPermissionRepository
+                    .TableNoTracking
+                    .Select(p => p.PermissionKey)
+                    .ToList();
+                return allPermissions;
+            }
 
             var roleIds =
                 from u in _unitOfWork.iUserRoleRepository.TableNoTracking

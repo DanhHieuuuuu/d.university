@@ -238,7 +238,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             newHd.IdNhanSu = newNhanSu.IdNhanSu;
 
             // Update nhân sự: chỉ update 2 field nếu cần
-            var nhansu = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x =>
+            var nhansu = _unitOfWork.iNsNhanSuRepository.Table.FirstOrDefault(x =>
                 x.Id == newNhanSu.IdNhanSu
             );
             if (nhansu != null)

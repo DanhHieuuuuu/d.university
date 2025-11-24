@@ -3,6 +3,7 @@
     public static class PermissionCoreKeys
     {
         #region User Management - Quản lý người dùng
+        public const string UserMenuAdmin = $"{PermissionPrefixKeys.Menu}admin_permission";
         #region Phân quyền website
         public const string UserMenuPermission = $"{PermissionPrefixKeys.Menu}user_permission";
         public const string UserTableRolePermission = $"{PermissionPrefixKeys.Table}user_role_permission";

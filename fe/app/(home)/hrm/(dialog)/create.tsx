@@ -8,10 +8,8 @@ import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
-import {
-  clearSelected,
-  createNhanSu,
-  getDetailNhanSu} from '@redux/feature/nhansuSlice';
+import { clearSelected } from '@redux/feature/nhansu/nhansuSlice';
+import { createNhanSu, getDetailNhanSu } from '@redux/feature/nhansu/nhansuThunk';
 import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab)';
 
 type NhanSuModalProps = {
@@ -70,12 +68,12 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   ];
 
   const initData = async () => {
-    await dispatch(getDetailNhanSu(selected.idNhanSu));  
-    
+    await dispatch(getDetailNhanSu(selected.idNhanSu));
+
     if (selected.status === ReduxStatus.SUCCESS) {
       console.log(selected.data);
       form.setFieldsValue(selected.data);
-    }     
+    }
   };
 
   const onCloseModal = () => {

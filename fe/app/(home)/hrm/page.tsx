@@ -13,7 +13,8 @@ import {
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getListNhanSu, resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansuSlice';
+import { resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansu/nhansuSlice';
+import { getListNhanSu } from '@redux/feature/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
@@ -213,5 +214,4 @@ const Page = () => {
   );
 };
 
-// export default withAuthGuard(Page, PermissionCoreConst.CoreMenuNhanSu);
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuNhanSu);
