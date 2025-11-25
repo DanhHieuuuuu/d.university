@@ -1,7 +1,10 @@
 ﻿using D.Core.Domain;
+using D.Core.Infrastructure.Repositories.Delegation.Incoming;
 using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.SinhVien;
+using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
+using D.Core.Infrastructure.Services.Delegation.Incoming.Implements;
 using D.Core.Infrastructure.Services.File.Abstracts;
 using D.Core.Infrastructure.Services.File.Implements;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
@@ -21,6 +24,16 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
                 .AddScoped<IDmDanhMucService, DmDanhMucService>()
                 .AddScoped<ISvSinhVienService, SvSinhVienService>()
+            #region Delegation
+                .AddScoped<IDelegationIncomingService, DelegationIncomingService>()
+                .AddScoped<IDepartmentSupportService, DepartmentSupportService>()
+                .AddScoped<IDetailDelegationIncomingService, DetailDelegationIncomingService>()
+                .AddScoped<ILogReceptionTimeService, LogReceptionTimeService>()
+                .AddScoped<ILogStatusService, LogStatusService>()
+                .AddScoped<IPrepareService, PrepareService>()
+                .AddScoped<IReceptionTimeService, ReceptionTimeService>()
+                .AddScoped<ISupporterService, SupporterService>()
+            #endregion
                 .AddScoped<IFileService, FileService>();
         }
 
@@ -44,6 +57,16 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>()
                 .AddScoped<INsToBoMonRepository, NsToBoMonRepository>()
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>()
+            #region Delegation
+                .AddScoped<IDelegationIncomingRepository, DelegationIncomingRepository>()
+                .AddScoped<IDepartmentSupportRepository, DepartmentSupportRepository>()
+                .AddScoped<IDetailDelegationIncomingRepository, DetailDelegationIncomingRepository>()
+                .AddScoped<ILogReceptionTimeRepository, LogReceptionTimeRepository>()
+                .AddScoped<ILogStatusRepository, LogStatusRepository>()
+                .AddScoped<IPrepareRepository, PrepareRepository>()
+                .AddScoped<IReceptionTimeRepository, ReceptionTimeRepository>()
+                .AddScoped<ISupporterRepository, SupporterRepository>()
+            #endregion
                 .AddScoped<IFileRepository, FileRepository>();
         }
 

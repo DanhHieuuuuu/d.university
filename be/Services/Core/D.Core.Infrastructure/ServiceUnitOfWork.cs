@@ -1,4 +1,5 @@
-﻿using D.Core.Infrastructure.Repositories.File;
+﻿using D.Core.Infrastructure.Repositories.Delegation.Incoming;
+using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.SinhVien;
 using D.InfrastructureBase.Database;
@@ -32,6 +33,18 @@ namespace D.Core.Infrastructure
         private SvSinhVienRepository _svSinhVienRepository;
 
         private FileRepository _fileRepository;
+
+        #region Delegation
+        private DelegationIncomingRepository _delegationIncomingRepository;
+        private DepartmentSupportRepository _departmentSupportRepository;
+        private DetailDelegationIncomingRepository _detailDelegationIncomingRepository;
+        private LogReceptionTimeRepository _logReceptionTimeRepository;
+        private LogStatusRepository _logStatusRepository;
+        private PrepareRepository _prepareRepository;
+        private ReceptionTimeRepository _receptionTimeRepository;
+        private SupporterRepository _supporterRepository;
+
+        #endregion
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
         {
@@ -263,5 +276,99 @@ namespace D.Core.Infrastructure
         }
 
         public DatabaseFacade Database => _dbContext.Database;
+
+        #region Delegation
+
+        public IDelegationIncomingRepository iDelegationIncomingRepository
+        {
+            get
+            {
+                if (_delegationIncomingRepository == null)
+                {
+                    _delegationIncomingRepository = new DelegationIncomingRepository(_dbContext, _httpContext);
+                }
+                return _delegationIncomingRepository;
+            }
+        }
+
+        public IDepartmentSupportRepository iDepartmentSupportRepository
+        {
+            get
+            {
+                if (_departmentSupportRepository == null)
+                {
+                    _departmentSupportRepository = new DepartmentSupportRepository(_dbContext, _httpContext);
+                }
+                return _departmentSupportRepository;
+            }
+        }
+
+        public IDetailDelegationIncomingRepository iDetailDelegationIncomingRepository
+        {
+            get
+            {
+                if (_detailDelegationIncomingRepository == null)
+                {
+                    _detailDelegationIncomingRepository = new DetailDelegationIncomingRepository(_dbContext, _httpContext);
+                }
+                return _detailDelegationIncomingRepository;
+            }
+        }
+        public ILogReceptionTimeRepository iLogReceptionTimeRepository
+        {
+            get
+            {
+                if (_logReceptionTimeRepository == null)
+                {
+                    _logReceptionTimeRepository = new LogReceptionTimeRepository(_dbContext, _httpContext);
+                }
+                return _logReceptionTimeRepository;
+            }
+        }
+        public ILogStatusRepository iLogStatusRepository
+        {
+            get
+            {
+                if (_logStatusRepository == null)
+                {
+                    _logStatusRepository = new LogStatusRepository(_dbContext, _httpContext);
+                }
+                return _logStatusRepository;
+            }
+        }
+        public IPrepareRepository iPrepareRepository
+        {
+            get
+            {
+                if (_prepareRepository == null)
+                {
+                    _prepareRepository = new PrepareRepository(_dbContext, _httpContext);
+                }
+                return _prepareRepository;
+            }
+        }
+        public IReceptionTimeRepository iReceptionTimeRepository
+        {
+            get
+            {
+                if (_receptionTimeRepository == null)
+                {
+                    _receptionTimeRepository = new ReceptionTimeRepository(_dbContext, _httpContext);
+                }
+                return _receptionTimeRepository;
+            }
+        }
+        public ISupporterRepository iSupporterRepository
+        {
+            get
+            {
+                if (_supporterRepository == null)
+                {
+                    _supporterRepository = new SupporterRepository(_dbContext, _httpContext);
+                }
+                return _supporterRepository;
+            }
+        }
+        #endregion
     }
 }
