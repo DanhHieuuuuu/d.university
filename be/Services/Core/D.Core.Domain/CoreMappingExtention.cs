@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using AutoMapper;
+using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
+using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Dtos.File;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
@@ -14,6 +16,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
@@ -87,6 +90,12 @@ namespace D.Core.Domain
             CreateMap<CreateFileDto, FileManagement>()
                 .ForMember(dest => dest.Link, opt => opt.Ignore());
 
+            #endregion
+
+            #region Delegation
+            CreateMap<DelegationIncoming, PageDelegationIncomingResultDto>();
+            CreateMap<CreateRequestDto, DelegationIncoming>();
+            CreateMap<DelegationIncoming, CreateResponseDto>();
             #endregion
         }
 

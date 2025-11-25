@@ -52,11 +52,12 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
 
         [Column("RequestDate")]
         [Description("Ngày yêu cầu")]
-        public int RequestDate { get; set; }
+        public DateOnly RequestDate { get; set; }
 
         [Column("ReceptionDate")]
         [Description("Ngày tiếp nhận")]
-        public int ReceptionDate { get; set; }
+        public DateOnly ReceptionDate { get; set; }
+
         [Column("TotalMoney")]
         [Description("Tổng chi phí")]
         public decimal TotalMoney { get; set; }
