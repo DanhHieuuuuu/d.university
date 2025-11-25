@@ -3,10 +3,10 @@ using D.DomainBase.Entity;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace D.Core.Domain.Entities.Hrm.DanhMuc
+namespace D.Core.Domain.Entities.DaoTao
 {
-    [Table(nameof(DmChuongTrinhKhung), Schema = DbSchema.Dt)]
-    public class DmChuongTrinhKhung : EntityBase
+    [Table(nameof(DtChuongTrinhKhung), Schema = DbSchema.Dt)]
+    public class DtChuongTrinhKhung : EntityBase
     {
         public string MaChuongTrinhKhung { get; set; }
         public string TenChuongTrinhKhung { get; set; }
@@ -17,6 +17,6 @@ namespace D.Core.Domain.Entities.Hrm.DanhMuc
         public string? MoTa { get; set; }
         public string? MaNganh { get; set; }
         public bool TrangThai { get; set; } = true;
-        public virtual ICollection<DmChuongTrinhKhungMon> ChuongTrinhKhungMons { get; set; }
+        public virtual ICollection<DtChuongTrinhKhungMon> ChuongTrinhKhungMons { get; set; }
     }
 }

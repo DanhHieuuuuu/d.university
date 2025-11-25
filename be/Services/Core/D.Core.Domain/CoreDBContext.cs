@@ -1,4 +1,5 @@
-﻿using D.Core.Domain.Entities.Delegation.Incoming;
+﻿using D.Core.Domain.Entities.DaoTao;
+using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
@@ -46,10 +47,10 @@ namespace D.Core.Domain
         DbSet<DmToBoMon> DmToBoMon { get; set; }
         DbSet<DmTonGiao> DmTonGiaos { get; set; }
         DbSet<DmKhoaHoc> DmKhoaHocs { get; set; }
-        DbSet<DmMonHoc> DmMonHocs { get; set; }
-        DbSet<DmChuongTrinhKhung> DmChuongTrinhKhungs { get; set; }
-        DbSet<DmMonTienQuyet> DmMonTienQuyets { get; set; }
-        DbSet<DmChuongTrinhKhungMon> DmChuongTrinhKhungMons { get; set; }
+        DbSet<DtMonHoc> DtMonHocs { get; set; }
+        DbSet<DtChuongTrinhKhung> DtChuongTrinhKhungs { get; set; }
+        DbSet<DtMonTienQuyet> DtMonTienQuyets { get; set; }
+        DbSet<DtChuongTrinhKhungMon> DtChuongTrinhKhungMons { get; set; }
 
         // Nhân sự
         DbSet<NsNhanSu> NsNhanSus { get; set; }
@@ -92,7 +93,7 @@ namespace D.Core.Domain
                 }
             }
 
-            modelBuilder.Entity<DmChuongTrinhKhungMon>(entity =>
+            modelBuilder.Entity<DtChuongTrinhKhungMon>(entity =>
             {
                 entity.HasKey(e => new { e.ChuongTrinhKhungId, e.MonHocId });
 
@@ -107,12 +108,12 @@ namespace D.Core.Domain
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<DmMonTienQuyet>(entity =>
+            modelBuilder.Entity<DtMonTienQuyet>(entity =>
             {
                 entity.HasKey(e => new { e.MonHocId, e.MonTienQuyetId });
             });
 
-            modelBuilder.Entity<DmMonHoc>(entity =>
+            modelBuilder.Entity<DtMonHoc>(entity =>
             {
                 entity.HasMany(monHoc => monHoc.MonTienQuyet)
                       .WithOne(tienQuyet => tienQuyet.MonHoc)

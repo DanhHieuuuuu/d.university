@@ -7,17 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.Core.Domain.Entities.Hrm.DanhMuc
+namespace D.Core.Domain.Entities.DaoTao
 {
-    [Table(nameof(DmNganh), Schema = DbSchema.Hrm)]
-    public class DmNganh : EntityBase
+    [Table(nameof(DtNganh), Schema = DbSchema.Dt)]
+    public class DtNganh : EntityBase
     {
         public string? MaNganh { get; set; }
         public string? TenNganh { get; set; }
         public string? TenTiengAnh { get; set; }
         public string? MoTa { get; set; }
         public bool? TrangThai { get; set; } = true;
-        public virtual ICollection<DmChuyenNganh> ChuyenNganhs { get; set; }
-        public virtual ICollection<DmChuongTrinhKhung> ChuongTrinhKhungs { get; set; }
+        public virtual ICollection<DtChuyenNganh> ChuyenNganhs { get; set; }
+        public virtual ICollection<DtChuongTrinhKhung> ChuongTrinhKhungs { get; set; }
     }
 }

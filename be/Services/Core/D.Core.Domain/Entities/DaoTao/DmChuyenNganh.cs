@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.Core.Domain.Entities.Hrm.DanhMuc
+namespace D.Core.Domain.Entities.DaoTao
 {
-    [Table(nameof(DmChuyenNganh), Schema = DbSchema.Hrm)]
-    public class DmChuyenNganh : EntityBase
+    [Table(nameof(DtChuyenNganh), Schema = DbSchema.Hrm)]
+    public class DtChuyenNganh : EntityBase
     {
         public string MaChuyenNganh { get; set; }
         public string TenChuyenNganh { get; set; }
@@ -19,7 +19,7 @@ namespace D.Core.Domain.Entities.Hrm.DanhMuc
         public bool? TrangThai { get; set; } = true;
         public string MaNganh { get; set; }
         [ForeignKey(nameof(MaNganh))]
-        public virtual DmNganh Nganh { get; set; }
-        public virtual ICollection<DmChuongTrinhKhung> ChuongTrinhKhungs { get; set; }
+        public virtual DtNganh Nganh { get; set; }
+        public virtual ICollection<DtChuongTrinhKhung> ChuongTrinhKhungs { get; set; }
     }
 }

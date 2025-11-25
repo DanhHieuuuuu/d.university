@@ -2,10 +2,10 @@
 using D.DomainBase.Entity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace D.Core.Domain.Entities.Hrm.DanhMuc
+namespace D.Core.Domain.Entities.DaoTao
 {
-    [Table(nameof(DmChuongTrinhKhungMon), Schema = DbSchema.Dt)]
-    public class DmChuongTrinhKhungMon : EntityBase
+    [Table(nameof(DtChuongTrinhKhungMon), Schema = DbSchema.Dt)]
+    public class DtChuongTrinhKhungMon : EntityBase
     {
         public int ChuongTrinhKhungId { get; set; }
         public int MonHocId { get; set; }
@@ -13,9 +13,9 @@ namespace D.Core.Domain.Entities.Hrm.DanhMuc
         public bool TrangThai { get; set; } = true;
 
         [ForeignKey(nameof(ChuongTrinhKhungId))]
-        public virtual DmChuongTrinhKhung ChuongTrinhKhung { get; set; }
+        public virtual DtChuongTrinhKhung ChuongTrinhKhung { get; set; }
 
         [ForeignKey(nameof(MonHocId))]
-        public virtual DmMonHoc MonHoc { get; set; }
+        public virtual DtMonHoc MonHoc { get; set; }
     }
 }
