@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Entities.DaoTao
 {
-    [Table(nameof(DtChuyenNganh), Schema = DbSchema.Hrm)]
+    [Table(nameof(DtChuyenNganh), Schema = DbSchema.Dt)]
     public class DtChuyenNganh : EntityBase
     {
         public string MaChuyenNganh { get; set; }
@@ -17,9 +17,13 @@ namespace D.Core.Domain.Entities.DaoTao
         public string? TenTiengAnh { get; set; }
         public string? MoTa { get; set; }
         public bool? TrangThai { get; set; } = true;
-        public string MaNganh { get; set; }
-        [ForeignKey(nameof(MaNganh))]
+        //
+        public int NganhId { get; set; }
+
+        [ForeignKey(nameof(NganhId))]
         public virtual DtNganh Nganh { get; set; }
+
+        [InverseProperty(nameof(DtChuongTrinhKhung.ChuyenNganh))]
         public virtual ICollection<DtChuongTrinhKhung> ChuongTrinhKhungs { get; set; }
     }
 }

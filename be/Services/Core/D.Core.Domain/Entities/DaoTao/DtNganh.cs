@@ -17,7 +17,16 @@ namespace D.Core.Domain.Entities.DaoTao
         public string? TenTiengAnh { get; set; }
         public string? MoTa { get; set; }
         public bool? TrangThai { get; set; } = true;
+        //
+        public int KhoaId { get; set; }
+
+        [ForeignKey(nameof(KhoaId))]
+        public virtual DtKhoa Khoa { get; set; }
+
+        [InverseProperty(nameof(DtChuyenNganh.Nganh))]
         public virtual ICollection<DtChuyenNganh> ChuyenNganhs { get; set; }
+
+        [InverseProperty(nameof(DtChuongTrinhKhung.Nganh))]
         public virtual ICollection<DtChuongTrinhKhung> ChuongTrinhKhungs { get; set; }
     }
 }

@@ -127,6 +127,7 @@ namespace D.Core.Domain
             });
 
             modelBuilder.SeedDataHrm();
+            modelBuilder.SeedDataDt();
             base.OnModelCreating(modelBuilder);
         }
     }

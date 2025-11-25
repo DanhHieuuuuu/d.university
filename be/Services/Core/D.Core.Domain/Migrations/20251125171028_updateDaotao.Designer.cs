@@ -4,6 +4,7 @@ using D.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    partial class CoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251125171028_updateDaotao")]
+    partial class updateDaotao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,36 +95,6 @@ namespace D.Core.Domain.Migrations
                     b.HasIndex("NganhId");
 
                     b.ToTable("DtChuongTrinhKhung", "dt");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ChuyenNganhId = 2,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            KhoaHocId = 1,
-                            MaChuongTrinhKhung = "CNTT-K66-KS",
-                            NganhId = 1,
-                            TenChuongTrinhKhung = "Chương trình chuẩn Kỹ sư CNTT K66",
-                            TongSoTinChi = 150,
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ChuyenNganhId = 1,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            KhoaHocId = 2,
-                            MaChuongTrinhKhung = "KTPM-K67-CLC",
-                            NganhId = 1,
-                            TenChuongTrinhKhung = "Kỹ sư KTPM Chất lượng cao K67",
-                            TongSoTinChi = 160,
-                            TrangThai = true
-                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuongTrinhKhungMon", b =>
@@ -176,52 +149,6 @@ namespace D.Core.Domain.Migrations
                     b.HasIndex("MonHocId");
 
                     b.ToTable("DtChuongTrinhKhungMon", "dt");
-
-                    b.HasData(
-                        new
-                        {
-                            ChuongTrinhKhungId = 1,
-                            MonHocId = 1,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            HocKy = "2021-2022",
-                            Id = 1,
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            ChuongTrinhKhungId = 1,
-                            MonHocId = 4,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            HocKy = "2021-2022",
-                            Id = 2,
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            ChuongTrinhKhungId = 1,
-                            MonHocId = 2,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            HocKy = "2021-2022",
-                            Id = 3,
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            ChuongTrinhKhungId = 1,
-                            MonHocId = 3,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            HocKy = "2021-2022",
-                            Id = 4,
-                            TrangThai = true
-                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuyenNganh", b =>
@@ -284,43 +211,6 @@ namespace D.Core.Domain.Migrations
                     b.HasIndex("NganhId");
 
                     b.ToTable("DtChuyenNganh", "dt");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            MaChuyenNganh = "KTPM",
-                            NganhId = 1,
-                            TenChuyenNganh = "Kỹ thuật phần mềm",
-                            TenTiengAnh = "Software Engineering",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            MaChuyenNganh = "HTTT",
-                            NganhId = 1,
-                            TenChuyenNganh = "Hệ thống thông tin",
-                            TenTiengAnh = "Information Systems",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            MaChuyenNganh = "AI",
-                            NganhId = 2,
-                            TenChuyenNganh = "Trí tuệ nhân tạo",
-                            TrangThai = true
-                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtKhoa", b =>
@@ -385,34 +275,6 @@ namespace D.Core.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DtKhoa", "dt");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            Email = "fit@huce.edu.vn",
-                            MaKhoa = "CNTT",
-                            TenKhoa = "Công nghệ Thông tin",
-                            TenTiengAnh = "Information Technology",
-                            TrangThai = true,
-                            VietTat = "FIT"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            Email = "ktql@huce.edu.vn",
-                            MaKhoa = "KT",
-                            TenKhoa = "Kinh tế & Quản lý",
-                            TenTiengAnh = "Economics and Management",
-                            TrangThai = true,
-                            VietTat = "FEM"
-                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtMonHoc", b =>
@@ -481,59 +343,6 @@ namespace D.Core.Domain.Migrations
                     b.HasIndex("ToBoMonId");
 
                     b.ToTable("DtMonHoc", "dt");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            MaMonHoc = "IT1110",
-                            SoTietLyThuyet = 30,
-                            SoTietThucHanh = 30,
-                            SoTinChi = 3,
-                            TenMonHoc = "Tin học đại cương",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            MaMonHoc = "IT3040",
-                            SoTietLyThuyet = 45,
-                            SoTietThucHanh = 0,
-                            SoTinChi = 3,
-                            TenMonHoc = "Kỹ thuật lập trình",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            MaMonHoc = "IT3090",
-                            SoTietLyThuyet = 45,
-                            SoTietThucHanh = 15,
-                            SoTinChi = 3,
-                            TenMonHoc = "Cơ sở dữ liệu",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            MaMonHoc = "MI1111",
-                            SoTietLyThuyet = 60,
-                            SoTinChi = 4,
-                            TenMonHoc = "Giải tích 1",
-                            TrangThai = true
-                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtMonTienQuyet", b =>
@@ -642,43 +451,6 @@ namespace D.Core.Domain.Migrations
                     b.HasIndex("KhoaId");
 
                     b.ToTable("DtNganh", "dt");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            KhoaId = 1,
-                            MaNganh = "7480201",
-                            TenNganh = "Công nghệ thông tin",
-                            TenTiengAnh = "Information Technology",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            KhoaId = 1,
-                            MaNganh = "7480101",
-                            TenNganh = "Khoa học máy tính",
-                            TenTiengAnh = "Computer Science",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            KhoaId = 2,
-                            MaNganh = "7340201",
-                            TenNganh = "Tài chính - Ngân hàng",
-                            TrangThai = true
-                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.Delegation.Incoming.DelegationIncoming", b =>

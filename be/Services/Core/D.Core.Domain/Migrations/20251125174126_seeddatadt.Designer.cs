@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    [Migration("20251125161402_updateDaotao")]
-    partial class updateDaotao
+    [Migration("20251125174126_seeddatadt")]
+    partial class seeddatadt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ChuyenNganhId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
@@ -53,15 +56,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("KhoaHoc")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("KhoaHocId")
+                        .HasColumnType("int");
 
                     b.Property<string>("MaChuongTrinhKhung")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MaNganh")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MoTa")
@@ -73,6 +72,9 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("NganhId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TenChuongTrinhKhung")
                         .IsRequired()
@@ -86,7 +88,43 @@ namespace D.Core.Domain.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChuyenNganhId");
+
+                    b.HasIndex("KhoaHocId");
+
+                    b.HasIndex("NganhId");
+
                     b.ToTable("DtChuongTrinhKhung", "dt");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ChuyenNganhId = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            KhoaHocId = 1,
+                            MaChuongTrinhKhung = "CNTT-K66-KS",
+                            NganhId = 1,
+                            TenChuongTrinhKhung = "Chương trình chuẩn Kỹ sư CNTT K66",
+                            TongSoTinChi = 150,
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ChuyenNganhId = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            KhoaHocId = 2,
+                            MaChuongTrinhKhung = "KTPM-K67-CLC",
+                            NganhId = 1,
+                            TenChuongTrinhKhung = "Kỹ sư KTPM Chất lượng cao K67",
+                            TongSoTinChi = 160,
+                            TrangThai = true
+                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuongTrinhKhungMon", b =>
@@ -117,8 +155,8 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HocKy")
-                        .HasColumnType("int");
+                    b.Property<string>("HocKy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,6 +179,243 @@ namespace D.Core.Domain.Migrations
                     b.HasIndex("MonHocId");
 
                     b.ToTable("DtChuongTrinhKhungMon", "dt");
+
+                    b.HasData(
+                        new
+                        {
+                            ChuongTrinhKhungId = 1,
+                            MonHocId = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            HocKy = "2021-2022",
+                            Id = 1,
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            ChuongTrinhKhungId = 1,
+                            MonHocId = 4,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            HocKy = "2021-2022",
+                            Id = 2,
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            ChuongTrinhKhungId = 1,
+                            MonHocId = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            HocKy = "2021-2022",
+                            Id = 3,
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            ChuongTrinhKhungId = 1,
+                            MonHocId = 3,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            HocKy = "2021-2022",
+                            Id = 4,
+                            TrangThai = true
+                        });
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuyenNganh", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MaChuyenNganh")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MoTa")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NganhId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TenChuyenNganh")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenTiengAnh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("TrangThai")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NganhId");
+
+                    b.ToTable("DtChuyenNganh", "dt");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            MaChuyenNganh = "KTPM",
+                            NganhId = 1,
+                            TenChuyenNganh = "Kỹ thuật phần mềm",
+                            TenTiengAnh = "Software Engineering",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            MaChuyenNganh = "HTTT",
+                            NganhId = 1,
+                            TenChuyenNganh = "Hệ thống thông tin",
+                            TenTiengAnh = "Information Systems",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            MaChuyenNganh = "AI",
+                            NganhId = 2,
+                            TenChuyenNganh = "Trí tuệ nhân tạo",
+                            TrangThai = true
+                        });
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtKhoa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DiaChi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaKhoa")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Sdt")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenKhoa")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenTiengAnh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("TrangThai")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("VietTat")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DtKhoa", "dt");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            Email = "fit@huce.edu.vn",
+                            MaKhoa = "CNTT",
+                            TenKhoa = "Công nghệ Thông tin",
+                            TenTiengAnh = "Information Technology",
+                            TrangThai = true,
+                            VietTat = "FIT"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            Email = "ktql@huce.edu.vn",
+                            MaKhoa = "KT",
+                            TenKhoa = "Kinh tế & Quản lý",
+                            TenTiengAnh = "Economics and Management",
+                            TrangThai = true,
+                            VietTat = "FEM"
+                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtMonHoc", b =>
@@ -206,7 +481,62 @@ namespace D.Core.Domain.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ToBoMonId");
+
                     b.ToTable("DtMonHoc", "dt");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            MaMonHoc = "IT1110",
+                            SoTietLyThuyet = 30,
+                            SoTietThucHanh = 30,
+                            SoTinChi = 3,
+                            TenMonHoc = "Tin học đại cương",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            MaMonHoc = "IT3040",
+                            SoTietLyThuyet = 45,
+                            SoTietThucHanh = 0,
+                            SoTinChi = 3,
+                            TenMonHoc = "Kỹ thuật lập trình",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            MaMonHoc = "IT3090",
+                            SoTietLyThuyet = 45,
+                            SoTietThucHanh = 15,
+                            SoTinChi = 3,
+                            TenMonHoc = "Cơ sở dữ liệu",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            MaMonHoc = "MI1111",
+                            SoTietLyThuyet = 60,
+                            SoTinChi = 4,
+                            TenMonHoc = "Giải tích 1",
+                            TrangThai = true
+                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtMonTienQuyet", b =>
@@ -255,6 +585,103 @@ namespace D.Core.Domain.Migrations
                     b.HasIndex("MonTienQuyetId");
 
                     b.ToTable("DtMonTienQuyet", "dt");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtNganh", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("KhoaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MaNganh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MoTa")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenNganh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenTiengAnh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("TrangThai")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KhoaId");
+
+                    b.ToTable("DtNganh", "dt");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            KhoaId = 1,
+                            MaNganh = "7480201",
+                            TenNganh = "Công nghệ thông tin",
+                            TenTiengAnh = "Information Technology",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            KhoaId = 1,
+                            MaNganh = "7480101",
+                            TenNganh = "Khoa học máy tính",
+                            TenTiengAnh = "Computer Science",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            KhoaId = 2,
+                            MaNganh = "7340201",
+                            TenNganh = "Tài chính - Ngân hàng",
+                            TrangThai = true
+                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.Delegation.Incoming.DelegationIncoming", b =>
@@ -3315,6 +3742,31 @@ namespace D.Core.Domain.Migrations
                     b.ToTable("SvSinhVien", "sv");
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuongTrinhKhung", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.DaoTao.DtChuyenNganh", "ChuyenNganh")
+                        .WithMany("ChuongTrinhKhungs")
+                        .HasForeignKey("ChuyenNganhId");
+
+                    b.HasOne("D.Core.Domain.Entities.Hrm.DanhMuc.DmKhoaHoc", "KhoaHoc")
+                        .WithMany()
+                        .HasForeignKey("KhoaHocId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("D.Core.Domain.Entities.DaoTao.DtNganh", "Nganh")
+                        .WithMany("ChuongTrinhKhungs")
+                        .HasForeignKey("NganhId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChuyenNganh");
+
+                    b.Navigation("KhoaHoc");
+
+                    b.Navigation("Nganh");
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuongTrinhKhungMon", b =>
                 {
                     b.HasOne("D.Core.Domain.Entities.DaoTao.DtChuongTrinhKhung", "ChuongTrinhKhung")
@@ -3334,6 +3786,26 @@ namespace D.Core.Domain.Migrations
                     b.Navigation("MonHoc");
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuyenNganh", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.DaoTao.DtNganh", "Nganh")
+                        .WithMany("ChuyenNganhs")
+                        .HasForeignKey("NganhId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Nganh");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtMonHoc", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Hrm.DanhMuc.DmToBoMon", "ToBoMon")
+                        .WithMany()
+                        .HasForeignKey("ToBoMonId");
+
+                    b.Navigation("ToBoMon");
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtMonTienQuyet", b =>
                 {
                     b.HasOne("D.Core.Domain.Entities.DaoTao.DtMonHoc", "MonHoc")
@@ -3351,6 +3823,17 @@ namespace D.Core.Domain.Migrations
                     b.Navigation("MonHoc");
 
                     b.Navigation("MonTienQuyet");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtNganh", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.DaoTao.DtKhoa", "Khoa")
+                        .WithMany("Nganhs")
+                        .HasForeignKey("KhoaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Khoa");
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.Delegation.Incoming.DepartmentSupport", b =>
@@ -3413,6 +3896,16 @@ namespace D.Core.Domain.Migrations
                     b.Navigation("ChuongTrinhKhungMons");
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuyenNganh", b =>
+                {
+                    b.Navigation("ChuongTrinhKhungs");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtKhoa", b =>
+                {
+                    b.Navigation("Nganhs");
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtMonHoc", b =>
                 {
                     b.Navigation("ChuongTrinhKhungMons");
@@ -3420,6 +3913,13 @@ namespace D.Core.Domain.Migrations
                     b.Navigation("LaTienQuyetMon");
 
                     b.Navigation("MonTienQuyet");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtNganh", b =>
+                {
+                    b.Navigation("ChuongTrinhKhungs");
+
+                    b.Navigation("ChuyenNganhs");
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.Delegation.Incoming.DelegationIncoming", b =>
