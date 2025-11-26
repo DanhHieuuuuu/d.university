@@ -4,11 +4,12 @@ import {
   BarsOutlined,
   DeploymentUnitOutlined,
   HomeOutlined,
+  HourglassOutlined,
   PartitionOutlined,
   TeamOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
-import { AdminIcon, StudentIcon } from '@components/custom-icon';
+import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
 
 export const listMenuCore: IMenu[] = [
   {
@@ -46,6 +47,28 @@ export const listMenuCore: IMenu[] = [
         label: 'Tổ bộ môn',
         routerLink: '/list/divisions',
         icon: <DeploymentUnitOutlined />
+      }
+    ]
+  },
+  {
+    label: 'Đoàn vào',
+    routerLink: '/delegation/incoming',
+    icon: <DelegationIcon />,
+    items: [
+      {
+        label: 'Đề xuất đoàn vào',
+        routerLink: '/delegation/incoming/suggest',
+        icon: <SuggestIcon />
+      },
+      {
+        label: 'Xử lý đoàn vào',
+        routerLink: '/delegation/incoming/x',
+        icon: <HourglassOutlined />
+      },
+      {
+        label: 'Phòng ban hỗ trợ',
+        routerLink: '/delegation/incoming/department-support',
+        icon: <TeamOutlined />
       }
     ]
   },
