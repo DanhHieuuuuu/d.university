@@ -10,7 +10,7 @@ const { Sider } = Layout;
 
 const StudentMenuComponent = () => {
   return (
-    <Sider width="20%" className="student-menu">
+    <Sider width="20%" className="student-menu" breakpoint="lg" collapsedWidth="80">
       <AppMenu data={listMenuStudent} />
     </Sider>
   );

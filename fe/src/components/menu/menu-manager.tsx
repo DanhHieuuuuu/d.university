@@ -10,7 +10,7 @@ const { Sider } = Layout;
 
 const RoleMenuComponent = () => {
   return (
-    <Sider width="20%" className="role-menu">
+    <Sider width="20%" className="role-menu" breakpoint="lg" collapsedWidth="80">
       <AppMenu data={listMenuManager} />
     </Sider>
   );
