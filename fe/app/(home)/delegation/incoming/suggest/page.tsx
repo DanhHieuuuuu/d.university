@@ -24,7 +24,8 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-
+import InputAntdWithTitle from '@components/hieu-custom/input';
+import AutoCompleteAntd from '@components/hieu-custom/combobox';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -158,6 +159,12 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
+const options = [
+  { value: "Hà Nội", key: "hn" },
+  { value: "Hồ Chí Minh", key: "hcm" },
+];
+
+
   return (
     <Card
       title="Danh sách nhân sự"
@@ -168,41 +175,13 @@ const Page = () => {
         </Button>
       }
     >
-      <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-2">
-          <Form.Item<IQueryNhanSu> label="Cccd:" name="cccd">
-            <Input onChange={(e) => handleSearch(e)} />
-          </Form.Item>
-        </div>
-        <Form.Item>
-          <div className="flex flex-row justify-center space-x-2">
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              Tìm kiếm
-            </Button>
-            <Button
-              color="default"
-              variant="filled"
-              icon={<SyncOutlined />}
-              onClick={() => {
-                form.resetFields();
-                form.submit();
-              }}
-            >
-              Tải lại
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
-
-      <AppTable
-        loading={status === ReduxStatus.LOADING}
-        rowKey="maNhanSu"
-        columns={columns}
-        dataSource={list}
-        listActions={actions}
-        pagination={{ position: ['bottomRight'], ...pagination }}
+      <InputAntdWithTitle title="Tài khoản" name="username" label="Tên đăng nhập" />
+      <AutoCompleteAntd
+        name="city"
+        title="Thành phố"
+        placeholder="Nhập tên thành phố..."
+        options={options}
       />
-
     </Card>
   );
 };

@@ -1,5 +1,3 @@
-import { ICreateHopDongNs, ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
-import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
 
@@ -7,7 +5,7 @@ const apiNhanSuEndpoint = 'delegation-incoming';
 
 const paging = async (query: any) => {
   try {
-    const res = await axios.get(`${apiNhanSuEndpoint}/paging`, {
+    const res = await axios.get(`${apiNhanSuEndpoint}/find`, {
       params: {
         ...query
       }
@@ -20,4 +18,5 @@ const paging = async (query: any) => {
     return Promise.reject(err);
   }
 };
-export const NhanSuService = { paging };
+
+export const DelegationIncomingService = { paging };
