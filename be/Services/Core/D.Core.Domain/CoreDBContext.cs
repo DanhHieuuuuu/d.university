@@ -3,6 +3,7 @@ using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
+using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Shared.SeedData;
 using D.DomainBase.Entity;
@@ -80,6 +81,16 @@ namespace D.Core.Domain
         public DbSet<Prepare> Prepares { get; set; }
         public DbSet<ReceptionTime> ReceptionTimes { get; set; }
         public DbSet<Supporter> Supporters { get; set; }
+        #endregion
+
+        #region Kpi
+        public DbSet<KpiCaNhan> KpiCaNhans { get; set; }
+        public DbSet<KpiDonVi> KpiDonVis { get; set; }
+        public DbSet<KpiLogStatus> KpiLogStatuses { get; set; }
+        public DbSet<KpiRole> KpiRoles { get; set; }
+        public DbSet<KpiTemplate> KpiTemplates { get; set; }
+        public DbSet<KpiTruong> KpiTruongs { get; set; }
+
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

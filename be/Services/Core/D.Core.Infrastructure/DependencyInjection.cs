@@ -2,6 +2,7 @@
 using D.Core.Infrastructure.Repositories.Delegation.Incoming;
 using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
+using D.Core.Infrastructure.Repositories.Kpi;
 using D.Core.Infrastructure.Repositories.SinhVien;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Implements;
@@ -67,7 +68,15 @@ namespace D.Core.Infrastructure
                 .AddScoped<IReceptionTimeRepository, ReceptionTimeRepository>()
                 .AddScoped<ISupporterRepository, SupporterRepository>()
             #endregion
-                .AddScoped<IFileRepository, FileRepository>();
+                .AddScoped<IFileRepository, FileRepository>()
+            #region Kpi
+                .AddScoped<IKpiCaNhanRepository, KpiCaNhanRepository>()
+                .AddScoped<IKpiDonViRepository, KpiDonViRepository>()
+                .AddScoped<IKpiLogStatusRepository, KpiLogStatusRepository>()
+                .AddScoped<IKpiRoleRepository, KpiRoleRepository>()
+                .AddScoped<IKpiTemplateRepository, KpiTemplateRepository>()
+                .AddScoped<IKpiTruongRepository, KpiTruongRepository>();
+            #endregion
         }
 
         public static IServiceCollection AddAutoMapperProfile(this IServiceCollection services)
