@@ -13,8 +13,11 @@ namespace D.Core.Domain.Dtos.SinhVien
         public int? GioiTinh { get; set; }
         public int? QuocTich { get; set; }
         public int? DanToc { get; set; }
+        public int? TonGiao { get; set; }
         public string? SoCccd { get; set; }
         public string? SoDienThoai { get; set; }
         public string? Email { get; set; }
+
+        public int? TrangThaiHoc { get; set; }
     }
 }

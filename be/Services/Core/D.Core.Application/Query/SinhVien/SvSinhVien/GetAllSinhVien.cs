@@ -5,9 +5,9 @@ using D.DomainBase.Dto;
 
 namespace D.Core.Application.Query.SinhVien.SvSinhVien
 {
-    internal class GetAllSinhVien : IQueryHandler<SvSinhVienGetAllRequestDto, PageResultDto<SvSinhVienGetAllResponseDto>>
+    public class GetAllSinhVien : IQueryHandler<SvSinhVienGetAllRequestDto, PageResultDto<SvSinhVienGetAllResponseDto>>
     {
-        public ISvSinhVienService _svSinhVienService;
+        private readonly ISvSinhVienService _svSinhVienService;
 
         public GetAllSinhVien(ISvSinhVienService svSinhVienService)
         {

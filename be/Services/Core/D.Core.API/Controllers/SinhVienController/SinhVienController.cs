@@ -9,7 +9,7 @@ namespace D.Core.API.Controllers.SinhVienController
     [ApiController]
     public class SvSinhVienController : APIControllerBase
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public SvSinhVienController(IMediator mediator)
             : base(mediator)
@@ -18,7 +18,7 @@ namespace D.Core.API.Controllers.SinhVienController
         }
 
         /// <summary>
-        /// Danh sách sinh viên
+        /// Tìm kiếm và phân trang sinh viên
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -28,7 +28,7 @@ namespace D.Core.API.Controllers.SinhVienController
             try
             {
                 var result = await _mediator.Send(dto);
-                return new(result);
+                return new ResponseAPI(result);
             }
             catch (Exception ex)
             {
@@ -37,7 +37,7 @@ namespace D.Core.API.Controllers.SinhVienController
         }
 
         /// <summary>
-        /// Danh sách sinh viên bản format
+        /// Danh sách sinh viên
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -47,7 +47,7 @@ namespace D.Core.API.Controllers.SinhVienController
             try
             {
                 var result = await _mediator.Send(dto);
-                return new(result);
+                return new ResponseAPI(result);
             }
             catch (Exception ex)
             {
@@ -66,7 +66,7 @@ namespace D.Core.API.Controllers.SinhVienController
             try
             {
                 var result = await _mediator.Send(dto);
-                return new(result);
+                return new ResponseAPI(result);
             }
             catch (Exception ex)
             {
@@ -85,7 +85,7 @@ namespace D.Core.API.Controllers.SinhVienController
             try
             {
                 var result = await _mediator.Send(dto);
-                return new(result);
+                return new ResponseAPI(result);
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace D.Core.API.Controllers.SinhVienController
             try
             {
                 var result = await _mediator.Send(dto);
-                return new(result);
+                return new ResponseAPI(result);
             }
             catch (Exception ex)
             {
@@ -113,7 +113,7 @@ namespace D.Core.API.Controllers.SinhVienController
         }
 
         /// <summary>
-        /// Lấy thông tin sinh viên bằng mssv
+        /// Chi tiết sinh viên bằng mssv
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -123,7 +123,7 @@ namespace D.Core.API.Controllers.SinhVienController
             try
             {
                 var result = await _mediator.Send(dto);
-                return new(result);
+                return new ResponseAPI(result);
             }
             catch (Exception ex)
             {

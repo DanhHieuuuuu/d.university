@@ -81,6 +81,11 @@ namespace D.Core.Domain
             #region sv
 
             CreateMap<SvSinhVien, SvSinhVienResponseDto>();
+            CreateMap<CreateSinhVienDto, SvSinhVien>();
+            CreateMap<UpdateSinhVienDto, SvSinhVien>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<SvSinhVien, SvSinhVienGetAllResponseDto>()
+                .ForMember(dest => dest.HoTen, opt => opt.MapFrom(src => src.HoDem + " " + src.Ten));
 
             #endregion
 

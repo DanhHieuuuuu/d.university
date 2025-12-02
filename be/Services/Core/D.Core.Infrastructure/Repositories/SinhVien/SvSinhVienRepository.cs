@@ -1,7 +1,10 @@
-﻿using D.Core.Domain.Entities.SinhVien;
+﻿using D.Core.Domain.Entities.Hrm.DanhMuc;
+using D.Core.Domain.Entities.SinhVien;
 using D.InfrastructureBase.Database;
 using D.InfrastructureBase.Repository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace D.Core.Infrastructure.Repositories.SinhVien
 {
@@ -15,13 +18,43 @@ namespace D.Core.Infrastructure.Repositories.SinhVien
             return TableNoTracking.Any(x => x.SoCccd == cccd);
         }
 
-        public string GenerateMssv(int khoa)
+        public async Task<string> GenerateMssv(int khoahoc)
         {
-            int currentCount = TableNoTracking.Count(x => x.Khoa == khoa) + 1;
+            var khoaHoc = await _dbContext.Set<DmKhoaHoc>()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Id == khoahoc);
 
-            string mssv = $"{currentCount:D5}{khoa:D2}";
+            if (khoaHoc == null) throw new Exception("Không tìm thấy thông tin khóa học!");
 
-            return mssv;
+            string prefixString = Regex.Match(khoaHoc.MaKhoaHoc ?? string.Empty, @"\d+").Value;
+            if (string.IsNullOrEmpty(prefixString)) prefixString = "00";
+
+            var lastStudent = await TableNoTracking
+                            .Where(x => x.KhoaHoc == khoahoc
+                                        && !string.IsNullOrEmpty(x.Mssv)
+                                        && x.Mssv.StartsWith(prefixString))
+                            .OrderByDescending(x => x.Mssv.Length)
+                            .ThenByDescending(x => x.Mssv)
+                            .FirstOrDefaultAsync();
+
+            int nextSequence = 1;
+            if (lastStudent != null)
+            {
+                string lastSeqStr = lastStudent.Mssv.Substring(prefixString.Length);
+
+                if (int.TryParse(lastSeqStr, out int lastSeq))
+                {
+                    nextSequence = lastSeq + 1;
+                }
+            }
+
+            return $"{prefixString}{nextSequence:D5}";
+
+            //var count = await TableNoTracking.CountAsync(x => x.KhoaHoc == khoahoc);
+            //var nextSequence = count + 1;
+
+            //string mssv = $"{khoahoc}{nextSequence:D5}";
+            //return mssv;
         }
 
         public string GenerateEmail(string mssv)
@@ -31,17 +64,21 @@ namespace D.Core.Infrastructure.Repositories.SinhVien
             return email;
         }
 
-        public SvSinhVien? GetByMssv(string mssv)
+        //public SvSinhVien? GetByMssv(string mssv)
+        //{
+        //    return Table.FirstOrDefault(x => x.Mssv == mssv);
+        //}
+        public async Task<SvSinhVien?> GetByMssv(string mssv)
         {
-            return Table.FirstOrDefault(x => x.Mssv == mssv);
+            return await Table.FirstOrDefaultAsync(x => x.Mssv == mssv);
         }
     }
 
     public interface ISvSinhVienRepository : IRepositoryBase<SvSinhVien>
     {
         bool IsSoCccdExits(string cccd);
-        string GenerateMssv(int khoa);
+        Task<string> GenerateMssv(int khoa);
         string GenerateEmail(string mssv);
-        SvSinhVien? GetByMssv(string mssv);
+        Task<SvSinhVien?> GetByMssv(string mssv);
     }
 }
