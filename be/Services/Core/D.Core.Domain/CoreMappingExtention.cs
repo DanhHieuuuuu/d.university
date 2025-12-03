@@ -15,11 +15,13 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
+using D.Core.Domain.Dtos.Kpi.KpiRole;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
+using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.SinhVien;
 
 namespace D.Core.Domain
@@ -96,6 +98,10 @@ namespace D.Core.Domain
             CreateMap<DelegationIncoming, PageDelegationIncomingResultDto>();
             CreateMap<CreateRequestDto, DelegationIncoming>();
             CreateMap<DelegationIncoming, CreateResponseDto>();
+            #endregion
+            #region Kpi
+            CreateMap<KpiRole, KpiRoleResponseDto>();
+            CreateMap<CreateKpiRoleDto, KpiRole>();
             #endregion
         }
 

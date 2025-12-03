@@ -10,6 +10,8 @@ using D.Core.Infrastructure.Services.File.Abstracts;
 using D.Core.Infrastructure.Services.File.Implements;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.Core.Infrastructure.Services.Hrm.Implements;
+using D.Core.Infrastructure.Services.Kpi.Abstracts;
+using D.Core.Infrastructure.Services.Kpi.Implements;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.Core.Infrastructure.Services.SinhVien.Implements;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +37,10 @@ namespace D.Core.Infrastructure
                 .AddScoped<IReceptionTimeService, ReceptionTimeService>()
                 .AddScoped<ISupporterService, SupporterService>()
             #endregion
-                .AddScoped<IFileService, FileService>();
+                .AddScoped<IFileService, FileService>()
+            #region Kpi
+                .AddScoped<IKpiRoleService, KpiRoleService>();
+            #endregion
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)

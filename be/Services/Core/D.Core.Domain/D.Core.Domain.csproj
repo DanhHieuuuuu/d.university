@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\Kpi\" />
     <Folder Include="Entities\Delegation\Outgoing\" />
     <Folder Include="Entities\Hrm\View\" />
   </ItemGroup>
