@@ -1,6 +1,5 @@
 ﻿using D.ApplicationBase;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
-using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
 
 namespace D.Core.Application.Command.Kpi.KpiRole

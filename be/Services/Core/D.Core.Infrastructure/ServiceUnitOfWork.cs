@@ -285,11 +285,6 @@ namespace D.Core.Infrastructure
             return await _dbContext.SaveChangesAsync();
         }
 
-        internal void SaveChanges()
-        {
-            throw new NotImplementedException();
-        }
-
         public DatabaseFacade Database => _dbContext.Database;
 
         #region Delegation

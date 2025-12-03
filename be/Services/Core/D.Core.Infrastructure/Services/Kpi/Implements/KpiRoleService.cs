@@ -72,7 +72,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 _unitOfWork.iKpiRoleRepository.Update(role);
             }
 
-            _unitOfWork.SaveChanges();
+            _unitOfWork.iKpiRoleRepository.SaveChange();
         }
 
         public PageResultDto<KpiRoleResponseDto> FindAllKpiRole(KpiRoleRequestDto dto)
@@ -167,7 +167,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             kpiRole.IdDonVi = dto.IdDonVi;
 
             _unitOfWork.iKpiRoleRepository.Update(kpiRole);
-            _unitOfWork.SaveChanges();
+            _unitOfWork.iKpiRoleRepository.SaveChange();
         }
     }
 }

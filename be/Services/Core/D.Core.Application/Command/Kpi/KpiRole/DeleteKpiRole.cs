@@ -1,13 +1,8 @@
 ﻿using D.ApplicationBase;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
-using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
+using Newtonsoft.Json.Linq;
 
 namespace D.Core.Application.Command.Kpi.KpiRole
 {
@@ -20,10 +15,15 @@ namespace D.Core.Application.Command.Kpi.KpiRole
             _service = kpiRoleService;
         }
 
-        public async Task Handle(DeleteKpiRoleDto request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DeleteKpiRoleDto request, CancellationToken cancellationToken)
         {
             _service.Delete(request);
-            return;
+            return Unit.Value;
+        }
+
+        Task IRequestHandler<DeleteKpiRoleDto>.Handle(DeleteKpiRoleDto request, CancellationToken cancellationToken)
+        {
+            return Handle(request, cancellationToken);
         }
     }
 }
