@@ -1,5 +1,4 @@
 ﻿using D.Core.Domain.Entities.DaoTao;
-using D.Core.Domain.Entities.Hrm.DanhMuc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

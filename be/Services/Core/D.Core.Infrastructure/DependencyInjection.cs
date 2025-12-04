@@ -1,8 +1,11 @@
 ﻿using D.Core.Domain;
+using D.Core.Infrastructure.Repositories.DaoTao;
 using D.Core.Infrastructure.Repositories.Delegation.Incoming;
 using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.SinhVien;
+using D.Core.Infrastructure.Services.DaoTao.Abstracts;
+using D.Core.Infrastructure.Services.DaoTao.Implements;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Implements;
 using D.Core.Infrastructure.Services.File.Abstracts;
@@ -24,6 +27,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
                 .AddScoped<IDmDanhMucService, DmDanhMucService>()
                 .AddScoped<ISvSinhVienService, SvSinhVienService>()
+                .AddScoped<IDaoTaoService, DaoTaoService>()
             #region Delegation
                 .AddScoped<IDelegationIncomingService, DelegationIncomingService>()
                 .AddScoped<IDepartmentSupportService, DepartmentSupportService>()
@@ -57,6 +61,9 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>()
                 .AddScoped<INsToBoMonRepository, NsToBoMonRepository>()
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>()
+            #region DaoTao
+                .AddScoped<IDtKhoaRepository, DtKhoaRepository>()
+            #endregion
             #region Delegation
                 .AddScoped<IDelegationIncomingRepository, DelegationIncomingRepository>()
                 .AddScoped<IDepartmentSupportRepository, DepartmentSupportRepository>()

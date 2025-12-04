@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
+using D.Core.Domain.Dtos.DaoTao.Khoa;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Dtos.File;
@@ -16,11 +16,13 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
+using System.Reflection;
 
 namespace D.Core.Domain
 {
@@ -87,6 +89,12 @@ namespace D.Core.Domain
             CreateMap<SvSinhVien, SvSinhVienGetAllResponseDto>()
                 .ForMember(dest => dest.HoTen, opt => opt.MapFrom(src => src.HoDem + " " + src.Ten));
 
+            #endregion
+
+            #region DaoTao
+            CreateMap<DtKhoa, DtKhoaResponseDto>();
+            CreateMap<CreateDtKhoaDto, DtKhoa>();
+            CreateMap<UpdateDtKhoaDto, DtKhoa>();
             #endregion
 
             #region file

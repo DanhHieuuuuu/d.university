@@ -1,4 +1,5 @@
-﻿using D.Core.Infrastructure.Repositories.Delegation.Incoming;
+﻿using D.Core.Infrastructure.Repositories.DaoTao;
+using D.Core.Infrastructure.Repositories.Delegation.Incoming;
 using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.SinhVien;
@@ -29,6 +30,10 @@ namespace D.Core.Infrastructure
         private NsQuanHeGiaDinhRepository _nsQuanHeGiaDinhRepository;
         private NsHopDongRepository _nsHopDongRepository;
         private NsHopDongChiTietRepository _nsHopDongChiTietRepository;
+
+        #region Dao Tao
+        private DtKhoaRepository _dtKhoaRepository;
+        #endregion
 
         private SvSinhVienRepository _svSinhVienRepository;
 
@@ -269,6 +274,20 @@ namespace D.Core.Infrastructure
                 return _fileRepository;
             }
         }
+
+        #region Dao Tao
+        public IDtKhoaRepository iDtKhoaRepository
+        {
+            get
+            {
+                if (_dtKhoaRepository == null)
+                {
+                    _dtKhoaRepository = new DtKhoaRepository(_dbContext, _httpContext);
+                }
+                return _dtKhoaRepository;
+            }
+        }
+        #endregion
 
         public async Task<int> SaveChangesAsync()
         {

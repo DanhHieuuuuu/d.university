@@ -61,6 +61,11 @@ namespace D.Core.Domain
 
         #endregion
 
+        #region DaoTao
+        DbSet<DtKhoa> DtKhoas { get; set; }
+
+        #endregion
+
         #region sv
 
         DbSet<SvSinhVien> SvSinhViens { get; set; }
