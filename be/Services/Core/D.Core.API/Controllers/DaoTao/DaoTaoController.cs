@@ -1,5 +1,6 @@
 ﻿using d.Shared.Permission;
 using D.ControllerBase;
+using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
 using D.Core.Domain.Dtos.DaoTao.Khoa;
 using D.Core.Domain.Dtos.DaoTao.Nganh;
 using MediatR;
@@ -191,7 +192,7 @@ namespace D.Core.API.Controllers.DaoTao
             try
             {
                 await _mediator.Send(dto);
-                return new("Đã cập nhật nganh thành công!");
+                return new("Đã cập nhật ngành thành công!");
             }
             catch (Exception ex)
             {
@@ -211,7 +212,108 @@ namespace D.Core.API.Controllers.DaoTao
             {
                 var dto = new DeleteDtNganhDto { Id = id };
                 await _mediator.Send(dto);
-                return new("Đã xóa nganh.");
+                return new("Đã xóa ngành.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        #endregion
+
+        #region ChuyenNganh
+        /// <summary>
+        /// Danh sách chuyên ngành
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("chuyen-nganh/find")]
+        public async Task<ResponseAPI> GetAllChuyenNganh([FromQuery] DtChuyenNganhRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy chuyên ngành theo Id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+
+        [HttpGet("chuyen-nganh/get-by-id")]
+        public async Task<ResponseAPI> GetDetailDtChuyenNganh(
+            [FromQuery] DtChuyenNganhGetByIdRequestDto dto
+        )
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tạo mới chuyên ngành
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("chuyen-nganh/create")]
+        public async Task<ResponseAPI> CreateDtChuyenNganh([FromBody] CreateDtChuyenNganhDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật chuyên ngành
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("chuyen-nganh/update")]
+        public async Task<ResponseAPI> UpdateDtChuyenNganh([FromBody] UpdateDtChuyenNganhDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new("Đã cập nhật chuyên ngành thành công!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Xóa chuyên ngành
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpDelete("chuyen-nganh/delete/{id}")]
+        public async Task<ResponseAPI> DeleteDtChuyenNganh([FromRoute] int id)
+        {
+            try
+            {
+                var dto = new DeleteDtChuyenNganhDto { Id = id };
+                await _mediator.Send(dto);
+                return new("Đã xóa chuyên ngành.");
             }
             catch (Exception ex)
             {

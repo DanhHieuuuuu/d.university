@@ -34,6 +34,12 @@ namespace D.Core.Infrastructure
         #region Dao Tao
         private DtKhoaRepository _dtKhoaRepository;
         private DtNganhRepository _dtNganhRepository;
+        private DtChuyenNganhRepository _dtChuyenNganhRepository;
+        private DtMonHocRepository _dtMonHocRepository;
+        private DtMonTienQuyetRepository _dtMonTienQuyetRepository;
+        private DtChuongTrinhKhungRepository _dtChuongTrinhKhungRepository;
+        private DtChuongTrinhKhungMonRepository _dtChuongTrinhKhungMonRepository;
+
         #endregion
 
         private SvSinhVienRepository _svSinhVienRepository;
@@ -298,6 +304,61 @@ namespace D.Core.Infrastructure
                     _dtNganhRepository = new DtNganhRepository(_dbContext, _httpContext);
                 }
                 return _dtNganhRepository;
+            }
+        }
+        public IDtChuyenNganhRepository iDtChuyenNganhRepository
+        {
+            get
+            {
+                if (_dtChuyenNganhRepository == null)
+                {
+                    _dtChuyenNganhRepository = new DtChuyenNganhRepository(_dbContext, _httpContext);
+                }
+                return _dtChuyenNganhRepository;
+            }
+        }
+        public IDtMonHocRepository iDtMonHocRepository
+        {
+            get
+            {
+                if (_dtMonHocRepository == null)
+                {
+                    _dtMonHocRepository = new DtMonHocRepository(_dbContext, _httpContext);
+                }
+                return _dtMonHocRepository;
+            }
+        }
+        public IDtMonTienQuyetRepository iDtMonTienQuyetRepository
+        {
+            get
+            {
+                if (_dtMonTienQuyetRepository == null)
+                {
+                    _dtMonTienQuyetRepository = new DtMonTienQuyetRepository(_dbContext, _httpContext);
+                }
+                return _dtMonTienQuyetRepository;
+            }
+        }
+        public IDtChuongTrinhKhungRepository iDtChuongTrinhKhungRepository
+        {
+            get
+            {
+                if (_dtChuongTrinhKhungRepository == null)
+                {
+                    _dtChuongTrinhKhungRepository = new DtChuongTrinhKhungRepository(_dbContext, _httpContext);
+                }
+                return _dtChuongTrinhKhungRepository;
+            }
+        }
+        public IDtChuongTrinhKhungMonRepository iDtChuongTrinhKhungMonRepository
+        {
+            get
+            {
+                if (_dtChuongTrinhKhungMonRepository == null)
+                {
+                    _dtChuongTrinhKhungMonRepository = new DtChuongTrinhKhungMonRepository(_dbContext, _httpContext);
+                }
+                return _dtChuongTrinhKhungMonRepository;
             }
         }
 

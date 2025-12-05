@@ -47,10 +47,6 @@ namespace D.Core.Domain
         DbSet<DmToBoMon> DmToBoMon { get; set; }
         DbSet<DmTonGiao> DmTonGiaos { get; set; }
         DbSet<DmKhoaHoc> DmKhoaHocs { get; set; }
-        DbSet<DtMonHoc> DtMonHocs { get; set; }
-        DbSet<DtChuongTrinhKhung> DtChuongTrinhKhungs { get; set; }
-        DbSet<DtMonTienQuyet> DtMonTienQuyets { get; set; }
-        DbSet<DtChuongTrinhKhungMon> DtChuongTrinhKhungMons { get; set; }
 
         // Nhân sự
         DbSet<NsNhanSu> NsNhanSus { get; set; }
@@ -64,6 +60,12 @@ namespace D.Core.Domain
         #region DaoTao
         DbSet<DtKhoa> DtKhoas { get; set; }
         DbSet<DtNganh> DtNganhs { get; set; }
+        DbSet<DtChuyenNganh> DtChuyenNganhs { get; set; }
+
+        DbSet<DtMonHoc> DtMonHocs { get; set; }
+        DbSet<DtChuongTrinhKhung> DtChuongTrinhKhungs { get; set; }
+        DbSet<DtMonTienQuyet> DtMonTienQuyets { get; set; }
+        DbSet<DtChuongTrinhKhungMon> DtChuongTrinhKhungMons { get; set; }
 
         #endregion
 

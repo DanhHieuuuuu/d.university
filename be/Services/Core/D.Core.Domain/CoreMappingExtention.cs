@@ -100,6 +100,27 @@ namespace D.Core.Domain
             CreateMap<DtNganh, DtNganhResponseDto>();
             CreateMap<CreateDtNganhDto, DtNganh>();
             CreateMap<UpdateDtNganhDto, DtNganh>();
+
+            CreateMap<DtChuyenNganh, DtChuyenNganhResponseDto>();
+            CreateMap<CreateDtChuyenNganhDto, DtChuyenNganh>();
+            CreateMap<UpdateDtChuyenNganhDto, DtChuyenNganh>();
+
+            CreateMap<DtChuongTrinhKhung, DtChuongTrinhKhungResponseDto>();
+            CreateMap<CreateDtChuongTrinhKhungDto, DtChuongTrinhKhung>();
+            CreateMap<UpdateDtChuongTrinhKhungDto, DtChuongTrinhKhung>();
+
+            CreateMap<DtMonHoc, DtMonHocResponseDto>();
+            CreateMap<CreateDtMonHocDto, DtMonHoc>();
+            CreateMap<UpdateDtMonHocDto, DtMonHoc>();
+
+            CreateMap<DtMonTienQuyet, DtMonTienQuyetResponseDto>();
+            CreateMap<CreateDtMonTienQuyetDto, DtMonTienQuyet>();
+            CreateMap<UpdateDtMonTienQuyetDto, DtMonTienQuyet>();
+
+            CreateMap<DtChuongTrinhKhungMon, DtChuongTrinhKhungMonResponseDto>();
+            CreateMap<CreateDtChuongTrinhKhungMonDto, DtChuongTrinhKhungMon>();
+            CreateMap<UpdateDtChuongTrinhKhungMonDto, DtChuongTrinhKhungMon>();
+
             #endregion
 
             #region file
