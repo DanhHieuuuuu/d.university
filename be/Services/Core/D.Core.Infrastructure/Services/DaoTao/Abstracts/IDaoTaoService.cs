@@ -1,4 +1,6 @@
-﻿using D.Core.Domain.Dtos.DaoTao.Khoa;
+﻿using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
+using D.Core.Domain.Dtos.DaoTao.Khoa;
+using D.Core.Domain.Dtos.DaoTao.MonHoc;
 using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.DomainBase.Dto;
 using System;
@@ -22,5 +24,17 @@ namespace D.Core.Infrastructure.Services.DaoTao.Abstracts
         Task UpdateDtNganh(UpdateDtNganhDto dto);
         Task DeleteDtNganh(int id);
         Task<DtNganhResponseDto> GetDtNganhById(int id);
+
+        Task<PageResultDto<DtChuyenNganhResponseDto>> GetAllDtChuyenNganh(DtChuyenNganhRequestDto dto);
+        Task CreateDtChuyenNganh(CreateDtChuyenNganhDto dto);
+        Task UpdateDtChuyenNganh(UpdateDtChuyenNganhDto dto);
+        Task DeleteDtChuyenNganh(int id);
+        Task<DtChuyenNganhResponseDto> GetDtChuyenNganhById(int id);
+
+        Task<PageResultDto<DtMonHocResponseDto>> GetAllDtMonHoc(DtMonHocRequestDto dto);
+        Task CreateDtMonHoc(CreateDtMonHocDto dto);
+        Task UpdateDtMonHoc(UpdateDtMonHocDto dto);
+        Task DeleteDtMonHoc(int id);
+        Task<DtMonHocResponseDto> GetDtMonHocById(int id);
     }
 }
