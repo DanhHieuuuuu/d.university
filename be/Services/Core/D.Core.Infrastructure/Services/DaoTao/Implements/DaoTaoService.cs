@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhung;
+using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon;
 using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
 using D.Core.Domain.Dtos.DaoTao.Khoa;
+using D.Core.Domain.Dtos.DaoTao.MonHoc;
+using D.Core.Domain.Dtos.DaoTao.MonTienQuyet;
 using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Infrastructure.Services.DaoTao.Abstracts;
@@ -252,7 +256,7 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
 
             if (await _unitOfWork.iDtChuyenNganhRepository.IsMaChuyenNganhExistAsync(dto.MaChuyenNganh!))
             {
-                throw new Exception($"Đã tồn tại chuyên ngành có mã {dto.MaChuyenNganh}");
+                throw new Exception($"Đã tồn tại môn học có mã {dto.MaChuyenNganh}");
             }
 
             var newChuyenNganh = _mapper.Map<DtChuyenNganh>(dto);
@@ -269,7 +273,7 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
                                      .FirstOrDefaultAsync(x => x.Id == dto.Id);
             if (existChuyenNganh == null)
             {
-                throw new Exception("Không tìm thấy chuyên ngành này.");
+                throw new Exception("Không tìm thấy môn học này.");
             }
 
             bool existMaChuyenNganh = await _unitOfWork.iDtChuyenNganhRepository.TableNoTracking
@@ -277,7 +281,7 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
 
             if (existMaChuyenNganh)
             {
-                throw new Exception($"Đã tồn tại mã chuyên ngành \"{dto.MaChuyenNganh}\" trong hệ thống.");
+                throw new Exception($"Đã tồn tại mã môn học \"{dto.MaChuyenNganh}\" trong hệ thống.");
             }
 
             _mapper.Map(dto, existChuyenNganh);
@@ -295,7 +299,7 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
 
             if (existChuyenNganh == null)
             {
-                throw new Exception("Chuyên ngành không tồn tại hoặc đã bị xóa.");
+                throw new Exception("Môn học không tồn tại hoặc đã bị xóa.");
             }
 
             _unitOfWork.iDtChuyenNganhRepository.Delete(existChuyenNganh);
@@ -310,6 +314,393 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
             if (entity == null) throw new Exception("Không tìm thấy dữ liệu.");
 
             return _mapper.Map<DtChuyenNganhResponseDto>(entity);
+        }
+        #endregion
+
+        #region MonHoc
+        public async Task<PageResultDto<DtMonHocResponseDto>> GetAllDtMonHoc(DtMonHocRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllDtMonHoc)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var query = _unitOfWork.iDtMonHocRepository.TableNoTracking
+                .Where(x => string.IsNullOrEmpty(dto.Keyword)
+                         || x.TenMonHoc.Contains(dto.Keyword)
+                         || x.MaMonHoc.Contains(dto.Keyword));
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.Id)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ProjectTo<DtMonHocResponseDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return new PageResultDto<DtMonHocResponseDto>
+            {
+                Items = items,
+                TotalItem = totalCount
+            };
+        }
+
+        public async Task CreateDtMonHoc(CreateDtMonHocDto dto)
+        {
+            _logger.LogInformation($"{nameof(CreateDtMonHoc)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            if (await _unitOfWork.iDtMonHocRepository.IsMaMonHocExistAsync(dto.MaMonHoc!))
+            {
+                throw new Exception($"Đã tồn tại môn học có mã {dto.MaMonHoc}");
+            }
+
+            var newMonHoc = _mapper.Map<DtMonHoc>(dto);
+
+            await _unitOfWork.iDtMonHocRepository.AddAsync(newMonHoc);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task UpdateDtMonHoc(UpdateDtMonHocDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateDtMonHoc)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var existMonHoc = await _unitOfWork.iDtMonHocRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == dto.Id);
+            if (existMonHoc == null)
+            {
+                throw new Exception("Không tìm thấy môn học này.");
+            }
+
+            bool existMaMonHoc = await _unitOfWork.iDtMonHocRepository.TableNoTracking
+                .AnyAsync(x => x.MaMonHoc == dto.MaMonHoc && x.Id != dto.Id);
+
+            if (existMaMonHoc)
+            {
+                throw new Exception($"Đã tồn tại mã môn học \"{dto.MaMonHoc}\" trong hệ thống.");
+            }
+
+            _mapper.Map(dto, existMonHoc);
+
+            _unitOfWork.iDtMonHocRepository.Update(existMonHoc);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteDtMonHoc(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDtMonHoc)} called. Id: {id}");
+
+            var existMonHoc = await _unitOfWork.iDtMonHocRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existMonHoc == null)
+            {
+                throw new Exception("Môn học không tồn tại hoặc đã bị xóa.");
+            }
+
+            _unitOfWork.iDtMonHocRepository.Delete(existMonHoc);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<DtMonHocResponseDto> GetDtMonHocById(int id)
+        {
+            var entity = await _unitOfWork.iDtMonHocRepository.TableNoTracking
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (entity == null) throw new Exception("Không tìm thấy dữ liệu.");
+
+            return _mapper.Map<DtMonHocResponseDto>(entity);
+        }
+        #endregion
+
+        #region MonTienQuyet
+        public async Task<PageResultDto<DtMonTienQuyetResponseDto>> GetAllDtMonTienQuyet(DtMonTienQuyetRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllDtMonTienQuyet)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var query = _unitOfWork.iDtMonTienQuyetRepository.TableNoTracking
+                .Include(x => x.MonHoc)
+                .Include(x => x.MonTienQuyet)
+                .Where(x => string.IsNullOrEmpty(dto.Keyword)
+                         // Mã/Tên môn chính
+                         || x.MonHoc.MaMonHoc.Contains(dto.Keyword) 
+                         || x.MonHoc.TenMonHoc.Contains(dto.Keyword)
+                         // Mã/Tên môn tiên quyết
+                         || x.MonTienQuyet.MaMonHoc.Contains(dto.Keyword)
+                         || x.MonTienQuyet.TenMonHoc.Contains(dto.Keyword));
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.Id)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ProjectTo<DtMonTienQuyetResponseDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return new PageResultDto<DtMonTienQuyetResponseDto>
+            {
+                Items = items,
+                TotalItem = totalCount
+            };
+        }
+
+        public async Task CreateDtMonTienQuyet(CreateDtMonTienQuyetDto dto)
+        {
+            _logger.LogInformation($"{nameof(CreateDtMonTienQuyet)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            if (dto.MonHocId == dto.MonTienQuyetId)
+            {
+                throw new Exception("Môn học và môn tiên quyết không được trùng nhau.");
+            }
+
+            if (await _unitOfWork.iDtMonTienQuyetRepository.IsRelationshipExistAsync(dto.MonHocId, dto.MonTienQuyetId))
+            {
+                throw new Exception("Môn học này đã có điều kiện môn tiên quyết này rồi.");
+            }
+
+            bool isReverseExist = await _unitOfWork.iDtMonTienQuyetRepository.TableNoTracking
+                .AnyAsync(x => x.MonHocId == dto.MonTienQuyetId && x.MonTienQuyetId == dto.MonHocId);
+
+            if (isReverseExist)
+            {
+                throw new Exception("Môn này đã là điều kiện của môn kia, không thể thiết lập ngược lại.");
+            }
+
+            var newEntity = _mapper.Map<DtMonTienQuyet>(dto);
+
+            await _unitOfWork.iDtMonTienQuyetRepository.AddAsync(newEntity);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task UpdateDtMonTienQuyet(UpdateDtMonTienQuyetDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateDtMonTienQuyet)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var existMonTienQuyet = await _unitOfWork.iDtMonTienQuyetRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == dto.Id);
+            if (existMonTienQuyet == null)
+            {
+                throw new Exception("Không tìm thấy môn tiên quyết này.");
+            }
+
+            existMonTienQuyet.LoaiDieuKien = dto.LoaiDieuKien;
+            existMonTienQuyet.GhiChu = dto.GhiChu;
+
+            _unitOfWork.iDtMonTienQuyetRepository.Update(existMonTienQuyet);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteDtMonTienQuyet(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDtMonTienQuyet)} called. Id: {id}");
+
+            var existMonTienQuyet = await _unitOfWork.iDtMonTienQuyetRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existMonTienQuyet == null)
+            {
+                throw new Exception("Môn tiên quyết không tồn tại hoặc đã bị xóa.");
+            }
+
+            _unitOfWork.iDtMonTienQuyetRepository.Delete(existMonTienQuyet);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<DtMonTienQuyetResponseDto> GetDtMonTienQuyetById(int id)
+        {
+            var entity = await _unitOfWork.iDtMonTienQuyetRepository.TableNoTracking
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (entity == null) throw new Exception("Không tìm thấy dữ liệu.");
+
+            return _mapper.Map<DtMonTienQuyetResponseDto>(entity);
+        }
+        #endregion
+
+        #region ChuongTrinhKhung
+        public async Task<PageResultDto<DtChuongTrinhKhungResponseDto>> GetAllDtChuongTrinhKhung(DtChuongTrinhKhungRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllDtChuongTrinhKhung)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var query = _unitOfWork.iDtChuongTrinhKhungRepository.TableNoTracking
+                .Where(x => string.IsNullOrEmpty(dto.Keyword)
+                         || x.TenChuongTrinhKhung.Contains(dto.Keyword)
+                         || x.MaChuongTrinhKhung.Contains(dto.Keyword));
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.Id)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ProjectTo<DtChuongTrinhKhungResponseDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return new PageResultDto<DtChuongTrinhKhungResponseDto>
+            {
+                Items = items,
+                TotalItem = totalCount
+            };
+        }
+
+        public async Task CreateDtChuongTrinhKhung(CreateDtChuongTrinhKhungDto dto)
+        {
+            _logger.LogInformation($"{nameof(CreateDtChuongTrinhKhung)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            if (await _unitOfWork.iDtChuongTrinhKhungRepository.IsMaChuongTrinhKhungExistAsync(dto.MaChuongTrinhKhung!))
+            {
+                throw new Exception($"Đã tồn tại chương trình khung có mã {dto.MaChuongTrinhKhung}");
+            }
+
+            var newChuongTrinhKhung = _mapper.Map<DtChuongTrinhKhung>(dto);
+
+            await _unitOfWork.iDtChuongTrinhKhungRepository.AddAsync(newChuongTrinhKhung);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task UpdateDtChuongTrinhKhung(UpdateDtChuongTrinhKhungDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateDtChuongTrinhKhung)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var existChuongTrinhKhung = await _unitOfWork.iDtChuongTrinhKhungRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == dto.Id);
+            if (existChuongTrinhKhung == null)
+            {
+                throw new Exception("Không tìm thấy chương trình khung này.");
+            }
+
+            bool existMaChuongTrinhKhung = await _unitOfWork.iDtChuongTrinhKhungRepository.TableNoTracking
+                .AnyAsync(x => x.MaChuongTrinhKhung == dto.MaChuongTrinhKhung && x.Id != dto.Id);
+
+            if (existMaChuongTrinhKhung)
+            {
+                throw new Exception($"Đã tồn tại mã chương trình khung \"{dto.MaChuongTrinhKhung}\" trong hệ thống.");
+            }
+
+            _mapper.Map(dto, existChuongTrinhKhung);
+
+            _unitOfWork.iDtChuongTrinhKhungRepository.Update(existChuongTrinhKhung);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteDtChuongTrinhKhung(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDtChuongTrinhKhung)} called. Id: {id}");
+
+            var existChuongTrinhKhung = await _unitOfWork.iDtChuongTrinhKhungRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existChuongTrinhKhung == null)
+            {
+                throw new Exception("Môn học không tồn tại hoặc đã bị xóa.");
+            }
+
+            _unitOfWork.iDtChuongTrinhKhungRepository.Delete(existChuongTrinhKhung);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<DtChuongTrinhKhungResponseDto> GetDtChuongTrinhKhungById(int id)
+        {
+            var entity = await _unitOfWork.iDtChuongTrinhKhungRepository.TableNoTracking
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (entity == null) throw new Exception("Không tìm thấy dữ liệu.");
+
+            return _mapper.Map<DtChuongTrinhKhungResponseDto>(entity);
+        }
+        #endregion
+
+        #region ChuongTrinhKhungMon
+        public async Task<PageResultDto<DtChuongTrinhKhungMonResponseDto>> GetAllDtChuongTrinhKhungMon(DtChuongTrinhKhungMonRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllDtChuongTrinhKhungMon)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var query = _unitOfWork.iDtChuongTrinhKhungMonRepository.TableNoTracking
+                .Include(x => x.MonHoc)
+                .Where(x => true);
+
+            if (dto.ChuongTrinhKhungId.HasValue)
+            {
+                query = query.Where(x => x.ChuongTrinhKhungId == dto.ChuongTrinhKhungId);
+            }
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                query = query.Where(x => x.MonHoc.MaMonHoc.Contains(dto.Keyword)
+                                      || x.MonHoc.TenMonHoc.Contains(dto.Keyword));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(x => x.HocKy)
+                .ThenBy(x => x.MonHoc.MaMonHoc)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ProjectTo<DtChuongTrinhKhungMonResponseDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return new PageResultDto<DtChuongTrinhKhungMonResponseDto>
+            {
+                Items = items,
+                TotalItem = totalCount
+            };
+        }
+
+        public async Task CreateDtChuongTrinhKhungMon(CreateDtChuongTrinhKhungMonDto dto)
+        {
+            _logger.LogInformation($"{nameof(CreateDtChuongTrinhKhungMon)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            if (await _unitOfWork.iDtChuongTrinhKhungMonRepository.IsExistAsync(dto.ChuongTrinhKhungId, dto.MonHocId))
+            {
+                throw new Exception("Môn học này đã có trong chương trình khung.");
+            }
+
+            var newChuongTrinhKhungMon = _mapper.Map<DtChuongTrinhKhungMon>(dto);
+
+            await _unitOfWork.iDtChuongTrinhKhungMonRepository.AddAsync(newChuongTrinhKhungMon);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task UpdateDtChuongTrinhKhungMon(UpdateDtChuongTrinhKhungMonDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateDtChuongTrinhKhungMon)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var existChuongTrinhKhungMon = await _unitOfWork.iDtChuongTrinhKhungMonRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == dto.Id);
+            if (existChuongTrinhKhungMon == null)
+            {
+                throw new Exception("Không tìm thấy chương trình khung môn này.");
+            }
+
+            _mapper.Map(dto, existChuongTrinhKhungMon);
+
+            _unitOfWork.iDtChuongTrinhKhungMonRepository.Update(existChuongTrinhKhungMon);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteDtChuongTrinhKhungMon(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDtChuongTrinhKhungMon)} called. Id: {id}");
+
+            var existChuongTrinhKhungMon = await _unitOfWork.iDtChuongTrinhKhungMonRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existChuongTrinhKhungMon == null)
+            {
+                throw new Exception("Môn học không tồn tại hoặc đã bị xóa.");
+            }
+
+            _unitOfWork.iDtChuongTrinhKhungMonRepository.Delete(existChuongTrinhKhungMon);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<DtChuongTrinhKhungMonResponseDto> GetDtChuongTrinhKhungMonById(int id)
+        {
+            var entity = await _unitOfWork.iDtChuongTrinhKhungMonRepository.TableNoTracking
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (entity == null) throw new Exception("Không tìm thấy dữ liệu.");
+
+            return _mapper.Map<DtChuongTrinhKhungMonResponseDto>(entity);
         }
         #endregion
     }

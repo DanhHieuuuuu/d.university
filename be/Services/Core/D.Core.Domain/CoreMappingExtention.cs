@@ -1,5 +1,10 @@
 ﻿using AutoMapper;
+using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhung;
+using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon;
+using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
 using D.Core.Domain.Dtos.DaoTao.Khoa;
+using D.Core.Domain.Dtos.DaoTao.MonHoc;
+using D.Core.Domain.Dtos.DaoTao.MonTienQuyet;
 using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;

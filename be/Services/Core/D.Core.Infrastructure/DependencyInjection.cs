@@ -64,6 +64,11 @@ namespace D.Core.Infrastructure
             #region DaoTao
                 .AddScoped<IDtKhoaRepository, DtKhoaRepository>()
                 .AddScoped<IDtNganhRepository, DtNganhRepository>()
+                .AddScoped<IDtChuyenNganhRepository, DtChuyenNganhRepository>()
+                .AddScoped<IDtMonHocRepository, DtMonHocRepository>()
+                .AddScoped<IDtMonTienQuyetRepository, DtMonTienQuyetRepository>()
+                .AddScoped<IDtChuongTrinhKhungRepository, DtChuongTrinhKhungRepository>()
+                .AddScoped<IDtChuongTrinhKhungMonRepository, DtChuongTrinhKhungMonRepository>()
             #endregion
             #region Delegation
                 .AddScoped<IDelegationIncomingRepository, DelegationIncomingRepository>()

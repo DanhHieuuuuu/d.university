@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    [Migration("20251125174126_seeddatadt")]
-    partial class seeddatadt
+    [Migration("20251205123918_updatestdb")]
+    partial class updatestdb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -155,8 +155,8 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HocKy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("HocKy")
+                        .HasColumnType("int");
 
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -170,6 +170,9 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("NamHoc")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TrangThai")
                         .HasColumnType("bit");
@@ -188,8 +191,9 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 1,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -199,8 +203,9 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 2,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -210,8 +215,9 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 3,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -221,8 +227,9 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 4,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         });
                 });
@@ -567,11 +574,17 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("GhiChu")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LoaiDieuKien")
+                        .HasColumnType("int");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
@@ -755,12 +768,12 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("PhoneNumber");
 
-                    b.Property<int>("ReceptionDate")
-                        .HasColumnType("int")
+                    b.Property<DateOnly>("ReceptionDate")
+                        .HasColumnType("date")
                         .HasColumnName("ReceptionDate");
 
-                    b.Property<int>("RequestDate")
-                        .HasColumnType("int")
+                    b.Property<DateOnly>("RequestDate")
+                        .HasColumnType("date")
                         .HasColumnName("RequestDate");
 
                     b.Property<int>("Status")
@@ -3683,6 +3696,9 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Khoa")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KhoaHoc")
                         .HasColumnType("int");
 
                     b.Property<int?>("LopQL")

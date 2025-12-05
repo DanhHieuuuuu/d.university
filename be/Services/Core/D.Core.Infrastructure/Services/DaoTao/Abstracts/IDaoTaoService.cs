@@ -1,6 +1,9 @@
-﻿using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
+﻿using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhung;
+using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon;
+using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
 using D.Core.Domain.Dtos.DaoTao.Khoa;
 using D.Core.Domain.Dtos.DaoTao.MonHoc;
+using D.Core.Domain.Dtos.DaoTao.MonTienQuyet;
 using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.DomainBase.Dto;
 using System;
@@ -36,5 +39,23 @@ namespace D.Core.Infrastructure.Services.DaoTao.Abstracts
         Task UpdateDtMonHoc(UpdateDtMonHocDto dto);
         Task DeleteDtMonHoc(int id);
         Task<DtMonHocResponseDto> GetDtMonHocById(int id);
+
+        Task<PageResultDto<DtMonTienQuyetResponseDto>> GetAllDtMonTienQuyet(DtMonTienQuyetRequestDto dto);
+        Task CreateDtMonTienQuyet(CreateDtMonTienQuyetDto dto);
+        Task UpdateDtMonTienQuyet(UpdateDtMonTienQuyetDto dto);
+        Task DeleteDtMonTienQuyet(int id);
+        Task<DtMonTienQuyetResponseDto> GetDtMonTienQuyetById(int id);
+
+        Task<PageResultDto<DtChuongTrinhKhungResponseDto>> GetAllDtChuongTrinhKhung(DtChuongTrinhKhungRequestDto dto);
+        Task CreateDtChuongTrinhKhung(CreateDtChuongTrinhKhungDto dto);
+        Task UpdateDtChuongTrinhKhung(UpdateDtChuongTrinhKhungDto dto);
+        Task DeleteDtChuongTrinhKhung(int id);
+        Task<DtChuongTrinhKhungResponseDto> GetDtChuongTrinhKhungById(int id);
+
+        Task<PageResultDto<DtChuongTrinhKhungMonResponseDto>> GetAllDtChuongTrinhKhungMon(DtChuongTrinhKhungMonRequestDto dto);
+        Task CreateDtChuongTrinhKhungMon(CreateDtChuongTrinhKhungMonDto dto);
+        Task UpdateDtChuongTrinhKhungMon(UpdateDtChuongTrinhKhungMonDto dto);
+        Task DeleteDtChuongTrinhKhungMon(int id);
+        Task<DtChuongTrinhKhungMonResponseDto> GetDtChuongTrinhKhungMonById(int id);
     }
 }

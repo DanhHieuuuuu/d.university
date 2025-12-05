@@ -173,10 +173,11 @@ namespace D.Core.Domain.Shared.SeedData
         public static void SeedDataDtChuongTrinhKhungMon(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<DtChuongTrinhKhungMon>().HasData(
-                new DtChuongTrinhKhungMon { Id = 1, ChuongTrinhKhungId = 1, MonHocId = 1, HocKy = "2021-2022"},
-                new DtChuongTrinhKhungMon { Id = 2, ChuongTrinhKhungId = 1, MonHocId = 4, HocKy = "2021-2022"},
-                new DtChuongTrinhKhungMon { Id = 3, ChuongTrinhKhungId = 1, MonHocId = 2, HocKy = "2021-2022"},
-                new DtChuongTrinhKhungMon { Id = 4, ChuongTrinhKhungId = 1, MonHocId = 3, HocKy = "2021-2022"}
+                new DtChuongTrinhKhungMon { Id = 1, ChuongTrinhKhungId = 1, MonHocId = 1, HocKy = 1, NamHoc = "2021-2022" },
+                new DtChuongTrinhKhungMon { Id = 2, ChuongTrinhKhungId = 1, MonHocId = 4, HocKy = 1, NamHoc = "2021-2022" },
+                new DtChuongTrinhKhungMon { Id = 3, ChuongTrinhKhungId = 1, MonHocId = 2, HocKy = 1, NamHoc = "2021-2022" },
+                new DtChuongTrinhKhungMon { Id = 4, ChuongTrinhKhungId = 1, MonHocId = 3, HocKy = 1, NamHoc = "2021-2022" },
+                new DtChuongTrinhKhungMon { Id = 5, ChuongTrinhKhungId = 2, MonHocId = 2, HocKy = 2, NamHoc = "2021-2022" }
             );
         }
     }
