@@ -10,7 +10,7 @@ namespace D.Core.Domain.Entities.SinhVien
     {
         public string? Mssv { get; set; }
 
-        // Thông tin cá nhân
+        //
         public string? HoDem { get; set; }
         public string? Ten { get; set; }
         public DateTime? NgaySinh { get; set; }
@@ -25,15 +25,15 @@ namespace D.Core.Domain.Entities.SinhVien
         public string? SoDienThoai { get; set; }
         public string? Email { get; set; }
 
-        // Thông tin công việc
+        //
 
-        //public int? KhoaHoc { get; set; }
+        public int? KhoaHoc { get; set; }
         public int? Khoa { get; set; }
         public int? Nganh { get; set; }
         public int? LopQL { get; set; }
         public int? TrangThaiHoc { get; set; }
 
-        // Thông tin đăng nhập
+        //
 
         [Description("Email do nhà trường cấp")]
         public string? Email2 { get; set; }

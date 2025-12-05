@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    [Migration("20251125174126_seeddatadt")]
-    partial class seeddatadt
+    [Migration("20251201093136_updatesv")]
+    partial class updatesv
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -755,12 +755,12 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("PhoneNumber");
 
-                    b.Property<int>("ReceptionDate")
-                        .HasColumnType("int")
+                    b.Property<DateOnly>("ReceptionDate")
+                        .HasColumnType("date")
                         .HasColumnName("ReceptionDate");
 
-                    b.Property<int>("RequestDate")
-                        .HasColumnType("int")
+                    b.Property<DateOnly>("RequestDate")
+                        .HasColumnType("date")
                         .HasColumnName("RequestDate");
 
                     b.Property<int>("Status")
@@ -3683,6 +3683,9 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Khoa")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KhoaHoc")
                         .HasColumnType("int");
 
                     b.Property<int?>("LopQL")
