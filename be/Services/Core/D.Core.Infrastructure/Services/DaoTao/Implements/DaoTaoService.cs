@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using D.Core.Domain.Dtos.DaoTao.Khoa;
+using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Infrastructure.Services.DaoTao.Abstracts;
 using D.DomainBase.Dto;
@@ -122,6 +123,99 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
             if (entity == null) throw new Exception("Không tìm thấy dữ liệu.");
 
             return _mapper.Map<DtKhoaResponseDto>(entity);
+        }
+        #endregion
+
+        #region Nganh
+        public async Task<PageResultDto<DtNganhResponseDto>> GetAllDtNganh(DtNganhRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllDtNganh)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var query = _unitOfWork.iDtNganhRepository.TableNoTracking
+                .Where(x => string.IsNullOrEmpty(dto.Keyword)
+                         || x.TenNganh.Contains(dto.Keyword)
+                         || x.MaNganh.Contains(dto.Keyword));
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.Id)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ProjectTo<DtNganhResponseDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return new PageResultDto<DtNganhResponseDto>
+            {
+                Items = items,
+                TotalItem = totalCount
+            };
+        }
+
+        public async Task CreateDtNganh(CreateDtNganhDto dto)
+        {
+            _logger.LogInformation($"{nameof(CreateDtNganh)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            if (await _unitOfWork.iDtNganhRepository.IsMaNganhExistAsync(dto.MaNganh!))
+            {
+                throw new Exception($"Đã tồn tại ngành có mã {dto.MaNganh}");
+            }
+
+            var newNganh = _mapper.Map<DtNganh>(dto);
+
+            await _unitOfWork.iDtNganhRepository.AddAsync(newNganh);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task UpdateDtNganh(UpdateDtNganhDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateDtNganh)} method called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            var existNganh = await _unitOfWork.iDtNganhRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == dto.Id);
+            if (existNganh == null)
+            {
+                throw new Exception("Không tìm thấy ngành này.");
+            }
+
+            bool existMaNganh = await _unitOfWork.iDtNganhRepository.TableNoTracking
+                .AnyAsync(x => x.MaNganh == dto.MaNganh && x.Id != dto.Id);
+
+            if (existMaNganh)
+            {
+                throw new Exception($"Đã tồn tại mã ngành \"{dto.MaNganh}\" trong hệ thống.");
+            }
+
+            _mapper.Map(dto, existNganh);
+
+            _unitOfWork.iDtNganhRepository.Update(existNganh);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteDtNganh(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDtNganh)} called. Id: {id}");
+
+            var existNganh = await _unitOfWork.iDtNganhRepository.TableNoTracking
+                                     .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existNganh == null)
+            {
+                throw new Exception("Ngành không tồn tại hoặc đã bị xóa.");
+            }
+
+            _unitOfWork.iDtNganhRepository.Delete(existNganh);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<DtNganhResponseDto> GetDtNganhById(int id)
+        {
+            var entity = await _unitOfWork.iDtNganhRepository.TableNoTracking
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (entity == null) throw new Exception("Không tìm thấy dữ liệu.");
+
+            return _mapper.Map<DtNganhResponseDto>(entity);
         }
         #endregion
     }

@@ -33,6 +33,7 @@ namespace D.Core.Infrastructure
 
         #region Dao Tao
         private DtKhoaRepository _dtKhoaRepository;
+        private DtNganhRepository _dtNganhRepository;
         #endregion
 
         private SvSinhVienRepository _svSinhVienRepository;
@@ -287,6 +288,19 @@ namespace D.Core.Infrastructure
                 return _dtKhoaRepository;
             }
         }
+
+        public IDtNganhRepository iDtNganhRepository
+        {
+            get
+            {
+                if (_dtNganhRepository == null)
+                {
+                    _dtNganhRepository = new DtNganhRepository(_dbContext, _httpContext);
+                }
+                return _dtNganhRepository;
+            }
+        }
+
         #endregion
 
         public async Task<int> SaveChangesAsync()

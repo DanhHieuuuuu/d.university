@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using D.Core.Domain.Dtos.DaoTao.Khoa;
+using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Dtos.File;
@@ -95,6 +96,10 @@ namespace D.Core.Domain
             CreateMap<DtKhoa, DtKhoaResponseDto>();
             CreateMap<CreateDtKhoaDto, DtKhoa>();
             CreateMap<UpdateDtKhoaDto, DtKhoa>();
+
+            CreateMap<DtNganh, DtNganhResponseDto>();
+            CreateMap<CreateDtNganhDto, DtNganh>();
+            CreateMap<UpdateDtNganhDto, DtNganh>();
             #endregion
 
             #region file

@@ -1,4 +1,5 @@
 ﻿using D.Core.Domain.Dtos.DaoTao.Khoa;
+using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.DomainBase.Dto;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,11 @@ namespace D.Core.Infrastructure.Services.DaoTao.Abstracts
         Task UpdateDtKhoa(UpdateDtKhoaDto dto);
         Task DeleteDtKhoa(int id);
         Task<DtKhoaResponseDto> GetDtKhoaById(int id);
+
+        Task<PageResultDto<DtNganhResponseDto>> GetAllDtNganh(DtNganhRequestDto dto);
+        Task CreateDtNganh(CreateDtNganhDto dto);
+        Task UpdateDtNganh(UpdateDtNganhDto dto);
+        Task DeleteDtNganh(int id);
+        Task<DtNganhResponseDto> GetDtNganhById(int id);
     }
 }

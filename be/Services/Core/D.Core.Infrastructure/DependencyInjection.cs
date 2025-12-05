@@ -63,6 +63,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>()
             #region DaoTao
                 .AddScoped<IDtKhoaRepository, DtKhoaRepository>()
+                .AddScoped<IDtNganhRepository, DtNganhRepository>()
             #endregion
             #region Delegation
                 .AddScoped<IDelegationIncomingRepository, DelegationIncomingRepository>()

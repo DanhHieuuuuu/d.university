@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.Core.Domain.Dtos.DaoTao.Khoa
+namespace D.Core.Domain.Dtos.DaoTao.Nganh
 {
-    public class DtKhoaGetByIdRequestDto : IQuery<DtKhoaResponseDto>
+    public class DeleteDtNganhDto : ICommand
     {
         public int Id { get; set; }
     }
