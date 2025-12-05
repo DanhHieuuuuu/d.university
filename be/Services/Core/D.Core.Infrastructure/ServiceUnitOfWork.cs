@@ -2,6 +2,7 @@
 using D.Core.Infrastructure.Repositories.Delegation.Incoming;
 using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
+using D.Core.Infrastructure.Repositories.Kpi;
 using D.Core.Infrastructure.Repositories.SinhVien;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
@@ -56,6 +57,14 @@ namespace D.Core.Infrastructure
         private ReceptionTimeRepository _receptionTimeRepository;
         private SupporterRepository _supporterRepository;
 
+        #endregion
+
+        #region Kpi
+        private KpiCaNhanRepository _kpiCaNhanRepository;
+        private KpiDonViRepository _kpiDonViRepository;
+        private KpiLogStatusRepository _kpiLogStatusRepository;
+        private KpiTemplateRepository _kpiTemplateRepository;
+        private KpiTruongRepository _kpiTruongRepository;
         #endregion
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -464,5 +473,66 @@ namespace D.Core.Infrastructure
             }
         }
         #endregion
+
+        #region Kpi
+        public IKpiCaNhanRepository iKpiCaNhanRepository
+        {
+            get
+            {
+                if (_kpiCaNhanRepository == null)
+                {
+                    _kpiCaNhanRepository = new KpiCaNhanRepository(_dbContext, _httpContext);
+                }
+                return _kpiCaNhanRepository;
+            }
+        }
+
+        public IKpiDonViRepository iKpiDonViRepository
+        {
+            get
+            {
+                if (_kpiDonViRepository == null)
+                {
+                    _kpiDonViRepository = new KpiDonViRepository(_dbContext, _httpContext);
+                }
+                return _kpiDonViRepository;
+            }
+        }
+        public IKpiLogStatusRepository iKpiLogStatusRepository
+        {
+            get
+            {
+                if (_kpiLogStatusRepository == null)
+                {
+                    _kpiLogStatusRepository = new KpiLogStatusRepository(_dbContext, _httpContext);
+                }
+                return _kpiLogStatusRepository;
+            }
+        }
+        public IKpiTemplateRepository iKpiTemplateRepository
+        {
+            get
+            {
+                if (_kpiTemplateRepository == null)
+                {
+                    _kpiTemplateRepository = new KpiTemplateRepository(_dbContext, _httpContext);
+                }
+                return _kpiTemplateRepository;
+            }
+        }
+        public IKpiTruongRepository iKpiTruongRepository
+        {
+            get
+            {
+                if (_kpiTruongRepository == null)
+                {
+                    _kpiTruongRepository = new KpiTruongRepository(_dbContext, _httpContext);
+                }
+                return _kpiTruongRepository;
+            }
+        }
+
+        #endregion
+
     }
 }

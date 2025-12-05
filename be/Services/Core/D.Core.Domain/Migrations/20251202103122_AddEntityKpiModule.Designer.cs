@@ -4,6 +4,7 @@ using D.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    partial class CoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251202103122_AddEntityKpiModule")]
+    partial class AddEntityKpiModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,8 +155,8 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HocKy")
-                        .HasColumnType("int");
+                    b.Property<string>("HocKy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,9 +170,6 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("NamHoc")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TrangThai")
                         .HasColumnType("bit");
@@ -188,9 +188,8 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = 1,
+                            HocKy = "2021-2022",
                             Id = 1,
-                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -200,9 +199,8 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = 1,
+                            HocKy = "2021-2022",
                             Id = 2,
-                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -212,9 +210,8 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = 1,
+                            HocKy = "2021-2022",
                             Id = 3,
-                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -224,21 +221,8 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = 1,
+                            HocKy = "2021-2022",
                             Id = 4,
-                            NamHoc = "2021-2022",
-                            TrangThai = true
-                        },
-                        new
-                        {
-                            ChuongTrinhKhungId = 2,
-                            MonHocId = 2,
-                            CreatedBy = "root",
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deleted = false,
-                            HocKy = 2,
-                            Id = 5,
-                            NamHoc = "2021-2022",
                             TrangThai = true
                         });
                 });
@@ -583,17 +567,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("GhiChu")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("LoaiDieuKien")
-                        .HasColumnType("int");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
@@ -4135,9 +4113,6 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Khoa")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("KhoaHoc")
                         .HasColumnType("int");
 
                     b.Property<int?>("LopQL")
