@@ -12,8 +12,8 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
         public int? LoaiKpi { get; set; }
         [FromQuery(Name = "namHoc")]
         public string? NamHoc { get; set; }
-        [FromQuery(Name = "phongBan")]
-        public string? PhongBan { get; set; }
+        [FromQuery(Name = "IdPhongBan")]
+        public int? IdPhongBan { get; set; }
         [FromQuery(Name = "trangthai")]
         public int? TrangThai { get; set; }
     }

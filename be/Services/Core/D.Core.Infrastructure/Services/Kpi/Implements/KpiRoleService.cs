@@ -60,6 +60,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
         public void Delete(DeleteKpiRoleDto dto)
         {
+            _logger.LogInformation($"{nameof(Delete)} method called.");
             if (dto.Ids == null || dto.Ids.Count == 0) return;
             foreach (var id in dto.Ids)
             {

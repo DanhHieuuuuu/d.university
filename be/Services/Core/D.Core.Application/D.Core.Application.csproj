@@ -17,8 +17,4 @@
     <ProjectReference Include="..\D.Core.Infrastructure\D.Core.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Query\Kpi\KpiCaNhan\" />
-  </ItemGroup>
-
 </Project>

@@ -8,6 +8,7 @@ namespace D.Core.Domain.Entities.Kpi
     [Table(nameof(KpiDonVi), Schema = DbSchema.Kpi)]
     public class KpiDonVi : EntityBase
     {
+        public int? STT { get; set; }
         [MaxLength(500)]
         public string? Kpi { get; set; }
         [MaxLength(250)]

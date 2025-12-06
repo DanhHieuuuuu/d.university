@@ -7,10 +7,10 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
     {
         PageResultDto<KpiCaNhanDto> GetAllKpiCaNhan(FilterKpiCaNhanDto dto);
         void CreateKpiCaNhan(CreateKpiCaNhanDto dto);
-        void DeleteKpiCaNhan(int id);
+        void DeleteKpiCaNhan(DeleteKpiCaNhanDto dto);
         void UpdateKpiCaNhan(UpdateKpiCaNhanDto dto);
-        Task<List<KpiCaNhanDto>> UpdateTrangThaiKpiCaNhan(UpdateTrangThaiKpiDto dto);
-        Task<PageResultDto<KpiCaNhanDto>> FindPagingKpiCaNhanAsync(FilterKpiCaNhanDto dto);
+        void UpdateTrangThaiKpiCaNhan(UpdateTrangThaiKpiDto dto);
+        Task<PageResultDto<KpiCaNhanDto>> FindPagingKpiCaNhan(FilterKpiCaNhanDto dto);
         void UpdateKetQuaThucTe(UpdateKpiThucTeKpiCaNhanListDto dto);
         List<int> GetListTrangThai();
     }

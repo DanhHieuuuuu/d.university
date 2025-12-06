@@ -9,6 +9,6 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
     }
     public class UpdateKpiThucTeKpiCaNhanListDto : ICommand
     {
-        public List<UpdateKqThucTeKpiCaNhanDto> Items { get; set; } = new();
+        public List<UpdateKqThucTeKpiCaNhanDto>? Items { get; set; }
     }
 }
