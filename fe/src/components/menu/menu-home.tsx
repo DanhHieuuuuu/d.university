@@ -14,7 +14,7 @@ const MenuComponent = () => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
   return (
-    <Sider width="20%" collapsible collapsed={collapsed} trigger={null} className="menu-core">
+    <Sider width="20%" collapsible collapsed={collapsed} trigger={null} className="menu-core" breakpoint="lg" collapsedWidth="80" onCollapse={(val) => setCollapsed(val)}>
       <div style={{ display: 'flex', padding: 8, justifyContent: collapsed ? 'center' : 'space-between' }}>
         <div className={`menu-title ${collapsed ? 'collapsed' : ''}`}>
           <MenuOutlined className="menu-icon" />

@@ -1,10 +1,11 @@
-﻿using D.Core.Domain.Dtos.SinhVien;
+﻿using D.ApplicationBase;
+using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using MediatR;
 
 namespace D.Core.Application.Command.SinhVien
 {
-    public class UpdateSinhVien : IRequestHandler<UpdateSinhVienDto, bool>
+    public class UpdateSinhVien : ICommandHandler<UpdateSinhVienDto, bool>
     {
         private readonly ISvSinhVienService _svSinhVienService;
 

@@ -6,7 +6,8 @@ namespace D.Core.Domain.Dtos.SinhVien
 {
     public class SvSinhVienGetAllRequestDto : FilterBaseDto, IQuery<PageResultDto<SvSinhVienGetAllResponseDto>>
     {
-        [FromQuery(Name = "mssv")]
-        public string? Mssv { get; set; }
+        public int? KhoaHoc { get; set; }
+        public int? Khoa { get; set; }
+        public int? Nganh { get; set; }
     }
 }

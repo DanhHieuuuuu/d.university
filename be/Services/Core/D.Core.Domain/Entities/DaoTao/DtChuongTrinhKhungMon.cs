@@ -9,7 +9,8 @@ namespace D.Core.Domain.Entities.DaoTao
     {
         public int ChuongTrinhKhungId { get; set; }
         public int MonHocId { get; set; }
-        public string? HocKy { get; set; }
+        public int? HocKy { get; set; }
+        public string? NamHoc { get; set; }
         public bool TrangThai { get; set; } = true;
 
         [ForeignKey(nameof(ChuongTrinhKhungId))]

@@ -18,7 +18,7 @@ export const listMenuCore: IMenu[] = [
     icon: <HomeOutlined />
   },
   {
-    label: 'Quán lý nhân sự',
+    label: 'Quản lý nhân sự',
     routerLink: '/hrm',
     // permissionKeys: [PermissionCoreConst.CoreMenuNhanSu],
     icon: <TeamOutlined />
@@ -56,13 +56,13 @@ export const listMenuCore: IMenu[] = [
     icon: <DelegationIcon />,
     items: [
       {
-        label: 'Đề xuất đoàn vào',
-        routerLink: '/delegation/incoming/suggest',
+        label: 'Danh sách đoàn vào',
+        routerLink: '/delegation/incoming/list-delegation',
         icon: <SuggestIcon />
       },
       {
         label: 'Xử lý đoàn vào',
-        routerLink: '/delegation/incoming/x',
+        routerLink: '/delegation/incoming/process',
         icon: <HourglassOutlined />
       },
       {

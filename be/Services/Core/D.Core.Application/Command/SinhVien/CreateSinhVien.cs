@@ -6,7 +6,7 @@ namespace D.Core.Application.Command.SinhVien
 {
     public class CreateSinhVien : ICommandHandler<CreateSinhVienDto, SvSinhVienResponseDto>
     {
-        public ISvSinhVienService _svSinhVienService { get; set; }
+        private readonly ISvSinhVienService _svSinhVienService;
         public CreateSinhVien(ISvSinhVienService svSinhVienService)
         {
             _svSinhVienService = svSinhVienService;
@@ -17,7 +17,7 @@ namespace D.Core.Application.Command.SinhVien
             CancellationToken cancellationToken
         )
         {
-            return _svSinhVienService.CreateSinhVien(req);
+            return await _svSinhVienService.CreateSinhVien(req);
         }
     }
 }

@@ -6,13 +6,13 @@ namespace D.Core.Domain.Dtos.SinhVien
 {
     public class FindByMssvDto : IQuery<SvSinhVienResponseDto>
     {
-        private string? _keyword;
+        private string? _mssv;
 
-        [FromQuery(Name = "keyword"), Description("Mssv")]
-        public string? Keyword
+        [FromQuery(Name = "mssv")]
+        public string? Mssv
         {
-            get => _keyword;
-            set => _keyword = value?.Trim();
+            get => _mssv;
+            set => _mssv = value?.Trim();
         }
     }
 }

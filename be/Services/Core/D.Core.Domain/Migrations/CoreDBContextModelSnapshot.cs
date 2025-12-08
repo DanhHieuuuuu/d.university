@@ -152,8 +152,8 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HocKy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("HocKy")
+                        .HasColumnType("int");
 
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,6 +167,9 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("NamHoc")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TrangThai")
                         .HasColumnType("bit");
@@ -185,8 +188,9 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 1,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -196,8 +200,9 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 2,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -207,8 +212,9 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 3,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         },
                         new
@@ -218,8 +224,21 @@ namespace D.Core.Domain.Migrations
                             CreatedBy = "root",
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Deleted = false,
-                            HocKy = "2021-2022",
+                            HocKy = 1,
                             Id = 4,
+                            NamHoc = "2021-2022",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            ChuongTrinhKhungId = 2,
+                            MonHocId = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            HocKy = 2,
+                            Id = 5,
+                            NamHoc = "2021-2022",
                             TrangThai = true
                         });
                 });
@@ -564,11 +583,17 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("GhiChu")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LoaiDieuKien")
+                        .HasColumnType("int");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
@@ -3636,6 +3661,436 @@ namespace D.Core.Domain.Migrations
                     b.ToTable("NsToBoMon", "hrm");
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiCaNhan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CongThucTinh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("DiemKpi")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("IdKpiDonVi")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdNhanSu")
+                        .HasColumnType("int");
+
+                    b.Property<string>("KPI")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("KetQuaThucTe")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("LoaiCongThuc")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LoaiKPI")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MucTieu")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("NamHoc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("STT")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ThamSoCongThuc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TrongSo")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiCaNhan", "kpi");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiDonVi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CongThucTinh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("DiemKpi")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("IdDonVi")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdKpiTruong")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("KetQuaThucTe")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Kpi")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("LoaiCongThuc")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LoaiKpi")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MucTieu")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("NamHoc")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("ThamSoCongThuc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TrangThai")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TrongSo")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiDonVi", "kpi");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiLogStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("KpiId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("NewStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OldStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiLogStatus", "kpi");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("IdDonVi")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdNhanSu")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("TiLe")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("decimal(4,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiRole", "kpi");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("KPI")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("LoaiKPI")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LoaiTemplate")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MucTieu")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("NamHoc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("STT")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TrongSo")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiTemplate", "kpi");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiTruong", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChienLuoc")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("CongThucTinh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("DiemKpi")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("KetQuaThucTe")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Kpi")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("LinhVuc")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("LoaiCongThuc")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LoaiKpi")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MucTieu")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("NamHoc")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("ThamSoCongThuc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TrangThai")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TrongSo")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiTruong", "kpi");
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.SinhVien.SvSinhVien", b =>
                 {
                     b.Property<int>("Id")
@@ -3680,6 +4135,9 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Khoa")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KhoaHoc")
                         .HasColumnType("int");
 
                     b.Property<int?>("LopQL")
