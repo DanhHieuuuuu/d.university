@@ -1,18 +1,15 @@
 ﻿using AutoMapper;
 using d.Shared.Permission.Error;
 using D.ControllerBase.Exceptions;
-using D.Core.Domain;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
-using D.Core.Domain.Migrations;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -208,7 +205,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             if (kpi.IdNhanSu != dto.IdNhanSu)
             {
                 var maxSTT = _unitOfWork.iKpiCaNhanRepository.TableNoTracking
-                    .Where(k => k.IdNhanSu == dto.IdNhanSu && !k.Deleted)
+                    .Where(k => k.IdNhanSu == dto.IdNhanSu && k.LoaiKPI == dto.LoaiKPI && !k.Deleted)
                     .Select(k => (int?)k.STT)
                     .Max() ?? 0;
                 kpi.STT = maxSTT + 1;

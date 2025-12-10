@@ -30,6 +30,7 @@ namespace D.Core.Domain.Entities.Kpi
         public string? NamHoc { get; set; }
 
         public int? Status { get; set; }
+        public float? TyLeThamGia { get; set; }
 
         public decimal? KetQuaThucTe { get; set; }
         public string? CongThucTinh { get; set; }

@@ -40,7 +40,8 @@ namespace D.Core.Infrastructure
                 .AddScoped<IFileService, FileService>()
             #region Kpi
                 .AddScoped<IKpiRoleService, KpiRoleService>()
-                .AddScoped<IKpiCaNhanService, KpiCaNhanService>();
+                .AddScoped<IKpiCaNhanService, KpiCaNhanService>()
+                .AddScoped<IKpiDonViService, KpiDonViService>();
             #endregion
         }
 

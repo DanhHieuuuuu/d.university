@@ -1,7 +1,5 @@
 ﻿using D.ControllerBase;
-using D.Core.Application.Command.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
-using D.Core.Domain.Dtos.Kpi.KpiRole;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,7 +61,7 @@ namespace D.Core.API.Controllers.Kpi
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("kpi-canhan/update")]
-        public async Task<ResponseAPI> UpdateKpiRole([FromBody] UpdateKpiCaNhanDto dto)
+        public async Task<ResponseAPI> UpdateKpiCaNhan([FromBody] UpdateKpiCaNhanDto dto)
         {
             try
             {
@@ -82,7 +80,7 @@ namespace D.Core.API.Controllers.Kpi
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("kpi-canhan/delete")]
-        public async Task<ResponseAPI> DeleteKpiRole([FromBody] DeleteKpiCaNhanDto dto)
+        public async Task<ResponseAPI> DeleteKpiCaNhan([FromBody] DeleteKpiCaNhanDto dto)
         {
             try
             {

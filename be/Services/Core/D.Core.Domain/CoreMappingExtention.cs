@@ -15,6 +15,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
+using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Entities.Delegation.Incoming;
@@ -106,11 +107,10 @@ namespace D.Core.Domain
             CreateMap<KpiRole, KpiRoleResponseDto>();
             CreateMap<CreateKpiRoleDto, KpiRole>();
             CreateMap<CreateKpiCaNhanDto, KpiCaNhan>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => KpiStatus.Create))
-            .ForMember(dest => dest.STT, opt => opt.Ignore()) 
-            .ForMember(dest => dest.IdNhanSu, opt => opt.MapFrom(src => src.IdNhanSu));
-
-            CreateMap<KpiCaNhan, KpiCaNhanDto>();
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => KpiStatus.Create));
+            CreateMap<KpiDonVi, KpiDonViDto>();
+            CreateMap<CreateKpiDonViDto, KpiDonVi>()
+            .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => KpiStatus.Create));
             #endregion
         }
 
