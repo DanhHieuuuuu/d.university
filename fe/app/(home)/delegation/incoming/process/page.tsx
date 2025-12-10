@@ -32,7 +32,6 @@ import { select } from '@redux/feature/delegation/delegationSlice';
 import { ETableColumnType } from '@/constants/e-table.consts';
 import { DelegationStatusConst } from '../../consts/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
-import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
 
 const Page = () => {
@@ -100,18 +99,18 @@ const Page = () => {
       dataIndex: 'phoneNumber',
       title: 'SĐT liên hệ'
     },
-    {
-      key: 'requestDate',
-      dataIndex: 'requestDate',
-      title: 'Ngày yêu cầu',
-      render: (value) => <p>{formatDateView(value)}</p>
-    },
-    {
-      key: 'receptionDate',
-      dataIndex: 'receptionDate',
-      title: 'Ngày tiếp đón',
-      render: (value) => <p>{formatDateView(value)}</p>
-    },
+    // {
+    //   key: 'requestDate',
+    //   dataIndex: 'requestDate',
+    //   title: 'Ngày yêu cầu',
+    //   render: (value) => <p>{formatDateView(value)}</p>
+    // },
+    // {
+    //   key: 'receptionDate',
+    //   dataIndex: 'receptionDate',
+    //   title: 'Ngày tiếp đón',
+    //   render: (value) => <p>{formatDateView(value)}</p>
+    // },
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
@@ -133,19 +132,19 @@ const Page = () => {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       command: (record: IViewGuestGroup) => onClickView(record)
-    },
-    {
-      label: 'Chỉnh sửa',
-      tooltip: 'Sửa danh sách đoàn vào',
-      icon: <EditOutlined />,
-      command: (record: IViewGuestGroup) => onClickUpdate(record)
-    },
-    {
-      label: 'Xóa',
-      color: 'red',
-      icon: <DeleteOutlined />,
-      command: (record: IViewGuestGroup) => onClickDelete(record)
     }
+    // {
+    //   label: 'Chỉnh sửa',
+    //   tooltip: 'Sửa danh sách đoàn vào',
+    //   icon: <EditOutlined />,
+    //   command: (record: IViewGuestGroup) => onClickUpdate(record)
+    // },
+    // {
+    //   label: 'Xóa',
+    //   color: 'red',
+    //   icon: <DeleteOutlined />,
+    //   command: (record: IViewGuestGroup) => onClickDelete(record)
+    // }
   ];
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryGuestGroup>({
@@ -196,33 +195,16 @@ const Page = () => {
     setIsModalUpdate(true);
     setIsModalOpen(true);
   };
-  const onClickDelete = (record: IViewGuestGroup) => {
-    console.log(record);
-    Modal.confirm({
-      title: `Xóa đoàn vào "${record.name}"?`,
-      okText: 'Xóa',
-      okType: 'danger',
-      cancelText: 'Hủy',
-      onOk: async () => {
-        try {
-          await dispatch(deleteDoanVao(record.id)).unwrap();
-          toast.success('Xóa thành công!');
-        } catch (error: any) {
-          toast.error(error?.response?.message || 'Xóa thất bại!');
-        }
-      }
-    });
-  };
 
   return (
     <Card
-      title="Danh sách Đoàn vào"
+      title="Xử lý Đoàn vào"
       className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
-      }
+      //   extra={
+      //     <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+      //       Thêm mới
+      //     </Button>
+      //   }
     >
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex flex-row items-center space-x-3">
@@ -279,12 +261,6 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-      />
-      <CreateDoanVaoModal
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        isUpdate={isUpdate}
-        isView={isView}
       />
     </Card>
   );

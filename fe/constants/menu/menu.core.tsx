@@ -67,7 +67,7 @@ export const listMenuCore: IMenu[] = [
       },
       {
         label: 'Phòng ban hỗ trợ',
-        routerLink: '/delegation/incoming/department-support',
+        routerLink: '/delegation/incoming/support',
         icon: <TeamOutlined />
       }
     ]

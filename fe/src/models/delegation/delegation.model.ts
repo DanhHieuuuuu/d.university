@@ -63,4 +63,23 @@ export interface ISupporter {
 }
 export type IQueryGuestGroup = IQueryPaging & {
   name?: string;
+  idPhongBan?: number;
+  status?: number;
+};
+export type ICreateDoanVao = {
+  code: string;
+  name: string;
+  content: string;
+  idPhongBan: number;
+  location?: string;
+  idStaffReception: number;
+  totalPerson: number;
+  phoneNumber?: string;
+  status: number;
+  requestDate: string;
+  receptionDate: string;
+  totalMoney: number;
+};
+export type IUpdateDoanVao = ICreateDoanVao & {
+  id: number;
 };

@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class UpdateDelegationIncomingDto
+    public class ViewPhongBanResponseDto
     {
+        public int IdPhongBan { get; set; }
+        public string? TenPhongBan { get; set; }
+       
     }
 }

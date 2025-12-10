@@ -1,7 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-import { getListGuestGroup} from './delegationThunk';
+import {
+  createDoanVao,
+  deleteDoanVao,
+  getListGuestGroup,
+  getListPhongBan,
+  getListStatus,
+  updateDoanVao
+} from './delegationThunk';
 import { IViewGuestGroup } from '@models/delegation/delegation.model';
 
 interface DelegationState {
@@ -12,6 +19,8 @@ interface DelegationState {
     data: any | null;
   };
   list: IViewGuestGroup[];
+  listPhongBan: any[];
+  listStatus: any[];
   total: number;
   $create: {
     status: ReduxStatus;
@@ -25,6 +34,8 @@ const initialState: DelegationState = {
     data: null
   },
   list: [],
+  listPhongBan: [],
+  listStatus: [],
   total: 0,
   $create: {
     status: ReduxStatus.IDLE
@@ -40,9 +51,14 @@ const delegationSlice = createSlice({
     }
   },
   reducers: {
-    select: (state, action: PayloadAction<number>) => {
-      state.selected.id = action.payload;
+    select: (state, action: PayloadAction<IViewGuestGroup>) => {
+      state.selected = {
+        id: action.payload.id,
+        status: ReduxStatus.SUCCESS,
+        data: action.payload
+      };
     },
+
     clearSelected: (state) => {
       state.selected = { id: 0, status: ReduxStatus.IDLE, data: null };
     },
@@ -52,6 +68,7 @@ const delegationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Danh sach doan vao
       .addCase(getListGuestGroup.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
@@ -63,7 +80,66 @@ const delegationSlice = createSlice({
       .addCase(getListGuestGroup.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
-      
+      // List Phong Ban
+      .addCase(getListPhongBan.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getListPhongBan.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listPhongBan = action.payload;
+      })
+      .addCase(getListPhongBan.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+
+      // List Trang thai
+      .addCase(getListStatus.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getListStatus.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listStatus = action.payload;
+      })
+      .addCase(getListStatus.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // Create Đoàn vào
+      .addCase(createDoanVao.pending, (state) => {
+        state.$create.status = ReduxStatus.LOADING;
+      })
+      .addCase(createDoanVao.fulfilled, (state) => {
+        state.$create.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createDoanVao.rejected, (state) => {
+        state.$create.status = ReduxStatus.FAILURE;
+      })
+      // Update Đoàn vào
+      .addCase(updateDoanVao.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateDoanVao.fulfilled, (state, action: PayloadAction<IViewGuestGroup>) => {
+        state.status = ReduxStatus.SUCCESS;
+        const index = state.list.findIndex((item) => item.id === action.payload.id);
+        if (index !== -1) {
+          state.list[index] = action.payload;
+        }
+      })
+      .addCase(updateDoanVao.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+
+      // Delete Đoàn vào
+      .addCase(deleteDoanVao.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(deleteDoanVao.fulfilled, (state, action: PayloadAction<number>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.list = state.list.filter((item) => item.id !== action.payload);
+        state.total -= 1;
+      })
+      .addCase(deleteDoanVao.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      });
   }
 });
 

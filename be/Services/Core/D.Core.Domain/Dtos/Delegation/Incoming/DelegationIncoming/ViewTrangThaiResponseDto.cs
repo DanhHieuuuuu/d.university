@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class CreateResponseDto : CreateRequestDto
+    public class ViewTrangThaiResponseDto
     {
-        public int Id { get; set; }
         public int Status { get; set; }
     }
 }

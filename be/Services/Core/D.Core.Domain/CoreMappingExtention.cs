@@ -140,6 +140,7 @@ namespace D.Core.Domain
             CreateMap<DelegationIncoming, PageDelegationIncomingResultDto>();
             CreateMap<CreateRequestDto, DelegationIncoming>();
             CreateMap<DelegationIncoming, CreateResponseDto>();
+            CreateMap<DelegationIncoming, UpdateDelegationIncomingResponseDto>();
             #endregion
         }
 
