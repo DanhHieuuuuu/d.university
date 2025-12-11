@@ -6,6 +6,7 @@ using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
@@ -32,17 +33,22 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
                 $"{nameof(FindPagingSvSinhVien)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var query = _unitOfWork.iSvSinhVienRepository.TableNoTracking.Where(x =>
-                string.IsNullOrEmpty(dto.Mssv) || dto.Mssv == x.Mssv
-            );
+            var query = _unitOfWork.iSvSinhVienRepository.TableNoTracking
+            .Where(x => string.IsNullOrEmpty(dto.Keyword)
+                     || x.Mssv.Contains(dto.Keyword)
+                     || x.Ten.Contains(dto.Keyword));
 
-            var totalCount = query.Count();
+            if (dto.Khoa.HasValue) query = query.Where(x => x.Khoa == dto.Khoa);
+            if (dto.Nganh.HasValue) query = query.Where(x => x.Nganh == dto.Nganh);
+            if (dto.KhoaHoc.HasValue) query = query.Where(x => x.KhoaHoc == dto.KhoaHoc);
 
             var items = query
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ProjectTo<SvSinhVienResponseDto>(_mapper.ConfigurationProvider)
                 .ToList();
+
+            var totalCount = query.Count();
 
             return new PageResultDto<SvSinhVienResponseDto> { Items = items, TotalItem = totalCount };
         }
@@ -53,52 +59,25 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
                 $"{nameof(GetAllSinhVien)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var query = _unitOfWork.iSvSinhVienRepository.TableNoTracking.Where(x =>
-                string.IsNullOrEmpty(dto.Mssv) || x.Mssv == dto.Mssv
-            );
+            var query = _unitOfWork.iSvSinhVienRepository.TableNoTracking;
 
-            var totalCount = query.Count();
+            if (dto.Khoa.HasValue) query = query.Where(x => x.Khoa == dto.Khoa);
+            if (dto.Nganh.HasValue) query = query.Where(x => x.Nganh == dto.Nganh);
+            if (dto.KhoaHoc.HasValue) query = query.Where(x => x.KhoaHoc == dto.KhoaHoc);
 
             var items = query
-                .Skip(dto.SkipCount())
-                .Take(dto.PageSize)
-                .ToList();
-
-            var result = items
-                .Select(x => new SvSinhVienGetAllResponseDto
-                {
-                    IdStudent = x.Id,
-                    Mssv = x.Mssv,
-                    HoDem = x.HoDem,
-                    Ten = x.Ten,
-                    NgaySinh = x.NgaySinh,
-                    NoiSinh = x.NoiSinh,
-                    SoCccd = x.SoCccd,
-                    SoDienThoai = x.SoDienThoai,
-                    Email = x.Email,
-                    Khoa = x.Khoa,
-                    //NganhHoc = x.IdNganh.HasValue
-                    //    ? _unitOfWork.iDmNganhRepository.FindById(x.IdNganh.Value)?.TenNganh
-                    //    : null,
-                    TrangThai = x.TrangThaiHoc switch
-                    {
-                        0 => "Đang học",
-                        1 => "Bảo lưu",
-                        2 => "Đã tốt nghiệp",
-                        _ => "Không xác định"
-                    }
-                })
+                .ProjectTo<SvSinhVienGetAllResponseDto>(_mapper.ConfigurationProvider)
                 .ToList();
 
             return new PageResultDto<SvSinhVienGetAllResponseDto>
             {
-                Items = result,
-                TotalItem = totalCount,
+                Items = items,
+                TotalItem = query.Count()
             };
         }
 
 
-        public SvSinhVienResponseDto CreateSinhVien(CreateSinhVienDto dto)
+        public async Task<SvSinhVienResponseDto> CreateSinhVien(CreateSinhVienDto dto)
         {
             _logger.LogInformation(
                 $"{nameof(CreateSinhVien)} method called. Dto: {JsonSerializer.Serialize(dto)}"
@@ -111,29 +90,21 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
 
             var newSv = _mapper.Map<SvSinhVien>(dto);
 
-            newSv.Mssv = _unitOfWork.iSvSinhVienRepository.GenerateMssv(dto.Khoa!.Value);
+            newSv.Mssv = await _unitOfWork.iSvSinhVienRepository.GenerateMssv(dto.KhoaHoc!.Value);
             newSv.Email2 = _unitOfWork.iSvSinhVienRepository.GenerateEmail(newSv.Mssv!);
+           
             _unitOfWork.iSvSinhVienRepository.AddAsync(newSv);
-            _unitOfWork.iSvSinhVienRepository.SaveChange();
+            _unitOfWork.iSvSinhVienRepository.SaveChangeAsync();
 
             return _mapper.Map<SvSinhVienResponseDto>(newSv);
         }
 
-
         public async Task<bool> UpdateSinhVien(UpdateSinhVienDto dto)
         {
-            var sv = _unitOfWork.iSvSinhVienRepository.GetByMssv(dto.Mssv!);
-            if (sv == null) return false;
+            var sv = await _unitOfWork.iSvSinhVienRepository.GetByMssv(dto.Mssv!);
+            if (sv == null) throw new Exception("Không tìm thấy sinh viên.");
 
-            sv.HoDem = dto.HoDem;
-            sv.Ten = dto.Ten;
-            sv.NgaySinh = dto.NgaySinh;
-            sv.NoiSinh = dto.NoiSinh;
-            sv.GioiTinh = dto.GioiTinh;
-            sv.QuocTich = dto.QuocTich;
-            sv.DanToc = dto.DanToc;
-            sv.SoCccd = dto.SoCccd;
-            sv.SoDienThoai = dto.SoDienThoai;
+            _mapper.Map(dto, sv);
 
             _unitOfWork.iSvSinhVienRepository.Update(sv);
             await _unitOfWork.iSvSinhVienRepository.SaveChangeAsync();
@@ -142,42 +113,27 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
 
         public async Task<bool> DeleteSinhVien(DeleteSinhVienDto dto)
         {
-            var sv = _unitOfWork.iSvSinhVienRepository.GetByMssv(dto.Mssv!);
-            if (sv == null)
-                return false;
+            var sv = await _unitOfWork.iSvSinhVienRepository.GetByMssv(dto.Mssv!);
+            if (sv == null) throw new Exception("Không tìm thấy sinh viên.");
 
             _unitOfWork.iSvSinhVienRepository.Delete(sv);
             await _unitOfWork.iSvSinhVienRepository.SaveChangeAsync();
             return true;
         }
 
-        public SvSinhVienResponseDto FindByMssv(FindByMssvDto dto)
+        public async Task<SvSinhVienResponseDto> FindByMssv(FindByMssvDto dto)
         {
             _logger.LogInformation(
                 $"{nameof(FindByMssv)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var sv = _unitOfWork.iSvSinhVienRepository.TableNoTracking.FirstOrDefault(x =>
-                string.IsNullOrEmpty(dto.Keyword)
-                || dto.Keyword == x.Mssv
-            );
+            var result = await _unitOfWork.iSvSinhVienRepository.TableNoTracking
+                .Where(x => x.Mssv == dto.Mssv) // Tìm chính xác theo MSSV
+                .ProjectTo<SvSinhVienResponseDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
 
-            var result = new SvSinhVienResponseDto
-            {
-                IdSinhVien = sv.Id,
-                Mssv = sv.Mssv,
-                HoDem = sv.HoDem,
-                Ten = sv.Ten,
-                NgaySinh = sv.NgaySinh,
-                NoiSinh = sv.NoiSinh,
-                SoCccd = sv.SoCccd,
-                SoDienThoai = sv.SoDienThoai,
-                Email = sv.Email,
-                Khoa = sv.Khoa,
-                //NganhHoc = sv.IdNganh.HasValue
-                //    ? _unitOfWork.iDmNganhRepository.FindById(sv.IdNganh.Value)?.TenNganh
-                //    : null,
-            };
+            if (result == null)
+                throw new Exception($"Không tìm thấy sinh viên có mssv: {dto.Mssv}");
 
             return result;
         }

@@ -1,4 +1,11 @@
 ﻿using AutoMapper;
+using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhung;
+using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon;
+using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
+using D.Core.Domain.Dtos.DaoTao.Khoa;
+using D.Core.Domain.Dtos.DaoTao.MonHoc;
+using D.Core.Domain.Dtos.DaoTao.MonTienQuyet;
+using D.Core.Domain.Dtos.DaoTao.Nganh;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Dtos.File;
@@ -18,6 +25,7 @@ using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
@@ -25,7 +33,6 @@ using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
 using D.Core.Domain.Entities.SinhVien;
-using System.Net.NetworkInformation;
 using System.Reflection;
 
 namespace D.Core.Domain
@@ -87,6 +94,42 @@ namespace D.Core.Domain
             #region sv
 
             CreateMap<SvSinhVien, SvSinhVienResponseDto>();
+            CreateMap<CreateSinhVienDto, SvSinhVien>();
+            CreateMap<UpdateSinhVienDto, SvSinhVien>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<SvSinhVien, SvSinhVienGetAllResponseDto>()
+                .ForMember(dest => dest.HoTen, opt => opt.MapFrom(src => src.HoDem + " " + src.Ten));
+
+            #endregion
+
+            #region DaoTao
+            CreateMap<DtKhoa, DtKhoaResponseDto>();
+            CreateMap<CreateDtKhoaDto, DtKhoa>();
+            CreateMap<UpdateDtKhoaDto, DtKhoa>();
+
+            CreateMap<DtNganh, DtNganhResponseDto>();
+            CreateMap<CreateDtNganhDto, DtNganh>();
+            CreateMap<UpdateDtNganhDto, DtNganh>();
+
+            CreateMap<DtChuyenNganh, DtChuyenNganhResponseDto>();
+            CreateMap<CreateDtChuyenNganhDto, DtChuyenNganh>();
+            CreateMap<UpdateDtChuyenNganhDto, DtChuyenNganh>();
+
+            CreateMap<DtChuongTrinhKhung, DtChuongTrinhKhungResponseDto>();
+            CreateMap<CreateDtChuongTrinhKhungDto, DtChuongTrinhKhung>();
+            CreateMap<UpdateDtChuongTrinhKhungDto, DtChuongTrinhKhung>();
+
+            CreateMap<DtMonHoc, DtMonHocResponseDto>();
+            CreateMap<CreateDtMonHocDto, DtMonHoc>();
+            CreateMap<UpdateDtMonHocDto, DtMonHoc>();
+
+            CreateMap<DtMonTienQuyet, DtMonTienQuyetResponseDto>();
+            CreateMap<CreateDtMonTienQuyetDto, DtMonTienQuyet>();
+            CreateMap<UpdateDtMonTienQuyetDto, DtMonTienQuyet>();
+
+            CreateMap<DtChuongTrinhKhungMon, DtChuongTrinhKhungMonResponseDto>();
+            CreateMap<CreateDtChuongTrinhKhungMonDto, DtChuongTrinhKhungMon>();
+            CreateMap<UpdateDtChuongTrinhKhungMonDto, DtChuongTrinhKhungMon>();
 
             #endregion
 

@@ -1,4 +1,5 @@
-﻿using D.Core.Infrastructure.Repositories.Delegation.Incoming;
+﻿using D.Core.Infrastructure.Repositories.DaoTao;
+using D.Core.Infrastructure.Repositories.Delegation.Incoming;
 using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.Kpi;
@@ -30,6 +31,17 @@ namespace D.Core.Infrastructure
         private NsQuanHeGiaDinhRepository _nsQuanHeGiaDinhRepository;
         private NsHopDongRepository _nsHopDongRepository;
         private NsHopDongChiTietRepository _nsHopDongChiTietRepository;
+
+        #region Dao Tao
+        private DtKhoaRepository _dtKhoaRepository;
+        private DtNganhRepository _dtNganhRepository;
+        private DtChuyenNganhRepository _dtChuyenNganhRepository;
+        private DtMonHocRepository _dtMonHocRepository;
+        private DtMonTienQuyetRepository _dtMonTienQuyetRepository;
+        private DtChuongTrinhKhungRepository _dtChuongTrinhKhungRepository;
+        private DtChuongTrinhKhungMonRepository _dtChuongTrinhKhungMonRepository;
+
+        #endregion
 
         private SvSinhVienRepository _svSinhVienRepository;
 
@@ -279,6 +291,88 @@ namespace D.Core.Infrastructure
                 return _fileRepository;
             }
         }
+
+        #region Dao Tao
+        public IDtKhoaRepository iDtKhoaRepository
+        {
+            get
+            {
+                if (_dtKhoaRepository == null)
+                {
+                    _dtKhoaRepository = new DtKhoaRepository(_dbContext, _httpContext);
+                }
+                return _dtKhoaRepository;
+            }
+        }
+
+        public IDtNganhRepository iDtNganhRepository
+        {
+            get
+            {
+                if (_dtNganhRepository == null)
+                {
+                    _dtNganhRepository = new DtNganhRepository(_dbContext, _httpContext);
+                }
+                return _dtNganhRepository;
+            }
+        }
+        public IDtChuyenNganhRepository iDtChuyenNganhRepository
+        {
+            get
+            {
+                if (_dtChuyenNganhRepository == null)
+                {
+                    _dtChuyenNganhRepository = new DtChuyenNganhRepository(_dbContext, _httpContext);
+                }
+                return _dtChuyenNganhRepository;
+            }
+        }
+        public IDtMonHocRepository iDtMonHocRepository
+        {
+            get
+            {
+                if (_dtMonHocRepository == null)
+                {
+                    _dtMonHocRepository = new DtMonHocRepository(_dbContext, _httpContext);
+                }
+                return _dtMonHocRepository;
+            }
+        }
+        public IDtMonTienQuyetRepository iDtMonTienQuyetRepository
+        {
+            get
+            {
+                if (_dtMonTienQuyetRepository == null)
+                {
+                    _dtMonTienQuyetRepository = new DtMonTienQuyetRepository(_dbContext, _httpContext);
+                }
+                return _dtMonTienQuyetRepository;
+            }
+        }
+        public IDtChuongTrinhKhungRepository iDtChuongTrinhKhungRepository
+        {
+            get
+            {
+                if (_dtChuongTrinhKhungRepository == null)
+                {
+                    _dtChuongTrinhKhungRepository = new DtChuongTrinhKhungRepository(_dbContext, _httpContext);
+                }
+                return _dtChuongTrinhKhungRepository;
+            }
+        }
+        public IDtChuongTrinhKhungMonRepository iDtChuongTrinhKhungMonRepository
+        {
+            get
+            {
+                if (_dtChuongTrinhKhungMonRepository == null)
+                {
+                    _dtChuongTrinhKhungMonRepository = new DtChuongTrinhKhungMonRepository(_dbContext, _httpContext);
+                }
+                return _dtChuongTrinhKhungMonRepository;
+            }
+        }
+
+        #endregion
 
         public async Task<int> SaveChangesAsync()
         {

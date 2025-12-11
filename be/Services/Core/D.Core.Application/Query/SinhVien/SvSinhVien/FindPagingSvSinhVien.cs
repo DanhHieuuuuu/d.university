@@ -8,7 +8,7 @@ namespace D.Core.Application.Query.SinhVien.SvSinhVien
     public class FindPagingSvSinhVien
         : IQueryHandler<SvSinhVienRequestDto, PageResultDto<SvSinhVienResponseDto>>
     {
-        public ISvSinhVienService _svSinhVienService;
+        private readonly ISvSinhVienService _svSinhVienService;
 
         public FindPagingSvSinhVien(ISvSinhVienService svSinhVienService)
         {

@@ -18,7 +18,7 @@ namespace D.Core.Application.Query.SinhVien.SvSinhVien
             CancellationToken cancellationToken
         )
         {
-            return _svSinhVienService.FindByMssv(request);
+            return await _svSinhVienService.FindByMssv(request);
         }
     }
 }
