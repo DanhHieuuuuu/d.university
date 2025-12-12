@@ -111,36 +111,67 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
       ]}
       style={{
         top: 0,
-        height: '90vh'
+        height: '85vh'
       }}
       bodyStyle={{
-        maxHeight: 'calc(90vh - 55px - 52px)',
+        maxHeight: 'calc(85vh - 55px - 52px)',
         overflowY: 'auto',
         paddingRight: '16px'
       }}
     >
       <Form form={form} layout="vertical" onFinish={onFinish} disabled={isView}>
-        <Form.Item label="Mã đoàn" name="code" rules={[{ required: true, message: 'Nhập mã đoàn' }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item label="Tên đoàn vào" name="name" rules={[{ message: 'Nhập tên đoàn' }]}>
-          <Input />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label="Mã đoàn" name="code" rules={[{ required: true, message: 'Nhập mã đoàn' }]}>
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Tên đoàn vào" name="name" rules={[{ message: 'Nhập tên đoàn' }]}>
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+
         <Form.Item label="Nội dung" name="content">
-          <Input.TextArea rows={3} />
+          <Input.TextArea rows={2} />
         </Form.Item>
-        <Form.Item label="Phòng ban phụ trách" name="idPhongBan" rules={[{ required: true }]}>
-          <Select options={listPhongBan.map((pb: any) => ({ value: pb.idPhongBan, label: pb.tenPhongBan }))} />
-        </Form.Item>
-        <Form.Item label="Địa điểm" name="location">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Nhân sự tiếp đón" name="idStaffReception" rules={[{ required: true }]}>
-          <InputNumber style={{ width: '100%' }} />
-        </Form.Item>
-        <Form.Item label="SĐT liên hệ" name="phoneNumber">
-          <Input />
-        </Form.Item>
+
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item label="Phòng ban phụ trách" name="idPhongBan" rules={[{ required: true }]}>
+              <Select options={listPhongBan.map((pb: any) => ({ value: pb.idPhongBan, label: pb.tenPhongBan }))} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="Địa điểm" name="location">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="Nhân sự tiếp đón" name="idStaffReception" rules={[{ required: true }]}>
+              <InputNumber style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item label="Tổng chi phí" name="totalMoney">
+              <InputNumber style={{ width: '100%' }} formatter={(value) => (value ? `${value}` : '')} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="Tổng số người" name="totalPerson">
+              <InputNumber style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="SĐT liên hệ" name="phoneNumber">
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item label="Ngày yêu cầu" name="requestDate" rules={[{ required: true }]}>
@@ -150,18 +181,6 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
           <Col span={12}>
             <Form.Item label="Ngày tiếp đón" name="receptionDate" rules={[{ required: true }]}>
               <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Tổng chi phí" name="totalMoney">
-              <InputNumber style={{ width: '100%' }} formatter={(value) => (value ? `${value}` : '')} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Tổng số người" name="totalPerson">
-              <InputNumber style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>

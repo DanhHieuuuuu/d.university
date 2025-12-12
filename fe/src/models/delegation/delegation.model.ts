@@ -5,6 +5,8 @@ export interface IViewGuestGroup {
   name: string;
   content: string;
   idPhongBan: number;
+  phongBan:string;
+  staffReceptionName: string;
   location?: string | null;
   idStaffReception: number;
   totalPerson: number;
@@ -38,6 +40,8 @@ export interface IReceptionTime {
   totalPerson: number;
   address: string;
   delegationIncomingId: number;
+  delegationName:string;
+  delegationCode:string;
   prepares?: IPrepare[] | null; 
 }
 export interface IPrepare {

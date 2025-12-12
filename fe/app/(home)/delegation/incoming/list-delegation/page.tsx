@@ -34,9 +34,12 @@ import { DelegationStatusConst } from '../../consts/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+
 
 const Page = () => {
   const [form] = Form.useForm();
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem, listPhongBan, listStatus } = useAppSelector((state) => state.delegationState);
 
@@ -69,14 +72,10 @@ const Page = () => {
       title: 'Nội dung'
     },
     {
-      key: 'idPhongBan',
-      dataIndex: 'idPhongBan',
+      key: 'phongBan',
+      dataIndex: 'phongBan',
       title: 'Phòng ban phụ trách',
       align: 'center',
-      render: (value: number) => {
-        const pb = listPhongBan.find((p: any) => p.idPhongBan === value);
-        return pb ? pb.tenPhongBan : '';
-      }
     },
     {
       key: 'location',
@@ -84,8 +83,8 @@ const Page = () => {
       title: 'Địa điểm'
     },
     {
-      key: 'idStaffReception',
-      dataIndex: 'idStaffReception',
+      key: 'staffReceptionName',
+      dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
       align: 'center'
     },
@@ -184,12 +183,9 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
-  const onClickView = (data: IViewGuestGroup) => {
-    dispatch(select(data));
-    setIsModalView(true);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
-  };
+ const onClickView = (data: IViewGuestGroup) => {
+  router.push(`/delegation/incoming/detail/${data.id}`);
+};
   const onClickUpdate = (data: IViewGuestGroup) => {
     dispatch(select(data));
     setIsModalView(false);

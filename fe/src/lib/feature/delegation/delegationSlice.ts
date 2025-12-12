@@ -4,6 +4,9 @@ import { ReduxStatus } from '@redux/const';
 import {
   createDoanVao,
   deleteDoanVao,
+  getByIdDetailDelegation,
+  getByIdGuestGroup,
+  getByIdReceptionTime,
   getListGuestGroup,
   getListPhongBan,
   getListStatus,
@@ -139,6 +142,42 @@ const delegationSlice = createSlice({
       })
       .addCase(deleteDoanVao.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
+      })
+      // Get by Id
+      .addCase(getByIdGuestGroup.pending, (state) => {
+        state.selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getByIdGuestGroup.fulfilled, (state, action: PayloadAction<any>) => {
+        state.selected.status = ReduxStatus.SUCCESS;
+        state.selected.data = action.payload;
+        state.selected.id = action.payload?.id;
+      })
+      .addCase(getByIdGuestGroup.rejected, (state) => {
+        state.selected.status = ReduxStatus.FAILURE;
+      })
+      // Get by Id Detail
+      .addCase(getByIdDetailDelegation.pending, (state) => {
+        state.selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getByIdDetailDelegation.fulfilled, (state, action: PayloadAction<any>) => {
+        state.selected.status = ReduxStatus.SUCCESS;
+        state.selected.data = action.payload;
+        state.selected.id = action.payload?.id;
+      })
+      .addCase(getByIdDetailDelegation.rejected, (state) => {
+        state.selected.status = ReduxStatus.FAILURE;
+      })
+      // Get by Id ReceptionTime
+      .addCase(getByIdReceptionTime.pending, (state) => {
+        state.selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getByIdReceptionTime.fulfilled, (state, action: PayloadAction<any>) => {
+        state.selected.status = ReduxStatus.SUCCESS;
+        state.selected.data = action.payload;
+        state.selected.id = action.payload?.id;
+      })
+      .addCase(getByIdReceptionTime.rejected, (state) => {
+        state.selected.status = ReduxStatus.FAILURE;
       });
   }
 });

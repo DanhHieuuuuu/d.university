@@ -1,7 +1,7 @@
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
-import { ICreateDoanVao, IUpdateDoanVao, IViewGuestGroup } from '@models/delegation/delegation.model';
-import { IResponseList } from '@models/common/response.model';
+import { ICreateDoanVao, IDetailDelegationIncoming, IReceptionTime, IUpdateDoanVao, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 
 const apiDelegationEndpoint = 'delegation-incoming';
@@ -71,4 +71,38 @@ const deleteDoanVao = async (id: number) => {
     return Promise.reject(err);
   }
 };
-export const DelegationIncomingService = { paging , getListPhongBan, getListStatus,updateDoanVao,deleteDoanVao,createDoanVao};
+const getByIdGuestGroup = async (id: number) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-by-id?Id=${id}`);
+
+    const data: IResponseItem<IViewGuestGroup> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const getByIdDetailDelegation = async (id: number) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-staff-by-id?Id=${id}`);
+
+    const data: IResponseItem<IDetailDelegationIncoming> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const getByIdReceptionTime = async (id: number) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-reception-time-by-id?Id=${id}`);
+
+    const data: IResponseItem<IReceptionTime> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+export const DelegationIncomingService = { paging , getListPhongBan, getListStatus,updateDoanVao,deleteDoanVao,createDoanVao,getByIdGuestGroup,getByIdDetailDelegation,getByIdReceptionTime};

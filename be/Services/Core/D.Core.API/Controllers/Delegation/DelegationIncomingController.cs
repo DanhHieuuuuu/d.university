@@ -132,6 +132,69 @@ namespace D.Core.API.Controllers.Delegation
                 return BadRequest(ex);
             }
         }
+        /// <summary>
+        /// Lấy đoàn vào theo Id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+
+        [HttpGet("get-by-id")]
+        public async Task<ResponseAPI> GetDelegationIncomingById(
+            [FromQuery] DelegationIncomingGetByIdRequestDto dto
+        )
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy thông tin thành viên theo Id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+
+        [HttpGet("get-staff-by-id")]
+        public async Task<ResponseAPI> GetDetailDelegationIncomingById(
+            [FromQuery] DetailDelegationIncomingRequestDto dto
+        )
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy thông tin thời gian đoàn vào theo Id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+
+        [HttpGet("get-reception-time-by-id")]
+        public async Task<ResponseAPI> GetReceptionTimeById(
+            [FromQuery] ReceptionTimeRequestDto dto
+        )
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
     }
 }

@@ -17,5 +17,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
         List<ViewTrangThaiResponseDto> GetListTrangThai(ViewTrangThaiRequestDto dto);
         Task<UpdateDelegationIncomingResponseDto> UpdateDelegationIncoming(UpdateDelegationIncomingRequestDto dto);
         void DeleteDoanVao(int id);
+        Task<PageDelegationIncomingResultDto> GetByIdDelegationIncoming(int id);
+        Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int id);
+        Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int id);
     }
 }

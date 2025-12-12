@@ -11,6 +11,7 @@ using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -45,26 +46,47 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(Paging)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
-            var query = _unitOfWork.iDelegationIncomingRepository.TableNoTracking.Where(x =>
-                (string.IsNullOrEmpty(dto.Keyword)
-                || x.Name.ToLower().Contains(dto.Keyword.ToLower()))
-                && (dto.IdPhongBan == 0 || x.IdPhongBan == dto.IdPhongBan)
-                && (dto.Status == 0 || x.Status == dto.Status)
-
-            );
+            var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
+            var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
+           
+            var query = from d in _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                        join pb in phongBanTable on d.IdPhongBan equals pb.Id into pbJoin
+                        from pb in pbJoin.DefaultIfEmpty()
+                        join s in staffTable on d.IdStaffReception equals s.Id into sJoin
+                        from s in sJoin.DefaultIfEmpty()
+                        where (string.IsNullOrEmpty(dto.Keyword) || d.Name.ToLower().Contains(dto.Keyword.ToLower()))
+                              && (dto.IdPhongBan == 0 || d.IdPhongBan == dto.IdPhongBan)
+                              && (dto.Status == 0 || d.Status == dto.Status)
+                        select new PageDelegationIncomingResultDto
+                        {
+                            Id = d.Id,
+                            Code = d.Code,
+                            Name = d.Name,
+                            Content = d.Content,
+                            IdPhongBan = d.IdPhongBan,
+                            PhongBan = pb != null ? pb.TenPhongBan : null,
+                            IdStaffReception = d.IdStaffReception,
+                            StaffReceptionName = s != null ? s.HoDem + " " + s.Ten : null,
+                            TotalPerson = d.TotalPerson,
+                            PhoneNumber = d.PhoneNumber,
+                            Status = d.Status,
+                            RequestDate = d.RequestDate,
+                            ReceptionDate = d.ReceptionDate,
+                            TotalMoney = d.TotalMoney
+                        };
 
             var totalCount = query.Count();
 
             var items = query.Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
-            ;
 
             return new PageResultDto<PageDelegationIncomingResultDto>
             {
-                Items = _mapper.Map<List<PageDelegationIncomingResultDto>>(items),
+                Items = items,
                 TotalItem = totalCount,
             };
         }
-        
+
+
         public async Task<CreateResponseDto> Create(CreateRequestDto dto)
         {
             _logger.LogInformation($"{nameof(Create)} method called, dto: {JsonSerializer.Serialize(dto)}.");
@@ -169,6 +191,106 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 .Select(x => new ViewTrangThaiResponseDto { Status = x })
                 .ToList();
         }
+        public async Task<PageDelegationIncomingResultDto> GetByIdDelegationIncoming(int id)
+        {
+            _logger.LogInformation($"{nameof(GetByIdDelegationIncoming)} called with id: {id}");
+
+            var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
+            var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
+
+            var query = from d in _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                        where d.Id == id
+                        join pb in phongBanTable on d.IdPhongBan equals pb.Id into pbJoin
+                        from pb in pbJoin.DefaultIfEmpty()
+                        join s in staffTable on d.IdStaffReception equals s.Id into sJoin
+                        from s in sJoin.DefaultIfEmpty()
+                        select new PageDelegationIncomingResultDto
+                        {
+                            Id = d.Id,
+                            Code = d.Code,
+                            Name = d.Name,
+                            Content = d.Content,
+                            IdPhongBan = d.IdPhongBan,
+                            PhongBan = pb != null ? pb.TenPhongBan : null,
+                            IdStaffReception = d.IdStaffReception,
+                            StaffReceptionName = s != null ? s.HoDem + " " + s.Ten : null,
+                            TotalPerson = d.TotalPerson,
+                            PhoneNumber = d.PhoneNumber,
+                            Status = d.Status,
+                            RequestDate = d.RequestDate,
+                            ReceptionDate = d.ReceptionDate,
+                            TotalMoney = d.TotalMoney
+                        };
+
+            var result = query.FirstOrDefault();
+            return result;
+        }
+        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int id)
+        {
+            _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with id: {id}");
+
+            var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.Id == id);
+
+            if (detail == null)
+            {
+                return null; 
+            }
+
+            var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.Id == detail.DelegationIncomingId);
+           
+            var result = new DetailDelegationIncomingResponseDto
+            {
+                Id = detail.Id,
+                Code = detail.Code,
+                FirstName = detail.FirstName,
+                LastName = detail.LastName,
+                YearOfBirth = detail.YearOfBirth,
+                PhoneNumber = detail.PhoneNumber,
+                Email = detail.Email,
+                IsLeader = detail.IsLeader,
+                DelegationIncomingId = detail.DelegationIncomingId,
+                DelegationName = delegation != null ? delegation.Name : null, 
+                DelegationCode = delegation != null ? delegation.Code : null
+            };
+
+            return result;
+        }
+        public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int id)
+        {
+            _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with id: {id}");
+
+            var receptionTime = _unitOfWork.iReceptionTimeRepository.TableNoTracking
+                .FirstOrDefault(r => r.Id == id);
+
+            if (receptionTime == null)
+                return null; 
+
+            var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.Id == receptionTime.DelegationIncomingId);
+
+            var result = new ReceptionTimeResponseDto
+            {
+                Id = receptionTime.Id,
+                StartDate = receptionTime.StartDate,
+                EndDate = receptionTime.EndDate,
+                Date = receptionTime.Date,
+                Content = receptionTime.Content,
+                TotalPerson = receptionTime.TotalPerson,
+                Address = receptionTime.Address,
+                DelegationIncomingId = receptionTime.DelegationIncomingId,
+                DelegationName = delegation != null ? delegation.Name : null,
+                DelegationCode = delegation != null ? delegation.Code : null
+            };
+
+            return result;
+        }
+
+
+
+
+
 
     }
 }

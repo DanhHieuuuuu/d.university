@@ -92,4 +92,50 @@ export const updateDoanVao = createAsyncThunk(
     }
   }
 );
+export const getByIdGuestGroup = createAsyncThunk(
+  'delegation-incoming/getById',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const res = await DelegationIncomingService.getByIdGuestGroup (id);
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
+export const getByIdDetailDelegation = createAsyncThunk(
+  'delegation-incoming/getByIdDetail',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const res = await DelegationIncomingService.getByIdDetailDelegation (id); 
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
+export const getByIdReceptionTime = createAsyncThunk(
+  'delegation-incoming/getByIdReceptionTime',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const res = await DelegationIncomingService.getByIdReceptionTime (id);
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
 
