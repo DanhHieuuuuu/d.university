@@ -2,6 +2,7 @@
 using d.Shared.Permission.Role;
 using D.Constants.Core.Delegation;
 using D.Core.Domain;
+using D.Core.Domain.Dtos.Delegation;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
@@ -28,16 +29,18 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
     public class DelegationIncomingService : ServiceBase, IDelegationIncomingService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
-
+        private readonly IExcelService _excelService;
         public DelegationIncomingService(
             ILogger<DelegationIncomingService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            IExcelService excelService
         )
             : base(logger, httpContext, mapper)
         {
             _unitOfWork = unitOfWork;
+            _excelService = excelService;
         }
 
         /// <summary>
@@ -100,6 +103,69 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 throw new Exception($"Đã tồn tại Đoàn vào có mã {dto.Code}");
             }
             var newDoanVao = _mapper.Map<DelegationIncoming>(dto);
+
+            if(dto.DetailDelegation != null)
+            {
+                var templateRules = new List<ExcelColumnRule>
+                {
+                    new()
+                    {
+                        Header = "Họ",
+                        Required = true,
+                        Validator = v => v.Length >= 1,
+                        ErrorMessage = "Họ không hợp lệ"
+                    },
+                    new()
+                    {
+                        Header = "Tên",
+                        Required = true,
+                        Validator = v => v.Length >= 1,
+                        ErrorMessage = "Tên không hợp lệ"
+                    },
+                    new()
+                    {
+                        Header = "Năm sinh",
+                        Required = true,
+                        Validator = v =>
+                        {
+                            if (!int.TryParse(v, out var year)) return false;
+                            return year >= 1900 && year <= DateTime.Now.Year;
+                        },
+                        ErrorMessage = "Năm sinh không hợp lệ"
+                    },
+                    new()
+                    {
+                        Header = "Số điện thoại liên lạc",
+                        Required = true,
+                        Validator = v =>
+                            System.Text.RegularExpressions.Regex.IsMatch(v, @"^(0|\+84)[0-9]{9}$"),
+                        ErrorMessage = "Số điện thoại không đúng định dạng"
+                    },
+                    new()
+                    {
+                        Header = "Email",
+                        Required = true,
+                        Validator = IsValidEmail,
+                        ErrorMessage = "Email sai định dạng"
+                    },
+                    new()
+                    {
+                        Header = "Trưởng đoàn (Có/Không)",
+                        Required = true,
+                        Validator = v =>
+                            v.Equals("Có", StringComparison.OrdinalIgnoreCase) ||
+                            v.Equals("Không", StringComparison.OrdinalIgnoreCase),
+                        ErrorMessage = "Giá trị Trưởng đoàn phải là 'Có' hoặc 'Không'"
+                    }
+                };
+
+                await _excelService.CheckValidateDetailDelegationAsync(dto.DetailDelegation, templateRules);
+
+                List<DetailDelegationIncoming> detailDelegationIncomings = await _excelService.ParseExcelToListDetailDelegationAsync(dto.DetailDelegation);
+
+                _unitOfWork.iDetailDelegationIncomingRepository.AddRange(detailDelegationIncomings);
+            }
+
             newDoanVao.Status = DelegationStatus.Create;
             _unitOfWork.iDelegationIncomingRepository.Add(newDoanVao);
             await _unitOfWork.SaveChangesAsync();
@@ -304,7 +370,72 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             var result = query.FirstOrDefault();
             return result;
         }
-      
+        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int id)
+        {
+            _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with id: {id}");
+
+            var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.Id == id);
+
+            if (detail == null)
+            {
+                return null; 
+            }
+
+            var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.Id == detail.DelegationIncomingId);
+           
+            var result = new DetailDelegationIncomingResponseDto
+            {
+                Id = detail.Id,
+                Code = detail.Code,
+                FirstName = detail.FirstName,
+                LastName = detail.LastName,
+                YearOfBirth = detail.YearOfBirth,
+                PhoneNumber = detail.PhoneNumber,
+                Email = detail.Email,
+                IsLeader = detail.IsLeader,
+                DelegationIncomingId = detail.DelegationIncomingId,
+                DelegationName = delegation != null ? delegation.Name : null, 
+                DelegationCode = delegation != null ? delegation.Code : null
+            };
+
+            return result;
+        }
+        public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int id)
+        {
+            _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with id: {id}");
+
+            var receptionTime = _unitOfWork.iReceptionTimeRepository.TableNoTracking
+                .FirstOrDefault(r => r.Id == id);
+
+            if (receptionTime == null)
+                return null; 
+
+            var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.Id == receptionTime.DelegationIncomingId);
+
+            var result = new ReceptionTimeResponseDto
+            {
+                Id = receptionTime.Id,
+                StartDate = receptionTime.StartDate,
+                EndDate = receptionTime.EndDate,
+                Date = receptionTime.Date,
+                Content = receptionTime.Content,
+                TotalPerson = receptionTime.TotalPerson,
+                Address = receptionTime.Address,
+                DelegationIncomingId = receptionTime.DelegationIncomingId,
+                DelegationName = delegation != null ? delegation.Name : null,
+                DelegationCode = delegation != null ? delegation.Code : null
+            };
+
+            return result;
+        }
+
+
+
+
+
 
     }
 }

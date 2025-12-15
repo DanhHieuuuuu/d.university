@@ -38,6 +38,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IPrepareService, PrepareService>()
                 .AddScoped<IReceptionTimeService, ReceptionTimeService>()
                 .AddScoped<ISupporterService, SupporterService>()
+                .AddScoped<IExcelService, ExcelService>()
             #endregion
                 .AddScoped<IFileService, FileService>();
         }
