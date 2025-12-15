@@ -12,9 +12,9 @@ namespace D.Core.Application.Query.Delegation.Incoming
 {
     public class DetailDelegationIncomingGetById : IQueryHandler<DetailDelegationIncomingRequestDto, DetailDelegationIncomingResponseDto>
     {
-        private readonly IDelegationIncomingService _service;
+        private readonly IDetailDelegationIncomingService _service;
 
-        public DetailDelegationIncomingGetById(IDelegationIncomingService service)
+        public DetailDelegationIncomingGetById(IDetailDelegationIncomingService service)
         {
             _service = service;
         }

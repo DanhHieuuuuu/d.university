@@ -12,9 +12,9 @@ namespace D.Core.Application.Query.Delegation.Incoming
 {
     public class ReceptionTimeGetById : IQueryHandler<ReceptionTimeRequestDto, ReceptionTimeResponseDto>
     {
-        private readonly IDelegationIncomingService _service;
+        private readonly IReceptionTimeService _service;
 
-        public ReceptionTimeGetById(IDelegationIncomingService service)
+        public ReceptionTimeGetById(IReceptionTimeService service)
         {
             _service = service;
         }

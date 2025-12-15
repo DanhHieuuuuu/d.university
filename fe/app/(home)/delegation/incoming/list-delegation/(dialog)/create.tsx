@@ -133,10 +133,6 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
           </Col>
         </Row>
 
-        <Form.Item label="Nội dung" name="content">
-          <Input.TextArea rows={2} />
-        </Form.Item>
-
         <Row gutter={16}>
           <Col span={8}>
             <Form.Item label="Phòng ban phụ trách" name="idPhongBan" rules={[{ required: true }]}>
@@ -184,6 +180,9 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
             </Form.Item>
           </Col>
         </Row>
+        <Form.Item label="Nội dung" name="content">
+          <Input.TextArea rows={2} />
+        </Form.Item>
       </Form>
     </Modal>
   );
