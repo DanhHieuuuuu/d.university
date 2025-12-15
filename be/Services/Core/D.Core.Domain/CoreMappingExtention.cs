@@ -141,6 +141,11 @@ namespace D.Core.Domain
             CreateMap<CreateRequestDto, DelegationIncoming>();
             CreateMap<DelegationIncoming, CreateResponseDto>();
             CreateMap<DelegationIncoming, UpdateDelegationIncomingResponseDto>();
+            CreateMap<LogStatus, ViewDelegationIncomingLogDto>();
+            CreateMap<LogReceptionTime, ViewReceptionTimeLogDto>();
+            CreateMap<CreateReceptionTimeRequestDto, ReceptionTime>();
+            CreateMap<ReceptionTime, CreateReceptionTimeResponseDto>();
+            CreateMap<ReceptionTime, UpdateReceptionTimeResponseDto>();
             #endregion
         }
 
