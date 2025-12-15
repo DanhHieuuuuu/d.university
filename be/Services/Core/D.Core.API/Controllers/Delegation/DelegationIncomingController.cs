@@ -7,6 +7,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmKhoaHoc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 namespace D.Core.API.Controllers.Delegation
 {
@@ -230,6 +231,32 @@ namespace D.Core.API.Controllers.Delegation
             {
                 return BadRequest(ex);
             }
+        }
+
+        [HttpGet("download-excel")]
+        public IActionResult DownloadExcel()
+        {
+            var filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Template",
+                "detail_delegation.xlsx"
+            );
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("File không tồn tại");
+
+            var bytes = System.IO.File.ReadAllBytes(filePath);
+
+            var stream = new FileStream(
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read
+            );
+
+            return FileByStream(
+                 stream,
+                 "Delegation_Template.xlsx");
         }
 
         /// <summary>
