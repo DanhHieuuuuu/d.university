@@ -47,7 +47,7 @@ namespace D.Core.API.Controllers.Delegation
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("create")]
-        public async Task<ResponseAPI> CreateDelegationIncoming([FromBody] CreateRequestDto dto)
+        public async Task<ResponseAPI> CreateDelegationIncoming([FromForm] CreateRequestDto dto)
         {
             try
             {

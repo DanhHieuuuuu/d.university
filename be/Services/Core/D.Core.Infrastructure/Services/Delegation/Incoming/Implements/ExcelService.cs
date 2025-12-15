@@ -28,7 +28,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             List<ExcelColumnRule> rules
         )
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.License.SetNonCommercialPersonal("Hieu_Nguyen");
             using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
 

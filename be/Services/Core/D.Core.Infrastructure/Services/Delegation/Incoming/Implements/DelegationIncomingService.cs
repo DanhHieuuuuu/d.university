@@ -432,8 +432,18 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             return result;
         }
 
-
-
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                _ = new System.Net.Mail.MailAddress(email);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
 
 
