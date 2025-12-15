@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using D.ControllerBase.Exceptions;
+﻿using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Delegation;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 {
@@ -28,7 +20,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             List<ExcelColumnRule> rules
         )
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.License.SetNonCommercialPersonal("Hieu_Nguyen");
+
             using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
 
