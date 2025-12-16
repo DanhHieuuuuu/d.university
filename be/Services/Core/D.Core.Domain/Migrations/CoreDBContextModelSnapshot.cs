@@ -1025,7 +1025,6 @@ namespace D.Core.Domain.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("DelegationIncomingCode")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("DelegationIncomingId");
@@ -1041,7 +1040,6 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Description");
@@ -1053,16 +1051,15 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("NewStatus")
+                    b.Property<int?>("NewStatus")
                         .HasColumnType("int")
                         .HasColumnName("NewStatus");
 
-                    b.Property<int>("OldStatus")
+                    b.Property<int?>("OldStatus")
                         .HasColumnType("int")
                         .HasColumnName("OldStatus");
 
                     b.Property<string>("Reason")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Reason");
@@ -4206,6 +4203,800 @@ namespace D.Core.Domain.Migrations
                     b.ToTable("SvSinhVien", "sv");
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsAIResponse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("DiemCamXuc")
+                        .HasColumnType("float")
+                        .HasColumnName("SentimentScore");
+
+                    b.Property<string>("GoiYCaiThien")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Recommendation");
+
+                    b.Property<int>("IdBaoCao")
+                        .HasColumnType("int")
+                        .HasColumnName("ReportId");
+
+                    b.Property<int>("IdTieuChi")
+                        .HasColumnType("int")
+                        .HasColumnName("CriteriaId");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NhanCamXuc")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("SentimentLabel");
+
+                    b.Property<string>("TomTatNoiDung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Summary");
+
+                    b.Property<string>("XuHuong")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("KeyTrends");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdBaoCao");
+
+                    b.HasIndex("IdTieuChi");
+
+                    b.ToTable("KsAIResponse", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsQuestionAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdCauHoi")
+                        .HasColumnType("int")
+                        .HasColumnName("QuestionId");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsCorrect");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoiDung")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Content");
+
+                    b.Property<int>("ThuTu")
+                        .HasColumnType("int")
+                        .HasColumnName("SortOrder");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int")
+                        .HasColumnName("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdCauHoi");
+
+                    b.ToTable("KsQuestionAnswer", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurvey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdPhongBan")
+                        .HasColumnType("int")
+                        .HasColumnName("IdPhongBan");
+
+                    b.Property<int>("IdYeuCau")
+                        .HasColumnType("int")
+                        .HasColumnName("SurveyRequestId");
+
+                    b.Property<string>("MaKhaoSat")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("SurveyCode");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("Status");
+
+                    b.Property<string>("TenKhaoSat")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("Name");
+
+                    b.Property<DateTime>("ThoiGianBatDau")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("TimeStart");
+
+                    b.Property<DateTime>("ThoiGianKetThuc")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("TimeEnd");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdYeuCau");
+
+                    b.ToTable("KsSurvey", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyCriteria", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdYeuCau")
+                        .HasColumnType("int")
+                        .HasColumnName("SurveyRequestId");
+
+                    b.Property<string>("Keyword")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Keyword");
+
+                    b.Property<int?>("KsSurveyRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenTieuChi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CriteriaName");
+
+                    b.Property<double>("Weight")
+                        .HasColumnType("float")
+                        .HasColumnName("Weight");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KsSurveyRequestId");
+
+                    b.ToTable("KsSurveyCriteria", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DuLieuCu")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("OldValue");
+
+                    b.Property<string>("DuLieuMoi")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("NewValue");
+
+                    b.Property<string>("IdDoiTuong")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("TargetId");
+
+                    b.Property<int?>("IdNguoiThaoTac")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.Property<string>("LoaiHanhDong")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("ActionType");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenBang")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("TargetTable");
+
+                    b.Property<string>("TenNguoiThaoTac")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("UserName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KsSurveyLog", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("BatBuoc")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsRequired");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdYeuCau")
+                        .HasColumnType("int")
+                        .HasColumnName("SurveyRequestId");
+
+                    b.Property<int>("LoaiCauHoi")
+                        .HasColumnType("int")
+                        .HasColumnName("Type");
+
+                    b.Property<string>("MaCauHoi")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("QuestionCode");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoiDung")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Content");
+
+                    b.Property<int>("ThuTu")
+                        .HasColumnType("int")
+                        .HasColumnName("SortOrder");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdYeuCau");
+
+                    b.ToTable("KsSurveyQuestion", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("DiemTrungBinh")
+                        .HasColumnType("float")
+                        .HasColumnName("AverageScore");
+
+                    b.Property<string>("DuLieuThongKe")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("StatisticsData");
+
+                    b.Property<int>("IdKhaoSat")
+                        .HasColumnType("int")
+                        .HasColumnName("SurveyId");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ThoiGianTao")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("GeneratedAt");
+
+                    b.Property<int>("TongSoLuotThamGia")
+                        .HasColumnType("int")
+                        .HasColumnName("TotalParticipants");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdKhaoSat");
+
+                    b.ToTable("KsSurveyReport", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdPhongBan")
+                        .HasColumnType("int")
+                        .HasColumnName("IdPhongBan");
+
+                    b.Property<string>("LyDoTuChoi")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Reason");
+
+                    b.Property<string>("MaYeuCau")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("SurveyRequestCode");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenKhaoSatYeuCau")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("Name");
+
+                    b.Property<DateTime>("ThoiGianBatDau")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("TimeStart");
+
+                    b.Property<DateTime>("ThoiGianKetThuc")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("TimeEnd");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int")
+                        .HasColumnName("Status");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KsSurveyRequest", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveySubmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("DiemTong")
+                        .HasColumnType("float")
+                        .HasColumnName("TotalScore");
+
+                    b.Property<int>("IdKhaoSat")
+                        .HasColumnType("int")
+                        .HasColumnName("SurveyId");
+
+                    b.Property<int?>("IdNguoiDung")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ThoiGianBatDau")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("StartTime");
+
+                    b.Property<DateTime?>("ThoiGianNop")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("SubmitTime");
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int")
+                        .HasColumnName("Status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdKhaoSat");
+
+                    b.ToTable("KsSurveySubmission", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveySubmissionAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CauTraLoiText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("TextResponse");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IdCauHoi")
+                        .HasColumnType("int")
+                        .HasColumnName("QuestionId");
+
+                    b.Property<int?>("IdDapAnChon")
+                        .HasColumnType("int")
+                        .HasColumnName("SelectedAnswerId");
+
+                    b.Property<int>("IdPhienLamBai")
+                        .HasColumnType("int")
+                        .HasColumnName("SubmissionId");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdCauHoi");
+
+                    b.HasIndex("IdDapAnChon");
+
+                    b.HasIndex("IdPhienLamBai");
+
+                    b.ToTable("KsSurveySubmissionAnswer", "ks");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyTarget", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("IdKhoa")
+                        .HasColumnType("int")
+                        .HasColumnName("FacultyId");
+
+                    b.Property<int?>("IdKhoaHoc")
+                        .HasColumnType("int")
+                        .HasColumnName("CourseId");
+
+                    b.Property<int?>("IdPhongBan")
+                        .HasColumnType("int")
+                        .HasColumnName("DepartmentId");
+
+                    b.Property<int>("IdYeuCau")
+                        .HasColumnType("int")
+                        .HasColumnName("SurveyRequestId");
+
+                    b.Property<int>("LoaiDoiTuong")
+                        .HasColumnType("int")
+                        .HasColumnName("Type");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdYeuCau");
+
+                    b.ToTable("KsSurveyTarget", "ks");
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuongTrinhKhung", b =>
                 {
                     b.HasOne("D.Core.Domain.Entities.DaoTao.DtChuyenNganh", "ChuyenNganh")
@@ -4355,6 +5146,124 @@ namespace D.Core.Domain.Migrations
                     b.Navigation("DepartmentSupport");
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsAIResponse", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyReport", "Report")
+                        .WithMany()
+                        .HasForeignKey("IdBaoCao")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyCriteria", "Criteria")
+                        .WithMany()
+                        .HasForeignKey("IdTieuChi")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Criteria");
+
+                    b.Navigation("Report");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsQuestionAnswer", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyQuestion", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("IdCauHoi")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurvey", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyRequest", "SurveyRequest")
+                        .WithMany()
+                        .HasForeignKey("IdYeuCau")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SurveyRequest");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyCriteria", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyRequest", null)
+                        .WithMany("Criterias")
+                        .HasForeignKey("KsSurveyRequestId");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyQuestion", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyRequest", "SurveyRequest")
+                        .WithMany("Questions")
+                        .HasForeignKey("IdYeuCau")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SurveyRequest");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyReport", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurvey", "Survey")
+                        .WithMany()
+                        .HasForeignKey("IdKhaoSat")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveySubmission", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurvey", "Survey")
+                        .WithMany()
+                        .HasForeignKey("IdKhaoSat")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveySubmissionAnswer", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyQuestion", "Question")
+                        .WithMany()
+                        .HasForeignKey("IdCauHoi")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsQuestionAnswer", "SelectedAnswer")
+                        .WithMany()
+                        .HasForeignKey("IdDapAnChon")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveySubmission", "Submission")
+                        .WithMany("Responses")
+                        .HasForeignKey("IdPhienLamBai")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("SelectedAnswer");
+
+                    b.Navigation("Submission");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyTarget", b =>
+                {
+                    b.HasOne("D.Core.Domain.Entities.Survey.KsSurveyRequest", "SurveyRequest")
+                        .WithMany("Targets")
+                        .HasForeignKey("IdYeuCau")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SurveyRequest");
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtChuongTrinhKhung", b =>
                 {
                     b.Navigation("ChuongTrinhKhungMons");
@@ -4403,6 +5312,25 @@ namespace D.Core.Domain.Migrations
             modelBuilder.Entity("D.Core.Domain.Entities.Delegation.Incoming.ReceptionTime", b =>
                 {
                     b.Navigation("Prepares");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyQuestion", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyRequest", b =>
+                {
+                    b.Navigation("Criterias");
+
+                    b.Navigation("Questions");
+
+                    b.Navigation("Targets");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveySubmission", b =>
+                {
+                    b.Navigation("Responses");
                 });
 #pragma warning restore 612, 618
         }

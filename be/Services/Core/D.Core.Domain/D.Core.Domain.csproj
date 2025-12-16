@@ -9,6 +9,8 @@
   <ItemGroup>
     <Folder Include="Dtos\Kpi\KpiTruong\" />
     <Folder Include="Dtos\Kpi\KpiTemplate\" />
+    <Folder Include="Dtos\Kpi\" />
+    <Folder Include="Dtos\Survey\" />
     <Folder Include="Entities\Delegation\Outgoing\" />
     <Folder Include="Entities\Hrm\View\" />
   </ItemGroup>

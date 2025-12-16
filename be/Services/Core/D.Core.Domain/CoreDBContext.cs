@@ -5,6 +5,7 @@ using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.SinhVien;
+using D.Core.Domain.Entities.Survey;
 using D.Core.Domain.Shared.SeedData;
 using D.DomainBase.Entity;
 using D.InfrastructureBase.Database;
@@ -100,6 +101,20 @@ namespace D.Core.Domain
         public DbSet<KpiTruong> KpiTruongs { get; set; }
 
         #endregion
+
+        #region Survey
+        public DbSet<KsSurvey> KsSurvey { get; set; }
+        public DbSet<KsSurveyRequest> KsSurveyRequest { get; set; }
+        public DbSet<KsSurveyQuestion> KsSurveyQuestion { get; set; }
+        public DbSet<KsQuestionAnswer> KsQuestionAnswer { get; set; }
+        public DbSet<KsSurveyTarget> KsSurveyTarget { get; set; }
+        public DbSet<KsSurveyCriteria> KsSurveyCriteria { get; set; }
+        public DbSet<KsSurveySubmission> KsSurveySubmission { get; set; }
+        public DbSet<KsSurveySubmissionAnswer> KsSurveySubmissionAnswer { get; set; }
+        public DbSet<KsSurveyReport> KsSurveyReport { get; set; }
+        public DbSet<KsAIResponse> KsAIResponse { get; set; }
+        public DbSet<KsSurveyLog> KsSurveyLog { get; set; }
+        #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -144,6 +159,18 @@ namespace D.Core.Domain
                       .HasForeignKey(tienQuyet => tienQuyet.MonTienQuyetId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+
+            modelBuilder.Entity<KsSurveySubmissionAnswer>()
+                .HasOne(a => a.Question)
+                .WithMany()
+                .HasForeignKey(a => a.IdCauHoi)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<KsSurveySubmissionAnswer>()
+                .HasOne(a => a.SelectedAnswer)
+                .WithMany()
+                .HasForeignKey(a => a.IdDapAnChon)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.SeedDataHrm();
             modelBuilder.SeedDataDt();

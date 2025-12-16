@@ -10,6 +10,7 @@ import studentReducer from './feature/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';
 import kpiReducer from './feature/kpiSlice';
+import delegationReducer from './feature/delegation/delegationSlice';
 
 const persistConfig = {
   key: 'auth',
@@ -25,6 +26,7 @@ export const makeStore = () => {
       authState: persistedAuthReducer,
       loadState: loadingReducer,
       nhanSuState: nhanSuReducer,
+      delegationState: delegationReducer,
       userState: userReducer,
       danhmucState: danhmucReducer,
       studentState: studentReducer,

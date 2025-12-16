@@ -5,7 +5,9 @@ using D.Auth.Domain.Dtos.Permission;
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Dtos.User;
 using D.Auth.Domain.Entities;
+using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.File;
+using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 
 namespace D.Auth.Domain
@@ -25,7 +27,7 @@ namespace D.Auth.Domain
 
             CreateMap<CreatePermissionRequestDto, RolePermission>();
 
-            CreateMap<CreateUserRequestDto, NsNhanSu>();
+            CreateMap<CreateUserRequestDto, NsNhanSu>();           
 
             // File mappings
             CreateMap<FileManagement, FileResponseDto>();

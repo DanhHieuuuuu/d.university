@@ -12,5 +12,6 @@
         public const string Notification = "noti";
         public const string Dt = "dt";
         public const string Kpi = "kpi";
+        public const string Ks = "ks";
     }
 }
