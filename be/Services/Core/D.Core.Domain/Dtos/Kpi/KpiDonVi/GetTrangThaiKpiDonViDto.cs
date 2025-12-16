@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Kpi.KpiDonVi
 {
-    public class GetTrangThaiKpiDonViDto : IQuery<List<int>>
+    public class GetTrangThaiKpiDonViDto : IQuery<List<TrangThaiKpiDonViResponseDto>>
     {
     }
 }

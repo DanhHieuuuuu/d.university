@@ -50,6 +50,41 @@ export const listMenuCore: IMenu[] = [
     ]
   },
   {
+    label: 'KPI',
+    routerLink: '/kpi',
+    icon: <BarsOutlined />,
+    items: [
+      {
+        label: 'Danh sách KPI',
+        routerLink: '/kpi/list',
+        icon: <ApartmentOutlined />,
+        items: [
+          {
+            label: 'Kpi Role',
+            routerLink: '/kpi/list/roles',
+            icon: <PartitionOutlined />
+          },
+          {
+            label: 'Kpi cá nhân',
+            routerLink: '/kpi/list/personals',
+            icon: <PartitionOutlined />
+          },
+          {
+            label: 'Kpi đơn vị',
+            routerLink: '/kpi/list/units',
+            icon: <PartitionOutlined />
+          },
+        ],
+        
+      },
+      {
+        label: 'Quản lý KPI',
+        routerLink: '/kpi/manage',
+        icon: <PartitionOutlined />
+      }
+    ]
+  },
+  {
     label: 'Admin',
     routerLink: '/manager',
     permissionKeys: [PermissionCoreConst.UserMenuAdmin],

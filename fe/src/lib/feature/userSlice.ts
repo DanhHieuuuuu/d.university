@@ -26,7 +26,7 @@ export const updateUser = createAsyncThunk(
   async (body: { Id: number; Email?: string; NewPassword?: string }) => {
     try {
       const res = await UserService.updateUser(body);
-      return res.data; // API trả về true/false
+      return res.data; 
     } catch (error: any) {
       console.error(error);
       throw error;

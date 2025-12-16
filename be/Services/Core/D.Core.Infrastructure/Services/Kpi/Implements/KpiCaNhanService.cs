@@ -10,6 +10,7 @@ using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Extensions;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -112,12 +113,17 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     STT = kpi.STT,
                     KPI = kpi.KPI,
                     LoaiKPI = kpi.LoaiKPI,
+                    LinhVuc = kpi.LinhVuc,
                     NhanSu = nhanSus[kpi.IdNhanSu].HoTenDayDu,
+                    IdNhanSu = kpi.IdNhanSu,
                     PhongBan = nhanSus[kpi.IdNhanSu].TenPhongBan,
                     MucTieu = kpi.MucTieu,
                     TrongSo = kpi.TrongSo,
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.Status,
+                    TrangThaiText = kpi.Status.HasValue && KpiStatus.Names.ContainsKey(kpi.Status.Value)
+                        ? KpiStatus.Names[kpi.Status.Value]
+                        : "Không xác định",
                     KetQuaThucTe = kpi.KetQuaThucTe
                 };
 
@@ -140,16 +146,23 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             throw new NotImplementedException();
         }
 
-        public List<int> GetListTrangThai()
+        public List<TrangThaiResponseDto> GetListTrangThai()
         {
             _logger.LogInformation($"{nameof(GetListTrangThai)}");
 
             var trangThaiExist = _unitOfWork.iKpiCaNhanRepository
                 .TableNoTracking
                 .Where(x => x.Status != null)
-                .Select(x => x.Status.Value)
+                .Select(x => x.Status!.Value)
                 .Distinct()
                 .OrderBy(x => x)
+                .Select(x => new TrangThaiResponseDto
+                {
+                    Value = x,
+                    Label = KpiStatus.Names.ContainsKey(x)
+                        ? KpiStatus.Names[x]
+                        : "Không xác định"
+                })
                 .ToList();
 
             return trangThaiExist;

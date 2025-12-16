@@ -6,6 +6,7 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
     {
         public string? KPI { get; set; }
         public int LoaiKPI { get; set; }
+        public string? LinhVuc { get; set; }
         public string? MucTieu { get; set; }
         public string? TrongSo { get; set; }
         public int IdNhanSu { get; set; }

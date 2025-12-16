@@ -4,7 +4,7 @@ using D.Core.Infrastructure.Services.Kpi.Abstracts;
 
 namespace D.Core.Application.Query.Kpi.KpiCaNhan
 {
-    public class GetListTrangThai : IQueryHandler<GetTrangThaiDto, List<int>>
+    public class GetListTrangThai : IQueryHandler<GetTrangThaiDto, List<TrangThaiResponseDto>>
     {
         private readonly IKpiCaNhanService _service;
 
@@ -13,7 +13,7 @@ namespace D.Core.Application.Query.Kpi.KpiCaNhan
             _service = kpiCaNhanService;
         }
 
-        public Task<List<int>> Handle(GetTrangThaiDto request, CancellationToken cancellationToken)
+        public Task<List<TrangThaiResponseDto>> Handle(GetTrangThaiDto request, CancellationToken cancellationToken)
         {
             return Task.FromResult(_service.GetListTrangThai());
         }

@@ -17,6 +17,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         List<NhanSuDaGiaoDto> GetNhanSuByKpiDonVi(GetNhanSuFromKpiDonViDto dto);
         PageResultDto<KpiDonViDto> FindPagingKeKhai(FilterKpiDonViKeKhaiDto dto);
         void UpdateKetQuaThucTe(UpdateKpiThucTeKpiDonViListDto dto);
-        List<int> GetListTrangThai();
+        List<TrangThaiKpiDonViResponseDto> GetListTrangThai();
     }
 }

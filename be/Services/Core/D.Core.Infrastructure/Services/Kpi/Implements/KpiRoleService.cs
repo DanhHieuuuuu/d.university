@@ -107,7 +107,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             // Lấy danh sách KPI Role
             var roles = _unitOfWork.iKpiRoleRepository.TableNoTracking
-                .Where(r => !r.Deleted && nhanSus.Select(ns => ns.Id).Contains(r.IdNhanSu))
+                .Where(r => !r.Deleted && nhanSus.Select(ns => ns.Id).Contains(r.IdNhanSu) && (string.IsNullOrEmpty(dto.Role) || r.Role == dto.Role))
                 .ToList();
 
             var mappedRoles = roles.Select(role =>

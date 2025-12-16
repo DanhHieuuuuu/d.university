@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using D.ControllerBase.Exceptions;
+using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
@@ -10,6 +11,7 @@ using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Extensions;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -105,8 +107,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             ? donvis[kpi.IdDonVi.Value]
                             : string.Empty,
                     LoaiKpi = kpi.LoaiKpi,
+                    LoaiKpiText = kpi.LoaiKpi.HasValue && KpiTypes.Names.ContainsKey(kpi.LoaiKpi.Value)
+                        ? KpiTypes.Names[kpi.LoaiKpi.Value]
+                        : "Không xác định",
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.TrangThai,
+                    TrangThaiText = kpi.TrangThai.HasValue && KpiStatus.Names.ContainsKey(kpi.TrangThai.Value)
+                            ? KpiStatus.Names[kpi.TrangThai.Value]
+                            : "Không xác định",
                     KetQuaThucTe = kpi.KetQuaThucTe,
                 };
 
@@ -154,6 +162,9 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             ? donvis[kpi.IdDonVi.Value]
                             : string.Empty,
                     LoaiKpi = kpi.LoaiKpi,
+                    LoaiKpiText = kpi.LoaiKpi.HasValue && KpiTypes.Names.ContainsKey(kpi.LoaiKpi.Value)
+                        ? KpiTypes.Names[kpi.LoaiKpi.Value]
+                        : "Không xác định",
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.TrangThai,
                     KetQuaThucTe = kpi.KetQuaThucTe
@@ -172,16 +183,24 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             };
         }
 
-        public List<int> GetListTrangThai()
+        public List<TrangThaiKpiDonViResponseDto> GetListTrangThai()
         {
             _logger.LogInformation($"{nameof(GetListTrangThai)}");
+
 
             var trangThaiExist = _unitOfWork.iKpiDonViRepository
                 .TableNoTracking
                 .Where(x => x.TrangThai != null)
-                .Select(x => x.TrangThai.Value)
+                .Select(x => x.TrangThai!.Value)
                 .Distinct()
                 .OrderBy(x => x)
+                .Select(x => new TrangThaiKpiDonViResponseDto
+                {
+                    Value = x,
+                    Label = KpiStatus.Names.ContainsKey(x)
+                        ? KpiStatus.Names[x]
+                        : "Không xác định"
+                })
                 .ToList();
 
             return trangThaiExist;

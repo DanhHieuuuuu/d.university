@@ -12,6 +12,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         void UpdateTrangThaiKpiCaNhan(UpdateTrangThaiKpiDto dto);
         Task<PageResultDto<KpiCaNhanDto>> FindPagingKpiCaNhan(FilterKpiCaNhanDto dto);
         void UpdateKetQuaThucTe(UpdateKpiThucTeKpiCaNhanListDto dto);
-        List<int> GetListTrangThai();
+        List<TrangThaiResponseDto> GetListTrangThai();
     }
 }

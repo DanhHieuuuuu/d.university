@@ -15,7 +15,7 @@
         public string? Email2 { get; set; }
         public string? TenChucVu { get; set; }
         public string? TenPhongBan { get; set; }
-        public string? TrangThai { get; set; } // "Đã về hưu", "Chấm dứt hợp đồng", "Thôi việc", "Đang hoạt động"
+        public string? TrangThai { get; set; } 
     }
 
 }

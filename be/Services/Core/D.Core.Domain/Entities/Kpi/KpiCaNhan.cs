@@ -12,6 +12,7 @@ namespace D.Core.Domain.Entities.Kpi
 
         [MaxLength(500)]
         public string? KPI { get; set; }
+        public string? LinhVuc { get; set; }
 
         [MaxLength(255)]
         public string? MucTieu { get; set; }
@@ -19,7 +20,7 @@ namespace D.Core.Domain.Entities.Kpi
         [MaxLength(255)]
         public string? TrongSo { get; set; }
 
-        public int LoaiKPI { get; set; }
+        public int? LoaiKPI { get; set; }
 
         public int IdNhanSu { get; set; }
 
