@@ -1,6 +1,13 @@
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
-import { ICreateDoanVao, IDetailDelegationIncoming, IReceptionTime, IUpdateDoanVao, IViewGuestGroup } from '@models/delegation/delegation.model';
+import {
+  ICreateDoanVao,
+  IDetailDelegationIncoming,
+  ILogStatus,
+  IReceptionTime,
+  IUpdateDoanVao,
+  IViewGuestGroup
+} from '@models/delegation/delegation.model';
 import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 
@@ -44,22 +51,26 @@ const getListStatus = async () => {
     return Promise.reject(err);
   }
 };
-const createDoanVao = async (body: ICreateDoanVao) => {
+const createDoanVao = async (formData: FormData) => {
   try {
-    const res = await axios.post(`${apiDelegationEndpoint}/create`, body);
+    const res = await axios.post(`${apiDelegationEndpoint}/create`,formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
     return Promise.reject(err);
   }
 };
-const updateDoanVao = async (body: IUpdateDoanVao) => {
+const updateDoanVao = async (formData: FormData) => {
   try {
-    const res = await axios.put(`${apiDelegationEndpoint}/update`, body);
-    return Promise.resolve(res.data);
+    const res = await axios.put(`${apiDelegationEndpoint}/update`, formData);
+    return res.data;
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+    throw err;
   }
 };
 const deleteDoanVao = async (id: number) => {
@@ -104,5 +115,43 @@ const getByIdReceptionTime = async (id: number) => {
     return Promise.reject(err);
   }
 };
+const downloadTemplateExcel = async () => {
+  try {
+    const res = await axios.get(
+      `${apiDelegationEndpoint}/download-excel`,
+      {
+        responseType: 'blob',
+      }
+    );
+    return Promise.resolve(res);
+  } catch (err) {
+    processApiMsgError(err, 'Không tải được file Excel mẫu');
+    return Promise.reject(err);
+  }
+};
+const getLogStatus = async () => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-log-status`);
 
-export const DelegationIncomingService = { paging , getListPhongBan, getListStatus,updateDoanVao,deleteDoanVao,createDoanVao,getByIdGuestGroup,getByIdDetailDelegation,getByIdReceptionTime};
+    const data: IResponseList<ILogStatus> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+
+export const DelegationIncomingService = {
+  paging,
+  getListPhongBan,
+  getListStatus,
+  updateDoanVao,
+  deleteDoanVao,
+  createDoanVao,
+  getByIdGuestGroup,
+  getByIdDetailDelegation,
+  getByIdReceptionTime,
+  downloadTemplateExcel,
+  getLogStatus
+};

@@ -46,9 +46,9 @@ export const getListStatus = createAsyncThunk ('delegation-incoming/getStatus', 
 
 export const createDoanVao = createAsyncThunk(
   'delegation-incoming/create',
-  async (payload: ICreateDoanVao, { rejectWithValue }) => {
+  async (formData: FormData, { rejectWithValue }) => {
     try {
-      const res = await DelegationIncomingService.createDoanVao(payload);
+      const res = await DelegationIncomingService.createDoanVao(formData);
 
       return res.data;
     } catch (error: any) {
@@ -79,9 +79,9 @@ export const deleteDoanVao = createAsyncThunk(
 
 export const updateDoanVao = createAsyncThunk(
   'delegation-incoming/update',
-  async (payload: IUpdateDoanVao, { rejectWithValue }) => {
+  async (formData: FormData, { rejectWithValue }) => {
     try {
-      const res = await DelegationIncomingService.updateDoanVao(payload);
+      const res = await DelegationIncomingService.updateDoanVao(formData);
       return res.data;
     } catch (error: any) {
       return rejectWithValue({
@@ -138,4 +138,17 @@ export const getByIdReceptionTime = createAsyncThunk(
     }
   }
 );
+export const getLogStatus = createAsyncThunk ('delegation-incoming/getLogStatus', async (_,thunkAPI) => {
+  try {
+    const res = await DelegationIncomingService.getLogStatus();
+
+    return res.data.items;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
+  }
+})
 

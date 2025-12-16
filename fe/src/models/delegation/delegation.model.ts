@@ -87,3 +87,11 @@ export type ICreateDoanVao = {
 export type IUpdateDoanVao = ICreateDoanVao & {
   id: number;
 };
+export interface ILogStatus {
+  oldStatus:number,
+  newStatus:number,
+  description:string,
+  reason:string,
+  createdBy:string,
+  createdDate:string
+}

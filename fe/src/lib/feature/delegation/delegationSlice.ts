@@ -10,9 +10,10 @@ import {
   getListGuestGroup,
   getListPhongBan,
   getListStatus,
+  getLogStatus,
   updateDoanVao
 } from './delegationThunk';
-import { IViewGuestGroup } from '@models/delegation/delegation.model';
+import { ILogStatus, IViewGuestGroup } from '@models/delegation/delegation.model';
 
 interface DelegationState {
   status: ReduxStatus;
@@ -22,6 +23,7 @@ interface DelegationState {
     data: any | null;
   };
   list: IViewGuestGroup[];
+  listLogStatus: ILogStatus[];
   listPhongBan: any[];
   listStatus: any[];
   total: number;
@@ -37,6 +39,7 @@ const initialState: DelegationState = {
     data: null
   },
   list: [],
+  listLogStatus: [],
   listPhongBan: [],
   listStatus: [],
   total: 0,
@@ -178,7 +181,19 @@ const delegationSlice = createSlice({
       })
       .addCase(getByIdReceptionTime.rejected, (state) => {
         state.selected.status = ReduxStatus.FAILURE;
-      });
+      })      
+      // Log Status
+      .addCase(getLogStatus.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getLogStatus.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listLogStatus = action.payload;
+      })
+      .addCase(getLogStatus.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+
   }
 });
 

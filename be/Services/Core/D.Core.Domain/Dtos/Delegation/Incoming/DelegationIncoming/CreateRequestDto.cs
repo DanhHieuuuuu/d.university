@@ -10,11 +10,11 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class CreateRequestDto : ICommand<CreateResponseDto>
     {
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         public string Name { get; set; }
 
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         public int IdPhongBan { get; set; }
 

@@ -102,7 +102,7 @@ namespace D.Core.API.Controllers.Delegation
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("update")]
-        public async Task<ResponseAPI> UpdateDoanVao([FromBody] UpdateDelegationIncomingRequestDto dto)
+        public async Task<ResponseAPI> UpdateDoanVao([FromForm] UpdateDelegationIncomingRequestDto dto)
         {
             try
             {

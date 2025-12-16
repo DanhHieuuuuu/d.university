@@ -3,6 +3,7 @@ import {
   ApartmentOutlined,
   BarsOutlined,
   DeploymentUnitOutlined,
+  HistoryOutlined,
   HomeOutlined,
   HourglassOutlined,
   PartitionOutlined,
@@ -10,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
+import { HistoryIcon } from 'lucide-react';
 
 export const listMenuCore: IMenu[] = [
   {
@@ -69,6 +71,11 @@ export const listMenuCore: IMenu[] = [
         label: 'Phòng ban hỗ trợ',
         routerLink: '/delegation/incoming/support',
         icon: <TeamOutlined />
+      },
+      {
+        label: 'Nhật ký đoàn vào',
+        routerLink: '/delegation/incoming/diary',
+        icon: <HistoryOutlined />
       }
     ]
   },
