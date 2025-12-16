@@ -23,6 +23,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 {
@@ -104,7 +105,14 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             }
             var newDoanVao = _mapper.Map<DelegationIncoming>(dto);
 
-            if(dto.DetailDelegation != null)
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+
+            newDoanVao.Status = DelegationStatus.Create;
+            _unitOfWork.iDelegationIncomingRepository.Add(newDoanVao);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (dto.DetailDelegation != null)
             {
                 var templateRules = new List<ExcelColumnRule>
                 {
@@ -163,12 +171,20 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
                 List<DetailDelegationIncoming> detailDelegationIncomings = await _excelService.ParseExcelToListDetailDelegationAsync(dto.DetailDelegation);
 
+                int countDetail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking.Count();
+
+                for(int i = 0; i < detailDelegationIncomings.Count(); i++)
+                {
+                    int stt = countDetail + i + 1;
+                    detailDelegationIncomings[i].Code = $"DDI{stt}";
+                    detailDelegationIncomings[i].DelegationIncomingId = newDoanVao.Id;
+                }
+
                 _unitOfWork.iDetailDelegationIncomingRepository.AddRange(detailDelegationIncomings);
+                await _unitOfWork.SaveChangesAsync();
             }
 
-            newDoanVao.Status = DelegationStatus.Create;
-            _unitOfWork.iDelegationIncomingRepository.Add(newDoanVao);
-            await _unitOfWork.SaveChangesAsync();
+
             #region Log         
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
@@ -187,6 +203,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             _unitOfWork.iLogStatusRepository.Add(log);
             await _unitOfWork.SaveChangesAsync();
+            scope.Complete();
             #endregion
             return _mapper.Map<CreateResponseDto>(newDoanVao);
 

@@ -30,7 +30,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             // Kiểm tra header
             for (int i = 0; i < rules.Count; i++)
             {
-                var cellValue = ws.Cells[1, i + 1].Text.Trim();
+                var cellValue = ws.Cells[2, i + 1].Text.Trim();
 
                 if (!cellValue.Equals(rules[i].Header, StringComparison.OrdinalIgnoreCase))
                 {
@@ -42,7 +42,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             }
 
             // Kiểm tra data
-            for (int row = 2; row <= ws.Dimension.End.Row; row++)
+            for (int row = 3; row <= ws.Dimension.End.Row; row++)
             {
                 for (int col = 0; col < rules.Count; col++)
                 {
@@ -92,12 +92,12 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             var headerMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             for (int col = 1; col <= sheet.Dimension.End.Column; col++)
             {
-                var header = sheet.Cells[1, col].Text.Trim();
+                var header = sheet.Cells[2, col].Text.Trim();
                 if (!string.IsNullOrEmpty(header))
                     headerMap[header] = col;
             }
 
-            for (int row = 2; row <= sheet.Dimension.End.Row; row++)
+            for (int row = 3; row <= sheet.Dimension.End.Row; row++)
             {
                 // Skip row trống
                 if (sheet.Cells[row, 1].Text.Trim() == string.Empty)
