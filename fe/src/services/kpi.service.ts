@@ -28,28 +28,28 @@ const getListKpiCaNhan = async (query?: IQueryKpiCaNhan) => {
 };
 
 const createKpiCaNhan = async (body: ICreateKpiCaNhan) => {
-  try {
-    const res = await axios.post(`${apiKpiCaNhanEndpoint}/create`, body);
-    return Promise.resolve(res.data);
-  } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+  const res = await axios.post(`${apiKpiCaNhanEndpoint}/create`, body);
+  if (res.data?.code != 200) {
+    return Promise.reject({
+      message: res.data?.message || 'Có lỗi xảy ra'
+    });
   }
+  return Promise.resolve(res.data);
 };
 
 const updateKpiCaNhan = async (body: IUpdateKpiCaNhan) => {
-  try {
-    const res = await axios.put(`${apiKpiCaNhanEndpoint}/update`, body);
-    return Promise.resolve(res.data);
-  } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+  const res = await axios.put(`${apiKpiCaNhanEndpoint}/update`, body);
+  if (res.data?.code != 200) {
+    return Promise.reject({
+      message: res.data?.message || 'Có lỗi xảy ra'
+    });
   }
+  return Promise.resolve(res.data);
 };
 
 const deleteKpiCaNhan = async (id: number) => {
   try {
-    const res = await axios.delete(`${apiKpiCaNhanEndpoint}/delete` , {params: {id}});
+    const res = await axios.put(`${apiKpiCaNhanEndpoint}/delete`, { id });
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -74,28 +74,28 @@ const getListKpiDonVi = async (query?: IQueryKpiDonVi) => {
 };
 
 const createKpiDonVi = async (body: ICreateKpiDonVi) => {
-  try {
-    const res = await axios.post(`${apiKpiDonViEndpoint}/create`, body);
-    return Promise.resolve(res.data);
-  } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+  const res = await axios.post(`${apiKpiDonViEndpoint}/create`, body);
+  if (res.data?.code != 200) {
+    return Promise.reject({
+      message: res.data?.message || 'Có lỗi xảy ra'
+    });
   }
+  return Promise.resolve(res.data);
 };
 
 const updateKpiDonVi = async (body: IUpdateKpiDonVi) => {
-  try {
-    const res = await axios.put(`${apiKpiDonViEndpoint}/update`, body);
-    return Promise.resolve(res.data);
-  } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+  const res = await axios.put(`${apiKpiDonViEndpoint}/update`, body);
+  if (res.data?.code != 200) {
+    return Promise.reject({
+      message: res.data?.message || 'Có lỗi xảy ra'
+    });
   }
+  return Promise.resolve(res.data);
 };
 
-const deleteKpiDonVi = async (id: number ) => {
+const deleteKpiDonVi = async (id: number) => {
   try {
-    const res = await axios.delete(`${apiKpiDonViEndpoint}/delete` , {params: {id}} );
+    const res = await axios.put(`${apiKpiDonViEndpoint}/delete`, { params: { id } });
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -120,30 +120,28 @@ const getListKpiRole = async (query?: IQueryKpiRole) => {
 };
 
 const createKpiRole = async (body: ICreateKpiRole) => {
-  try {
-    const res = await axios.post(`${apiKpiRoleEndpoint}/create`, body);
-    return Promise.resolve(res.data);
-  } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+  const res = await axios.post(`${apiKpiRoleEndpoint}/create`, body);
+  if (res.data?.code != 200) {
+    return Promise.reject({
+      message: res.data?.message || 'Có lỗi xảy ra'
+    });
   }
+  return res.data;
 };
 
 const updateKpiRole = async (body: IUpdateKpiRole) => {
-  try {
-    const res = await axios.put(`${apiKpiRoleEndpoint}/update`, body);
-    return Promise.resolve(res.data);
-  } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+  const res = await axios.put(`${apiKpiRoleEndpoint}/update`, body);
+  if (res.data?.code != 200) {
+    return Promise.reject({
+      message: res.data?.message || 'Có lỗi xảy ra'
+    });
   }
+  return Promise.resolve(res.data);
 };
 
 const deleteKpiRole = async (ids: number[]) => {
-  const res = await axios.delete(`${apiKpiRoleEndpoint}/delete`, {
-    data: {
-      ids
-    }
+  const res = await axios.put(`${apiKpiRoleEndpoint}/delete`, {
+    ids
   });
   return res.data;
 };

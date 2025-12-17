@@ -38,10 +38,9 @@ export const updateKpiCaNhan = createAsyncThunk('kpi/update-canhan', async (payl
     console.error(error);
   }
 });
-export const deleteKpiCaNhan = createAsyncThunk('danhmuc/delete-chucvu', async (payload: number) => {
+export const deleteKpiCaNhan = createAsyncThunk('kpi/delete-canhan', async (payload: number) => {
   try {
     const res = await KpiService.deleteKpiCaNhan(payload);
-
     return res.data;
   } catch (error: any) {
     console.error(error);
@@ -78,13 +77,17 @@ export const updateKpiDonVi = createAsyncThunk('kpi/update-donvi', async (payloa
     console.error(error);
   }
 });
-export const deleteKpiDonVi = createAsyncThunk('kpi/delete-donvi', async (payload: number) => {
+export const deleteKpiDonVi = createAsyncThunk('kpi/delete-donvi', async (payload: number, { rejectWithValue }) => {
   try {
     const res = await KpiService.deleteKpiDonVi(payload);
     return res.data;
   } catch (error: any) {
-    console.error(error);
-  }
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
 });
 //Kpi Role
 export const getAllKpiRole = createAsyncThunk('kpi-role/list', async (payload?: IQueryKpiRole) => {
@@ -98,31 +101,38 @@ export const getAllKpiRole = createAsyncThunk('kpi-role/list', async (payload?: 
 }
 );
 
-export const createKpiRole = createAsyncThunk('kpi-role/create', async (payload: ICreateKpiRole) => {
+export const createKpiRole = createAsyncThunk('kpi-role/create', async (payload: ICreateKpiRole, { rejectWithValue }) => {
   try {
     return await KpiService.createKpiRole(payload);
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue(
+      error?.message || ' Đã xảy ra lỗi, vui lòng thử lại!'
+    );
   }
 }
 );
 
-export const updateKpiRole = createAsyncThunk('kpi-role/update', async (payload: IUpdateKpiRole) => {
+export const updateKpiRole = createAsyncThunk('kpi-role/update', async (payload: IUpdateKpiRole, { rejectWithValue }) => {
   try {
     return await KpiService.updateKpiRole(payload);
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue(
+      error?.message || ' Đã xảy ra lỗi, vui lòng thử lại!'
+    );
   }
 }
 );
 
-export const deleteKpiRole = createAsyncThunk('kpi-role/delete', async (ids: number[]) => {
+export const deleteKpiRole = createAsyncThunk('kpi-role/delete', async (ids: number[], { rejectWithValue }) => {
   try {
     return await KpiService.deleteKpiRole(ids);
   } catch (error: any) {
-    // return rejectWithValue(err?.response?.data);
-    console.error(error);
-  }
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
 }
 );
 

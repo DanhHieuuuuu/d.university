@@ -14,7 +14,7 @@ import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { KpiLoaiConst } from '../../../const/kpiType.const';
-import { getAllUser } from '@redux/feature/userSlice';
+import { getAllPhongBan } from '@redux/feature/danhmucSlice';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -26,7 +26,7 @@ type PositionModalProps = {
 const PositionModal: React.FC<PositionModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm<any>();
-  const [title, setTitle] = useState<string>('Thêm mới Kpi cá nhân');
+  const [title, setTitle] = useState<string>('Thêm mới Kpi Đơn vị');
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiCaNhan);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
@@ -35,7 +35,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   useEffect(() => {
     if (isModalOpen) {
       if (isUpdate || isView) {
-        setTitle(isView ? 'Xem thông tin KPI Cá nhân' : 'Cập nhật KPI Cá nhân');
+        setTitle(isView ? 'Xem thông tin KPI Đơn vị' : 'Cập nhật KPI Đơn vị');
       } else {
         setTitle('Thêm mới KPI Cá nhân');
       }
@@ -47,13 +47,13 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
     const selectedData = $selected.data;
 
-    const nhanSuOption = selectedData.idNhanSu
+    const donViOption = selectedData.idNhanSu
       ? userOptions.find(u => u.value === selectedData.idNhanSu)
       : undefined;
 
     form.setFieldsValue({
       ...selectedData,
-      idNhanSu: nhanSuOption,
+      idNhanSu: nhanSuOption, // ✅ ĐÚNG SHAPE
       namHoc: selectedData.namHoc
         ? dayjs(selectedData.namHoc, 'YYYY')
         : undefined,
@@ -70,7 +70,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   }, [$create.status, $update.status, dispatch, form, setIsModalOpen]);
 
   useEffect(() => {
-    dispatch(getAllUser({ SkipCount: 0, MaxResultCount: 2000 }));
+    dispatch(getAllPhongBan({ SkipCount: 0, MaxResultCount: 2000 }));
   }, [dispatch]);
 
   const userOptions: UserOption[] = users.map(u => ({

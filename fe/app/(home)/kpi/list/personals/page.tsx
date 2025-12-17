@@ -1,6 +1,6 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllKpiCaNhan, setSelectedKpiCaNhan } from '@redux/feature/kpiSlice';
+import { deleteKpiCaNhan, getAllKpiCaNhan, setSelectedKpiCaNhan } from '@redux/feature/kpiSlice';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -19,6 +19,7 @@ import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
 import { KpiLoaiConst } from '../../const/kpiType.const';
+import { toast } from 'react-toastify';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -28,7 +29,6 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
-  const [selectedId, setSelectedId] = useState<number>(0);
 
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
@@ -50,22 +50,37 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
-  const onClickUpdate = (id: number) => {
-    setSelectedId(id);
+  const onClickUpdate = (record: IViewKpiCaNhan) => {
+    dispatch(setSelectedKpiCaNhan(record));
     setIsModalView(false);
     setIsModalUpdate(true);
     setIsModalOpen(true);
   };
 
-  const onClickView = (id: number) => {
-    setSelectedId(id);
+  const onClickView = (record: IViewKpiCaNhan) => {
+    dispatch(setSelectedKpiCaNhan(record));
     setIsModalView(true);
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
 
-  const refreshData = () => {
-    dispatch(getAllKpiCaNhan(query));
+  const onClickDelete = (record: IViewKpiCaNhan) => {
+    console.log(record);
+    Modal.confirm({
+      title: `Xóa Kpi ${record.kpi} của ${record.nhanSu}?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await dispatch(deleteKpiCaNhan(record.id)).unwrap();
+          toast.success('Xóa thành công!');
+          dispatch(getAllKpiCaNhan(query));
+        } catch (error: any) {
+          toast.error(error?.response?.message || 'Xóa thất bại!');
+        }
+      }
+    });
   };
 
   const columns: IColumn<IViewKpiCaNhan>[] = [
@@ -123,27 +138,19 @@ const Page = () => {
       label: 'Chi tiết',
       tooltip: 'Xem thông tin phòng ban',
       icon: <EyeOutlined />,
-      command: (record: IViewKpiCaNhan) => {
-        dispatch(setSelectedKpiCaNhan(record));
-        onClickView(record.id);
-      }
+      command: onClickView
     },
     {
       label: 'Sửa',
       tooltip: 'Sửa thông tin phòng ban',
       icon: <EditOutlined />,
-      command: (record: IViewKpiCaNhan) => {
-        dispatch(setSelectedKpiCaNhan(record));
-        onClickUpdate(record.id);
-      }
+      command: onClickUpdate
     },
     {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewKpiCaNhan) => {
-        dispatch(setSelectedKpiCaNhan(record));
-      }
+      command: onClickDelete
     }
   ];
 
@@ -204,7 +211,6 @@ const Page = () => {
         isUpdate={isUpdate}
         isView={isView}
         setIsModalOpen={setIsModalOpen}
-        refreshData={refreshData}
       />
     </Card>
   );

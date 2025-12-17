@@ -1,6 +1,6 @@
 'use client';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { Button, Card, Form, Input, Modal, Select } from 'antd';
+import { ChangeEvent, useState } from 'react';
+import { Button, Card, Form, Input, Modal } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -11,27 +11,27 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { deleteKpiRole, getAllKpiRole, setSelectedKpiRole } from '@redux/feature/kpiSlice';
+import { deleteKpiDonVi, getAllKpiDonVi, setSelectedKpiDonVi } from '@redux/feature/kpiSlice';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
+import { IQueryKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KpiRoleConst } from '../../const/kpiRole.const';
+import { KpiLoaiConst } from '../../const/kpiType.const';
 import { toast } from 'react-toastify';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiRole.$list);
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiDonVi.$list);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
 
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiRole>({
+  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiDonVi>({
     total: totalItem || 0,
     initialQuery: {
       SkipCount: 0,
@@ -39,16 +39,10 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllKpiRole(newQuery));
+      dispatch(getAllKpiDonVi(newQuery));
     },
     triggerFirstLoad: true
   });
-
-  useEffect(() => {
-    if (!isModalOpen) {
-      dispatch(getAllKpiRole(query));
-    }
-  }, [isModalOpen]);
 
   const onClickAdd = () => {
     setIsModalView(false);
@@ -56,32 +50,32 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
-  const onClickUpdate = (record: IViewKpiRole) => {
-    dispatch(setSelectedKpiRole(record));
+  const onClickUpdate = (record: IViewKpiDonVi) => {
+    dispatch(setSelectedKpiDonVi(record));
     setIsModalView(false);
     setIsModalUpdate(true);
     setIsModalOpen(true);
   };
 
-  const onClickView = (record: IViewKpiRole) => {
-    dispatch(setSelectedKpiRole(record));
+  const onClickView = (record: IViewKpiDonVi) => {
+    dispatch(setSelectedKpiDonVi(record));
     setIsModalView(true);
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
 
-  const onClickDelete = (record: IViewKpiRole) => {
+  const onClickDelete = (record: IViewKpiDonVi) => {
     console.log(record);
     Modal.confirm({
-      title: `Xóa Role ${record.role} của ${record.tenNhanSu} với ${record.tenDonViKiemNhiem}?`,
+      title: `Xóa Kpi ${record.kpi} của ${record.donVi}?`,
       okText: 'Xóa',
       okType: 'danger',
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await dispatch(deleteKpiRole([record.id])).unwrap();
+          await dispatch(deleteKpiDonVi(record.id)).unwrap();
           toast.success('Xóa thành công!');
-          dispatch(getAllKpiRole(query));
+          dispatch(getAllKpiDonVi(query));
         } catch (error: any) {
           toast.error(error?.response?.message || 'Xóa thất bại!');
         }
@@ -89,38 +83,52 @@ const Page = () => {
     });
   };
 
-  const columns: IColumn<IViewKpiRole>[] = [
+  // const refreshData = () => {
+  //   dispatch(getAllKpiDonVi(query));
+  // };
+
+  const columns: IColumn<IViewKpiDonVi>[] = [
     {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      align: 'center',
-      render: (value, row, index) => index + 1
+      key: 'Id',
+      dataIndex: 'id',
+      title: 'ID',
+      showOnConfig: false
     },
     {
-      key: 'tenNhanSu',
-      dataIndex: 'tenNhanSu',
-      title: 'Tên Nhân sự'
+      key: 'linhVuc',
+      dataIndex: 'linhVuc',
+      title: 'Lĩnh Vực'
     },
     {
-      key: 'tenPhongBan',
-      dataIndex: 'tenPhongBan',
-      title: 'Phòng ban hiện tại'
+      key: 'kpi',
+      dataIndex: 'kpi',
+      title: 'Tên KPI'
     },
     {
-      key: 'tenDonViKiemNhiem',
-      dataIndex: 'tenDonViKiemNhiem',
-      title: 'Đơn vị kiêm nhiệm'
+      key: 'mucTieu',
+      dataIndex: 'mucTieu',
+      title: 'Mục tiêu'
     },
     {
-      key: 'tiLe',
-      dataIndex: 'tiLe',
-      title: 'Tỉ lệ',
+      key: 'trongSo',
+      dataIndex: 'trongSo',
+      title: 'Trọng số'
     },
     {
-      key: 'role',
-      dataIndex: 'role',
-      title: 'Chức vụ',
+      key: 'loaiKpi',
+      dataIndex: 'loaiKPI',
+      title: 'Loại KPI',
+      render: (value: number) => KpiLoaiConst.getName(value),
+    },
+    {
+      key: 'ketQuaThucTe',
+      dataIndex: 'ketQuaThucTe',
+      title: 'Kết quả thực tế'
+    },
+    {
+      key: 'trangThai',
+      dataIndex: 'trangThaiText',
+      title: 'Trạng thái'
     },
   ];
 
@@ -155,7 +163,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách KPI Cá nhân"
+      title="Danh sách KPI Đơn vị"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -165,18 +173,8 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item name="role">
-            <Select
-              showSearch
-              placeholder="Chọn chức vụ"
-              allowClear
-              optionFilterProp="label"
-              options={KpiRoleConst.list.map((x) => ({
-                value: x.value,
-                label: x.name,
-              }))}
-              onChange={(value) => onFilterChange({ chucVu: value })}
-            />
+          <Form.Item<IQueryKpiDonVi> label="Tên đơn vị:" name="Keyword">
+            <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
         <Form.Item>

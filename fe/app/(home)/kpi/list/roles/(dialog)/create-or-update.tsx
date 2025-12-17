@@ -14,13 +14,13 @@ import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import { KpiRoleConst } from '../../../const/kpiRole.const';
 import { getAllUser } from '@redux/feature/userSlice';
+import { getAllPhongBan } from '@redux/feature/danhmucSlice';
 
 type PositionModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
   isView: boolean;
-  refreshData: () => void;
 };
 
 const PositionModal: React.FC<PositionModalProps> = ({
@@ -28,11 +28,9 @@ const PositionModal: React.FC<PositionModalProps> = ({
   setIsModalOpen,
   isUpdate,
   isView,
-  refreshData,
 }) => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
-  const [title, setTitle] = useState('Thêm mới KPI Cá nhân');
 
   const { $selected, $create, $update } = useAppSelector(
     (state) => state.kpiState.kpiRole
@@ -40,22 +38,23 @@ const PositionModal: React.FC<PositionModalProps> = ({
   const { list: users, status } = useAppSelector(
     (state) => state.userState
   );
+  const { phongBan } = useAppSelector((state) => state.danhmucState);
 
   const isSaving =
     $create.status === ReduxStatus.LOADING ||
     $update.status === ReduxStatus.LOADING;
 
+  const title = useMemo(() => {
+    if (isView) return 'Xem thông tin KPI Cá nhân';
+    if (isUpdate) return 'Cập nhật KPI Cá nhân';
+    return 'Thêm mới KPI Cá nhân';
+  }, [isView, isUpdate]);
+  
   useEffect(() => {
     if (!isModalOpen) return;
-
-    if (isView) setTitle('Xem thông tin KPI Cá nhân');
-    else if (isUpdate) setTitle('Cập nhật KPI Cá nhân');
-    else setTitle('Thêm mới KPI Cá nhân');
-  }, [isModalOpen, isUpdate, isView]);
-
-  useEffect(() => {
     dispatch(getAllUser({ SkipCount: 0, MaxResultCount: 2000 }));
-  }, [dispatch]);
+    dispatch(getAllPhongBan({ SkipCount: 0, MaxResultCount: 2000 }));
+  }, [isModalOpen]);
 
   const userOptions: UserOption[] = useMemo(
     () =>
@@ -88,7 +87,6 @@ const PositionModal: React.FC<PositionModalProps> = ({
       dispatch(resetStatusKpiRole());
       dispatch(clearSeletedKpiRole());
       form.resetFields();
-      refreshData();
       setIsModalOpen(false);
     }
   }, [$create.status, $update.status]);
@@ -117,8 +115,8 @@ const PositionModal: React.FC<PositionModalProps> = ({
         await dispatch(createKpiRole(payload)).unwrap();
         toast.success('Thêm mới KPI Role thành công');
       }
-    } catch {
-      toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+    } catch (err: any) {
+      toast.error(err);
     }
   };
   return (
@@ -168,7 +166,16 @@ const PositionModal: React.FC<PositionModalProps> = ({
             name="idDonVi"
             rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}
           >
-            <Input />
+            <Select
+              options={phongBan.$list.data.map((pb) => ({
+                value: pb.id,
+                label: pb.tenPhongBan,
+              }))}
+              loading={phongBan.$list.status === ReduxStatus.LOADING}
+              showSearch
+              optionFilterProp="label"
+              placeholder="Chọn đơn vị kiêm nhiệm"
+            />
           </Form.Item>
 
           <Form.Item
