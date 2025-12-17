@@ -7,6 +7,6 @@ const StudentSvg = () => {
       />
     </svg>
   );
-}
- 
+};
+
 export default StudentSvg;

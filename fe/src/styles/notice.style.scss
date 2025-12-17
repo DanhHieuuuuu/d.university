@@ -36,7 +36,6 @@
   }
 
   .notification-body {
-
     background-color: transparent;
 
     :hover {
@@ -63,7 +62,6 @@
           border-radius: 50%;
           background-color: red;
         }
-
       }
 
       &.small {
@@ -76,7 +74,6 @@
           width: 250px;
           margin-bottom: 8px;
           padding: 4px 0;
-
 
           .notification-title {
             font-size: 13px;
@@ -95,11 +92,6 @@
           }
         }
       }
-
-
-
-
-
     }
   }
 
@@ -116,8 +108,6 @@
 }
 
 .notification-page {
-
-
   .notification-list {
     flex: 1;
     max-height: 600px;
@@ -153,10 +143,7 @@
           border-radius: 50%;
           background-color: red;
         }
-
       }
-
-
 
       &.large {
         gap: 16px;
@@ -189,12 +176,8 @@
             top: 16px;
             left: 24px;
           }
-
         }
-
       }
     }
   }
-
-
 }

@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { Breadcrumb, Button, Card, Form, Input, Modal, Image } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
+  EyeOutlined
+} from '@ant-design/icons';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import AppTable from '@components/common/Table';
@@ -44,11 +51,11 @@ const Page = () => {
     return `${baseUrl}/s3-test/download?fileName=${encodeURIComponent(fileName)}`;
   };
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Name: ''
     },
     onQueryChange: async (newQuery) => {
@@ -86,7 +93,7 @@ const Page = () => {
     };
     onFilterChange(searchQuery);
   };
-  
+
   const onClickAdd = () => {
     setSelectedFile(null);
     setModalState({ open: true, isUpdate: false });
@@ -211,7 +218,7 @@ const Page = () => {
                 icon={<SyncOutlined />}
                 onClick={() => {
                   form.resetFields();
-                  form.submit();
+                  resetFilter();
                 }}
               >
                 Tải lại

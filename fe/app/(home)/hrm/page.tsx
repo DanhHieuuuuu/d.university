@@ -111,17 +111,17 @@ const Page = () => {
     }
   ];
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryNhanSu>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryNhanSu>({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
       dispatch(getListNhanSu(newQuery));
     },
-    triggerFirstLoad: true
+    triggerFirstLoad: true,
   });
 
   useEffect(() => {
@@ -186,7 +186,7 @@ const Page = () => {
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
-                form.submit();
+                resetFilter();
               }}
             >
               Tải lại

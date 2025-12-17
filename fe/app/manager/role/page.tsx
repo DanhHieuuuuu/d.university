@@ -11,7 +11,13 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 
 import { IQueryRole, IRole } from '@models/role';
-import { deleteRole, getListPermissionTree, getListRole, resetStatusRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
+import {
+  deleteRole,
+  getListPermissionTree,
+  getListRole,
+  resetStatusRole,
+  setSelectedRoleId
+} from '@redux/feature/roleConfigSlice';
 import CreateRoleModal from './(dialog)/create-or-update';
 import RolePermissionModal from './(dialog)/update-permission';
 import { toast } from 'react-toastify';
@@ -47,11 +53,11 @@ const Page = () => {
   }, []);
 
   const [openPermission, setOpenModalPermission] = useState<boolean>(false);
-  const { query, pagination, onFilterChange } = usePaginationWithFilter({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -96,7 +102,7 @@ const Page = () => {
     if (result != undefined) {
       toast.success(result?.message || 'Xóa nhóm thành công');
       dispatch(resetStatusRole());
-      onFilterChange(query)
+      onFilterChange(query);
     }
   };
 
@@ -178,7 +184,7 @@ const Page = () => {
                 icon={<SyncOutlined />}
                 onClick={() => {
                   form.resetFields();
-                  form.submit();
+                  resetFilter();
                 }}
               >
                 Tải lại

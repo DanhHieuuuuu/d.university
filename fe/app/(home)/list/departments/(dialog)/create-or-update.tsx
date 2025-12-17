@@ -179,10 +179,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Input />
           </Form.Item>
 
-          <Form.Item<ICreatePhongBan>
-            label="Fax"
-            name="fax"
-          >
+          <Form.Item<ICreatePhongBan> label="Fax" name="fax">
             <Input />
           </Form.Item>
 
@@ -202,10 +199,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Input />
           </Form.Item>
 
-          <Form.Item<ICreatePhongBan>
-            label="Chức vụ người đại diện"
-            name="chucVuNguoiDaiDien"
-          >
+          <Form.Item<ICreatePhongBan> label="Chức vụ người đại diện" name="chucVuNguoiDaiDien">
             <Input />
           </Form.Item>
 

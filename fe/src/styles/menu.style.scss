@@ -3,25 +3,24 @@
 .role-menu,
 .student-menu {
   font-weight: 500;
-  overflow: auto;
-  height: 90vh;
+  height: 100vh;
   position: sticky;
   inset-inline-start: 0;
   top: 0;
-  bottom: 0;
+  left: 0;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
   background-color: $primaryNavyDark !important;
-  
+
   // Menu items - màu text mặc định
   .ant-menu {
     background-color: transparent !important;
     color: $white;
-    
+
     .ant-menu-item,
     .ant-menu-submenu-title {
       color: rgba(255, 255, 255, 0.85) !important;
-      
+
       .ant-menu-item-icon,
       .anticon {
         color: rgba(255, 255, 255, 0.7);
@@ -34,7 +33,7 @@
   .ant-menu-submenu-title:hover {
     color: $white !important;
     background-color: rgba(33, 150, 243, 0.15) !important;
-    
+
     .ant-menu-item-icon,
     .anticon {
       color: $primaryLight !important;
@@ -45,14 +44,14 @@
   .ant-menu-item-selected {
     background-color: $primaryLight !important;
     color: $white !important;
-    
+
     .ant-menu-item-icon,
     .anticon {
       color: $white !important;
     }
-    
+
     &:hover {
-      background-color: #42A5F5 !important;
+      background-color: #42a5f5 !important;
     }
   }
 
@@ -60,7 +59,7 @@
   .ant-menu-submenu-selected > .ant-menu-submenu-title {
     color: $primaryLight !important;
     background-color: rgba(33, 150, 243, 0.1) !important;
-    
+
     .ant-menu-item-icon,
     .anticon {
       color: $primaryLight !important;
@@ -90,7 +89,7 @@
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.3);
     }
@@ -100,7 +99,16 @@
 .menu-core {
   font-weight: 500;
   background-color: $primaryNavyDark !important;
-  
+  height: 100vh;
+  top: 0;
+  left: 0;
+  position: sticky;
+
+  .ant-layout-sider-children {
+    overflow-y: auto;
+    height: 100%;
+  }
+
   .menu-title {
     display: flex;
     align-items: center;
@@ -129,11 +137,11 @@
   .ant-menu {
     background-color: transparent !important;
     color: $white;
-    
+
     .ant-menu-item,
     .ant-menu-submenu-title {
       color: rgba(255, 255, 255, 0.85) !important;
-      
+
       .ant-menu-item-icon,
       .anticon {
         color: rgba(255, 255, 255, 0.7);
@@ -146,7 +154,7 @@
   .ant-menu-submenu-title:hover {
     color: $white !important;
     background-color: rgba(33, 150, 243, 0.15) !important;
-    
+
     .ant-menu-item-icon,
     .anticon {
       color: $primaryLight !important;
@@ -157,14 +165,14 @@
   .ant-menu-item-selected {
     background-color: $primaryLight !important;
     color: $white !important;
-    
+
     .ant-menu-item-icon,
     .anticon {
       color: $white !important;
     }
-    
+
     &:hover {
-      background-color: #42A5F5 !important;
+      background-color: #42a5f5 !important;
     }
   }
 
@@ -172,7 +180,7 @@
   .ant-menu-submenu-selected > .ant-menu-submenu-title {
     color: $primaryLight !important;
     background-color: rgba(33, 150, 243, 0.1) !important;
-    
+
     .ant-menu-item-icon,
     .anticon {
       color: $primaryLight !important;
@@ -202,7 +210,7 @@
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.3);
     }

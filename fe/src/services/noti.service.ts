@@ -39,7 +39,7 @@ const markAllAsRead = async () => {
     return Promise.resolve(res.data);
   } catch (err) {
     console.error(err);
-    
+
     processApiMsgError(err, '');
     return Promise.reject(err);
   }

@@ -16,12 +16,7 @@ type UserRoleModalProps = {
   refreshData: () => void;
 };
 
-const UserRoleModal: React.FC<UserRoleModalProps> = ({
-  isModalOpen,
-  setIsModalOpen,
-  userId,
-  refreshData
-}) => {
+const UserRoleModal: React.FC<UserRoleModalProps> = ({ isModalOpen, setIsModalOpen, userId, refreshData }) => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
 
@@ -30,7 +25,6 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({
 
   const [treeData, setTreeData] = useState<{ title: string; value: number; key: number }[]>([]);
   const [userData, setUserData] = useState<IUserView | null>(null);
-
 
   useEffect(() => {
     if (roleList?.length) {
@@ -60,7 +54,7 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({
             email: user?.email ?? '',
             tenPhongBan: user?.tenPhongBan ?? '',
             tenChucVu: user?.tenChucVu ?? '',
-            RoleIds: res.data?.roleIds ?? [] 
+            RoleIds: res.data?.roleIds ?? []
           });
         })
         .catch((err) => {
@@ -69,7 +63,6 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({
         });
     }
   }, [isModalOpen, userId]);
-
 
   const handleClose = () => {
     form.resetFields();

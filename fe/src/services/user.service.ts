@@ -9,8 +9,8 @@ const getAll = async (query: IQueryUser) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/get-all`, { params: query });
 
-    console.log('Raw response:', res); 
-    console.log('res.data:', res.data); 
+    console.log('Raw response:', res);
+    console.log('res.data:', res.data);
     const data: IResponseList<IUserView> = res.data;
 
     data.data.items = data.data.items.map((x: IUserView) => ({
@@ -97,7 +97,7 @@ const changeStatusUser = async (userId: number) => {
   try {
     const res = await axios.post(
       `user/${userId}/change-status`,
-      {}, 
+      {},
       {
         baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
       }
@@ -109,4 +109,12 @@ const changeStatusUser = async (userId: number) => {
   }
 };
 
-export const UserService = { getAll, createUser, updateUser, getNhanSuByMaNhanSu, updateRolesToUser, getRolesOfUser, changeStatusUser };
+export const UserService = {
+  getAll,
+  createUser,
+  updateUser,
+  getNhanSuByMaNhanSu,
+  updateRolesToUser,
+  getRolesOfUser,
+  changeStatusUser
+};
