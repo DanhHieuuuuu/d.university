@@ -48,13 +48,15 @@ const Page = () => {
       }
     >
       <div className="notification-page">
-        <div className='notification-list'>
+        <div className="notification-list">
           {data.map((noti) => (
             <NotificationItem key={noti.id} item={noti} />
           ))}
         </div>
-        <div className='text-center mt-4'>
-          <Button type='text' style={{color: colors.primary, fontWeight: 500}}>Xem thêm</Button>
+        <div className="mt-4 text-center">
+          <Button type="text" style={{ color: colors.primary, fontWeight: 500 }}>
+            Xem thêm
+          </Button>
         </div>
       </div>
     </Card>

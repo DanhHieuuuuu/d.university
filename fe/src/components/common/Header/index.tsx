@@ -104,28 +104,37 @@ const AppHeader = () => {
         style={{
           background: 'var(--background-header)',
           color: '#FFFFFF',
-          paddingInline: 0
+          paddingInline: 0,
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
         }}
       >
         <div className="flex h-full w-full items-center justify-between" style={{ padding: '0 20px' }}>
-          <div className='left-header'>
-            <Title level={2} style={{ cursor: 'pointer', margin: 0, color: '#FFFFFF' }} onClick={() => navigateTo('/home')}>
+          <div className="left-header">
+            <Title
+              level={2}
+              style={{ cursor: 'pointer', margin: 0, color: '#FFFFFF' }}
+              onClick={() => navigateTo('/home')}
+            >
               University
             </Title>
           </div>
 
-          <div className='right-header flex items-center gap-4'>
+          <div className="right-header flex items-center gap-4">
             <NotificationComponent />
             <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
-              <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-opacity-20 hover:bg-white">
-                <UserAvatar 
+              <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white hover:bg-opacity-20">
+                <UserAvatar
                   key={`header-avatar-${avatarRefreshKey}`}
                   imageLink={user?.imageLink}
                   maNhanSu={user?.maNhanSu}
                   size="large"
                   className="mr-3"
                 />
-                <span className="font-medium" style={{ color: '#FFFFFF' }}>{userDisplayName}</span>
+                <span className="font-medium" style={{ color: '#FFFFFF' }}>
+                  {userDisplayName}
+                </span>
               </div>
             </Dropdown>
           </div>
@@ -145,7 +154,7 @@ const AppHeader = () => {
         width={500}
       >
         <div className="flex flex-col items-center">
-          <UserAvatar 
+          <UserAvatar
             key={`modal-avatar-${avatarRefreshKey}`}
             imageLink={user?.imageLink}
             maNhanSu={user?.maNhanSu}

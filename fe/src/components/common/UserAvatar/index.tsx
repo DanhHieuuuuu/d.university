@@ -78,12 +78,12 @@ const UserAvatar = ({
     try {
       // Gọi API update-image-user
       const imageBlob = await FileService.updateUserImage(maNhanSu, file);
-      
+
       // Cập nhật avatar với blob mới
       updateAvatar(imageBlob);
-      
+
       message.success('Cập nhật ảnh đại diện thành công!');
-      
+
       if (onUploadSuccess) {
         // Trigger callback để cập nhật Redux store với cache busting
         onUploadSuccess(imageBlob, Date.now());
@@ -91,7 +91,7 @@ const UserAvatar = ({
     } catch (error) {
       console.error('Avatar upload error:', error);
       message.error('Không thể tải lên ảnh đại diện!');
-      
+
       if (onUploadError) {
         onUploadError(error);
       }
@@ -112,15 +112,9 @@ const UserAvatar = ({
         className={editable ? 'cursor-pointer' : ''}
         onClick={handleAvatarClick}
       />
-      
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-      />
-      
+
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+
       {showEditButton && (
         <Button
           type="default"

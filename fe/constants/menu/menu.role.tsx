@@ -14,25 +14,25 @@ export const listMenuManager: IMenu[] = [
     label: 'Tổng quan',
     routerLink: '/manager',
     icon: <HomeOutlined />,
-    permissionKeys: [PermissionCoreConst.UserMenuAdmin],
+    permissionKeys: [PermissionCoreConst.UserMenuAdmin]
   },
   {
     label: 'Phân quyền website',
     routerLink: '/manager/role',
     icon: <GlobalOutlined />,
-    permissionKeys: [PermissionCoreConst.UserMenuPermission],
+    permissionKeys: [PermissionCoreConst.UserMenuPermission]
   },
   {
     label: 'Quản lý tài khoản',
     routerLink: '/manager/user',
     icon: <TeamOutlined />,
-    permissionKeys: [PermissionCoreConst.UserMenuAccountManager],
+    permissionKeys: [PermissionCoreConst.UserMenuAccountManager]
   },
   {
     label: 'Quản lý thông báo',
     routerLink: '/manager/notification',
     icon: <NotificationOutlined />,
-    permissionKeys: ["d"]
+    permissionKeys: ['d']
   },
   {
     label: 'Quản lý log',
