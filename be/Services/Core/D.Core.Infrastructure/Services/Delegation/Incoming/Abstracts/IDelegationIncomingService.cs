@@ -18,7 +18,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
         Task<UpdateDelegationIncomingResponseDto> UpdateDelegationIncoming(UpdateDelegationIncomingRequestDto dto);
         void DeleteDoanVao(int id);
         Task<PageDelegationIncomingResultDto> GetByIdDelegationIncoming(int id);
-      
-       
+        Task NextStatus(UpdateStatusRequestDto dto);
     }
 }

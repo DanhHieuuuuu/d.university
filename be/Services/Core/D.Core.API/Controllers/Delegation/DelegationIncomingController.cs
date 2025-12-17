@@ -352,5 +352,24 @@ namespace D.Core.API.Controllers.Delegation
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Trạng thái tiếp theo của đoàn vào
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("next-status")]
+        public async Task<ResponseAPI> NextStatus([FromBody] UpdateStatusRequestDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
