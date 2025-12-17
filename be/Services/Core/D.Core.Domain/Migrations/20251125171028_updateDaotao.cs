@@ -11,6 +11,31 @@ namespace D.Core.Domain.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Rename tables
+            migrationBuilder.RenameTable(
+                name: "DmChuongTrinhKhung",
+                schema: "dt",
+                newName: "DtChuongTrinhKhung",
+                newSchema: "dt");
+
+            migrationBuilder.RenameTable(
+                name: "DmChuongTrinhKhungMon",
+                schema: "dt",
+                newName: "DtChuongTrinhKhungMon",
+                newSchema: "dt");
+
+            migrationBuilder.RenameTable(
+                name: "DmMonHoc",
+                schema: "dt",
+                newName: "DtMonHoc",
+                newSchema: "dt");
+
+            migrationBuilder.RenameTable(
+                name: "DmMonTienQuyet",
+                schema: "dt",
+                newName: "DtMonTienQuyet",
+                newSchema: "dt");
+
             migrationBuilder.DropColumn(
                 name: "KhoaHoc",
                 schema: "dt",
@@ -30,6 +55,13 @@ namespace D.Core.Domain.Migrations
                 oldClrType: typeof(int),
                 oldType: "int",
                 oldNullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "NamHoc",
+                schema: "dt",
+                table: "DtChuongTrinhKhungMon",
+                type: "nvarchar(max)",
+                nullable: true);
 
             migrationBuilder.AddColumn<int>(
                 name: "ChuyenNganhId",
