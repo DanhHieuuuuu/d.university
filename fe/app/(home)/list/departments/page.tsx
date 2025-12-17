@@ -123,7 +123,7 @@ const Page = () => {
       key: 'chucVuNguoiDaiDien',
       dataIndex: 'chucVuNguoiDaiDien',
       title: 'Chức vụ người đại diện'
-    },
+    }
   ];
 
   const actions: IAction[] = [

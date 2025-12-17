@@ -23,7 +23,7 @@ export type IRoleDetail = {
   id?: number;
   name?: string;
   description?: string;
-  permissions?: string[]
+  permissions?: string[];
   permissionIds?: number[];
 };
 

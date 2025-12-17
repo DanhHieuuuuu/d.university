@@ -12,6 +12,6 @@ const AdminSvg = () => {
       />
     </svg>
   );
-}
- 
+};
+
 export default AdminSvg;

@@ -25,7 +25,6 @@ const StudentPage = () => {
 
   const [isView, setIsView] = useState(false);
 
-
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryStudent>({
     total: total,
     initialQuery: {
@@ -86,7 +85,7 @@ const StudentPage = () => {
         setSelectedStudent(record);
         setIsView(true);
         setIsModalOpen(true);
-      },
+      }
     },
     {
       label: 'Sửa',
@@ -96,7 +95,7 @@ const StudentPage = () => {
         setSelectedStudent(record);
         setIsView(false);
         setIsModalOpen(true);
-      },
+      }
     },
     {
       label: 'Xóa',
@@ -120,7 +119,7 @@ const StudentPage = () => {
           }
         });
       }
-    },
+    }
   ];
 
   const onClickAdd = () => {

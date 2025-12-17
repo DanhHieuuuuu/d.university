@@ -11,7 +11,13 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 
 import { IQueryRole, IRole } from '@models/role';
-import { deleteRole, getListPermissionTree, getListRole, resetStatusRole, setSelectedRoleId } from '@redux/feature/roleConfigSlice';
+import {
+  deleteRole,
+  getListPermissionTree,
+  getListRole,
+  resetStatusRole,
+  setSelectedRoleId
+} from '@redux/feature/roleConfigSlice';
 import CreateRoleModal from './(dialog)/create-or-update';
 import RolePermissionModal from './(dialog)/update-permission';
 import { toast } from 'react-toastify';
@@ -96,7 +102,7 @@ const Page = () => {
     if (result != undefined) {
       toast.success(result?.message || 'Xóa nhóm thành công');
       dispatch(resetStatusRole());
-      onFilterChange(query)
+      onFilterChange(query);
     }
   };
 

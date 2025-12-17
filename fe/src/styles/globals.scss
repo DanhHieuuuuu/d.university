@@ -9,9 +9,9 @@
 
 /* Theme light */
 .light {
-  --background: #F5F5F5;
+  --background: #f5f5f5;
   --foreground: #171717;
-  --background-header: #0D47A1;
+  --background-header: #0d47a1;
 
   .ant-spin-fullscreen {
     background-color: rgba(255, 255, 255, 0.6) !important;
@@ -43,6 +43,13 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+// khóa scroll toàn màn hình
+body,
+html {
+  height: 100%;
+  overflow: hidden;
 }
 
 @layer utilities {

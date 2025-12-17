@@ -62,7 +62,7 @@ const CreateFileModal: React.FC<CreateFileModalProps> = (props) => {
         toast.error('File phải nhỏ hơn 10MB!');
         return false;
       }
-      
+
       setUploadedFile(file);
       setFileList([file as any]);
       return false;
@@ -78,11 +78,11 @@ const CreateFileModal: React.FC<CreateFileModalProps> = (props) => {
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-      
+
       if (props.isUpdate && props.selectedFile?.id) {
         formData.append('Id', props.selectedFile.id.toString());
       }
-      
+
       formData.append('Name', values.name);
       if (values.description) {
         formData.append('Description', values.description);
@@ -101,7 +101,7 @@ const CreateFileModal: React.FC<CreateFileModalProps> = (props) => {
         await FileService.create(formData);
         toast.success('Tạo file thành công');
       }
-      
+
       props.refreshData();
       onCloseModal();
     } catch (err: any) {

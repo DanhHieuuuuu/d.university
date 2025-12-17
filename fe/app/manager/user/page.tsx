@@ -177,7 +177,7 @@ const Page = () => {
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
           <Form.Item<IQueryUser> label="Tìm kiếm:" name="Keyword">
-            <Input placeholder='Nhập họ tên/CCCD/Mã nhân sự' onChange={(e) => handleSearch(e)} />
+            <Input placeholder="Nhập họ tên/CCCD/Mã nhân sự" onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
         <Form.Item>
