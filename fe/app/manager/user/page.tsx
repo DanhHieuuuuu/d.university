@@ -143,11 +143,11 @@ const Page = () => {
     }
   ];
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryUser>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryUser>({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -191,7 +191,7 @@ const Page = () => {
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
-                form.submit();
+                resetFilter();
               }}
             >
               Tải lại

@@ -25,11 +25,11 @@ const StudentPage = () => {
 
   const [isView, setIsView] = useState(false);
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryStudent>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryStudent>({
     total: total,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       mssv: ''
     },
     onQueryChange: (newQuery) => {
@@ -155,7 +155,7 @@ const StudentPage = () => {
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
-                form.submit();
+                resetFilter();
               }}
             >
               Tải lại

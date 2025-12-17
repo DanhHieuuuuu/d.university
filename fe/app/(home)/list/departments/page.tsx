@@ -31,11 +31,11 @@ const Page = () => {
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryPhongBan>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryPhongBan>({
     total: totalItem || 0,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -190,7 +190,7 @@ const Page = () => {
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
-                form.submit();
+                resetFilter();
               }}
             >
               Tải lại
