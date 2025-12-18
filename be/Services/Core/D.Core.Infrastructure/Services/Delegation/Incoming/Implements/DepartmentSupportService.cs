@@ -54,8 +54,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(PagingDepartmentSupport)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
+            var department = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Include(x => x.Supporters);
+
             var query =
-                from ds in _unitOfWork.iDepartmentSupportRepository.TableNoTracking
+                from ds in department
                 join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
                     on ds.DepartmentSupportId equals pb.Id
                 join di in _unitOfWork.iDelegationIncomingRepository.TableNoTracking
@@ -68,7 +70,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     DepartmentSupportName = pb.TenPhongBan,
                     DelegationIncomingId = di.Id,
                     DelegationIncomingName = di.Name,
-                    Content = ds.Content
+                    Content = ds.Content,
+                    Supporters = ds.Supporters.ToList(),
                 };
 
             var totalCount = query.Count();
