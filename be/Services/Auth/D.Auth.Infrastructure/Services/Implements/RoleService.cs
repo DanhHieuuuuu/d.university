@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using D.Auth.Domain.Dtos.Role;
 using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
@@ -6,7 +7,6 @@ using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace D.Auth.Infrastructure.Services.Implements
 {
@@ -97,31 +97,51 @@ namespace D.Auth.Infrastructure.Services.Implements
                 $"{nameof(GetAllRole)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var query =
-                from ur in _unitOfWork.iUserRoleRepository.TableNoTracking
-                group ur by ur.RoleId into g
-                select new { RoleId = g.Key, TotalUser = g.Count() } into A
-                join r in _unitOfWork.iRoleRepository.TableNoTracking on A.RoleId equals r.Id
-                where
-                    (
-                        string.IsNullOrEmpty(dto.Keyword)
-                        || (
-                            !string.IsNullOrEmpty(r.Description)
-                            && r.Description.ToLower().Contains(dto.Keyword.ToLower())
-                        )
-                        || (
-                            !string.IsNullOrEmpty(r.Name)
-                            && r.Name.ToLower().Contains(dto.Keyword.ToLower())
-                        )
+            //var query =
+            //    from r in _unitOfWork.iRoleRepository.TableNoTracking
+            //    join u in _unitOfWork.iUserRoleRepository.TableNoTracking
+            //        on r.Id equals u.RoleId
+            //        into grp
+            //    from x in grp.DefaultIfEmpty()
+            //    group x by new
+            //    {
+            //        r.Id,
+            //        r.Name,
+            //        r.Description,
+            //        r.Status,
+            //    } into g
+            //    select new RoleResponseDto
+            //    {
+            //        Id = g.Key.Id,
+            //        Name = g.Key.Name,
+            //        Description = g.Key.Description,
+            //        Status = g.Key.Status,
+            //        TotalUser = g.Count(x => x != null),
+            //    };
+
+            var query = _unitOfWork.iRoleRepository.TableNoTracking.Select(r => new RoleResponseDto
+            {
+                Id = r.Id,
+                Name = r.Name,
+                Description = r.Description,
+                Status = r.Status,
+                TotalUser = r.UserRoles.Count(),
+            });
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                query = query.Where(x =>
+                    string.IsNullOrEmpty(dto.Keyword)
+                    || (
+                        !string.IsNullOrEmpty(x.Description)
+                        && x.Description.ToLower().Contains(dto.Keyword.ToLower())
                     )
-                select new RoleResponseDto
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    Description = r.Description,
-                    Status = r.Status,
-                    TotalUser = A.TotalUser,
-                };
+                    || (
+                        !string.IsNullOrEmpty(x.Name)
+                        && x.Name.ToLower().Contains(dto.Keyword.ToLower())
+                    )
+                );
+            }
 
             var totalCount = query.Count();
 
