@@ -54,22 +54,20 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(PagingDepartmentSupport)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
-            var department = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Include(x => x.Supporters);
+            var department = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Include(x => x.Supporters).Include(x => x.DelegationIncoming);
 
             var query =
                 from ds in department
                 join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
                     on ds.DepartmentSupportId equals pb.Id
-                join di in _unitOfWork.iDelegationIncomingRepository.TableNoTracking
-                    on ds.DelegationIncomingId equals di.Id
                 where !ds.Deleted
                 select new PageDepartmentSupportResultDto
                 {
                     Id = ds.Id,
                     DepartmentSupportId = pb.Id,
                     DepartmentSupportName = pb.TenPhongBan,
-                    DelegationIncomingId = di.Id,
-                    DelegationIncomingName = di.Name,
+                    DelegationIncomingId = ds.DelegationIncoming.Id,
+                    DelegationIncomingName = ds.DelegationIncoming.Name,
                     Content = ds.Content,
                     Supporters = ds.Supporters.ToList(),
                 };
