@@ -159,7 +159,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 ReceptionTimeId = exist.Id,
                 Type = LogType.Update,
                 Description = description,
-                Reason = DelegationStatus.Names[DelegationStatus.Edited],
+                Reason = DelegationStatus.Names[DelegationStatus.Propose],
                 CreatedDate = DateTime.Now,
                 CreatedBy = userId.ToString()
             };

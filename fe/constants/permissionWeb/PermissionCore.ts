@@ -16,7 +16,6 @@ export class PermissionCoreConst {
   // Đoàn vào / ra
   public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}delegation`;
 
-
   // Admin
   public static readonly UserMenuAdmin = `${PermissionCoreConst.Menu}admin_permission`;
   //Phân quyền Website

@@ -13,7 +13,7 @@ export type IUserView = {
   noiSinh?: string;
   soDienThoai?: string;
   email?: string;
-  email2?:string;
+  email2?: string;
   soCccd?: string;
   tenChucVu?: string;
   tenPhongBan?: string;

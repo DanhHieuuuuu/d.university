@@ -22,5 +22,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
 
 
 
+        Task NextStatus(UpdateStatusRequestDto dto);
     }
 }

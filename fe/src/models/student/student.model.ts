@@ -37,5 +37,3 @@ export type ICreateStudent = {
 export type IUpdateStudent = ICreateStudent & {
   idStudent: number;
 };
-
-

@@ -114,7 +114,7 @@ const uploadFile = async (file: File, folderPath?: string): Promise<IS3UploadRes
     const { accessToken } = getItem();
     const formData = new FormData();
     formData.append('file', file);
-    
+
     if (folderPath) {
       formData.append('folderPath', folderPath);
     }
@@ -139,11 +139,11 @@ const uploadMultipleFiles = async (files: File[], folderPath?: string): Promise<
   try {
     const { accessToken } = getItem();
     const formData = new FormData();
-    
+
     files.forEach((file) => {
       formData.append('files', file);
     });
-    
+
     if (folderPath) {
       formData.append('folderPath', folderPath);
     }
@@ -278,13 +278,13 @@ const updateUserImage = async (maNhanSu: string, file: File): Promise<Blob> => {
   }
 };
 
-export const FileService = { 
-  findPaging, 
-  findById, 
-  getFileById, 
-  create, 
-  update, 
-  deleteFile, 
+export const FileService = {
+  findPaging,
+  findById,
+  getFileById,
+  create,
+  update,
+  deleteFile,
   getFile,
   // S3 methods
   uploadFile,

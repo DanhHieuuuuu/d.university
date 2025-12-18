@@ -38,7 +38,7 @@ const find = async (keyword: string) => {
 const findById = async (id: number) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/${id}`);
-    
+
     return res.data;
   } catch (err) {
     processApiMsgError(err, 'Không thể tìm kiếm nhân sự.');

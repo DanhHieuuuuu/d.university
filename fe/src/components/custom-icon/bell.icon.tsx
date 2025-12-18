@@ -10,6 +10,6 @@ const BellSvg = () => {
       </g>
     </svg>
   );
-}
- 
+};
+
 export default BellSvg;

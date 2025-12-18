@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using d.Shared.Permission.Error;
 using d.Shared.Permission.Role;
 using D.Constants.Core.Delegation;
+using D.ControllerBase.Exceptions;
 using D.Core.Domain;
 using D.Core.Domain.Dtos.Delegation;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
@@ -257,7 +259,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             exist.RequestDate = dto.RequestDate;
             exist.ReceptionDate = dto.ReceptionDate;
             exist.TotalMoney = dto.TotalMoney;
-            exist.Status = DelegationStatus.Edited;
 
             _unitOfWork.iDelegationIncomingRepository.Update(exist);
             await _unitOfWork.SaveChangesAsync();
@@ -482,6 +483,83 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             };
 
             return result;
+        }
+
+        /// <summary>
+        /// Trạng thái tiếp theo của đoàn vào
+        /// </summary>
+        /// <param name="idDelegation"></param>
+        /// <param name="oldStatus"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        public async Task NextStatus(UpdateStatusRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(NextStatus)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+            // Kiểm check delegation
+            var delegation = _unitOfWork.iDelegationIncomingRepository.FindById(dto.IdDelegation);
+
+            if(delegation == null)
+            {
+                throw new UserFriendlyException(ErrorCodeConstant.DelegationNotFound, "Không tìm thấy đoàn vào.");
+            }
+            if(delegation.Status != dto.OldStatus)
+                throw new UserFriendlyException(4002, "Trạng thái của đoàn vào đã được sửa đổi.");
+
+            if(delegation.Status == DelegationStatus.Done)
+                throw new UserFriendlyException(4003, "Đoàn này đã hoàn thành tiếp đoàn.");
+
+            if(delegation.Status == DelegationStatus.ReceptionGroup)
+                throw new UserFriendlyException(4003, "Đoàn này đang thực hiện tiếp đoàn.");
+
+            if (dto.Action == "upgrade")
+            {
+                if(dto.OldStatus == DelegationStatus.Create)
+                {
+                    delegation.Status = DelegationStatus.Propose;
+                }
+                else if( dto.OldStatus == DelegationStatus.Propose)
+                {
+                    delegation.Status = DelegationStatus.BGHApprove;
+                }
+                else if (dto.OldStatus == DelegationStatus.BGHApprove)
+                {
+                    delegation.Status = DelegationStatus.ReceptionGroup;
+                }
+                else if (dto.OldStatus == DelegationStatus.ReceptionGroup)
+                {
+                    delegation.Status = DelegationStatus.Done;
+                }
+            }
+            else if(dto.Action == "cancel")
+            {
+                delegation.Status = DelegationStatus.Canceled;
+            }
+            _unitOfWork.iDelegationIncomingRepository.Update(delegation);
+            await _unitOfWork.SaveChangesAsync();
+
+            // Ghi log
+            #region Log         
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+            .FirstOrDefault(u => u.Id == userId);
+            var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
+
+            var log = new LogStatus
+            {
+                DelegationIncomingCode = delegation.Code,
+                NewStatus = dto.OldStatus,
+                OldStatus = delegation.Status,
+                Description = $"Đã thay đổi trạng thái từ {dto.OldStatus} => {delegation.Status} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}",
+                CreatedDate = DateTime.Now,
+                CreatedBy = userId.ToString(),
+                Reason = "Trạng thái"
+            };
+
+            _unitOfWork.iLogStatusRepository.Add(log);
+            await _unitOfWork.SaveChangesAsync();
+            #endregion
+
         }
 
         private bool IsValidEmail(string email)

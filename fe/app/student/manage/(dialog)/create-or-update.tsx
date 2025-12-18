@@ -17,21 +17,14 @@ type StudentDialogProps = {
   isView?: boolean;
 };
 
-const StudentDialog: React.FC<StudentDialogProps> = ({
-  open,
-  onClose,
-  onSuccess,
-  student = null,
-  isView = false
-}) => {
+const StudentDialog: React.FC<StudentDialogProps> = ({ open, onClose, onSuccess, student = null, isView = false }) => {
   const [form] = Form.useForm<ICreateStudent>();
   const dispatch = useAppDispatch();
 
   const { $create, $update } = useAppSelector((state) => state.studentState);
   const { listGioiTinh, listQuocTich, listDanToc } = useAppSelector((s) => s.danhmucState);
 
-  const isLoading =
-    $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
+  const isLoading = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const title = student ? (isView ? 'Xem sinh viên' : 'Cập nhật sinh viên') : 'Thêm sinh viên mới';
 
   useEffect(() => {
@@ -46,7 +39,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
         danToc: student.danToc,
         soCccd: student.soCccd,
         soDienThoai: student.soDienThoai,
-        email: student.email,
+        email: student.email
       });
     } else if (open && !student) {
       form.resetFields();
@@ -69,7 +62,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
         soCccd: values.soCccd,
         soDienThoai: values.soDienThoai,
         email: values.email,
-        mssv: values.mssv || undefined,
+        mssv: values.mssv || undefined
       };
 
       dispatch(updateStudent(updatePayload))
@@ -87,7 +80,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
       const createPayload: ICreateStudent = {
         ...values,
         ngaySinh: formattedDate ? new Date(formattedDate) : undefined,
-        mssv: values.mssv || undefined,
+        mssv: values.mssv || undefined
       };
 
       dispatch(createStudent(createPayload))
@@ -113,12 +106,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
       footer={
         <Space>
           {!isView && (
-            <Button
-              type="primary"
-              onClick={() => form.submit()}
-              icon={<SaveOutlined />}
-              loading={isLoading}
-            >
+            <Button type="primary" onClick={() => form.submit()} icon={<SaveOutlined />} loading={isLoading}>
               {student ? 'Cập nhật' : 'Lưu'}
             </Button>
           )}
@@ -128,27 +116,13 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
         </Space>
       }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        autoComplete="off"
-        disabled={isView}
-      >
+      <Form form={form} layout="vertical" onFinish={onFinish} autoComplete="off" disabled={isView}>
         <div className="grid grid-cols-4 gap-x-5">
-          <Form.Item
-            label="Họ đệm"
-            name="hoDem"
-            rules={[{ required: true, message: 'Không được để trống!' }]}
-          >
+          <Form.Item label="Họ đệm" name="hoDem" rules={[{ required: true, message: 'Không được để trống!' }]}>
             <Input placeholder="Nhập họ đệm" />
           </Form.Item>
 
-          <Form.Item
-            label="Tên"
-            name="ten"
-            rules={[{ required: true, message: 'Không được để trống!' }]}
-          >
+          <Form.Item label="Tên" name="ten" rules={[{ required: true, message: 'Không được để trống!' }]}>
             <Input placeholder="Nhập tên" />
           </Form.Item>
 
@@ -165,7 +139,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
               placeholder="Chọn giới tính"
               options={(listGioiTinh || []).map((i: any) => ({
                 label: i.tenGioiTinh || i.name || i.label,
-                value: i.id === 1,
+                value: i.id === 1
               }))}
             />
           </Form.Item>
@@ -175,7 +149,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
               placeholder="Chọn quốc tịch"
               options={(listQuocTich || []).map((i: any) => ({
                 label: i.tenQuocGia,
-                value: i.id,
+                value: i.id
               }))}
             />
           </Form.Item>
@@ -185,7 +159,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
               placeholder="Chọn dân tộc"
               options={(listDanToc || []).map((i: any) => ({
                 label: i.tenDanToc,
-                value: i.id,
+                value: i.id
               }))}
             />
           </Form.Item>
@@ -200,8 +174,8 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
             rules={[
               {
                 pattern: /^(0|\+84)(\d{9})$/,
-                message: 'Số điện thoại không hợp lệ!',
-              },
+                message: 'Số điện thoại không hợp lệ!'
+              }
             ]}
           >
             <Input placeholder="Nhập số điện thoại" maxLength={11} />
@@ -212,7 +186,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
             name="email"
             rules={[
               { type: 'email', message: 'Email không hợp lệ' },
-              { required: true, message: 'Vui lòng nhập email!' },
+              { required: true, message: 'Vui lòng nhập email!' }
             ]}
           >
             <Input placeholder="Nhập email" />

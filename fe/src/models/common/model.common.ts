@@ -2,12 +2,10 @@
  * COMMOM MODEL FOR REQUEST PAGING
  */
 export type IQueryPaging = {
-  SkipCount?: number;
-  MaxResultCount?: number;
-  Sorting?: string;
-  PageCount?: number;
-  Queryable?: string[];
+  PageIndex?: number;
+  PageSize?: number;
   Keyword?: string;
+  Queryable?: string[];
 
   search?: string | null;
   filter?: string | null;
