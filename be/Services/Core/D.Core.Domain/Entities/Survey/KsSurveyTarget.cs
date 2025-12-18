@@ -23,7 +23,7 @@ namespace D.Core.Domain.Entities.Survey
         public int LoaiDoiTuong { get; set; }
 
         [Column("DepartmentId")]
-        [Description("Lọc theo Phòng ban(giảng viên/nhân viên)")]
+        [Description("Lọc theo Phòng ban")]
         public int? IdPhongBan { get; set; }
 
         [Column("FacultyId")]
