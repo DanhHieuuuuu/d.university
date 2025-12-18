@@ -11,10 +11,11 @@ namespace d.Shared.Permission.Permission
             #region Phân quyền website
             { PermissionCoreKeys.UserMenuPermission,new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserMenuPermission, PermissionName = "Phân quyền website", ParentKey = PermissionCoreKeys.UserMenuAdmin } },
             { PermissionCoreKeys.UserTableRolePermission, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserTableRolePermission, PermissionName = "Danh sách nhóm quyền", ParentKey = PermissionCoreKeys.UserMenuPermission } },
-            { PermissionCoreKeys.UserButtonPermissionSetting, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonPermissionSetting, PermissionName = "Setting nhóm quyền", ParentKey = PermissionCoreKeys.UserMenuPermission } },
-            { PermissionCoreKeys.UserButtonPermissionAdd, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonPermissionAdd, PermissionName = "Thêm nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSetting } },
-            { PermissionCoreKeys.UserButtonRolePermissionUpdate,  new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRolePermissionUpdate, PermissionName = "Chỉnh sửa nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSetting } },
-            { PermissionCoreKeys.UserButtonRolePermissionDelete, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRolePermissionDelete, PermissionName = "Xóa nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSetting } },
+            { PermissionCoreKeys.UserButtonPermissionSettings, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonPermissionSettings, PermissionName = "Settings nhóm quyền", ParentKey = PermissionCoreKeys.UserMenuPermission } },
+            { PermissionCoreKeys.UserButtonRoleAdd, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRoleAdd, PermissionName = "Thêm nhóm quyền", ParentKey = PermissionCoreKeys.UserMenuPermission } },
+            { PermissionCoreKeys.UserButtonRoleUpdate,  new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRoleUpdate, PermissionName = "Chỉnh sửa nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSettings } },
+            { PermissionCoreKeys.UserButtonRolePermissionUpdate,  new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRolePermissionUpdate, PermissionName = "Chỉnh sửa quyền của nhóm", ParentKey = PermissionCoreKeys.UserButtonPermissionSettings } },
+            { PermissionCoreKeys.UserButtonRoleDelete, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonRoleDelete, PermissionName = "Xóa nhóm quyền", ParentKey = PermissionCoreKeys.UserButtonPermissionSettings } },
             #endregion
             #region Quản lý tài khoản
             { PermissionCoreKeys.UserMenuAccountManager, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserMenuAccountManager, PermissionName = "Quản lý tài khoản", ParentKey = PermissionCoreKeys.UserMenuAdmin } },

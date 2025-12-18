@@ -1,4 +1,5 @@
 ﻿using d.Shared.Permission;
+using d.Shared.Permission.Permission;
 using D.Auth.Domain.Dtos.Permission;
 using D.Auth.Domain.Dtos.Role;
 using D.ControllerBase;
@@ -64,7 +65,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserButtonRoleAdd)]
         [HttpPost("create-role")]
         public async Task<ResponseAPI> CreateNewRole([FromBody] CreateRoleRequestDto dto)
         {
@@ -105,6 +106,7 @@ namespace D.Auth.API.Controllers
         /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserButtonRoleUpdate)]
         [HttpPut("{id}")]
         public async Task<ResponseAPI> UpdateRoleInformation(
             [FromRoute] int id,
@@ -133,6 +135,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserButtonRoleDelete)]
         [HttpDelete("{id}")]
         public async Task<ResponseAPI> DeleteRole([FromRoute] int id)
         {
@@ -154,6 +157,7 @@ namespace D.Auth.API.Controllers
         /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserButtonRolePermissionUpdate)]
         [HttpPost("{id}/permissions")]
         public async Task<ResponseAPI> UpdateRolePermission(
             [FromRoute] int id,

@@ -32,13 +32,13 @@ export const listMenuManager: IMenu[] = [
     label: 'Quản lý thông báo',
     routerLink: '/manager/notification',
     icon: <NotificationOutlined />,
-    permissionKeys: ['d']
+    permissionKeys: []
   },
   {
     label: 'Quản lý log',
     routerLink: '/manager/log',
     icon: <ContainerOutlined />,
-    permissionKeys: ['d']
+    permissionKeys: []
   },
   {
     label: 'Quản lý file',
