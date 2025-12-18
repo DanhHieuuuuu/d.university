@@ -58,17 +58,19 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             #endregion
             return _mapper.Map<CreateReceptionTimeResponseDto>(newReceptionTime);
 
-        }
-        public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int id)
+        }       
+        public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int delegationIncomingId)
         {
-            _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with id: {id}");
+            _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with DelegationIncomingId: {delegationIncomingId}");
 
+            // Lấy receptionTime theo DelegationIncomingId
             var receptionTime = _unitOfWork.iReceptionTimeRepository.TableNoTracking
-                .FirstOrDefault(r => r.Id == id);
+                .FirstOrDefault(r => r.DelegationIncomingId == delegationIncomingId);
 
             if (receptionTime == null)
                 return null;
 
+            // Lấy thông tin đoàn
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
                 .FirstOrDefault(d => d.Id == receptionTime.DelegationIncomingId);
 
@@ -82,12 +84,13 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 TotalPerson = receptionTime.TotalPerson,
                 Address = receptionTime.Address,
                 DelegationIncomingId = receptionTime.DelegationIncomingId,
-                DelegationName = delegation != null ? delegation.Name : null,
-                DelegationCode = delegation != null ? delegation.Code : null
+                DelegationName = delegation?.Name,
+                DelegationCode = delegation?.Code
             };
 
             return result;
         }
+
         public async Task<UpdateReceptionTimeResponseDto> UpdateReceptionTime(UpdateReceptionTimeRequestDto dto)
         {
             _logger.LogInformation(
@@ -95,7 +98,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             );
 
             var exist = _unitOfWork.iReceptionTimeRepository.Table
-                .FirstOrDefault(x => x.Id == dto.Id);
+                .FirstOrDefault(x => x.DelegationIncomingId == dto.DelegationIncomingId);
 
             if (exist == null)
                 throw new Exception("Không tìm thấy thời gian tiếp đoàn.");

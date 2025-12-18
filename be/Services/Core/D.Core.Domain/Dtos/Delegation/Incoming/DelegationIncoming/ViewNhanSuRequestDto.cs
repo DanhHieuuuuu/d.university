@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class DetailDelegationIncomingRequestDto : IQuery<DetailDelegationIncomingResponseDto>
+    public class ViewNhanSuRequestDto : IQuery<List<ViewNhanSuResponseDto>>
     {
-        public int DelegationIncomingId { get; set; }
     }
 }

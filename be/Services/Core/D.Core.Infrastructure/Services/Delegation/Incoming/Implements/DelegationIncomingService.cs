@@ -77,6 +77,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                             TotalPerson = d.TotalPerson,
                             PhoneNumber = d.PhoneNumber,
                             Status = d.Status,
+                            Location = d.Location,
                             RequestDate = d.RequestDate,
                             ReceptionDate = d.ReceptionDate,
                             TotalMoney = d.TotalMoney
@@ -261,6 +262,16 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             _unitOfWork.iDelegationIncomingRepository.Update(exist);
             await _unitOfWork.SaveChangesAsync();
 
+            var staffReceptionName = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                .Where(x => x.Id == exist.IdStaffReception)
+                .Select(x => x.HoDem + " " + x.Ten)
+                .FirstOrDefault();
+
+            var phongBanName = _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                .Where(x => x.Id == exist.IdPhongBan)
+                .Select(x => x.TenPhongBan)
+                .FirstOrDefault();
+
             #region Log
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
@@ -299,7 +310,11 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             await _unitOfWork.SaveChangesAsync();
             #endregion
 
-            return _mapper.Map<UpdateDelegationIncomingResponseDto>(exist);
+            var result = _mapper.Map<UpdateDelegationIncomingResponseDto>(exist);
+            result.StaffReceptionName = staffReceptionName;
+            result.PhongBan = phongBanName;
+
+            return result;
         }
 
 
@@ -337,6 +352,25 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             return list;
         }
+        public List<ViewNhanSuResponseDto> GetAllNhanSu(ViewNhanSuRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllNhanSu)} called.");
+
+            var list = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                .Where(x => x.DaChamDutHopDong != true
+                    && x.DaVeHuu != true
+                    && x.IsThoiViec != true
+                )
+                .Select(x => new ViewNhanSuResponseDto
+                {
+                    IdNhanSu = x.Id,         
+                    TenNhanSu = x.HoDem + x.Ten
+                })
+                .ToList();
+
+            return list;
+        }
+
         public List<ViewTrangThaiResponseDto> GetListTrangThai(ViewTrangThaiRequestDto dto)
         {
             _logger.LogInformation($"{nameof(GetListTrangThai)}");
@@ -379,6 +413,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                             TotalPerson = d.TotalPerson,
                             PhoneNumber = d.PhoneNumber,
                             Status = d.Status,
+                            Location = d.Location,
                             RequestDate = d.RequestDate,
                             ReceptionDate = d.ReceptionDate,
                             TotalMoney = d.TotalMoney

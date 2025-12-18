@@ -13,8 +13,10 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
         public string? Name { get; set; }
         public string? Content { get; set; }
         public int IdPhongBan { get; set; }
+        public string? PhongBan { get; set; }
         public string? Location { get; set; }
         public int IdStaffReception { get; set; }
+        public string? StaffReceptionName { get; set; }
         public int TotalPerson { get; set; }
         public string? PhoneNumber { get; set; }
         public DateOnly RequestDate { get; set; }

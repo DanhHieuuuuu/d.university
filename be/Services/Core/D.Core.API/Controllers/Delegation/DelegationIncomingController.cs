@@ -79,6 +79,24 @@ namespace D.Core.API.Controllers.Delegation
             }
         }
         /// <summary>
+        /// Lấy nhân sự
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-nhansu")]
+        public async Task<ResponseAPI> GetAllNhanSu([FromQuery] ViewNhanSuRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
         /// Lấy trạng thái 
         /// </summary>
         /// <param name="dto"></param>
@@ -200,7 +218,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("create/reception-time")]
+        [HttpPost("create-reception-time")]
         public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeRequestDto dto)
         {
             try

@@ -95,3 +95,15 @@ export interface ILogStatus {
   createdBy:string,
   createdDate:string
 }
+export type ICreateReceptionTime = {
+  startDate: number,
+  endDate:number,
+  date:number,
+  content: string,
+  totalPerson:number,
+  address:string,
+  delegationIncomingId: number,
+};
+export type IUpdateReceptionTime = ICreateReceptionTime & {
+  id: number;
+};

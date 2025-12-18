@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ICreateHopDongNs, IQueryNhanSu } from '@models/nhansu/nhansu.model';
-import { ICreateDoanVao, IQueryGuestGroup, IUpdateDoanVao } from '@models/delegation/delegation.model';
+import { ICreateDoanVao, ICreateReceptionTime, IQueryGuestGroup, IUpdateDoanVao, IUpdateReceptionTime } from '@models/delegation/delegation.model';
 import { DelegationIncomingService } from '@services/delegation/delegationIncoming.service';
 import { rejects } from 'assert';
 
@@ -20,6 +20,19 @@ export const getListGuestGroup = createAsyncThunk('delegation-incoming/list', as
 export const getListPhongBan = createAsyncThunk ('delegation-incoming/getPhongBan', async (_,thunkAPI) => {
   try {
     const res = await DelegationIncomingService.getListPhongBan();
+
+    return res.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
+  }
+})
+export const getListNhanSu = createAsyncThunk ('delegation-incoming/getNhanSu', async (_,thunkAPI) => {
+  try {
+    const res = await DelegationIncomingService.getListNhanSu();
 
     return res.data;
   } catch (error: any) {
@@ -110,9 +123,9 @@ export const getByIdGuestGroup = createAsyncThunk(
 );
 export const getByIdDetailDelegation = createAsyncThunk(
   'delegation-incoming/getByIdDetail',
-  async (id: number, { rejectWithValue }) => {
+  async (delegationIncomingId: number, { rejectWithValue }) => {
     try {
-      const res = await DelegationIncomingService.getByIdDetailDelegation (id); 
+      const res = await DelegationIncomingService.getByIdDetailDelegation (delegationIncomingId); 
       return res.data;
     } catch (error: any) {
       return rejectWithValue({
@@ -125,9 +138,9 @@ export const getByIdDetailDelegation = createAsyncThunk(
 );
 export const getByIdReceptionTime = createAsyncThunk(
   'delegation-incoming/getByIdReceptionTime',
-  async (id: number, { rejectWithValue }) => {
+  async (delegationIncomingId: number, { rejectWithValue }) => {
     try {
-      const res = await DelegationIncomingService.getByIdReceptionTime (id);
+      const res = await DelegationIncomingService.getByIdReceptionTime (delegationIncomingId);
       return res.data;
     } catch (error: any) {
       return rejectWithValue({
@@ -151,4 +164,26 @@ export const getLogStatus = createAsyncThunk ('delegation-incoming/getLogStatus'
     });
   }
 })
+export const updateReceptionTime = createAsyncThunk('delegation-incoming/updateReceptionTime', async (payload: IUpdateReceptionTime) => {
+  try {
+    const res = await DelegationIncomingService.updateReceptionTime(payload);
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+export const createReceptionTime = createAsyncThunk('delegation-incoming/createReceptionTime',async (payload: ICreateReceptionTime, { rejectWithValue }) => {
+    try {
+      const res = await DelegationIncomingService.createReceptionTime(payload);
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
 

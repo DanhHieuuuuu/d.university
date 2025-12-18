@@ -9,6 +9,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
 {
     public interface IDetailDelegationIncomingService
     {
-        Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int id);
+        Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int delegationIncomingId);
     }
 }

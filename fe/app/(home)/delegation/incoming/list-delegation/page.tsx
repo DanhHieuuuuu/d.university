@@ -21,10 +21,11 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { ICreateReceptionTime, IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
   getListGuestGroup,
+  getListNhanSu,
   getListPhongBan,
   getListStatus
 } from '@redux/feature/delegation/delegationThunk';
@@ -140,6 +141,11 @@ const Page = () => {
       command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
     {
+      label: 'Thêm thời gian',
+      icon: <PlusOutlined />,
+      command: (record: IViewGuestGroup) => onClickCreateTime(record)
+    },
+    {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
@@ -165,6 +171,7 @@ const Page = () => {
       dispatch(resetStatusCreate());
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
+      dispatch(getListNhanSu())
       dispatch(getListStatus());
     }
   }, [isModalOpen]);
@@ -185,6 +192,9 @@ const Page = () => {
 
  const onClickView = (data: IViewGuestGroup) => {
   router.push(`/delegation/incoming/detail/${data.id}`);
+};
+const onClickCreateTime = (data: IViewGuestGroup) => {
+  router.push(`/delegation/incoming/create-reception-time?delegationIncomingId=${data.id}`);
 };
   const onClickUpdate = (data: IViewGuestGroup) => {
     dispatch(select(data));

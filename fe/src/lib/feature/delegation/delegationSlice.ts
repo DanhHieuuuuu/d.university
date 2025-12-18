@@ -3,15 +3,18 @@ import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
 import {
   createDoanVao,
+  createReceptionTime,
   deleteDoanVao,
   getByIdDetailDelegation,
   getByIdGuestGroup,
   getByIdReceptionTime,
   getListGuestGroup,
+  getListNhanSu,
   getListPhongBan,
   getListStatus,
   getLogStatus,
-  updateDoanVao
+  updateDoanVao,
+  updateReceptionTime
 } from './delegationThunk';
 import { ILogStatus, IViewGuestGroup } from '@models/delegation/delegation.model';
 
@@ -25,6 +28,7 @@ interface DelegationState {
   list: IViewGuestGroup[];
   listLogStatus: ILogStatus[];
   listPhongBan: any[];
+  listNhanSu: any[];
   listStatus: any[];
   total: number;
   $create: {
@@ -41,6 +45,7 @@ const initialState: DelegationState = {
   list: [],
   listLogStatus: [],
   listPhongBan: [],
+  listNhanSu: [],
   listStatus: [],
   total: 0,
   $create: {
@@ -95,6 +100,17 @@ const delegationSlice = createSlice({
         state.listPhongBan = action.payload;
       })
       .addCase(getListPhongBan.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // List Nhan su
+      .addCase(getListNhanSu.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getListNhanSu.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listNhanSu = action.payload;
+      })
+      .addCase(getListNhanSu.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
 
@@ -181,7 +197,7 @@ const delegationSlice = createSlice({
       })
       .addCase(getByIdReceptionTime.rejected, (state) => {
         state.selected.status = ReduxStatus.FAILURE;
-      })      
+      })
       // Log Status
       .addCase(getLogStatus.pending, (state) => {
         state.status = ReduxStatus.LOADING;
@@ -193,7 +209,26 @@ const delegationSlice = createSlice({
       .addCase(getLogStatus.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
-
+      // update receptionTime
+      .addCase(updateReceptionTime.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateReceptionTime.fulfilled, (state, action) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateReceptionTime.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // create ReceptionTime
+      .addCase(createReceptionTime.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(createReceptionTime.fulfilled, (state) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createReceptionTime.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      });
   }
 });
 

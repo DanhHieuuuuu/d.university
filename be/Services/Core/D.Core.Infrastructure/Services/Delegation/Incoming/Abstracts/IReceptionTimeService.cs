@@ -9,7 +9,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
 {
     public interface  IReceptionTimeService
     {
-        Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int id);
+        Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int delegationIncomingId);
         Task<CreateReceptionTimeResponseDto> CreateReceptionTime(CreateReceptionTimeRequestDto dto);
         void DeleteReceptionTime(int id);
         Task<UpdateReceptionTimeResponseDto> UpdateReceptionTime(UpdateReceptionTimeRequestDto dto);
