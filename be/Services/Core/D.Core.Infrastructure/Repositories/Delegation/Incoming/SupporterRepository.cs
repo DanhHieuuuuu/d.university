@@ -9,9 +9,14 @@ namespace D.Core.Infrastructure.Repositories.Delegation.Incoming
     {
         public SupporterRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
             : base(dbContext, httpContext) { }
+        public bool IsSupporterCodeExist(string supporterCode)
+        {
+            return TableNoTracking.Any(x => x.SupporterCode == supporterCode);
+        }
     }
 
     public interface ISupporterRepository : IRepositoryBase<Supporter>
     {
+        bool IsSupporterCodeExist(string supporterCode);
     }
 }

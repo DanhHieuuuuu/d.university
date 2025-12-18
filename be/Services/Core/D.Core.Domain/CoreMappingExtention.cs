@@ -146,6 +146,13 @@ namespace D.Core.Domain
             CreateMap<CreateReceptionTimeRequestDto, ReceptionTime>();
             CreateMap<ReceptionTime, CreateReceptionTimeResponseDto>();
             CreateMap<ReceptionTime, UpdateReceptionTimeResponseDto>();
+            CreateMap<Supporter, CreateSupporterResponseDto>();
+            CreateMap<CreateSupporterResponseDto,Supporter>();
+            CreateMap<CreateSupporterRequestDto, Supporter>();
+            CreateMap<CreateDepartmentSupportResponseDto, DepartmentSupport>();
+            CreateMap<CreateDepartmentSupportRequestDto, DepartmentSupport>();
+            CreateMap<DepartmentSupport, CreateDepartmentSupportResponseDto>();                
+
             #endregion
         }
 

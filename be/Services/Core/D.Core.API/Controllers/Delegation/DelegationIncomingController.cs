@@ -389,5 +389,80 @@ namespace D.Core.API.Controllers.Delegation
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Lấy paging nhân viên hỗ trợ 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("paging-supporter")]
+        public async Task<ResponseAPI> PagingSupporter([FromQuery] FilterSupporterDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tạo mới nhân viên hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("create-supporter")]
+        public async Task<ResponseAPI> CreateSupporter([FromBody] CreateSupporterRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy paging bộ phận hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("paging-department-support")]
+        public async Task<ResponseAPI> PagingDepartmentSupport([FromQuery] FilterDepartmentSupportDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tạo mới bộ phận hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("create-department-support")]
+        public async Task<ResponseAPI> CreateDepartmentSupport([FromBody] CreateDepartmentSupportRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

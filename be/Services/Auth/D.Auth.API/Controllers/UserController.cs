@@ -124,7 +124,7 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerUpdatePermission)]
+        //[PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerUpdatePermission)]
         [HttpPost("update-roles-to-user")]
         public async Task<ResponseAPI> UpdateRoleToUser(UpdateUserRoleDto dto)
         {

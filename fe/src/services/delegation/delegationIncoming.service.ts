@@ -3,6 +3,7 @@ import axios from '@utils/axios';
 import {
   ICreateDoanVao,
   ICreateReceptionTime,
+  ICreateSupporter,
   IDetailDelegationIncoming,
   ILogStatus,
   IReceptionTime,
@@ -146,11 +147,15 @@ const downloadTemplateExcel = async () => {
     return Promise.reject(err);
   }
 };
-const getLogStatus = async () => {
+const getLogStatus = async (query: any) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-log-status`);
+    const res = await axios.get(`${apiDelegationEndpoint}/get-log-status`, {
+      params: {
+        ...query
+      }
+    });
 
-    const data: IResponseList<ILogStatus> = res.data;
+    const data = res.data;
     return Promise.resolve(data);
   } catch (err) {
     processApiMsgError(err, '');
@@ -176,6 +181,54 @@ const createReceptionTime = async (body: ICreateReceptionTime) => {
   }
 };
 
+const pagingSupporter = async (query: any) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/paging-supporter`, {
+      params: {
+        ...query
+      }
+    });
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const pagingDepartmentSupport = async (query: any) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/paging-department-support`, {
+      params: {
+        ...query
+      }
+    });
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const createSupporter = async (body: ICreateSupporter) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/create-supporter`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const createDepartment = async (body: ICreateSupporter) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/create-supporter`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
 export const DelegationIncomingService = {
   paging,
   getListPhongBan,
@@ -190,5 +243,10 @@ export const DelegationIncomingService = {
   getLogStatus,
   getListNhanSu,
   updateReceptionTime,
-  createReceptionTime
+  createReceptionTime,
+  pagingSupporter,
+  createSupporter,
+  pagingDepartmentSupport,
+  createDepartment
+
 };

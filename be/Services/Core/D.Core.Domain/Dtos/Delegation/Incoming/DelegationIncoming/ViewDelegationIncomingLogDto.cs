@@ -8,6 +8,7 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class ViewDelegationIncomingLogDto
     {
+        public int Id { get; set; }
         public int? OldStatus { get; set; }
         public int? NewStatus { get; set; }
         public string? Description { get; set; }

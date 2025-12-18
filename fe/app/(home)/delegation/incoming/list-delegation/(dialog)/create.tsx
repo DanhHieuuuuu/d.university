@@ -152,7 +152,7 @@ const uploadProps: UploadProps = {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Tên đoàn vào" name="name" rules={[{ message: 'Nhập tên đoàn' }]}>
+            <Form.Item label="Tên đoàn vào" name="name" rules={[{  required: true,message: 'Nhập tên đoàn' }]}>
               <Input />
             </Form.Item>
           </Col>

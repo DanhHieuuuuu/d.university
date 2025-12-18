@@ -1,78 +1,95 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from 'antd';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getLogStatus } from '@redux/feature/delegation/delegationThunk';
-import { ILogStatus } from '@models/delegation/delegation.model';
-import { formatDateTimeView, formatDateView } from '@utils/index';
+import { ILogStatus, IQueryLogStatus } from '@models/delegation/delegation.model';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { DelegationStatusConst } from '../../consts/delegation-status.consts';
-import { getStatusClass, getStatusName } from '@utils/status.helper';
-
+import AppTable from '@components/common/Table';
+import { ReduxStatus } from '@redux/const';
+import { IAction, IColumn } from '@models/common/table.model';
+import { usePaginationWithFilter } from '@hooks/usePagination';
+import { useDebouncedCallback } from '@hooks/useDebounce';
+import { getStatusName } from '@utils/status.helper';
+import { formatDateTimeView } from '@utils/index';
 const Page = () => {
   const dispatch = useAppDispatch();
-  const { listLogStatus, status } = useAppSelector((state) => state.delegationState);
+  const { status, total: totalItem, listLogStatus } = useAppSelector((state) => state.delegationState);
+  console.log('listLogStatus', listLogStatus);
+  const columns: IColumn<ILogStatus>[] = [
+    {
+      key: 'stt',
+      title: 'STT',
+      align: 'center',
+      render: (_: any, __: any, index: number) => index + 1
+    },
+    {
+      key: 'createdBy',
+      dataIndex: 'createdBy',
+      title: 'Người thực hiện',
+      align: 'center'
+    },
+    {
+      key: 'oldStatus',
+      dataIndex: 'oldStatus',
+      title: 'Trạng thái cũ',
+      render: (value: number) => getStatusName(value)
+    },
+    {
+      key: 'newStatus',
+      dataIndex: 'newStatus',
+      title: 'Trạng thái mới',
+      render: (value: number) => getStatusName(value)
+    },
+    {
+      key: 'description',
+      dataIndex: 'description',
+      title: 'Mô tả'
+    },
+    {
+      key: 'reason',
+      dataIndex: 'reason',
+      title: 'Lý do'
+    },
+    {
+      key: 'createdDate',
+      dataIndex: 'createdDate',
+      title: 'Thời gian',
+      align: 'center',
+      render: (value: string) => formatDateTimeView(value)
+    }
+  ];
 
+  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryLogStatus>({
+    total: totalItem,
+    initialQuery: {
+      PageIndex: 1,
+      PageSize: 10,
+      Keyword: ''
+    },
+    onQueryChange: (newQuery) => {
+      dispatch(getLogStatus(newQuery));
+    },
+    triggerFirstLoad: true
+  });
   useEffect(() => {
-    dispatch(getLogStatus());
-  }, [dispatch]);
+    dispatch(getLogStatus(query));
+  }, [dispatch,query]);
 
+  const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
+    onFilterChange({ Keyword: value });
+  }, 500);
   return (
     <Card title="Nhật ký đoàn vào" className="h-full">
-      {status === 'loading' && <p>Đang tải dữ liệu...</p>}
-
-      {listLogStatus && listLogStatus.length === 0 && <p>Không có dữ liệu.</p>}
-
-      <div className="log-list">
-        {listLogStatus &&
-          listLogStatus.map((log: ILogStatus, index: number) => (
-            <div key={index} className="log-item">
-              <div className='log-head'>
-                <p style={{ fontSize: '18px', fontWeight: 'bold' }}>
-                   {formatDateTimeView(log.createdDate)}
-                </p>
-                <p>                 
-                  <span className={getStatusClass(log.newStatus)}>{getStatusName(log.newStatus)}</span>
-                </p>
-              </div>
-
-              <p>
-                <strong>Mô tả:</strong> {log.description || '----'}
-              </p>
-              <p>
-                <strong>Lý do:</strong> {log.reason || '---- '}
-              </p>
-              <p>
-                <strong>Id người tạo:</strong> {log.createdBy}
-              </p>
-            </div>
-          ))}
-      </div>
-
-      <style jsx>{`
-        .log-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        .log-item {
-          padding: 12px;
-          border: 1px solid #e8e8e8;
-          border-radius: 6px;
-          background-color: #fafafa;
-        }
-        .log-item p {
-          margin: 4px 0;
-        }
-        .log-head{
-          display:flex;
-          justify-content: space-between;
-         
-        }
-          
-      `}</style>
+      <AppTable
+        loading={status === ReduxStatus.LOADING}
+        rowKey="id"
+        columns={columns}
+        dataSource={listLogStatus}
+        pagination={{ position: ['bottomRight'], ...pagination }}
+      />
     </Card>
   );
 };

@@ -153,11 +153,11 @@ const Page = () => {
     }
   ];
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryGuestGroup>({
+  const { query, pagination, onFilterChange,resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -263,15 +263,9 @@ const onClickCreateTime = (data: IViewGuestGroup) => {
             variant="filled"
             icon={<SyncOutlined />}
             onClick={() => {
-              form.resetFields();
-              onFilterChange({
-                SkipCount: 0,
-                MaxResultCount: 10,
-                Keyword: '',
-                idPhongBan: undefined,
-                status: undefined
-              });
-            }}
+                form.resetFields();
+                resetFilter();
+              }}
           >
             Tải lại
           </Button>

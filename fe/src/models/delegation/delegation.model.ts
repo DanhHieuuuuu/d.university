@@ -70,6 +70,18 @@ export type IQueryGuestGroup = IQueryPaging & {
   idPhongBan?: number;
   status?: number;
 };
+export type IQuerySupporter = IQueryPaging & {
+  supporterCode?: string;
+  departmentSupportId?:number
+};
+export type IQueryDepartmentSupport = IQueryPaging & {
+  
+  departmentSupportId?:number
+
+};
+export type IQueryLogStatus = IQueryPaging & {
+
+};
 export type ICreateDoanVao = {
   code: string;
   name: string;
@@ -106,4 +118,15 @@ export type ICreateReceptionTime = {
 };
 export type IUpdateReceptionTime = ICreateReceptionTime & {
   id: number;
+};
+
+export type ICreateSupporter = {
+  supporterId: number;
+  supporterCode: string;
+  departmentSupportId: number
+};
+export type ICreateDepartment = {
+  delegationIncomingId: number;
+  content: string;
+  departmentSupportId: number
 };

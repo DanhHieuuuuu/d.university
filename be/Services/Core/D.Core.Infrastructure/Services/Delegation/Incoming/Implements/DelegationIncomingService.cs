@@ -198,9 +198,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             {
                 DelegationIncomingCode = newDoanVao.Code,
                 NewStatus = DelegationStatus.Create,
-                OldStatus = null,
+                OldStatus = DelegationStatus.Create,
                 Description = $"Thêm đoàn vào: Đã được thêm bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}",
                 CreatedDate = DateTime.Now,
+                Reason = "Thêm mới đoàn vào",
                 CreatedBy = userId.ToString()
             };
 

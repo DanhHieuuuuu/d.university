@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ICreateHopDongNs, IQueryNhanSu } from '@models/nhansu/nhansu.model';
-import { ICreateDoanVao, ICreateReceptionTime, IQueryGuestGroup, IUpdateDoanVao, IUpdateReceptionTime } from '@models/delegation/delegation.model';
+import { ICreateDoanVao, ICreateReceptionTime, IQueryDepartmentSupport, IQueryGuestGroup, IQueryLogStatus, IUpdateDoanVao, IUpdateReceptionTime } from '@models/delegation/delegation.model';
 import { DelegationIncomingService } from '@services/delegation/delegationIncoming.service';
 import { rejects } from 'assert';
 
@@ -151,19 +151,20 @@ export const getByIdReceptionTime = createAsyncThunk(
     }
   }
 );
-export const getLogStatus = createAsyncThunk ('delegation-incoming/getLogStatus', async (_,thunkAPI) => {
-  try {
-    const res = await DelegationIncomingService.getLogStatus();
 
-    return res.data.items;
+export const getLogStatus = createAsyncThunk('delegation-incoming/getLogStatus', async (args: IQueryLogStatus, { rejectWithValue }) => {
+  try {
+    const res = await DelegationIncomingService.getLogStatus(args);
+
+    return res.data;
   } catch (error: any) {
-    return thunkAPI.rejectWithValue({
+    return rejectWithValue({
       message: error.message,
       code: error.code,
       response: error.response?.data
     });
   }
-})
+});
 export const updateReceptionTime = createAsyncThunk('delegation-incoming/updateReceptionTime', async (payload: IUpdateReceptionTime) => {
   try {
     const res = await DelegationIncomingService.updateReceptionTime(payload);
@@ -187,3 +188,16 @@ export const createReceptionTime = createAsyncThunk('delegation-incoming/createR
   }
 );
 
+export const getListDepartmentSupport = createAsyncThunk('delegation-incoming/listDepartmentSupport', async (args: IQueryDepartmentSupport, { rejectWithValue }) => {
+  try {
+    const res = await DelegationIncomingService.pagingDepartmentSupport(args);
+
+    return res.data;
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
+  }
+});

@@ -8,6 +8,7 @@ import {
   getByIdDetailDelegation,
   getByIdGuestGroup,
   getByIdReceptionTime,
+  getListDepartmentSupport,
   getListGuestGroup,
   getListNhanSu,
   getListPhongBan,
@@ -16,7 +17,7 @@ import {
   updateDoanVao,
   updateReceptionTime
 } from './delegationThunk';
-import { ILogStatus, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { IDepartmentSupport, ILogStatus, IViewGuestGroup } from '@models/delegation/delegation.model';
 
 interface DelegationState {
   status: ReduxStatus;
@@ -26,6 +27,7 @@ interface DelegationState {
     data: any | null;
   };
   list: IViewGuestGroup[];
+  listDepartmentSupport: IDepartmentSupport[];
   listLogStatus: ILogStatus[];
   listPhongBan: any[];
   listNhanSu: any[];
@@ -43,6 +45,7 @@ const initialState: DelegationState = {
     data: null
   },
   list: [],
+  listDepartmentSupport:[],
   listLogStatus: [],
   listPhongBan: [],
   listNhanSu: [],
@@ -203,8 +206,10 @@ const delegationSlice = createSlice({
         state.status = ReduxStatus.LOADING;
       })
       .addCase(getLogStatus.fulfilled, (state, action: PayloadAction<any>) => {
+        console.log('getLogStatus payload', action.payload);
         state.status = ReduxStatus.SUCCESS;
-        state.listLogStatus = action.payload;
+        state.listLogStatus = action.payload?.items ?? [];
+        state.total = action.payload?.totalItem ?? 0;
       })
       .addCase(getLogStatus.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
@@ -228,7 +233,19 @@ const delegationSlice = createSlice({
       })
       .addCase(createReceptionTime.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
-      });
+      })
+      // Danh sach phòng ban hõ trợ
+      .addCase(getListDepartmentSupport.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getListDepartmentSupport.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listDepartmentSupport = action.payload?.items;
+        state.total = action.payload?.totalItem;
+      })
+      .addCase(getListDepartmentSupport.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
   }
 });
 
