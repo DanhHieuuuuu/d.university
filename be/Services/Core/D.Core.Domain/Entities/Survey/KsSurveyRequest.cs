@@ -48,7 +48,7 @@ namespace D.Core.Domain.Entities.Survey
         [Column("Reason")]
         [Description("Lý do từ chối")]
         [MaxLength(500)]
-        public string LyDoTuChoi { get; set; } = string.Empty;
+        public string? LyDoTuChoi { get; set; }
 
         public virtual ICollection<KsSurveyTarget> Targets { get; set; }
         public virtual ICollection<KsSurveyQuestion> Questions { get; set; }
