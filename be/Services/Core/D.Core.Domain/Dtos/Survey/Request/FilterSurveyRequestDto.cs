@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Survey.Request
 {
-    public class FilterSurveyRequestDto : FilterBaseDto, IQuery<PageResultDto<RequestSurveyRequestDto>>
+    public class FilterSurveyRequestDto : FilterBaseDto, IQuery<PageResultDto<RequestSurveyResponseDto>>
     {
-        public string Keyword { get; set; }
+        public string? Keyword { get; set; }
         public int? TrangThai { get; set; }
     }
 }
+ 

@@ -10,7 +10,7 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Abstracts
 {
     public interface IRequestService
     {
-        PageResultDto<RequestSurveyRequestDto> Paging(FilterSurveyRequestDto dto);
+        PageResultDto<RequestSurveyResponseDto> Paging(FilterSurveyRequestDto dto);
         Task<RequestSurveyDetailDto> GetByIdRequest(int id);
 
         Task<CreateRequestSurveyResponseDto> CreateRequestSurvey(CreateRequestSurveyRequestDto dto);

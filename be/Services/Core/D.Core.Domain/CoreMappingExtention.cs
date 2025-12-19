@@ -22,12 +22,14 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Dtos.Survey.Request;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
+using D.Core.Domain.Entities.Survey;
 using System.Reflection;
 
 namespace D.Core.Domain
@@ -127,7 +129,7 @@ namespace D.Core.Domain
             CreateMap<UpdateDtChuongTrinhKhungMonDto, DtChuongTrinhKhungMon>();
 
             #endregion
-
+ 
             #region file
 
             CreateMap<FileManagement, FileResponseDto>();
@@ -140,6 +142,22 @@ namespace D.Core.Domain
             CreateMap<DelegationIncoming, PageDelegationIncomingResultDto>();
             CreateMap<CreateRequestDto, DelegationIncoming>();
             CreateMap<DelegationIncoming, CreateResponseDto>();
+            #endregion
+
+            #region Survey
+            CreateMap<KsSurveyTarget, RequestSurveyTargetDto>().ReverseMap();
+            CreateMap<KsSurveyCriteria, RequestSurveyCriteriaDto>().ReverseMap();
+            CreateMap<KsSurveyQuestion, RequestSurveyQuestionDto>().ReverseMap();
+            CreateMap<KsQuestionAnswer, RequestQuestionAnswerDto>().ReverseMap();
+
+            CreateMap<KsSurveyRequest, RequestSurveyResponseDto>();
+            CreateMap<KsSurveyRequest, RequestSurveyDetailDto>();
+
+            CreateMap<CreateRequestSurveyRequestDto, KsSurveyRequest>();
+            CreateMap<KsSurveyRequest, CreateRequestSurveyResponseDto>();
+            CreateMap<UpdateRequestSurveyRequestDto, KsSurveyRequest>();
+            CreateMap<KsSurveyRequest, UpdateRequestSurveyResponseDto>();
+
             #endregion
         }
 

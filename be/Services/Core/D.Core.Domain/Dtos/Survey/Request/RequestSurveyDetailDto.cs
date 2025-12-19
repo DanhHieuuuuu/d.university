@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Survey.Request
 {
-    public class RequestSurveyDetailDto : RequestSurveyRequestDto
+    public class RequestSurveyDetailDto : RequestSurveyResponseDto
     {
         public List<RequestSurveyTargetDto> Targets { get; set; } = new();
         public List<RequestSurveyQuestionDto> Questions { get; set; } = new();

@@ -4,6 +4,7 @@ using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.Kpi;
 using D.Core.Infrastructure.Repositories.SinhVien;
+using D.Core.Infrastructure.Repositories.Survey;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -65,6 +66,11 @@ namespace D.Core.Infrastructure
         private KpiLogStatusRepository _kpiLogStatusRepository;
         private KpiTemplateRepository _kpiTemplateRepository;
         private KpiTruongRepository _kpiTruongRepository;
+        #endregion
+
+        #region Survey
+        private SurveyRequestRepository _surveyRequestRepository;
+        private SurveyLogRepository _surveyLogRepository;
         #endregion
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -534,5 +540,31 @@ namespace D.Core.Infrastructure
 
         #endregion
 
+        #region Survey
+        public IKsSurveyRequestRepository iKsSurveyRequestRepository
+        {
+            get
+            {
+                if (_surveyRequestRepository == null)
+                {
+                    _surveyRequestRepository = new SurveyRequestRepository(_dbContext, _httpContext);
+                }
+                return _surveyRequestRepository;
+            }
+        }
+
+        public IKsSurveyLogRepository iKsSurveyLogRepository
+        {
+            get
+            {
+                if (_surveyLogRepository == null)
+                {
+                    _surveyLogRepository = new SurveyLogRepository(_dbContext, _httpContext);
+                }
+                return _surveyLogRepository;
+            }
+        }
+
+        #endregion
     }
 }

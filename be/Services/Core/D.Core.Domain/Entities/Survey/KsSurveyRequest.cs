@@ -42,13 +42,13 @@ namespace D.Core.Domain.Entities.Survey
         public int IdPhongBan { get; set; }
 
         [Column("Status")]
-        [Description("Trạng thái (0:Draft, 1:Pending, 2:Approved, 3:Rejected)")]
+        [Description("Trạng thái (1:Draft, 2:Pending, 3:Approved, 4:Rejected)")]
         public int TrangThai { get; set; }
 
         [Column("Reason")]
         [Description("Lý do từ chối")]
         [MaxLength(500)]
-        public string LyDoTuChoi { get; set; }
+        public string LyDoTuChoi { get; set; } = string.Empty;
 
         public virtual ICollection<KsSurveyTarget> Targets { get; set; }
         public virtual ICollection<KsSurveyQuestion> Questions { get; set; }

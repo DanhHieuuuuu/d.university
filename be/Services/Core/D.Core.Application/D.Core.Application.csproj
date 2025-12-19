@@ -17,9 +17,4 @@
     <ProjectReference Include="..\D.Core.Infrastructure\D.Core.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Command\Survey\" />
-    <Folder Include="Query\Survey\" />
-  </ItemGroup>
-
 </Project>

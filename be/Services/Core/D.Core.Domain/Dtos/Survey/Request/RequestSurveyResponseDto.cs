@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Survey.Request
 {
-    public class RequestSurveyRequestDto
+    public class RequestSurveyResponseDto
     {
         public int Id { get; set; }
         public string MaYeuCau { get; set; }
