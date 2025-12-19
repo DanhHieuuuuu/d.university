@@ -3,6 +3,7 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, message, Modal, Select } from 'antd';
 import {
+  CheckOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
@@ -27,7 +28,8 @@ import {
   getListGuestGroup,
   getListNhanSu,
   getListPhongBan,
-  getListStatus
+  getListStatus,
+  updateStatus
 } from '@redux/feature/delegation/delegationThunk';
 import { select } from '@redux/feature/delegation/delegationSlice';
 import { ETableColumnType } from '@/constants/e-table.consts';
@@ -36,14 +38,13 @@ import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-
+import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 
 const Page = () => {
   const [form] = Form.useForm();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem, listPhongBan, listStatus } = useAppSelector((state) => state.delegationState);
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
@@ -76,7 +77,7 @@ const Page = () => {
       key: 'phongBan',
       dataIndex: 'phongBan',
       title: 'Phòng ban phụ trách',
-      align: 'center',
+      align: 'center'
     },
     {
       key: 'location',
@@ -141,6 +142,18 @@ const Page = () => {
       command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
     {
+      label: 'Phê duyệt',
+      icon: <CheckOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
+      command: (record: IViewGuestGroup) => onClickPheDuyet(record)
+    },
+    {
+      label: 'Báo cáo kết quả',
+      icon: <CheckOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
+      command: (record: IViewGuestGroup) => onClickBaoCao(record)
+    },
+    {
       label: 'Thêm thời gian',
       icon: <PlusOutlined />,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
@@ -153,7 +166,7 @@ const Page = () => {
     }
   ];
 
-  const { query, pagination, onFilterChange,resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
     total: totalItem,
     initialQuery: {
       PageIndex: 1,
@@ -171,7 +184,7 @@ const Page = () => {
       dispatch(resetStatusCreate());
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
-      dispatch(getListNhanSu())
+      dispatch(getListNhanSu());
       dispatch(getListStatus());
     }
   }, [isModalOpen]);
@@ -189,13 +202,41 @@ const Page = () => {
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
+  const onClickPheDuyet = (data: IViewGuestGroup) => {
+    openConfirmStatusModal({
+      title: 'Xác nhận tiếp đoàn',
+      content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,
+      okText: 'Đồng ý',
+      cancelText: 'Không đồng ý',
+      okAction: 'upgrade',
+      cancelAction: 'cancel',
+      data,
+      dispatch,
+      onSuccess: () => {
+        dispatch(getListGuestGroup(query));
+      }
+    });
+  };
+  const onClickBaoCao = (data: IViewGuestGroup) => {
+    openConfirmStatusModal({
+      title: 'Xác nhận',
+      content: `Bạn có hoàn thành đoàn vào "${data.name}" không?`,
+      okText: 'Hoàn thành',
+      okAction: 'upgrade',
+      data,
+      dispatch,
+      onSuccess: () => {
+        dispatch(getListGuestGroup(query));
+      }
+    });
+  };
 
- const onClickView = (data: IViewGuestGroup) => {
-  router.push(`/delegation/incoming/detail/${data.id}`);
-};
-const onClickCreateTime = (data: IViewGuestGroup) => {
-  router.push(`/delegation/incoming/create-reception-time?delegationIncomingId=${data.id}`);
-};
+  const onClickView = (data: IViewGuestGroup) => {
+    router.push(`/delegation/incoming/detail/${data.id}`);
+  };
+  const onClickCreateTime = (data: IViewGuestGroup) => {
+    router.push(`/delegation/incoming/list-delegation/create-reception-time?delegationIncomingId=${data.id}`);
+  };
   const onClickUpdate = (data: IViewGuestGroup) => {
     dispatch(select(data));
     setIsModalView(false);
@@ -263,9 +304,9 @@ const onClickCreateTime = (data: IViewGuestGroup) => {
             variant="filled"
             icon={<SyncOutlined />}
             onClick={() => {
-                form.resetFields();
-                resetFilter();
-              }}
+              form.resetFields();
+              resetFilter();
+            }}
           >
             Tải lại
           </Button>

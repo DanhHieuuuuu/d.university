@@ -85,7 +85,22 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 TotalItem = totalCount
             };
         }
+        public List<ViewDelegationIncomingResponseDto> GetAllDelegationIncoming(ViewDelegationIncomingRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllDelegationIncoming)} called.");
 
+            var list = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                .Where(x => !x.Deleted)
+                .Select(x => new ViewDelegationIncomingResponseDto
+                {
+                    IdDelegationIncoming = x.Id,
+                    TenDoanVao = x.Name,
+                    DelegationIncomingCode = x.Code,
+                })
+                .ToList();
+
+            return list;
+        }
 
     }
 }

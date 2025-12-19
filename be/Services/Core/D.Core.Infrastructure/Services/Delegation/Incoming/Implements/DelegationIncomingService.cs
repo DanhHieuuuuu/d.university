@@ -260,6 +260,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             exist.RequestDate = dto.RequestDate;
             exist.ReceptionDate = dto.ReceptionDate;
             exist.TotalMoney = dto.TotalMoney;
+            exist.Status = DelegationStatus.Edited;
 
             _unitOfWork.iDelegationIncomingRepository.Update(exist);
             await _unitOfWork.SaveChangesAsync();
@@ -303,6 +304,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 DelegationIncomingCode = exist.Code,
                 OldStatus = oldValues.Status,
                 NewStatus = exist.Status,
+                Reason = "Cập nhật",
                 Description = description,
                 CreatedDate = DateTime.Now,
                 CreatedBy = userId.ToString()

@@ -1,6 +1,7 @@
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
 import {
+  ICreateDepartment,
   ICreateDoanVao,
   ICreateReceptionTime,
   ICreateSupporter,
@@ -9,6 +10,7 @@ import {
   IReceptionTime,
   IUpdateDoanVao,
   IUpdateReceptionTime,
+  IUpdateStatus,
   IViewGuestGroup
 } from '@models/delegation/delegation.model';
 import { IResponseItem, IResponseList } from '@models/common/response.model';
@@ -162,6 +164,21 @@ const getLogStatus = async (query: any) => {
     return Promise.reject(err);
   }
 };
+const getLogReceptionTime = async (query: any) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-log-reception-time`, {
+      params: {
+        ...query
+      }
+    });
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
 const updateReceptionTime = async (body: IUpdateReceptionTime) => {
   try {
     const res = await axios.put(`${apiDelegationEndpoint}/update-reception-time`, body);
@@ -220,15 +237,36 @@ const createSupporter = async (body: ICreateSupporter) => {
     return Promise.reject(err);
   }
 };
-const createDepartment = async (body: ICreateSupporter) => {
+const createDepartment = async (body: ICreateDepartment) => {
   try {
-    const res = await axios.post(`${apiDelegationEndpoint}/create-supporter`, body);
+    const res = await axios.post(`${apiDelegationEndpoint}/create-department-support`, body);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
     return Promise.reject(err);
   }
 };
+const getListDelegationIncoming = async () => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-delegation-incoming`);
+
+    const data: IResponseList<IViewGuestGroup> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const updateStatus = async (body: IUpdateStatus) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/next-status`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
 export const DelegationIncomingService = {
   paging,
   getListPhongBan,
@@ -247,6 +285,9 @@ export const DelegationIncomingService = {
   pagingSupporter,
   createSupporter,
   pagingDepartmentSupport,
-  createDepartment
+  createDepartment,
+  getListDelegationIncoming,
+  updateStatus,
+  getLogReceptionTime
 
 };

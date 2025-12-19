@@ -10,6 +10,7 @@ namespace D.Constants.Core.Delegation
         public static int Done = 5;
         public static int Canceled = 6;
         public static int NeedEdit = 7;
+        public static int Edited = 8;
 
         public static Dictionary<int, string> Names = new Dictionary<int, string>()
         {
@@ -20,6 +21,7 @@ namespace D.Constants.Core.Delegation
             { Done, "Hoàn thành" },
             { Canceled, "Bị hủy" },
             { NeedEdit, "Cần bổ sung" },
+            { Edited, "Đã chỉnh sửa" },
         };
     }
 }

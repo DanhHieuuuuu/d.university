@@ -71,20 +71,37 @@ html {
 .light {
   .tag-init {
     @extend .tag-status;
-    background-color: #E3F2FD; 
-    color: #0D47A1;
+    background-color: #e3f2fd;
+    color: #0d47a1;
   }
 
   .tag-cancel {
     @extend .tag-status;
-    background-color: #FFEBEE; 
-    color: #C62828;
+    background-color: #ffebee;
+    color: #c62828;
   }
 
   .tag-edit {
     @extend .tag-status;
-    background-color: #FFF8E1; 
-    color: #EF6C00;
+    background-color: #fff8e1;
+    color: #ef6c00;
+  }
+  .tag-done {
+    @extend .tag-status;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .tag-reception {
+    @extend .tag-status;
+    background-color: #fff3e0;
+    color: #ef6c00;
+  }
+
+  .tag-propose {
+    @extend .tag-status;
+    background-color: #f3e5f5;
+    color: #6a1b9a;
   }
 }
 
@@ -92,7 +109,7 @@ html {
   .tag-init {
     @extend .tag-status;
     background-color: rgba(33, 150, 243, 0.15);
-    color: #64B5F6;
+    color: #64b5f6;
   }
 
   .tag-cancel {
@@ -105,6 +122,23 @@ html {
     @extend .tag-status;
     background-color: rgba(255, 193, 7, 0.15);
     color: #ffeb3b;
+  }
+  .tag-done {
+    @extend .tag-status;
+    background-color: rgba(76, 175, 80, 0.15);
+    color: #81c784;
+  }
+
+  .tag-reception {
+    @extend .tag-status;
+    background-color: rgba(255, 152, 0, 0.15);
+    color: #FFB74D;
+  }
+
+  .tag-propose {
+    @extend .tag-status;
+    background-color: rgba(156, 39, 176, 0.15);
+    color: #ce93d8;
   }
 }
 .hover-box:hover {

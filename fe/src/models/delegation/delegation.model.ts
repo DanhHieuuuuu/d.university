@@ -53,18 +53,21 @@ export interface IPrepare {
 }
 export interface IDepartmentSupport {
   id: number;                       
-  departmentSupportId: number;      
+  departmentSupportId: number;  
+  departmentSupportName:string;
+  delegationIncomingName:string;    
   delegationIncomingId: number;    
   content: string;                  
-  supporters?: ISupporter[] | null; 
+  supporters: ISupporter[] ; 
 }
 export interface ISupporter {
   id: number;
-  name: string;
-  position: string;
-  phoneNumber: string;
+  supporterId: number;
+  supporterCode: string;
   departmentSupportId: number;
+  departmentSupport: any | null;
 }
+
 export type IQueryGuestGroup = IQueryPaging & {
   name?: string;
   idPhongBan?: number;
@@ -80,6 +83,9 @@ export type IQueryDepartmentSupport = IQueryPaging & {
 
 };
 export type IQueryLogStatus = IQueryPaging & {
+
+};
+export type IQueryLogReceptionTime = IQueryPaging & {
 
 };
 export type ICreateDoanVao = {
@@ -107,6 +113,14 @@ export interface ILogStatus {
   createdBy:string,
   createdDate:string
 }
+export interface ILogReceptionTime {
+  id:number,
+  receptionTimeId:number,
+  type:string,
+  reason:string,
+  createdBy:string,
+  createdDate:string
+}
 export type ICreateReceptionTime = {
   startDate: number,
   endDate:number,
@@ -121,12 +135,21 @@ export type IUpdateReceptionTime = ICreateReceptionTime & {
 };
 
 export type ICreateSupporter = {
-  supporterId: number;
-  supporterCode: string;
-  departmentSupportId: number
+  departmentSupportId: number;
+  supporters: {
+    supporterId: number;
+    supporterCode: string;
+  }[];
 };
+
 export type ICreateDepartment = {
   delegationIncomingId: number;
   content: string;
   departmentSupportId: number
 };
+
+export interface IUpdateStatus {
+  idDelegation: number;
+  oldStatus: number;
+  action: string;
+}

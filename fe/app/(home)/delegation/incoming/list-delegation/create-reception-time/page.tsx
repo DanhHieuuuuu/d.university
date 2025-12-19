@@ -16,14 +16,14 @@ const CreateReceptionTimePage: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
-  const delegationIncomingId = Number(searchParams.get('delegationIncomingId')); 
+  const delegationIncomingId = Number(searchParams.get('delegationIncomingId'));
 
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
 
       const payload: ICreateReceptionTime = {
-        delegationIncomingId, 
+        delegationIncomingId,
         date: values.date.format('YYYY-MM-DD'),
         startDate: values.startTime.format('HH:mm:ss'),
         endDate: values.endTime.format('HH:mm:ss'),
@@ -110,13 +110,13 @@ const CreateReceptionTimePage: React.FC = () => {
             <Form.Item
               label="Tổng số người"
               name="totalPerson"
-              rules={[{ message: 'Vui lòng nhập tổng số người' }]}
+              rules={[{ type: 'number', min: 0, message: 'Số người phải lớn hơn hoặc bằng 0' }]}
             >
               <InputNumber min={0} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Địa điểm" name="address" rules={[{message: 'Vui lòng nhập địa điểm' }]}>
+            <Form.Item label="Địa điểm" name="address" rules={[{ message: 'Vui lòng nhập địa điểm' }]}>
               <Input />
             </Form.Item>
           </Col>

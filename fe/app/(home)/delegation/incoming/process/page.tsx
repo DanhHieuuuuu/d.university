@@ -4,10 +4,13 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, message, Modal, Select } from 'antd';
 import {
   DeleteOutlined,
+  DeploymentUnitOutlined,
   EditOutlined,
   EyeOutlined,
+  PlayCircleOutlined,
   PlusOutlined,
   SearchOutlined,
+  SendOutlined,
   SyncOutlined
 } from '@ant-design/icons';
 
@@ -26,13 +29,15 @@ import {
   deleteDoanVao,
   getListGuestGroup,
   getListPhongBan,
-  getListStatus
+  getListStatus,
+  updateStatus
 } from '@redux/feature/delegation/delegationThunk';
 import { select } from '@redux/feature/delegation/delegationSlice';
 import { ETableColumnType } from '@/constants/e-table.consts';
 import { DelegationStatusConst } from '../../consts/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
+import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -99,18 +104,6 @@ const Page = () => {
       dataIndex: 'phoneNumber',
       title: 'SĐT liên hệ'
     },
-    // {
-    //   key: 'requestDate',
-    //   dataIndex: 'requestDate',
-    //   title: 'Ngày yêu cầu',
-    //   render: (value) => <p>{formatDateView(value)}</p>
-    // },
-    // {
-    //   key: 'receptionDate',
-    //   dataIndex: 'receptionDate',
-    //   title: 'Ngày tiếp đón',
-    //   render: (value) => <p>{formatDateView(value)}</p>
-    // },
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
@@ -132,26 +125,25 @@ const Page = () => {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       command: (record: IViewGuestGroup) => onClickView(record)
+    },
+    {
+      label: 'Đề xuất',
+      icon: <SendOutlined />,
+      command: (record: IViewGuestGroup) => onClickUpdateStatus(record)
+    },
+    {
+      label: 'Tiếp đoàn',
+      icon: <DeploymentUnitOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET,
+      command: (record: IViewGuestGroup) => onClickTiepDoan(record)
     }
-    // {
-    //   label: 'Chỉnh sửa',
-    //   tooltip: 'Sửa danh sách đoàn vào',
-    //   icon: <EditOutlined />,
-    //   command: (record: IViewGuestGroup) => onClickUpdate(record)
-    // },
-    // {
-    //   label: 'Xóa',
-    //   color: 'red',
-    //   icon: <DeleteOutlined />,
-    //   command: (record: IViewGuestGroup) => onClickDelete(record)
-    // }
   ];
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryGuestGroup>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -177,23 +169,40 @@ const Page = () => {
     handleDebouncedSearch(event.target.value);
   };
 
-  const onClickAdd = () => {
-    setIsModalView(false);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
-  };
-
   const onClickView = (data: IViewGuestGroup) => {
     dispatch(select(data));
     setIsModalView(true);
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
-  const onClickUpdate = (data: IViewGuestGroup) => {
-    dispatch(select(data));
-    setIsModalView(false);
-    setIsModalUpdate(true);
-    setIsModalOpen(true);
+  const onClickUpdateStatus = (data: IViewGuestGroup) => {
+    openConfirmStatusModal({
+      title: 'Xác nhận đề xuất',
+      content: `Bạn có muốn đề xuất đoàn vào "${data.name}" không?`,
+      okText: 'Đề xuất',
+      okAction: 'upgrade',
+      data,
+      dispatch,
+      onSuccess: () => {
+        dispatch(getListGuestGroup(query));
+      }
+    });
+  };
+
+  const onClickTiepDoan = (data: IViewGuestGroup) => {
+    openConfirmStatusModal({
+      title: 'Xác nhận tiếp đoàn',
+      content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,
+      okText: 'Đồng ý',
+      cancelText: 'Không đồng ý',
+      okAction: 'upgrade',
+      cancelAction: 'cancel',
+      data,
+      dispatch,
+      onSuccess: () => {
+        dispatch(getListGuestGroup(query));
+      }
+    });
   };
 
   return (
@@ -240,13 +249,7 @@ const Page = () => {
             icon={<SyncOutlined />}
             onClick={() => {
               form.resetFields();
-              onFilterChange({
-                SkipCount: 0,
-                MaxResultCount: 10,
-                Keyword: '',
-                idPhongBan: undefined,
-                status: undefined
-              });
+              resetFilter();
             }}
           >
             Tải lại

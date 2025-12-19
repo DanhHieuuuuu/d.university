@@ -11,7 +11,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
 {
     public interface ISupporterService
     {
-        Task<CreateSupporterResponseDto> CreateSupporter(CreateSupporterRequestDto dto);
+        Task<List<CreateSupporterResponseDto>> CreateSupporter(CreateSupporterRequestDto dto);
         PageResultDto<PageSupporterResultDto> PagingSupporter(FilterSupporterDto dto);
     }
 }

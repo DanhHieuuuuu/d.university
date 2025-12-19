@@ -8,13 +8,16 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class CreateSupporterRequestDto : ICommand<CreateSupporterResponseDto>
+    public class CreateSupporterRequestDto : ICommand<List<CreateSupporterResponseDto>>
     {
-    
+        public int DepartmentSupportId { get; set; }
+
+        public List<SupporterItemDto> Supporters { get; set; } = new();
+    }
+
+    public class SupporterItemDto
+    {
         public int SupporterId { get; set; }
-
-        public string? SupporterCode { get; set; } // mã người hỗ trợ
-
-        public int DepartmentSupportId { get; set; } // phòng ban hỗ trợ 
+        public string? SupporterCode { get; set; }
     }
 }

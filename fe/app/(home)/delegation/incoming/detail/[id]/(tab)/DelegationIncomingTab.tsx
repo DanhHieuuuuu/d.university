@@ -66,7 +66,7 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
       return [
         {
           label: 'Mã đoàn',
-          value: renderField('code', data.code, <Input />, options)
+          value: renderField('code', data.code, <Input  disabled/>, options)
         },
         {
           label: 'Tên đoàn vào',

@@ -79,6 +79,24 @@ namespace D.Core.API.Controllers.Delegation
             }
         }
         /// <summary>
+        /// Lấy Đoàn vào 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-delegation-incoming")]
+        public async Task<ResponseAPI> GetAllDelegationIncoming([FromQuery] ViewDelegationIncomingRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
         /// Lấy nhân sự
         /// </summary>
         /// <param name="dto"></param>

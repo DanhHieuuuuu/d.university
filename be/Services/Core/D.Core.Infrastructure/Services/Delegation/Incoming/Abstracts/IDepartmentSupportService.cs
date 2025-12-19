@@ -13,5 +13,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
     {
         Task<CreateDepartmentSupportResponseDto> CreateDepartmentSupport(CreateDepartmentSupportRequestDto dto);
         PageResultDto<PageDepartmentSupportResultDto> PagingDepartmentSupport(FilterDepartmentSupportDto dto);
+        List<ViewDelegationIncomingResponseDto> GetAllDelegationIncoming(ViewDelegationIncomingRequestDto dto);
     }
 }

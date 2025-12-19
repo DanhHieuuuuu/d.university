@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ICreateHopDongNs, IQueryNhanSu } from '@models/nhansu/nhansu.model';
-import { ICreateDoanVao, ICreateReceptionTime, IQueryDepartmentSupport, IQueryGuestGroup, IQueryLogStatus, IUpdateDoanVao, IUpdateReceptionTime } from '@models/delegation/delegation.model';
+import { ICreateDepartment, ICreateDoanVao, ICreateReceptionTime, ICreateSupporter, IQueryDepartmentSupport, IQueryGuestGroup, IQueryLogReceptionTime, IQueryLogStatus, IUpdateDoanVao, IUpdateReceptionTime, IUpdateStatus } from '@models/delegation/delegation.model';
 import { DelegationIncomingService } from '@services/delegation/delegationIncoming.service';
 import { rejects } from 'assert';
 
@@ -165,6 +165,19 @@ export const getLogStatus = createAsyncThunk('delegation-incoming/getLogStatus',
     });
   }
 });
+export const getLogReceptionTime = createAsyncThunk('delegation-incoming/getLogReceptionTime', async (args: IQueryLogReceptionTime, { rejectWithValue }) => {
+  try {
+    const res = await DelegationIncomingService.getLogReceptionTime(args);
+
+    return res.data;
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
+  }
+});
 export const updateReceptionTime = createAsyncThunk('delegation-incoming/updateReceptionTime', async (payload: IUpdateReceptionTime) => {
   try {
     const res = await DelegationIncomingService.updateReceptionTime(payload);
@@ -199,5 +212,54 @@ export const getListDepartmentSupport = createAsyncThunk('delegation-incoming/li
       code: error.code,
       response: error.response?.data
     });
+  }
+});
+export const createDepartmentSupport = createAsyncThunk('delegation-incoming/createDepartmentSupport',async (payload: ICreateDepartment, { rejectWithValue }) => {
+    try {
+      const res = await DelegationIncomingService.createDepartment(payload);
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
+export const createSupporter = createAsyncThunk('delegation-incoming/createSupporter',async (payload: ICreateSupporter, { rejectWithValue }) => {
+    try {
+      const res = await DelegationIncomingService.createSupporter(payload);
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
+export const getListDelegationIncoming = createAsyncThunk ('delegation-incoming/getDelegationIncoming', async (_,thunkAPI) => {
+  try {
+    const res = await DelegationIncomingService.getListDelegationIncoming();
+
+    return res.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
+  }
+})
+export const updateStatus = createAsyncThunk('delegation-incoming/updateStatus', async (payload: IUpdateStatus) => {
+  try {
+    const res = await DelegationIncomingService.updateStatus(payload);
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
   }
 });

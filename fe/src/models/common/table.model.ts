@@ -14,5 +14,6 @@ export type IAction = {
   command: Function;
   icon: React.ReactNode;
   color?: BaseButtonProps['color'];
+  hidden?: (record: any) => boolean;
   
 };

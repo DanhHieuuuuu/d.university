@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Application.Command.Delegation.Incoming
 {
-    public class CreateSupporter : ICommandHandler<CreateSupporterRequestDto, CreateSupporterResponseDto>
+    public class CreateSupporter : ICommandHandler<CreateSupporterRequestDto,List<CreateSupporterResponseDto>>
     {
         private readonly ISupporterService _service;
 
@@ -18,7 +18,7 @@ namespace D.Core.Application.Command.Delegation.Incoming
             _service = service;
         }
 
-        public async Task<CreateSupporterResponseDto> Handle(CreateSupporterRequestDto request, CancellationToken cancellationToken)
+        public async Task<List<CreateSupporterResponseDto>> Handle(CreateSupporterRequestDto request, CancellationToken cancellationToken)
         {
             return await _service.CreateSupporter(request);
         }

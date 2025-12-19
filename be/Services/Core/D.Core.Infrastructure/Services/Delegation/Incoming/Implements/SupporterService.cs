@@ -33,27 +33,49 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<CreateSupporterResponseDto> CreateSupporter(CreateSupporterRequestDto dto)
+        public async Task<List<CreateSupporterResponseDto>> CreateSupporter(CreateSupporterRequestDto dto)
         {
-            _logger.LogInformation($"{nameof(CreateSupporter)} method called, dto: {JsonSerializer.Serialize(dto)}.");
-            var exist = _unitOfWork.iSupporterRepository.IsSupporterCodeExist(dto.SupporterCode!);
-            if (exist)
-                throw new Exception("SupporterCode đã tồn tại");
+            _logger.LogInformation($"{nameof(CreateSupporter)} called.");
 
-            //Kiểm tra supporterId có tồn tại trong nhân sự 
-            var nhanSuExist = await _unitOfWork.iNsNhanSuRepository
-                .TableNoTracking
-                .AnyAsync(x => x.Id == dto.SupporterId && !x.Deleted);
+            var result = new List<Supporter>();
 
-            if (!nhanSuExist)
-                throw new Exception("Không tồn tại nhân sự này");
+            foreach (var item in dto.Supporters)
+            {
+                // Check mã supporter
+                if (!string.IsNullOrEmpty(item.SupporterCode))
+                {
+                    var existCode = _unitOfWork.iSupporterRepository
+                        .IsSupporterCodeExist(item.SupporterCode);
 
-            var newSupporter = _mapper.Map<Supporter>(dto);
-            _unitOfWork.iSupporterRepository.Add(newSupporter);
+                    if (existCode)
+                        throw new Exception($"SupporterCode {item.SupporterCode} đã tồn tại");
+                }
+
+                //Check nhân sự tồn tại
+                var nhanSuExist = await _unitOfWork.iNsNhanSuRepository
+                    .TableNoTracking
+                    .AnyAsync(x => x.Id == item.SupporterId && !x.Deleted);
+
+                if (!nhanSuExist)
+                    throw new Exception($"Không tồn tại nhân sự ID = {item.SupporterId}");
+
+                // 3. Create entity
+                var supporter = new Supporter
+                {
+                    SupporterId = item.SupporterId,
+                    SupporterCode = item.SupporterCode,
+                    DepartmentSupportId = dto.DepartmentSupportId
+                };
+
+                result.Add(supporter);
+                _unitOfWork.iSupporterRepository.Add(supporter);
+            }
+
             await _unitOfWork.SaveChangesAsync();
-            return _mapper.Map<CreateSupporterResponseDto>(newSupporter);
 
+            return _mapper.Map<List<CreateSupporterResponseDto>>(result);
         }
+
         public PageResultDto<PageSupporterResultDto> PagingSupporter(FilterSupporterDto dto)
         {
             _logger.LogInformation($"{nameof(PagingSupporter)} method called, dto: {JsonSerializer.Serialize(dto)}.");
