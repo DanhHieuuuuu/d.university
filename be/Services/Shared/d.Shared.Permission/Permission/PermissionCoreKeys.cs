@@ -33,5 +33,9 @@
         #region Delegation - Đoàn vào / Đoàn ra
         public const string CoreMenuDelegation = $"{PermissionPrefixKeys.Menu}delegation";
         #endregion
+
+        #region Survey - Khảo sát
+
+        #endregion
     }
 }

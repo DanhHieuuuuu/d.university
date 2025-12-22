@@ -16,8 +16,12 @@ using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.Core.Infrastructure.Services.Hrm.Implements;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.Core.Infrastructure.Services.SinhVien.Implements;
+using D.Core.Infrastructure.Services.Survey.Report.Abstracts;
+using D.Core.Infrastructure.Services.Survey.Report.Implement;
 using D.Core.Infrastructure.Services.Survey.Request.Abstracts;
 using D.Core.Infrastructure.Services.Survey.Request.Implement;
+using D.Core.Infrastructure.Services.Survey.Surveys.Abstracts;
+using D.Core.Infrastructure.Services.Survey.Surveys.Implement;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace D.Core.Infrastructure
@@ -43,7 +47,9 @@ namespace D.Core.Infrastructure
                 .AddScoped<ISupporterService, SupporterService>()
             #endregion
             #region Survey
-                .AddScoped<IRequestService, RequestService>()
+                .AddScoped<IRequestSurveyService, RequestSurveyService>()
+                .AddScoped<ISurveyService, SurveyService>()
+                .AddScoped<IReportSurveyService, ReportSurveyService>()
             #endregion
                 .AddScoped<IFileService, FileService>();
         }
@@ -98,6 +104,8 @@ namespace D.Core.Infrastructure
             #endregion
             #region Survey
                 .AddScoped<IKsSurveyRequestRepository, SurveyRequestRepository>()
+                .AddScoped<IKsSurveyRepository, SurveyRepository>()
+                .AddScoped<IKsSurveyReportRepository, SurveyReportRepository>()
                 .AddScoped<IKsSurveyLogRepository, SurveyLogRepository>();
             #endregion
         }

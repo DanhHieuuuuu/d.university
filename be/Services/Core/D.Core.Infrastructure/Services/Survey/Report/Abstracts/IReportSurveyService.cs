@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace D.Core.Infrastructure.Services.Survey.Execution.Abstracts
+namespace D.Core.Infrastructure.Services.Survey.Report.Abstracts
 {
-    class IExecutionService
+    public interface IReportSurveyService
     {
+
     }
 }

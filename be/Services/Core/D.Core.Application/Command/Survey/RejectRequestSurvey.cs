@@ -9,18 +9,18 @@ using System.Threading.Tasks;
 
 namespace D.Core.Application.Command.Survey
 {
-    public class CancelSubmitRequestSurvey : ICommandHandler<CancelSubmitRequestDto>
+    public class RejectRequestSurvey : ICommandHandler<RejectRequestDto>
     {
         private readonly IRequestSurveyService _service;
 
-        public CancelSubmitRequestSurvey(IRequestSurveyService service)
+        public RejectRequestSurvey(IRequestSurveyService service)
         {
             _service = service;
         }
 
-        public async Task Handle(CancelSubmitRequestDto request, CancellationToken cancellationToken)
+        public async Task Handle(RejectRequestDto request, CancellationToken cancellationToken)
         {
-            await _service.CancelSubmitAsync(request.Id);
+            await _service.RejectRequestAsync(request);
         }
     }
 }

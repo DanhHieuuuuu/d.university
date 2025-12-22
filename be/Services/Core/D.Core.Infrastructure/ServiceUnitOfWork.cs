@@ -70,6 +70,7 @@ namespace D.Core.Infrastructure
 
         #region Survey
         private SurveyRequestRepository _surveyRequestRepository;
+        private SurveyRepository _surveyRepository;
         private SurveyLogRepository _surveyLogRepository;
         #endregion
 
@@ -562,6 +563,18 @@ namespace D.Core.Infrastructure
                     _surveyLogRepository = new SurveyLogRepository(_dbContext, _httpContext);
                 }
                 return _surveyLogRepository;
+            }
+        }
+
+        public IKsSurveyRepository iKsSurveyRepository
+        {
+            get
+            {
+                if (_surveyRepository == null)
+                {
+                    _surveyRepository = new SurveyRepository(_dbContext, _httpContext);
+                }
+                return _surveyRepository;
             }
         }
 

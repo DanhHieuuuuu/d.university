@@ -14,7 +14,6 @@ namespace D.Core.Domain.Entities.Survey.Constants
         public const int Approved = 3;
         public const int Rejected = 4;
         public const int Canceled = 5;
-        public const int NeedEdit = 6;
 
         public static Dictionary<int, string> Names = new Dictionary<int, string>()
         {
@@ -23,7 +22,6 @@ namespace D.Core.Domain.Entities.Survey.Constants
             { Approved, "Phê duyệt" },
             { Rejected, "Từ chối" },
             { Canceled, "Bị hủy/đóng" },
-            { NeedEdit, "Cần bổ sung" },
         };
     }
 }

@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure.Repositories.Survey
 {
-    public class SurveyRepository : RepositoryBase<KsSurvey>, IKsSurveyRepository
+    public class SurveyReportRepository : RepositoryBase<KsSurveyReport>, IKsSurveyReportRepository
     {
-        public SurveyRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
+        public SurveyReportRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
             : base(dbContext, httpContext) { }
     }
 
-    public interface IKsSurveyRepository : IRepositoryBase<KsSurvey>
+    public interface IKsSurveyReportRepository : IRepositoryBase<KsSurveyReport>
     {
     }
 }

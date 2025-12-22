@@ -12,9 +12,9 @@ namespace D.Core.Application.Command.Survey
 {
     public class DeleteRequestSurvey : ICommandHandler<DeleteRequestSurveyDto>
     {
-        private readonly IRequestService _service;
+        private readonly IRequestSurveyService _service;
 
-        public DeleteRequestSurvey(IRequestService service)
+        public DeleteRequestSurvey(IRequestSurveyService service)
         {
             _service = service;
         }

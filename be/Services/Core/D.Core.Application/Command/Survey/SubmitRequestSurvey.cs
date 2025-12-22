@@ -11,9 +11,9 @@ namespace D.Core.Application.Command.Survey
 {
     public class SubmitRequestSurvey : ICommandHandler<SubmitRequestDto>
     {
-        private readonly IRequestService _service;
+        private readonly IRequestSurveyService _service;
 
-        public SubmitRequestSurvey(IRequestService service)
+        public SubmitRequestSurvey(IRequestSurveyService service)
         {
             _service = service;
         }

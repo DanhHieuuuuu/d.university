@@ -12,9 +12,9 @@ namespace D.Core.Application.Query.Survey
 {
     public class GetRequestSurveyPaging : IQueryHandler<FilterSurveyRequestDto, PageResultDto<RequestSurveyResponseDto>>
     {
-        private readonly IRequestService _service;
+        private readonly IRequestSurveyService _service;
 
-        public GetRequestSurveyPaging(IRequestService service)
+        public GetRequestSurveyPaging(IRequestSurveyService service)
         {
             _service = service;
         }

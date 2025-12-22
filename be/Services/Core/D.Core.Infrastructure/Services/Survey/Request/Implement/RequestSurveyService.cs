@@ -18,13 +18,13 @@ using System.Transactions;
 
 namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 {
-    public class RequestService : ServiceBase, IRequestService
+    public class RequestSurveyService : ServiceBase, IRequestSurveyService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
         private IHttpContextAccessor _httpContextAccessor;
 
-        public RequestService(
-            ILogger<RequestService> logger,
+        public RequestSurveyService(
+            ILogger<RequestSurveyService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork
@@ -45,7 +45,7 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
                         where (string.IsNullOrEmpty(dto.Keyword) || r.TenKhaoSatYeuCau.Contains(dto.Keyword) || r.MaYeuCau.Contains(dto.Keyword))
                            && (!dto.TrangThai.HasValue || r.TrangThai == dto.TrangThai)
 
-                        orderby r.Id descending
+                        orderby r.Id
                         select new RequestSurveyResponseDto
                         {
                             Id = r.Id,
@@ -82,21 +82,21 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            // 1. Validate
+            // Validate
             if (_unitOfWork.iKsSurveyRequestRepository.IsMaYeuCauExist(dto.MaYeuCau))
                 throw new Exception($"Mã yêu cầu {dto.MaYeuCau} đã tồn tại.");
 
             if (dto.ThoiGianKetThuc < dto.ThoiGianBatDau)
                 throw new Exception("Thời gian kết thúc phải sau thời gian bắt đầu.");
 
-            // 2. Map & Save
+            // Map & Save
             var entity = _mapper.Map<KsSurveyRequest>(dto);
             entity.TrangThai = RequestStatus.Draft;
          
             await _unitOfWork.iKsSurveyRequestRepository.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
 
-            // 3. Log
+            // Log
             await LogActionAsync(entity.MaYeuCau, "Create", "Thêm mới yêu cầu khảo sát", null, "Draft");
             scope.Complete();
             return _mapper.Map<CreateRequestSurveyResponseDto>(entity);
@@ -108,15 +108,13 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
             var entity = await _unitOfWork.iKsSurveyRequestRepository.GetDetailWithNavigationsAsync(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
-            if (entity.TrangThai != RequestStatus.Draft) throw new Exception("Chỉ được chỉnh sửa khi phiếu ở trạng thái Nháp.");
+            if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)
+                throw new Exception("Chỉ được chỉnh sửa khi phiếu ở trạng thái Nháp hoặc bị Từ chối.");
 
-            // Detect change 
             string changeDesc = $"Cập nhật thông tin phiếu {entity.MaYeuCau}";
 
-            // Map Main Info
             _mapper.Map(dto, entity);
 
-            // Map Children (Clear -> Add)
             entity.Targets.Clear();
             if (dto.Targets != null)
                 foreach (var t in dto.Targets) entity.Targets.Add(_mapper.Map<KsSurveyTarget>(t));
@@ -143,7 +141,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             var entity =  _unitOfWork.iKsSurveyRequestRepository.FindById(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
-            if (entity.TrangThai != RequestStatus.Draft) throw new Exception("Chỉ được hủy khi phiếu ở trạng thái Nháp.");
+            if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)
+                throw new Exception("Chỉ được xóa phiếu Nháp hoặc phiếu bị Từ chối.");
 
             var oldStatus = entity.TrangThai;
             entity.TrangThai = RequestStatus.Canceled;
@@ -165,29 +164,55 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task SubmitRequestAsync(int id)
         {
-            await ChangeStatusAsync(id, RequestStatus.Draft, RequestStatus.Pending, "Gửi duyệt yêu cầu");
-        }
-
-        public async Task CancelSubmitAsync(int id)
-        {
-            await ChangeStatusAsync(id, RequestStatus.Pending, RequestStatus.Draft, "Hủy gửi duyệt - Về lại Nháp");
-        }
-
-        private async Task ChangeStatusAsync(int id, int oldStatusExpect, int newStatus, string actionDesc)
-        {
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
 
-            if (entity.TrangThai != oldStatusExpect)
-                throw new Exception($"Trạng thái không hợp lệ. (Hiện tại: {entity.TrangThai})");
+            if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)          
+                throw new Exception("Chỉ được gửi duyệt khi phiếu ở trạng thái Nháp hoặc đã bị Từ chối.");      
 
             var oldStatus = entity.TrangThai;
-            entity.TrangThai = newStatus;
+
+            entity.TrangThai = RequestStatus.Pending;
+
+            // resubmit > clear reject reason
+            entity.LyDoTuChoi = null;
 
             _unitOfWork.iKsSurveyRequestRepository.Update(entity);
 
             // Log
-            await LogActionAsync(entity.MaYeuCau, "ChangeStatus", actionDesc, oldStatus.ToString(), newStatus.ToString());
+            await LogActionAsync(
+                entity.MaYeuCau,
+                "Submit",
+                "Gửi duyệt yêu cầu (Chuyển sang trạng thái Chờ duyệt)",
+                oldStatus.ToString(),
+                RequestStatus.Pending.ToString()
+            );
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task CancelSubmitAsync(int id)
+        {
+            var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
+            if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            if (entity.TrangThai != RequestStatus.Pending)
+                throw new Exception("Chỉ có thể hủy gửi duyệt khi phiếu đang ở trạng thái Chờ duyệt.");
+
+            var oldStatus = entity.TrangThai;
+
+            entity.TrangThai = RequestStatus.Draft;
+
+            _unitOfWork.iKsSurveyRequestRepository.Update(entity);
+
+            // Log
+            await LogActionAsync(
+                entity.MaYeuCau,
+                "CancelSubmit",
+                "Hủy gửi duyệt - Rút yêu cầu về lại Nháp",
+                oldStatus.ToString(),
+                RequestStatus.Draft.ToString()
+            );
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -217,7 +242,61 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
             };
 
             await _unitOfWork.iKsSurveyLogRepository.AddAsync(log);
+        }
 
+        public async Task ApproveRequestAsync(int id)
+        {
+            var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
+            if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            if (entity.TrangThai != RequestStatus.Pending)
+                throw new Exception("Chỉ được duyệt phiếu đang ở trạng thái Chờ duyệt.");
+
+            var oldStatus = entity.TrangThai;
+            entity.TrangThai = RequestStatus.Approved;
+            entity.LyDoTuChoi = null;
+
+            _unitOfWork.iKsSurveyRequestRepository.Update(entity);
+
+            // Log
+            await LogActionAsync(
+                entity.MaYeuCau,
+                "Approve",
+                "Duyệt yêu cầu khảo sát",
+                oldStatus.ToString(),
+                RequestStatus.Approved.ToString()
+            );
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task RejectRequestAsync(RejectRequestDto dto)
+        {
+            var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(dto.Id);
+            if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            if (entity.TrangThai != RequestStatus.Pending)
+                throw new Exception("Chỉ được từ chối phiếu đang ở trạng thái Chờ duyệt.");
+
+            if (string.IsNullOrWhiteSpace(dto.Reason))
+                throw new Exception("Vui lòng nhập lý do từ chối.");
+
+            var oldStatus = entity.TrangThai;
+            entity.TrangThai = RequestStatus.Rejected;
+            entity.LyDoTuChoi = dto.Reason;
+
+            _unitOfWork.iKsSurveyRequestRepository.Update(entity);
+
+            // Log
+            await LogActionAsync(
+                entity.MaYeuCau,
+                "Reject",
+                $"Từ chối yêu cầu. Lý do: {dto.Reason}",
+                oldStatus.ToString(),
+                RequestStatus.Rejected.ToString()
+            );
+
+            await _unitOfWork.SaveChangesAsync();
         }
 
     }

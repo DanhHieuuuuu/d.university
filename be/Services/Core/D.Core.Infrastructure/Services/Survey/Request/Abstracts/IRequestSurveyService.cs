@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure.Services.Survey.Request.Abstracts
 {
-    public interface IRequestService
+    public interface IRequestSurveyService
     {
         PageResultDto<RequestSurveyResponseDto> Paging(FilterSurveyRequestDto dto);
         Task<RequestSurveyDetailDto> GetByIdRequest(int id);
@@ -19,5 +19,7 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Abstracts
 
         Task SubmitRequestAsync(int id);
         Task CancelSubmitAsync(int id);
+        Task ApproveRequestAsync(int id);
+        Task RejectRequestAsync(RejectRequestDto dto);
     }
 }

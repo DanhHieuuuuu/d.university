@@ -23,6 +23,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Dtos.Survey.Request;
+using D.Core.Domain.Dtos.Survey.Surveys;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
@@ -30,6 +31,7 @@ using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Entities.Survey;
+using D.Core.Domain.Entities.Survey.Constants;
 using System.Reflection;
 
 namespace D.Core.Domain
@@ -157,6 +159,15 @@ namespace D.Core.Domain
             CreateMap<KsSurveyRequest, CreateRequestSurveyResponseDto>();
             CreateMap<UpdateRequestSurveyRequestDto, KsSurveyRequest>();
             CreateMap<KsSurveyRequest, UpdateRequestSurveyResponseDto>();
+
+            CreateMap<KsSurvey, SurveyResponseDto>();
+            CreateMap<KsSurvey, SurveyDetailDto>();
+
+            CreateMap<KsSurveyRequest, KsSurvey>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.IdYeuCau, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.MaKhaoSat, opt => opt.MapFrom(src => src.MaYeuCau))
+                .ForMember(dest => dest.TenKhaoSat, opt => opt.MapFrom(src => src.TenKhaoSatYeuCau));
 
             #endregion
         }

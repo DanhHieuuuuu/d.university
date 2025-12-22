@@ -11,9 +11,9 @@ namespace D.Core.Application.Query.Survey
 {
     public class GetRequestSurveyDetail : IQueryHandler<GetRequestSurveyDetailDto, RequestSurveyDetailDto>
     {
-        private readonly IRequestService _service;
+        private readonly IRequestSurveyService _service;
 
-        public GetRequestSurveyDetail(IRequestService service)
+        public GetRequestSurveyDetail(IRequestSurveyService service)
         {
             _service = service;
         }
