@@ -4,7 +4,7 @@ using D.Core.Infrastructure.Services.Kpi.Abstracts;
 
 namespace D.Core.Application.Query.Kpi.KpiDonVi
 {
-    public class GetListYearKpiDonVi : IQueryHandler<GetListYearRequestDto, List<GetListYearKpiDonViDto>>
+    public class GetListYearKpiDonVi : IQueryHandler<GetListYearKpiDonViRequestDto, List<GetListYearKpiDonViDto>>
     {
         private readonly IKpiDonViService _service;
 
@@ -13,7 +13,7 @@ namespace D.Core.Application.Query.Kpi.KpiDonVi
             _service = kpiDonViService;
         }
 
-        public  Task<List<GetListYearKpiDonViDto>> Handle(GetListYearRequestDto request, CancellationToken cancellationToken)
+        public  Task<List<GetListYearKpiDonViDto>> Handle(GetListYearKpiDonViRequestDto request, CancellationToken cancellationToken)
         {
             return Task.FromResult(_service.GetListYear());
         }

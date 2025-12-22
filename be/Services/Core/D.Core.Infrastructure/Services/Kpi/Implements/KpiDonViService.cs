@@ -256,49 +256,44 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 .Where(x => x.Count() > 1)
                 .Select(x => x.Key)
                 .ToList();
+
             if (duplicationId.Any())
-            {
-                throw new Exception("Kpi Cá nhân đã tồn tại");
-            }
+                throw new Exception("KPI cá nhân đã tồn tại");
 
-            var kpiDonVi = _unitOfWork.iKpiDonViRepository.TableNoTracking
-                .FirstOrDefault(x => x.Id == dto.IdKpiDonVi && !x.Deleted);
-
-
+            var kpiDonVi = await _unitOfWork.iKpiDonViRepository.Table
+                .FirstOrDefaultAsync(x => x.Id == dto.IdKpiDonVi && !x.Deleted);
 
             if (kpiDonVi == null)
-                throw new Exception(" Không tìm thấy KPI đơn vị");
+                throw new Exception("Không tìm thấy KPI đơn vị");
 
             if (dto.NhanSus == null || !dto.NhanSus.Any())
                 throw new Exception("Danh sách nhân sự không được trống");
+            var listKpiCaNhan = await _unitOfWork.iKpiCaNhanRepository.Table
+                .Where(x => x.IdKpiDonVi == dto.IdKpiDonVi && !x.Deleted)
+                .ToListAsync();
 
-            var listKpiCaNhan = _unitOfWork.iKpiCaNhanRepository.TableNoTracking
-                .Where(e => e.IdKpiDonVi == dto.IdKpiDonVi && !e.Deleted)
-                .ToList();
             var listNhanSuDtoIds = dto.NhanSus.Select(n => n.IdNhanSu).ToList();
 
-            var remove = listKpiCaNhan.Where(x => !listNhanSuDtoIds.Contains(x.IdNhanSu)).ToList();
-
-            foreach (var item in remove)
+            foreach (var item in listKpiCaNhan.Where(x => !listNhanSuDtoIds.Contains(x.IdNhanSu)))
             {
                 item.Deleted = true;
+                item.ModifiedDate = DateTime.UtcNow;
             }
 
             foreach (var nsDto in dto.NhanSus)
             {
-                var nhanSu = _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                    .AsNoTracking()
-                    .FirstOrDefault(x => x.Id == nsDto.IdNhanSu);
+                var nhanSuExists = await _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                    .AnyAsync(x => x.Id == nsDto.IdNhanSu);
 
-                if (nhanSu == null) continue;
+                if (!nhanSuExists) continue;
 
                 var existed = listKpiCaNhan
-                              .FirstOrDefault(x => x.IdNhanSu == nhanSu.Id);
-
+                    .FirstOrDefault(x => x.IdNhanSu == nsDto.IdNhanSu);
 
                 if (existed != null)
                 {
-                    if (existed.TrongSo != nsDto.TrongSo || existed.TyLeThamGia != nsDto.TyLeThamGia)
+                    if (existed.TrongSo != nsDto.TrongSo ||
+                        existed.TyLeThamGia != nsDto.TyLeThamGia)
                     {
                         existed.TrongSo = nsDto.TrongSo;
                         existed.TyLeThamGia = nsDto.TyLeThamGia;
@@ -307,20 +302,18 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     continue;
                 }
 
-                var kpiCaNhan = new KpiCaNhan
+                _unitOfWork.iKpiCaNhanRepository.Add(new KpiCaNhan
                 {
                     KPI = kpiDonVi.Kpi,
                     MucTieu = kpiDonVi.MucTieu ?? "0",
                     TrongSo = nsDto.TrongSo,
                     LoaiKPI = kpiDonVi.LoaiKpi ?? 0,
-                    IdNhanSu = nhanSu.Id,
+                    IdNhanSu = nsDto.IdNhanSu,
                     IdKpiDonVi = kpiDonVi.Id,
                     NamHoc = kpiDonVi.NamHoc,
                     TyLeThamGia = nsDto.TyLeThamGia,
                     Status = KpiStatus.Assigned
-                };
-
-                _unitOfWork.iKpiCaNhanRepository.Add(kpiCaNhan);
+                });
             }
 
             await _unitOfWork.SaveChangesAsync();

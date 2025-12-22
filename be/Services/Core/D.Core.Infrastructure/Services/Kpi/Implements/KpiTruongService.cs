@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
+using D.ControllerBase.Exceptions;
+using D.Core.Domain;
+using D.Core.Domain.Dtos.Kpi.KpiDonVi;
+using D.Core.Domain.Dtos.Kpi.KpiTruong;
+using D.Core.Domain.Entities.Kpi;
+using D.Core.Domain.Entities.Kpi.Constants;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
+using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
 {
@@ -24,6 +28,275 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task CreateKpiTruong(CreateKpiTruongDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(CreateKpiTruong)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
+
+
+            var entity = _mapper.Map<KpiTruong>(dto);
+            await _unitOfWork.iKpiTruongRepository.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+        }
+
+        public async Task DeleteKpi(DeleteKpiTruongDto dto)
+        {
+            _logger.LogInformation($"{nameof(DeleteKpi)} method called.");
+
+            var kpi = await _unitOfWork.iKpiTruongRepository
+                .Table
+                .FirstOrDefaultAsync(x => x.Id == dto.Id && !x.Deleted);
+
+            if (kpi == null)
+                throw new Exception($"KPI trường với Id = {dto.Id} không tồn tại hoặc đã bị xóa.");
+
+            kpi.Deleted = true;
+
+            _unitOfWork.iKpiTruongRepository.Update(kpi);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public PageResultDto<KpiTruongDto> GetAllKpiTruong(FilterKpiTruongDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(GetAllKpiTruong)} => dto = {JsonSerializer.Serialize(dto)}"
+            );
+            var kpis = _unitOfWork.iKpiTruongRepository.TableNoTracking.ToList();
+
+            var query =
+                from kpi in kpis
+                where
+                    !kpi.Deleted &&
+                    (
+                    string.IsNullOrEmpty(dto.Keyword)
+                    || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower().Trim())
+                    )
+                    && (dto.LoaiKpi == null || kpi.LoaiKpi == dto.LoaiKpi)
+                    && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
+                    && (dto.TrangThai == null || kpi.TrangThai == dto.TrangThai)
+                select new KpiTruongDto
+                {
+                    Id = kpi.Id,
+                    LinhVuc = kpi.LinhVuc,
+                    ChienLuoc = kpi.ChienLuoc,
+                    Kpi = kpi.Kpi,
+                    MucTieu = kpi.MucTieu,
+                    TrongSo = kpi.TrongSo,
+                    LoaiKpi = kpi.LoaiKpi,
+                    NamHoc = kpi.NamHoc,
+                    TrangThai = kpi.TrangThai,
+                    KetQuaThucTe = kpi.KetQuaThucTe,
+                    LoaiCongThuc = kpi.LoaiCongThuc,
+                };
+
+            var totalCount = query.Count();
+            var pagedItems = query
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ToList();
+
+            return new PageResultDto<KpiTruongDto>
+            {
+                Items = pagedItems,
+                TotalItem = totalCount
+            };
+        }
+
+        public List<GetListKpiTruongResponseDto> GetListKpiTruong()
+        {
+            _logger.LogInformation(
+                $"{nameof(GetListKpiTruong)}"
+            );
+
+            var query =
+                from kpi in _unitOfWork.iKpiTruongRepository.TableNoTracking
+                where !kpi.Deleted
+                select new GetListKpiTruongResponseDto
+                {
+                    Id = kpi.Id,
+                    Kpi = kpi.Kpi,
+                };
+            return query.ToList();
+        }
+
+        public List<TrangThaiKpiTruongResponseDto> GetListTrangThai()
+        {
+            _logger.LogInformation($"{nameof(GetListTrangThai)}");
+
+
+            var trangThaiExist = _unitOfWork.iKpiTruongRepository
+                .TableNoTracking
+                .Where(x => x.TrangThai != null)
+                .Select(x => x.TrangThai!.Value)
+                .Distinct()
+                .OrderBy(x => x)
+                .Select(x => new TrangThaiKpiTruongResponseDto
+                {
+                    Value = x,
+                    Label = KpiStatus.Names.ContainsKey(x)
+                        ? KpiStatus.Names[x]
+                        : "Không xác định"
+                })
+                .ToList();
+
+            return trangThaiExist;
+        }
+
+        public List<GetListYearKpiTruongDto> GetListYear()
+        {
+            _logger.LogInformation($"{nameof(GetListYear)} ");
+            var years = _unitOfWork.iKpiTruongRepository
+                        .TableNoTracking
+                        .Where(x => !string.IsNullOrEmpty(x.NamHoc))
+                        .Select(x => x.NamHoc)
+                        .Distinct()
+                        .OrderByDescending(x => x)
+                        .ToList();
+            var result = years.Select(y => new GetListYearKpiTruongDto
+            {
+                NamHoc = y
+            }).ToList();
+
+            return result;
+        }
+
+        public async Task GiaoKpiHieuTruong(GiaoKpiHieuTruongDto dto)
+        {
+            _logger.LogInformation($"{nameof(GiaoKpiHieuTruong)} dto={JsonSerializer.Serialize(dto)}");
+
+            var kpiTruongs = await _unitOfWork.iKpiTruongRepository.TableNoTracking
+                .Where(x => x.NamHoc == dto.NamHoc && !x.Deleted)
+                .ToListAsync();
+
+            if (!kpiTruongs.Any())
+                throw new Exception("Không tồn tại Kpi trường");
+
+            var idNhanSus = await _unitOfWork.iKpiRoleRepository.Table
+                .Where(x => x.Role == "HIEU_TRUONG" && !x.Deleted)
+                .Select(x => x.IdNhanSu)
+                .ToListAsync();
+
+            foreach (var idNhanSu in idNhanSus)
+            {
+                var nhanSu = await _unitOfWork.iNsNhanSuRepository.Table
+                    .FirstOrDefaultAsync(x => x.Id == idNhanSu);
+
+                if (nhanSu == null) continue;
+                foreach (var kpiTruong in kpiTruongs)
+                {
+                    // Kiểm tra tồn tại KPI cá nhân
+                    var existed = await _unitOfWork.iKpiCaNhanRepository.TableNoTracking.AnyAsync(x =>
+                            x.KPI == kpiTruong.Kpi &&
+                            x.IdNhanSu == nhanSu.Id &&
+                            !x.Deleted);
+
+                    if (existed)
+                        continue; 
+
+                    var kpiCaNhan = new KpiCaNhan
+                    {
+                        KPI = kpiTruong.Kpi,
+                        MucTieu = kpiTruong.MucTieu ?? "0",
+                        TrongSo = kpiTruong.TrongSo,
+                        LoaiKPI = kpiTruong.LoaiKpi ?? 0,
+                        IdNhanSu = nhanSu.Id,
+                        NamHoc = kpiTruong.NamHoc,
+                        Status = KpiStatus.Assigned
+                    };
+
+                    await _unitOfWork.iKpiCaNhanRepository.AddAsync(kpiCaNhan);
+
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task UpdateKetQuaThucTe(UpdateKpiThucTeKpiTruongListDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateKetQuaThucTe)} dto={JsonSerializer.Serialize(dto)}");
+            using var transaction = _unitOfWork.Database.BeginTransaction();
+            try
+            {
+                foreach (var item in dto.Items)
+                {
+                    var kpi = await _unitOfWork.iKpiTruongRepository.TableNoTracking
+                        .FirstOrDefaultAsync(x => x.Id == item.Id && !x.Deleted);
+
+                    if (kpi == null)
+                        throw new Exception("Không tìm thấy KPI");
+
+                    if (item.KetQuaThucTe.HasValue)
+                    {
+                        kpi.KetQuaThucTe = item.KetQuaThucTe;
+                        kpi.TrangThai = KpiStatus.Declared;
+
+                        _unitOfWork.iKpiTruongRepository.Update(kpi);
+                    }
+                }
+
+                await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public async Task UpdateKpiTruong(UpdateKpiTruongDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateKpiTruong)} dto={JsonSerializer.Serialize(dto)}");
+            // Tìm KPI cập nhật
+            var kpiTruong = await _unitOfWork.iKpiTruongRepository.Table.FirstOrDefaultAsync(x => x.Id == dto.Id && !x.Deleted);
+
+            if (kpiTruong == null)
+            {
+                throw new Exception($"Không tìm thấy KPI cá nhân với Id={dto.Id}");
+            }
+
+
+            // Cập nhật thông tin
+            kpiTruong.LinhVuc = dto.LinhVuc;
+            kpiTruong.ChienLuoc = dto.ChienLuoc;
+            kpiTruong.Kpi = dto.Kpi;
+            kpiTruong.MucTieu = dto.MucTieu;
+            kpiTruong.TrongSo = dto.TrongSo;
+            kpiTruong.LoaiKpi = dto.LoaiKpi;
+            kpiTruong.NamHoc = dto.NamHoc;
+            kpiTruong.KetQuaThucTe = dto.KetQuaThucTe;
+            kpiTruong.LoaiCongThuc = dto.LoaiCongThuc;
+
+            _unitOfWork.iKpiTruongRepository.Update(kpiTruong);
+            await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
+        }
+
+        public async Task UpdateTrangThaiKpiTruong(UpdateTrangThaiKpiTruongDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateTrangThaiKpiTruong)} => dto = {JsonSerializer.Serialize(dto)}");
+
+            if (dto.Ids == null || !dto.Ids.Any())
+                throw new UserFriendlyException(ErrorCode.BadRequest, "Danh sách ID không được để trống.");
+
+            var kpiList = await _unitOfWork.iKpiTruongRepository.TableNoTracking
+                .Where(s => dto.Ids.Contains(s.Id))
+                .ToListAsync();
+
+            if (!kpiList.Any())
+                throw new Exception("Không tìm thấy KPI nào để cập nhật.");
+
+            foreach (var kpi in kpiList)
+            {
+                kpi.TrangThai = dto.TrangThai;
+                _unitOfWork.iKpiTruongRepository.Update(kpi);
+            }
+
+            await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
         }
     }
 }

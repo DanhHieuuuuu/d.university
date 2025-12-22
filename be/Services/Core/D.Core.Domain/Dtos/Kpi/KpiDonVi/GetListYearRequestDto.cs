@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Kpi.KpiDonVi
 {
-    public class GetListYearRequestDto : IQuery<List<GetListYearKpiDonViDto>>
+    public class GetListYearKpiDonViRequestDto : IQuery<List<GetListYearKpiDonViDto>>
     {
     }
 }

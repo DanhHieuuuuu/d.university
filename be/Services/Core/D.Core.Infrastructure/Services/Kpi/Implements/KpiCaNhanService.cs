@@ -175,7 +175,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 foreach (var item in dto.Items)
                 {
-                    var kpi = _unitOfWork.iKpiCaNhanRepository.TableNoTracking
+                    var kpi = _unitOfWork.iKpiCaNhanRepository.Table
                         .FirstOrDefault(x => x.Id == item.Id && !x.Deleted);
 
                     if (kpi == null)
@@ -208,7 +208,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         {
             _logger.LogInformation($"{nameof(UpdateKpiCaNhan)} dto={JsonSerializer.Serialize(dto)}");
             // Tìm KPI cập nhật
-            var kpi = _unitOfWork.iKpiCaNhanRepository.TableNoTracking.FirstOrDefault(x => x.Id == dto.Id && !x.Deleted);
+            var kpi = _unitOfWork.iKpiCaNhanRepository.Table.FirstOrDefault(x => x.Id == dto.Id && !x.Deleted);
 
             if (kpi == null)
             {
@@ -217,7 +217,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             if (kpi.IdNhanSu != dto.IdNhanSu)
             {
-                var maxSTT = _unitOfWork.iKpiCaNhanRepository.TableNoTracking
+                var maxSTT = _unitOfWork.iKpiCaNhanRepository.Table
                     .Where(k => k.IdNhanSu == dto.IdNhanSu && k.LoaiKPI == dto.LoaiKPI && !k.Deleted)
                     .Select(k => (int?)k.STT)
                     .Max() ?? 0;
@@ -244,7 +244,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             if (dto.Ids == null || !dto.Ids.Any())
                 throw new UserFriendlyException(ErrorCode.BadRequest, "Danh sách ID không được để trống.");
 
-            var kpiList = _unitOfWork.iKpiCaNhanRepository.TableNoTracking
+            var kpiList = _unitOfWork.iKpiCaNhanRepository.Table
                 .Where(s => dto.Ids.Contains(s.Id))
                 .ToList();
 

@@ -8,7 +8,7 @@ namespace D.Core.Domain.Entities.Kpi
     [Table(nameof(KpiTruong), Schema = DbSchema.Kpi)]
     public class KpiTruong : EntityBase
     {
-        public int? STT { get; set; }
+        //public int? STT { get; set; }
         [MaxLength(250)]
         public string? LinhVuc { get; set; }
         [MaxLength(250)]

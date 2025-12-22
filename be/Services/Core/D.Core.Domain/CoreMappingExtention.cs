@@ -24,6 +24,8 @@ using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
+using D.Core.Domain.Dtos.Kpi.KpiTemplate;
+using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
@@ -160,6 +162,12 @@ namespace D.Core.Domain
             CreateMap<KpiDonVi, KpiDonViDto>();
             CreateMap<CreateKpiDonViDto, KpiDonVi>()
             .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => KpiStatus.Create));
+            CreateMap<KpiTruong, KpiTruongDto>();
+            CreateMap<CreateKpiTruongDto, KpiTruong>()
+            .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => KpiStatus.Create));
+
+            CreateMap<KpiTemplate, KpiTemplateDto>();
+            CreateMap<CreateKpiTemplateDto, KpiTemplate>();
             #endregion
         }
 

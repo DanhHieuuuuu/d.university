@@ -5,11 +5,11 @@ using D.DomainBase.Dto;
 
 namespace D.Core.Application.Query.Kpi.KpiDonVi
 {
-    public class FingPagingKeKhaiKpiDonVi : IQueryHandler<FilterKpiDonViKeKhaiDto, PageResultDto<KpiDonViDto>>
+    public class FindPagingKeKhaiKpiDonVi : IQueryHandler<FilterKpiDonViKeKhaiDto, PageResultDto<KpiDonViDto>>
     {
         private readonly IKpiDonViService _service;
 
-        public FingPagingKeKhaiKpiDonVi(IKpiDonViService kpiDonViService)
+        public FindPagingKeKhaiKpiDonVi(IKpiDonViService kpiDonViService)
         {
             _service = kpiDonViService;
         }

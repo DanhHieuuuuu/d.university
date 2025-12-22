@@ -46,7 +46,9 @@ namespace D.Core.Infrastructure
             #region Kpi
                 .AddScoped<IKpiRoleService, KpiRoleService>()
                 .AddScoped<IKpiCaNhanService, KpiCaNhanService>()
-                .AddScoped<IKpiDonViService, KpiDonViService>();
+                .AddScoped<IKpiDonViService, KpiDonViService>()
+                .AddScoped<IKpiTruongService, KpiTruongService>()
+                .AddScoped<IKpiTemplateService, KpiTemplateService>();
             #endregion
         }
 

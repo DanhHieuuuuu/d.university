@@ -156,7 +156,7 @@ namespace D.Core.API.Controllers.Kpi
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet("kpi-donvi/list-nam-hoc")]
-        public async Task<ResponseAPI> GetNamHoc([FromQuery] GetListYearRequestDto dto)
+        public async Task<ResponseAPI> GetNamHoc([FromQuery] GetListYearKpiDonViRequestDto dto)
         {
             try
             {
