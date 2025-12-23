@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
@@ -25,5 +26,36 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _unitOfWork = unitOfWork;
         }
+        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int delegationIncomingId)
+        {
+            _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with DelegationIncomingId: {delegationIncomingId}");
+          
+            var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.DelegationIncomingId == delegationIncomingId);
+
+            if (detail == null)
+                return null;
+
+            var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+                .FirstOrDefault(d => d.Id == delegationIncomingId);
+
+            var result = new DetailDelegationIncomingResponseDto
+            {
+                Id = detail.Id,
+                Code = detail.Code,
+                FirstName = detail.FirstName,
+                LastName = detail.LastName,
+                YearOfBirth = detail.YearOfBirth,
+                PhoneNumber = detail.PhoneNumber,
+                Email = detail.Email,
+                IsLeader = detail.IsLeader,
+                DelegationIncomingId = detail.DelegationIncomingId,
+                DelegationName = delegation?.Name,
+                DelegationCode = delegation?.Code
+            };
+
+            return result;
+        }
+
     }
 }

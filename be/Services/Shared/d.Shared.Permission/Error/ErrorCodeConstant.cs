@@ -9,5 +9,6 @@
         public const int CodeExits = 1009; // Mã nhân sự đã tồn tại
         public const int CodeNotFound = 1010; // Không tìm thấy mã nhân sự
         public const int AccountDisabled = 1011; // Tài khoản bị vô hiệu hóa
+        public const int DelegationNotFound = 4001; // Không tìm thấy đoàn vào
     }
 }

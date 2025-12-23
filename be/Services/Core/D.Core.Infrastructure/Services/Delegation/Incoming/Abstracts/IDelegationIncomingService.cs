@@ -13,5 +13,15 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
     {
         Task<CreateResponseDto> Create(CreateRequestDto dto);
         PageResultDto<PageDelegationIncomingResultDto> Paging(FilterDelegationIncomingDto dto);
+        List<ViewPhongBanResponseDto> GetAllPhongBan(ViewPhongBanRequestDto dto);
+        List<ViewTrangThaiResponseDto> GetListTrangThai(ViewTrangThaiRequestDto dto);
+        Task<UpdateDelegationIncomingResponseDto> UpdateDelegationIncoming(UpdateDelegationIncomingRequestDto dto);
+        void DeleteDoanVao(int id);
+        Task<PageDelegationIncomingResultDto> GetByIdDelegationIncoming(int id);
+        List<ViewNhanSuResponseDto> GetAllNhanSu(ViewNhanSuRequestDto dto);
+
+
+
+        Task NextStatus(UpdateStatusRequestDto dto);
     }
 }

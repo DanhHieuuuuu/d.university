@@ -1,4 +1,5 @@
 ﻿using D.DomainBase.Common;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class CreateRequestDto : ICommand<CreateResponseDto>
     {
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         public int IdPhongBan { get; set; }
 
@@ -25,12 +26,8 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 
         public string? PhoneNumber { get; set; }
 
-        public int Status { get; set; }
-
         public DateOnly RequestDate { get; set; }
 
-        public DateOnly ReceptionDate { get; set; }
-
-        public decimal TotalMoney { get; set; }
+        public IFormFile DetailDelegation { get; set; }
     }
 }

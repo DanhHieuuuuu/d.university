@@ -1,10 +1,10 @@
 import { ReduxStatus } from '@redux/const';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CRUD } from '@models/common/common';
-import { ICreateChucVu, IQueryChucVu, IUpdateChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
-import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
-import { ICreatePhongBan, IQueryPhongBan, IUpdatePhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 
+import { IViewChucVu } from '@models/danh-muc/chuc-vu.model';
+import { IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
+import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import {
   IViewDanToc,
   IViewGioiTinh,
@@ -14,207 +14,31 @@ import {
   IViewQuocTich,
   IViewTonGiao
 } from '@models/danh-muc/common.model';
-import { DanhMucService } from '@services/danhmuc.service';
 
-export const getAllChucVu = createAsyncThunk('danhmuc/list-chucvu', async (payload?: IQueryChucVu) => {
-  try {
-    const res = await DanhMucService.getListChucVu(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const createChucVu = createAsyncThunk('danhmuc/create-chucvu', async (payload: ICreateChucVu) => {
-  try {
-    const res = await DanhMucService.createChucVu(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const updateChucVu = createAsyncThunk('danhmuc/update-chucvu', async (payload: IUpdateChucVu) => {
-  try {
-    const res = await DanhMucService.updateChucVu(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const deleteChucVu = createAsyncThunk('danhmuc/delete-chucvu', async (payload: number) => {
-  try {
-    const res = await DanhMucService.deleteChucVu(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getChucVuById = createAsyncThunk('danhmuc/get-chucvu', async (payload: number) => {
-  try {
-    const res = await DanhMucService.getChucVuById(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllDanToc = createAsyncThunk('danhmuc/list-dantoc', async () => {
-  try {
-    const res = await DanhMucService.getListDanToc();
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllGioiTinh = createAsyncThunk('danhmuc/list-gioitinh', async () => {
-  try {
-    const res = await DanhMucService.getListGioiTinh();
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllLoaiHopDong = createAsyncThunk('danhmuc/list-loaihopdong', async () => {
-  try {
-    const res = await DanhMucService.getListLoaiHopDong();
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllLoaiPhongBan = createAsyncThunk('danhmuc/list-loaiphongban', async () => {
-  try {
-    const res = await DanhMucService.getListLoaiPhongBan();
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllPhongBan = createAsyncThunk('danhmuc/list-phongban', async (payload?: IQueryPhongBan) => {
-  try {
-    const res = await DanhMucService.getListPhongBan(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const createPhongBan = createAsyncThunk('danhmuc/create-phongban', async (payload: ICreatePhongBan) => {
-  try {
-    const res = await DanhMucService.createPhongBan(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const updatePhongBan = createAsyncThunk('danhmuc/update-phongban', async (payload: IUpdatePhongBan) => {
-  try {
-    const res = await DanhMucService.updatePhongBan(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const deletePhongBan = createAsyncThunk('danhmuc/delete-phongban', async (payload: number) => {
-  try {
-    const res = await DanhMucService.deletePhongBan(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getPhongBanById = createAsyncThunk('danhmuc/get-phongban', async (payload: number) => {
-  try {
-    const res = await DanhMucService.getPhongBanById(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllQuanHeGiaDinh = createAsyncThunk('danhmuc/list-qhgd', async () => {
-  try {
-    const res = await DanhMucService.getListQuanHeGiaDinh();
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllQuocTich = createAsyncThunk('danhmuc/list-quoctich', async () => {
-  try {
-    const res = await DanhMucService.getListQuocTich();
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getAllToBoMon = createAsyncThunk('danhmuc/list-tobomon', async (payload?: IQueryToBoMon) => {
-  try {
-    const res = await DanhMucService.getListToBoMon(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const createToBoMon = createAsyncThunk('danhmuc/create-toBoMon', async (payload: ICreateToBoMon) => {
-  try {
-    const res = await DanhMucService.createToBoMon(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const updateToBoMon = createAsyncThunk('danhmuc/update-toBoMon', async (payload: IUpdateToBoMon) => {
-  try {
-    const res = await DanhMucService.updateToBoMon(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const deleteToBoMon = createAsyncThunk('danhmuc/delete-toBoMon', async (payload: number) => {
-  try {
-    const res = await DanhMucService.deleteToBoMon(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-export const getToBoMonById = createAsyncThunk('danhmuc/get-toBoMon', async (payload: number) => {
-  try {
-    const res = await DanhMucService.getToBoMonById(payload);
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
-
-export const getAllTonGiao = createAsyncThunk('danhmuc/list-tongiao', async () => {
-  try {
-    const res = await DanhMucService.getListTonGiao();
-
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
+import {
+  getAllChucVu,
+  createChucVu,
+  createPhongBan,
+  createToBoMon,
+  deleteChucVu,
+  deletePhongBan,
+  deleteToBoMon,
+  getAllDanToc,
+  getAllGioiTinh,
+  getAllLoaiHopDong,
+  getAllLoaiPhongBan,
+  getAllPhongBan,
+  getAllQuanHeGiaDinh,
+  getAllQuocTich,
+  getAllToBoMon,
+  getAllTonGiao,
+  getChucVuById,
+  getPhongBanById,
+  getToBoMonById,
+  updateChucVu,
+  updatePhongBan,
+  updateToBoMon
+} from './danhmucThunk';
 
 interface DanhMucState {
   chucVu: CRUD<IViewChucVu>;

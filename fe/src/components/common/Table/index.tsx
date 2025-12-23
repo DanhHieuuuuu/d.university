@@ -6,6 +6,8 @@ import type { CheckboxOptionType } from 'antd';
 import { SettingOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { IAction, IColumn } from '@models/common/table.model';
 import '@styles/table.style.scss';
+import { ETableColumnType } from '@/constants/e-table.consts';
+import { DelegationStatusConst } from '@/app/(home)/delegation/consts/delegation-status.consts';
 
 interface AppTableProps<T> extends TableProps<T> {
   columns: IColumn<T>[];
@@ -24,6 +26,32 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
   const closePopupConfig = () => {
     setOpenConfig(false);
   };
+  const renderStatusColumn = (value: any) => {
+    const info = DelegationStatusConst.getInfo(value);
+
+    if (!info || typeof info !== 'object') return value;
+
+    return <span className={info.class}>{info.name}</span>;
+  };
+
+  const enhancedColumns = columns.map((col) => {
+    if (col.type === ETableColumnType.STATUS) {
+      return {
+        ...col,
+         fixed: col.fixed ?? 'right', 
+         width: col.width ?? 200,         
+        render: (value: any, record: any, index: number) => {
+          if (col.render) {
+            return col.render(value, record, index);
+          }
+
+          return renderStatusColumn(value);
+        }
+      };
+    }
+
+    return col;
+  });
 
   const configColumn: IColumn<T> = {
     key: 'config',
@@ -33,7 +61,9 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     fixed: 'right',
     render: (value, record, index) => {
       if (listActions?.length) {
-        const actions = listActions.map((act, idx) => {
+        const actions = listActions
+        .filter((act) => !act.hidden?.(record))
+        .map((act, idx) => {
           return (
             <Button
               key={idx}
@@ -89,7 +119,8 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     })) ?? [];
 
   const newColumns = [
-    ...(columns?.filter((item) => item.showOnConfig === false || checkedList.includes(item.key as string)) ?? []),
+    ...(enhancedColumns?.filter((item) => item.showOnConfig === false || checkedList.includes(item.key as string)) ??
+      []),
     configColumn
   ];
 

@@ -86,3 +86,7 @@ export const _toUpperUnderscore = (text: string): string => {
     .toUpperCase()
     .replace(/\s+/g, '_'); // replace spaces with _
 };
+
+export const formatDateTimeView = (date: Date | string | number, type: string = 'dd/MM/yyyy - HH:mm:ss') => {
+  return formatDate(date, type);
+};

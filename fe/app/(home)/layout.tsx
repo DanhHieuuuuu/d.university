@@ -15,7 +15,7 @@ import {
   getAllQuocTich,
   getAllToBoMon,
   getAllTonGiao
-} from '@redux/feature/danhmucSlice';
+} from '@redux/feature/danh-muc/danhmucThunk';
 
 import MenuComponent from '@components/menu/menu-home';
 import AppHeader from '@components/common/Header';

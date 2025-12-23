@@ -14,6 +14,7 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging
     /// </summary>
     public class PageDelegationIncomingResultDto
     {
+        public int Id { get; set; }
         public string Code { get; set; }
 
         public string Name { get; set; }
@@ -21,10 +22,12 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging
         public string Content { get; set; }
 
         public int IdPhongBan { get; set; }
+        public string? PhongBan { get; set; }
 
         public string? Location { get; set; }
 
         public int IdStaffReception { get; set; }
+        public string? StaffReceptionName { get; set; }
 
         public int TotalPerson { get; set; }
 

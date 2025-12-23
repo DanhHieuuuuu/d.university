@@ -3,12 +3,15 @@ import {
   ApartmentOutlined,
   BarsOutlined,
   DeploymentUnitOutlined,
+  HistoryOutlined,
   HomeOutlined,
+  HourglassOutlined,
   PartitionOutlined,
   TeamOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
-import { AdminIcon, StudentIcon } from '@components/custom-icon';
+import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
+import { HistoryIcon } from 'lucide-react';
 
 export const listMenuCore: IMenu[] = [
   {
@@ -17,7 +20,7 @@ export const listMenuCore: IMenu[] = [
     icon: <HomeOutlined />
   },
   {
-    label: 'Quán lý nhân sự',
+    label: 'Quản lý nhân sự',
     routerLink: '/hrm',
     // permissionKeys: [PermissionCoreConst.CoreMenuNhanSu],
     icon: <TeamOutlined />
@@ -50,6 +53,34 @@ export const listMenuCore: IMenu[] = [
     ]
   },
   {
+    label: 'Đoàn vào',
+    routerLink: '/delegation/incoming',
+    icon: <DelegationIcon />,
+    items: [
+      {
+        label: 'Danh sách đoàn vào',
+        routerLink: '/delegation/incoming/list-delegation',
+        icon: <SuggestIcon />
+      },
+      {
+        label: 'Xử lý đoàn vào',
+        routerLink: '/delegation/incoming/process',
+        icon: <HourglassOutlined />
+      },
+      {
+        label: 'Phòng ban hỗ trợ',
+        routerLink: '/delegation/incoming/support',
+        icon: <TeamOutlined />
+      },
+      {
+        label: 'Nhật ký đoàn vào',
+        routerLink: '/delegation/incoming/diary',
+        icon: <HistoryOutlined />
+
+      }
+    ],
+  },
+  {
     label: 'Đào tạo',
     routerLink: '/training',
     icon: <BarsOutlined />,
@@ -57,6 +88,31 @@ export const listMenuCore: IMenu[] = [
       {
         label: 'Khoa',
         routerLink: '/training/faculty',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Ngành',
+        routerLink: '/training/major',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Chuyên ngành',
+        routerLink: '/training/specialization',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Môn học',
+        routerLink: '/training/course',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Môn học tiên quyết',
+        routerLink: '/training/prerequisiteCourse',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Khung chương trình',
+        routerLink: '/training/curriculumFramework',
         icon: <ApartmentOutlined />
       }
     ]

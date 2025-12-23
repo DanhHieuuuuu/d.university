@@ -57,3 +57,91 @@ html {
     text-wrap: balance;
   }
 }
+
+.tag-status {
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+}
+
+.light {
+  .tag-init {
+    @extend .tag-status;
+    background-color: #e3f2fd;
+    color: #0d47a1;
+  }
+
+  .tag-cancel {
+    @extend .tag-status;
+    background-color: #ffebee;
+    color: #c62828;
+  }
+
+  .tag-edit {
+    @extend .tag-status;
+    background-color: #fff8e1;
+    color: #ef6c00;
+  }
+  .tag-done {
+    @extend .tag-status;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .tag-reception {
+    @extend .tag-status;
+    background-color: #fff3e0;
+    color: #ef6c00;
+  }
+
+  .tag-propose {
+    @extend .tag-status;
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+  }
+}
+
+.dark {
+  .tag-init {
+    @extend .tag-status;
+    background-color: rgba(33, 150, 243, 0.15);
+    color: #64b5f6;
+  }
+
+  .tag-cancel {
+    @extend .tag-status;
+    background-color: rgba(244, 67, 54, 0.15);
+    color: #e57373;
+  }
+
+  .tag-edit {
+    @extend .tag-status;
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #ffeb3b;
+  }
+  .tag-done {
+    @extend .tag-status;
+    background-color: rgba(76, 175, 80, 0.15);
+    color: #81c784;
+  }
+
+  .tag-reception {
+    @extend .tag-status;
+    background-color: rgba(255, 152, 0, 0.15);
+    color: #FFB74D;
+  }
+
+  .tag-propose {
+    @extend .tag-status;
+    background-color: rgba(156, 39, 176, 0.15);
+    color: #ce93d8;
+  }
+}
+.hover-box:hover {
+  background: #f5f5f5;
+  border: 1px solid #d9d9d9;
+}

@@ -1,21 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
+import { Button, Form, FormProps, Input, Modal, Switch } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ICreatePhongBan, IUpdatePhongBan } from '@models/danh-muc/phong-ban.model';
-import {
-  clearSelectedPhongBan,
-  createPhongBan,
-  getPhongBanById,
-  resetStatusPhongBan,
-  updatePhongBan,
-  getAllLoaiPhongBan
-} from '@redux/feature/danhmucSlice';
+import { ICreateKhoa, IUpdateKhoa } from '@models/dao-tao/khoa.model';
+import { createKhoa, getKhoaById, updateKhoa } from '@redux/feature/dao-tao/khoaThunk';
+import { clearSelectedKhoa, resetStatusKhoa } from '@redux/feature/dao-tao/daotaoSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
-import dayjs from 'dayjs';
 
-type PositionModalProps = {
+type FacultyModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
@@ -23,70 +16,61 @@ type PositionModalProps = {
   refreshData: () => void;
 };
 
-const PositionModal: React.FC<PositionModalProps> = (props) => {
+const FacultyModal: React.FC<FacultyModalProps> = (props) => {
   const dispatch = useAppDispatch();
-  const [form] = Form.useForm<ICreatePhongBan>();
-  const [title, setTitle] = useState<string>('Thêm mới phòng ban');
+  const [form] = Form.useForm<ICreateKhoa>();
+  const [title, setTitle] = useState<string>('');
 
-  const { listLoaiPhongBan } = useAppSelector((state) => state.danhmucState);
-
-  const { $selected, $create, $update } = useAppSelector((state) => state.danhmucState.phongBan);
+  const { $selected, $create, $update } = useAppSelector((state) => state.daotaoState.khoa);
 
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
 
-  const { isModalOpen, isUpdate, isView, refreshData, setIsModalOpen } = props;
-
-  // Khi mở modal thì nếu là update/view thì load chi tiết phòng ban
   useEffect(() => {
-    if (isModalOpen) {
-      dispatch(getAllLoaiPhongBan());
-      if (isUpdate || isView) {
-        if ($selected.id) dispatch(getPhongBanById($selected.id));
-        setTitle(isView ? 'Xem thông tin phòng ban' : 'Cập nhật phòng ban');
-      } else {
-        setTitle('Thêm mới phòng ban');
-      }
+    if (props.isModalOpen) {
+      if (props.isUpdate) setTitle('Chỉnh sửa khoa');
+      else if (props.isView) setTitle('Chi tiết khoa');
+      else setTitle('Thêm mới khoa');
     }
-  }, [dispatch, isModalOpen, isUpdate, isView, $selected.id]);
+  }, [props.isModalOpen, props.isUpdate, props.isView]);
 
-  // Gán dữ liệu vào form khi load xong
+  useEffect(() => {
+    if (props.isModalOpen && (props.isUpdate || props.isView) && $selected.id) {
+      dispatch(getKhoaById($selected.id));
+    }
+  }, [props.isModalOpen, props.isUpdate, props.isView, $selected.id]);
+
   useEffect(() => {
     if ($selected.data) {
-      const selectedData = $selected.data;
-      form.setFieldsValue({
-        ...selectedData,
-        ngayThanhLap: selectedData.ngayThanhLap ? dayjs(selectedData.ngayThanhLap) : undefined
-      });
+      form.setFieldsValue($selected.data);
     }
-  }, [$selected.data, form]);
+  }, [$selected.data]);
 
-  // Khi lưu thành công thì đóng modal, reset form
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
-      dispatch(resetStatusPhongBan());
-      dispatch(clearSelectedPhongBan());
+      dispatch(resetStatusKhoa());
+      dispatch(clearSelectedKhoa());
       form.resetFields();
-      refreshData();
-      setIsModalOpen(false);
+      props.refreshData();
+      props.setIsModalOpen(false);
     }
-  }, [$create.status, $update.status, dispatch, form, refreshData, setIsModalOpen]);
+  }, [$create.status, $update.status]);
 
   const handleClose = () => {
     form.resetFields();
-    dispatch(clearSelectedPhongBan());
-    setIsModalOpen(false);
+    dispatch(clearSelectedKhoa());
+    props.setIsModalOpen(false);
   };
 
-  const handleFinish: FormProps['onFinish'] = async (values: ICreatePhongBan | IUpdatePhongBan) => {
+  const handleFinish: FormProps['onFinish'] = async (values: ICreateKhoa | IUpdateKhoa) => {
     try {
-      if (isUpdate && $selected.id) {
-        await dispatch(updatePhongBan({ id: $selected.id, ...values })).unwrap();
-        toast.success('Cập nhật phòng ban thành công');
+      if (props.isUpdate && $selected.id) {
+        await dispatch(updateKhoa({ id: $selected.id, ...values })).unwrap();
+        toast.success('Cập nhật thành công');
       } else {
-        await dispatch(createPhongBan(values)).unwrap();
-        toast.success('Thêm mới phòng ban thành công');
+        await dispatch(createKhoa(values)).unwrap();
+        toast.success('Thêm mới thành công');
       }
-    } catch {
+    } catch (error) {
       toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
     }
   };
@@ -96,18 +80,19 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       title={title}
       className="app-modal"
       width="60%"
-      open={isModalOpen}
+      closable={{ 'aria-label': 'Custom Close Button' }}
+      open={props.isModalOpen}
       onCancel={handleClose}
       footer={
         <>
-          {!isView && (
+          {!props.isView && (
             <Button
               loading={isSaving}
               onClick={form.submit}
-              icon={isUpdate ? <SaveOutlined /> : <PlusOutlined />}
+              icon={props.isUpdate ? <SaveOutlined /> : <PlusOutlined />}
               type="primary"
             >
-              {isUpdate ? 'Lưu' : 'Tạo'}
+              {props.isUpdate ? 'Lưu' : 'Tạo'}
             </Button>
           )}
           <Button color="default" variant="filled" onClick={handleClose} icon={<CloseOutlined />}>
@@ -117,94 +102,47 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       }
     >
       <Form
-        name="phongBan"
+        name="khoa"
         layout="vertical"
         form={form}
         onFinish={handleFinish}
         autoComplete="on"
-        disabled={isView}
+        disabled={props.isView}
         labelCol={{ style: { fontWeight: 600 } }}
+        initialValues={{ trangThai: true }}
       >
         <div className="grid grid-cols-2 gap-x-5">
-          <Form.Item<ICreatePhongBan>
-            label="Mã phòng ban"
-            name="maPhongBan"
-            rules={[{ required: true, message: 'Vui lòng nhập mã phòng ban' }]}
+          <Form.Item<ICreateKhoa>
+            label="Mã khoa"
+            name="maKhoa"
+            rules={[{ required: true, message: 'Vui lòng nhập mã khoa' }]}
           >
             <Input />
           </Form.Item>
-
-          <Form.Item<ICreatePhongBan>
-            label="Tên phòng ban"
-            name="tenPhongBan"
-            rules={[{ required: true, message: 'Vui lòng nhập tên phòng ban' }]}
+          <Form.Item<ICreateKhoa>
+            label="Tên khoa"
+            name="tenKhoa"
+            rules={[{ required: true, message: 'Vui lòng nhập tên khoa' }]}
           >
             <Input />
           </Form.Item>
-
-          <Form.Item<ICreatePhongBan>
-            label="Loại phòng ban"
-            name="idLoaiPhongBan"
-            rules={[{ required: true, message: 'Vui lòng chọn loại phòng ban' }]}
-          >
-            <Select
-              placeholder="Chọn loại phòng ban"
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.children as unknown as string).toLowerCase().includes(input.toLowerCase())
-              }
-            >
-              {listLoaiPhongBan.map((loai) => (
-                <Select.Option key={loai.id} value={loai.id}>
-                  {loai.tenLoaiPhongBan}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item<ICreatePhongBan>
-            label="Địa chỉ"
-            name="diaChi"
-            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
-          >
+          <Form.Item<ICreateKhoa> label="Tên tiếng Anh" name="tenTiengAnh">
             <Input />
           </Form.Item>
-
-          <Form.Item<ICreatePhongBan>
-            label="Hotline"
-            name="hotline"
-            rules={[{ required: true, message: 'Vui lòng nhập hotline' }]}
-          >
+          <Form.Item<ICreateKhoa> label="Viết tắt" name="vietTat">
             <Input />
           </Form.Item>
-
-          <Form.Item<ICreatePhongBan> label="Fax" name="fax">
+          <Form.Item<ICreateKhoa> label="Email" name="email">
+            <Input type="email" />
+          </Form.Item>
+          <Form.Item<ICreateKhoa> label="Số điện thoại" name="sdt">
             <Input />
           </Form.Item>
-
-          <Form.Item<ICreatePhongBan>
-            label="Ngày thành lập"
-            name="ngayThanhLap"
-            rules={[{ required: true, message: 'Vui lòng chọn ngày thành lập' }]}
-          >
-            <DatePicker format="DD/MM/YYYY" className="!w-full" />
+          <Form.Item<ICreateKhoa> label="Địa chỉ" name="diaChi" className="col-span-2">
+            <Input.TextArea rows={2} />
           </Form.Item>
-
-          <Form.Item<ICreatePhongBan>
-            label="Người đại diện"
-            name="nguoiDaiDien"
-            rules={[{ required: true, message: 'Vui lòng nhập tên người đại diện' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item<ICreatePhongBan> label="Chức vụ người đại diện" name="chucVuNguoiDaiDien">
-            <Input />
-          </Form.Item>
-
-          <Form.Item<ICreatePhongBan> label="STT" name="stt">
-            <InputNumber className="!w-full" min={0} />
+          <Form.Item<ICreateKhoa> label="Trạng thái" name="trangThai" valuePropName="checked">
+            <Switch checkedChildren="Hoạt động" unCheckedChildren="Ngừng" />
           </Form.Item>
         </div>
       </Form>
@@ -212,4 +150,4 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   );
 };
 
-export default PositionModal;
+export default FacultyModal;

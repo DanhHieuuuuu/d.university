@@ -17,24 +17,25 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [Column("DelegationIncomingId")]
         [Description("Mã đoàn vào")]
         [MaxLength(255)]
-        public string DelegationIncomingCode { get; set; }
+        public string? DelegationIncomingCode { get; set; }
 
         [Column("OldStatus")]
         [Description("Trạng thái cũ")]
-        public int OldStatus { get; set; }
+        public int? OldStatus { get; set; }
 
         [Column("NewStatus")]
         [Description("Trạng thái mới")]
-        public int NewStatus { get; set; }
+        public int? NewStatus { get; set; }
 
         [Column("Description")]
         [Description("Mô tả")]
         [MaxLength(255)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Column("Reason")]
         [Description("Lý do")]
         [MaxLength(255)]
-        public string Reason { get; set; }
+        public string? Reason { get; set; }
+        public string? CreatedByName { get; set; }
     }
 }

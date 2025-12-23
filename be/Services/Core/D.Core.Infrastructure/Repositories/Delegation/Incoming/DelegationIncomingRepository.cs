@@ -9,9 +9,14 @@ namespace D.Core.Infrastructure.Repositories.Delegation.Incoming
     {
         public DelegationIncomingRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
             : base(dbContext, httpContext) { }
+        public bool IsMaDoanVaoExist(string code) 
+        { 
+            return TableNoTracking.Any(x => x.Code == code);
+        }
     }
 
     public interface IDelegationIncomingRepository : IRepositoryBase<DelegationIncoming>
     {
+        bool IsMaDoanVaoExist(string code);
     }
 }

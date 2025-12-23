@@ -144,6 +144,19 @@ namespace D.Core.Domain
             CreateMap<DelegationIncoming, PageDelegationIncomingResultDto>();
             CreateMap<CreateRequestDto, DelegationIncoming>();
             CreateMap<DelegationIncoming, CreateResponseDto>();
+            CreateMap<DelegationIncoming, UpdateDelegationIncomingResponseDto>();
+            CreateMap<LogStatus, ViewDelegationIncomingLogDto>();
+            CreateMap<LogReceptionTime, ViewReceptionTimeLogDto>();
+            CreateMap<CreateReceptionTimeRequestDto, ReceptionTime>();
+            CreateMap<ReceptionTime, CreateReceptionTimeResponseDto>();
+            CreateMap<ReceptionTime, UpdateReceptionTimeResponseDto>();
+            CreateMap<Supporter, CreateSupporterResponseDto>();
+            CreateMap<CreateSupporterResponseDto,Supporter>();
+            CreateMap<CreateSupporterRequestDto, Supporter>();
+            CreateMap<CreateDepartmentSupportResponseDto, DepartmentSupport>();
+            CreateMap<CreateDepartmentSupportRequestDto, DepartmentSupport>();
+            CreateMap<DepartmentSupport, CreateDepartmentSupportResponseDto>();                
+
             #endregion
 
             #region Survey
