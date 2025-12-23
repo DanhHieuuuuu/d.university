@@ -3,11 +3,13 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, message, Modal, Select } from 'antd';
 import {
+  CheckOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
   SearchOutlined,
+  SendOutlined,
   SyncOutlined
 } from '@ant-design/icons';
 
@@ -21,12 +23,14 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { ICreateReceptionTime, IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
   getListGuestGroup,
+  getListNhanSu,
   getListPhongBan,
-  getListStatus
+  getListStatus,
+  updateStatus
 } from '@redux/feature/delegation/delegationThunk';
 import { select } from '@redux/feature/delegation/delegationSlice';
 import { ETableColumnType } from '@/constants/e-table.consts';
@@ -35,14 +39,13 @@ import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-
+import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 
 const Page = () => {
   const [form] = Form.useForm();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem, listPhongBan, listStatus } = useAppSelector((state) => state.delegationState);
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
@@ -75,7 +78,7 @@ const Page = () => {
       key: 'phongBan',
       dataIndex: 'phongBan',
       title: 'Phòng ban phụ trách',
-      align: 'center',
+      align: 'center'
     },
     {
       key: 'location',
@@ -131,13 +134,28 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
+      hidden: (r) => r.status == DelegationStatusConst.DONE,
       command: (record: IViewGuestGroup) => onClickView(record)
     },
     {
       label: 'Chỉnh sửa',
       tooltip: 'Sửa danh sách đoàn vào',
       icon: <EditOutlined />,
+      hidden: (r) => r.status == DelegationStatusConst.DONE,
       command: (record: IViewGuestGroup) => onClickUpdate(record)
+    },
+    {
+      label: 'Đề xuất',
+      icon: <SendOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.TAO_MOI,
+      command: (record: IViewGuestGroup) => onClickUpdateStatus(record)
+    },
+
+    {
+      label: 'Thêm thời gian',
+      icon: <PlusOutlined />,
+      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE,
+      command: (record: IViewGuestGroup) => onClickCreateTime(record)
     },
     {
       label: 'Xóa',
@@ -147,24 +165,31 @@ const Page = () => {
     }
   ];
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryGuestGroup>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
-      Keyword: ''
+      PageIndex: 1,
+      PageSize: 10,
+      Keyword: '',
+      status: DelegationStatusConst.TAO_MOI
     },
     onQueryChange: (newQuery) => {
       dispatch(getListGuestGroup(newQuery));
     },
     triggerFirstLoad: true
   });
+  useEffect(() => {
+    form.setFieldsValue({
+      status: DelegationStatusConst.TAO_MOI
+    });
+  }, []);
 
   useEffect(() => {
     if (!isModalOpen) {
       dispatch(resetStatusCreate());
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
+      dispatch(getListNhanSu());
       dispatch(getListStatus());
     }
   }, [isModalOpen]);
@@ -182,10 +207,26 @@ const Page = () => {
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
+  const onClickUpdateStatus = (data: IViewGuestGroup) => {
+    openConfirmStatusModal({
+      title: 'Xác nhận đề xuất',
+      content: `Bạn có muốn đề xuất đoàn vào "${data.name}" không?`,
+      okText: 'Đề xuất',
+      okAction: 'upgrade',
+      data,
+      dispatch,
+      onSuccess: () => {
+        dispatch(getListGuestGroup(query));
+      }
+    });
+  };
 
- const onClickView = (data: IViewGuestGroup) => {
-  router.push(`/delegation/incoming/detail/${data.id}`);
-};
+  const onClickView = (data: IViewGuestGroup) => {
+    router.push(`/delegation/incoming/detail/${data.id}`);
+  };
+  const onClickCreateTime = (data: IViewGuestGroup) => {
+    router.push(`/delegation/incoming/list-delegation/create-reception-time?delegationIncomingId=${data.id}`);
+  };
   const onClickUpdate = (data: IViewGuestGroup) => {
     dispatch(select(data));
     setIsModalView(false);
@@ -254,13 +295,7 @@ const Page = () => {
             icon={<SyncOutlined />}
             onClick={() => {
               form.resetFields();
-              onFilterChange({
-                SkipCount: 0,
-                MaxResultCount: 10,
-                Keyword: '',
-                idPhongBan: undefined,
-                status: undefined
-              });
+              resetFilter();
             }}
           >
             Tải lại

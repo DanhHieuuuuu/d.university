@@ -70,7 +70,6 @@ export const usePaginationWithFilter = <T extends IQueryPaging>({
     }
   }, [query]);
 
-
   // xử lý reset filter
   const resetFilter = () => {
     const defaultQuery = {

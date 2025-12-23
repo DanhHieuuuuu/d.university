@@ -9,18 +9,22 @@ using System.Threading.Tasks;
 
 namespace D.Core.Application.Command.Delegation.Incoming
 {
-    public class CreateReceptionTime : ICommandHandler<CreateReceptionTimeRequestDto, CreateReceptionTimeResponseDto>
+    public class CreateReceptionTimeList
+        : ICommandHandler<CreateReceptionTimeListRequestDto, List<CreateReceptionTimeResponseDto>>
     {
         private readonly IReceptionTimeService _service;
 
-        public CreateReceptionTime(IReceptionTimeService service)
+        public CreateReceptionTimeList(IReceptionTimeService service)
         {
             _service = service;
         }
 
-        public async Task<CreateReceptionTimeResponseDto> Handle(CreateReceptionTimeRequestDto request, CancellationToken cancellationToken)
+        public async Task<List<CreateReceptionTimeResponseDto>> Handle(
+            CreateReceptionTimeListRequestDto request,
+            CancellationToken cancellationToken)
         {
-            return await _service.CreateReceptionTime(request);
+            return await _service.CreateReceptionTimeList(request);
         }
     }
 }
+

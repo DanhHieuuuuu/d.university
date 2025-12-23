@@ -22,7 +22,7 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [Column("Content")]
         [Description("Nội dung")]
         [MaxLength(255)]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [Column("IdPhongBan")]
         [Description("Id của phòng ban tiếp nhận")]

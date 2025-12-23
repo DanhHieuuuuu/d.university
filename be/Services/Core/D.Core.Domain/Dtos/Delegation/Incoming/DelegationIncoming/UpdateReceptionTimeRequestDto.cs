@@ -9,7 +9,7 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class UpdateReceptionTimeRequestDto : ICommand<UpdateReceptionTimeResponseDto>
     {
-        public int Id { get; set; }
+        public int DelegationIncomingId { get; set; }
 
         public TimeOnly StartDate { get; set; }
 

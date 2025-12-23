@@ -6,6 +6,7 @@ import { IDetailDelegationIncoming } from '@models/delegation/delegation.model';
 
 type DetailGuestGroupTabProps = {
   data: IDetailDelegationIncoming | null;
+  isEdit?: boolean;
 };
 
 const DetailGuestGroupTab: React.FC<DetailGuestGroupTabProps> = ({ data }) => {

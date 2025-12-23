@@ -79,6 +79,42 @@ namespace D.Core.API.Controllers.Delegation
             }
         }
         /// <summary>
+        /// Lấy Đoàn vào 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-delegation-incoming")]
+        public async Task<ResponseAPI> GetAllDelegationIncoming([FromQuery] ViewDelegationIncomingRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy nhân sự
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-nhansu")]
+        public async Task<ResponseAPI> GetAllNhanSu([FromQuery] ViewNhanSuRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
         /// Lấy trạng thái 
         /// </summary>
         /// <param name="dto"></param>
@@ -200,8 +236,8 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("create/reception-time")]
-        public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeRequestDto dto)
+        [HttpPost("create-reception-time")]
+        public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeListRequestDto dto)
         {
             try
             {
@@ -341,6 +377,136 @@ namespace D.Core.API.Controllers.Delegation
 
         [HttpGet("get-log-reception-time")]
         public async Task<ResponseAPI> GetLogReceptionTime([FromQuery] FindReceptionTimeLogDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Trạng thái tiếp theo của đoàn vào
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("next-status")]
+        public async Task<ResponseAPI> NextStatus([FromBody] UpdateStatusRequestDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy paging nhân viên hỗ trợ 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("paging-supporter")]
+        public async Task<ResponseAPI> PagingSupporter([FromQuery] FilterSupporterDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tạo mới nhân viên hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("create-supporter")]
+        public async Task<ResponseAPI> CreateSupporter([FromBody] CreateSupporterRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy paging bộ phận hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("paging-department-support")]
+        public async Task<ResponseAPI> PagingDepartmentSupport([FromQuery] FilterDepartmentSupportDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tạo mới bộ phận hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("create-department-support")]
+        public async Task<ResponseAPI> CreateDepartmentSupport([FromBody] CreateDepartmentSupportRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Cập nhật Phòng ban hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("update-department-support")]
+        public async Task<ResponseAPI> UpdateDepartmentSupport([FromBody] UpdateDepartmentSupportRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy phòng ban theo id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-id-department-support")]
+        public async Task<ResponseAPI> GetByIdDepartmentSupport([FromQuery] DetailDepartmentSupportRequestDto dto)
         {
             try
             {

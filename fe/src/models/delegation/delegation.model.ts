@@ -53,22 +53,40 @@ export interface IPrepare {
 }
 export interface IDepartmentSupport {
   id: number;                       
-  departmentSupportId: number;      
+  departmentSupportId: number;  
+  departmentSupportName:string;
+  delegationIncomingName:string;    
   delegationIncomingId: number;    
   content: string;                  
-  supporters?: ISupporter[] | null; 
+  supporters: ISupporter[] ; 
 }
 export interface ISupporter {
   id: number;
-  name: string;
-  position: string;
-  phoneNumber: string;
+  supporterId: number;
+  supporterCode: string;
   departmentSupportId: number;
+  departmentSupport: any | null;
 }
+
 export type IQueryGuestGroup = IQueryPaging & {
   name?: string;
   idPhongBan?: number;
   status?: number;
+};
+export type IQuerySupporter = IQueryPaging & {
+  supporterCode?: string;
+  departmentSupportId?:number
+};
+export type IQueryDepartmentSupport = IQueryPaging & {
+  
+  departmentSupportId?:number
+
+};
+export type IQueryLogStatus = IQueryPaging & {
+
+};
+export type IQueryLogReceptionTime = IQueryPaging & {
+
 };
 export type ICreateDoanVao = {
   code: string;
@@ -93,5 +111,60 @@ export interface ILogStatus {
   description:string,
   reason:string,
   createdBy:string,
+  createdByName:string,
   createdDate:string
+}
+export interface ILogReceptionTime {
+  id:number,
+  receptionTimeId:number,
+  description:string,
+  type:string,
+  reason:string,
+  createdBy:string,
+  createdDate:string,
+  createdByName:string
+}
+export type ICreateReceptionTime = {
+  startDate: number,
+  endDate:number,
+  date:number,
+  content: string,
+  totalPerson:number,
+  address:string,
+  delegationIncomingId: number,
+};
+export type ICreateReceptionTimeList = {
+  items: ICreateReceptionTime[];
+};
+export type IUpdateReceptionTime = ICreateReceptionTime & {
+  id: number;
+};
+
+export type ICreateSupporter = {
+  departmentSupportId: number;
+  supporters: {
+    supporterId: number;
+    supporterCode: string;
+  }[];
+};
+
+export type ICreateDepartment = {
+  delegationIncomingId: number;
+  content: string;
+  departmentSupportId: number
+};
+
+export interface IUpdateStatus {
+  idDelegation: number;
+  oldStatus: number;
+  action: string;
+}
+export interface IUpdateDepartmentSupport {
+  departmentSupportId: number;
+  delegationIncomingId: number;
+  content: string;
+  supporters: {
+    supporterId: number;
+    supporterCode: string;
+  }[]; 
 }

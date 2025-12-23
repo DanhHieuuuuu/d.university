@@ -15,7 +15,7 @@ import { DelegationStatusConst } from '../../../consts/delegation-status.consts'
 import type { UploadProps } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { downloadDelegationTemplateExcel } from '@utils/file-download.helper';
-import { buildCreateFormData } from '@utils/form-data.helper';
+
 type DoanVaoModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
@@ -25,7 +25,7 @@ type DoanVaoModalProps = {
 
 const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsModalOpen, isUpdate, isView }) => {
   const dispatch = useAppDispatch();
-  const { selected, $create, listPhongBan, listStatus } = useAppSelector((state) => state.delegationState);
+  const { selected, $create, listPhongBan, listNhanSu } = useAppSelector((state) => state.delegationState);
   const [form] = Form.useForm<ICreateDoanVao>();
   const [title, setTitle] = useState<string>('');
   const [excelFile, setExcelFile] = useState<File | null>(null);
@@ -63,7 +63,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
   };
 const onFinish: FormProps<ICreateDoanVao>['onFinish'] = async (values) => {
   try {
-    if (!excelFile) {
+    if (!isUpdate && !excelFile) {
       toast.error('Vui lòng upload file');
       return;
     }
@@ -81,24 +81,22 @@ const onFinish: FormProps<ICreateDoanVao>['onFinish'] = async (values) => {
     formData.append('ReceptionDate', dayjs(values.receptionDate).format('YYYY-MM-DD'));
     formData.append('TotalMoney', values.totalMoney?.toString() ?? '0');
     formData.append('TotalPerson', values.totalPerson?.toString() ?? '0');
-    formData.append('DetailDelegation', excelFile,excelFile.name);
+    if (excelFile) {
+      formData.append('DetailDelegation', excelFile, excelFile.name);
+    }
 
     if (isUpdate && selected.data) {
       formData.append('Id', selected.data.id.toString());
       await dispatch(updateDoanVao(formData)).unwrap();
+      toast.success('Cập nhật thành công');
     } else {
-      console.log(excelFile as File, excelFile instanceof File);
-      console.log('FormData check:', {
-  ...values,
-  excelFile
-});
       await dispatch(createDoanVao(formData)).unwrap();
       toast.success('Thêm mới thành công');
     }
 
     onCloseModal();
-  } catch (error) {
-    toast.error('Lỗi khi lưu dữ liệu');
+  } catch (err) {
+    toast.error(String(err));
   }
 };
 
@@ -154,7 +152,7 @@ const uploadProps: UploadProps = {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Tên đoàn vào" name="name" rules={[{ message: 'Nhập tên đoàn' }]}>
+            <Form.Item label="Tên đoàn vào" name="name" rules={[{  required: true,message: 'Nhập tên đoàn' }]}>
               <Input />
             </Form.Item>
           </Col>
@@ -173,7 +171,7 @@ const uploadProps: UploadProps = {
           </Col>
           <Col span={8}>
             <Form.Item label="Nhân sự tiếp đón" name="idStaffReception" rules={[{ required: true }]}>
-              <InputNumber style={{ width: '100%' }} />
+              <Select options={listNhanSu.map((ns: any) => ({ value: ns.idNhanSu, label: ns.tenNhanSu }))} />
             </Form.Item>
           </Col>
         </Row>

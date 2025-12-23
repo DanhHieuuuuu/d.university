@@ -8,7 +8,12 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class CreateReceptionTimeRequestDto : ICommand<CreateReceptionTimeResponseDto>
+    public class CreateReceptionTimeListRequestDto : ICommand<List<CreateReceptionTimeResponseDto>>
+
+    {
+        public List<CreateReceptionTimeRequestDto> Items { get; set; } = new();
+    }
+    public class CreateReceptionTimeRequestDto
     {
         public TimeOnly StartDate { get; set; }
 
@@ -16,11 +21,11 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 
         public DateOnly Date { get; set; }
 
-        public string Content { get; set; } = string.Empty;
+        public string? Content { get; set; }
 
         public int TotalPerson { get; set; }
 
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; }
 
         public int DelegationIncomingId { get; set; }
 

@@ -2,18 +2,34 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
 import {
+  createDepartmentSupport,
   createDoanVao,
+  createReceptionTime,
+  createSupporter,
   deleteDoanVao,
+  getByIdDepartmentSupport,
   getByIdDetailDelegation,
   getByIdGuestGroup,
   getByIdReceptionTime,
+  getListDelegationIncoming,
+  getListDepartmentSupport,
   getListGuestGroup,
+  getListNhanSu,
   getListPhongBan,
   getListStatus,
+  getLogReceptionTime,
   getLogStatus,
-  updateDoanVao
+  updateDepartmentSupport,
+  updateDoanVao,
+  updateReceptionTime,
+  updateStatus
 } from './delegationThunk';
-import { ILogStatus, IViewGuestGroup } from '@models/delegation/delegation.model';
+import {
+  IDepartmentSupport,
+  ILogReceptionTime,
+  ILogStatus,
+  IViewGuestGroup
+} from '@models/delegation/delegation.model';
 
 interface DelegationState {
   status: ReduxStatus;
@@ -23,11 +39,22 @@ interface DelegationState {
     data: any | null;
   };
   list: IViewGuestGroup[];
+  listDepartmentSupport: IDepartmentSupport[];
   listLogStatus: ILogStatus[];
+  listLogReceptionTime: ILogReceptionTime[];
   listPhongBan: any[];
+  listNhanSu: any[];
   listStatus: any[];
+  listDelegationIncoming: any[];
   total: number;
   $create: {
+    status: ReduxStatus;
+  };
+  $update: {
+    status: ReduxStatus;
+    error?: string;
+  };
+  $delete: {
     status: ReduxStatus;
   };
 }
@@ -39,11 +66,21 @@ const initialState: DelegationState = {
     data: null
   },
   list: [],
+  listDepartmentSupport: [],
   listLogStatus: [],
+  listLogReceptionTime: [],
   listPhongBan: [],
+  listNhanSu: [],
+  listDelegationIncoming: [],
   listStatus: [],
   total: 0,
   $create: {
+    status: ReduxStatus.IDLE
+  },
+  $update: {
+    status: ReduxStatus.IDLE
+  },
+  $delete: {
     status: ReduxStatus.IDLE
   }
 };
@@ -95,6 +132,17 @@ const delegationSlice = createSlice({
         state.listPhongBan = action.payload;
       })
       .addCase(getListPhongBan.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // List Nhan su
+      .addCase(getListNhanSu.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getListNhanSu.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listNhanSu = action.payload;
+      })
+      .addCase(getListNhanSu.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
 
@@ -181,19 +229,127 @@ const delegationSlice = createSlice({
       })
       .addCase(getByIdReceptionTime.rejected, (state) => {
         state.selected.status = ReduxStatus.FAILURE;
-      })      
+      })
       // Log Status
       .addCase(getLogStatus.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
       .addCase(getLogStatus.fulfilled, (state, action: PayloadAction<any>) => {
+        console.log('getLogStatus payload', action.payload);
         state.status = ReduxStatus.SUCCESS;
-        state.listLogStatus = action.payload;
+        state.listLogStatus = action.payload?.items ?? [];
+        state.total = action.payload?.totalItem ?? 0;
       })
       .addCase(getLogStatus.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
-
+      // Log ReceptionTime
+      .addCase(getLogReceptionTime.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getLogReceptionTime.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listLogReceptionTime = action.payload?.items ?? [];
+        state.total = action.payload?.totalItem ?? 0;
+      })
+      .addCase(getLogReceptionTime.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // update receptionTime
+      .addCase(updateReceptionTime.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateReceptionTime.fulfilled, (state, action) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateReceptionTime.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // create ReceptionTime
+      .addCase(createReceptionTime.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(createReceptionTime.fulfilled, (state) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createReceptionTime.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // Danh sach phòng ban hõ trợ
+      .addCase(getListDepartmentSupport.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getListDepartmentSupport.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listDepartmentSupport = action.payload?.items;
+        state.total = action.payload?.totalItem;
+      })
+      .addCase(getListDepartmentSupport.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // create departmentSupport
+      .addCase(createDepartmentSupport.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(createDepartmentSupport.fulfilled, (state) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createDepartmentSupport.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // create Supporter
+      .addCase(createSupporter.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(createSupporter.fulfilled, (state) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createSupporter.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // List Đoàn vào
+      .addCase(getListDelegationIncoming.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getListDelegationIncoming.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.listDelegationIncoming = action.payload;
+      })
+      .addCase(getListDelegationIncoming.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // cập nhật trạng thái tiếp theo
+      .addCase(updateStatus.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateStatus.fulfilled, (state) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateStatus.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // update departmentSupport
+      .addCase(updateDepartmentSupport.pending, (state) => {
+        state.$update.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateDepartmentSupport.fulfilled, (state, action) => {
+        state.$update.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateDepartmentSupport.rejected, (state) => {
+        state.$update.status = ReduxStatus.FAILURE;
+      })
+      // Get by Id departmentSupport
+      .addCase(getByIdDepartmentSupport.pending, (state) => {
+        state.selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getByIdDepartmentSupport.fulfilled, (state, action: PayloadAction<any>) => {
+        state.selected.status = ReduxStatus.SUCCESS;
+        state.selected.data = action.payload;
+        state.selected.id = action.payload?.id;
+      })
+      .addCase(getByIdDepartmentSupport.rejected, (state) => {
+        state.selected.status = ReduxStatus.FAILURE;
+      });
   }
 });
 

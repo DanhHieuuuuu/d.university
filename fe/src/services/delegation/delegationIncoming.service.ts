@@ -1,15 +1,24 @@
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
 import {
+  ICreateDepartment,
   ICreateDoanVao,
+  ICreateReceptionTime,
+  ICreateReceptionTimeList,
+  ICreateSupporter,
+  IDepartmentSupport,
   IDetailDelegationIncoming,
   ILogStatus,
   IReceptionTime,
+  IUpdateDepartmentSupport,
   IUpdateDoanVao,
+  IUpdateReceptionTime,
+  IUpdateStatus,
   IViewGuestGroup
 } from '@models/delegation/delegation.model';
 import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
+import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 const apiDelegationEndpoint = 'delegation-incoming';
 
@@ -39,7 +48,17 @@ const getListPhongBan = async () => {
     return Promise.reject(err);
   }
 };
+const getListNhanSu = async () => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-nhansu`);
 
+    const data: IResponseList<IViewNhanSu> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
 const getListStatus = async () => {
   try {
     const res = await axios.get(`${apiDelegationEndpoint}/get-status`);
@@ -61,12 +80,16 @@ const createDoanVao = async (formData: FormData) => {
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+    throw err;
   }
 };
 const updateDoanVao = async (formData: FormData) => {
   try {
-    const res = await axios.put(`${apiDelegationEndpoint}/update`, formData);
+    const res = await axios.put(`${apiDelegationEndpoint}/update`, formData,{
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return res.data;
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -93,9 +116,9 @@ const getByIdGuestGroup = async (id: number) => {
     return Promise.reject(err);
   }
 };
-const getByIdDetailDelegation = async (id: number) => {
+const getByIdDetailDelegation = async (delegationIncomingId: number) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-staff-by-id?Id=${id}`);
+    const res = await axios.get(`${apiDelegationEndpoint}/get-staff-by-id?DelegationIncomingId=${delegationIncomingId}`);
 
     const data: IResponseItem<IDetailDelegationIncoming> = res.data;
     return Promise.resolve(data);
@@ -104,9 +127,9 @@ const getByIdDetailDelegation = async (id: number) => {
     return Promise.reject(err);
   }
 };
-const getByIdReceptionTime = async (id: number) => {
+const getByIdReceptionTime = async (delegationIncomingId: number) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-reception-time-by-id?Id=${id}`);
+    const res = await axios.get(`${apiDelegationEndpoint}/get-reception-time-by-id?DelegationIncomingId=${delegationIncomingId}`);
 
     const data: IResponseItem<IReceptionTime> = res.data;
     return Promise.resolve(data);
@@ -129,18 +152,144 @@ const downloadTemplateExcel = async () => {
     return Promise.reject(err);
   }
 };
-const getLogStatus = async () => {
+const getLogStatus = async (query: any) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-log-status`);
+    const res = await axios.get(`${apiDelegationEndpoint}/get-log-status`, {
+      params: {
+        ...query
+      }
+    });
 
-    const data: IResponseList<ILogStatus> = res.data;
+    const data = res.data;
     return Promise.resolve(data);
   } catch (err) {
     processApiMsgError(err, '');
     return Promise.reject(err);
   }
 };
+const getLogReceptionTime = async (query: any) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-log-reception-time`, {
+      params: {
+        ...query
+      }
+    });
 
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const updateReceptionTime = async (body: IUpdateReceptionTime) => {
+  try {
+    const res = await axios.put(`${apiDelegationEndpoint}/update-reception-time`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const createReceptionTime = async (body: ICreateReceptionTimeList) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/create-reception-time`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const pagingSupporter = async (query: any) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/paging-supporter`, {
+      params: {
+        ...query
+      }
+    });
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const pagingDepartmentSupport = async (query: any) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/paging-department-support`, {
+      params: {
+        ...query
+      }
+    });
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const createSupporter = async (body: ICreateSupporter) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/create-supporter`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const createDepartment = async (body: ICreateDepartment) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/create-department-support`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const getListDelegationIncoming = async () => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-delegation-incoming`);
+
+    const data: IResponseList<IViewGuestGroup> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const updateStatus = async (body: IUpdateStatus) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/next-status`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const updateDepartmentSupport = async (body: IUpdateDepartmentSupport) => {
+  try {
+    const res = await axios.put(`${apiDelegationEndpoint}/update-department-support`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const getByIdDepartmentSupport = async (departmentSupportId: number) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-id-department-support?DepartmentSupportId=${departmentSupportId}`);
+
+    const data: IResponseItem<IDepartmentSupport> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
 
 export const DelegationIncomingService = {
   paging,
@@ -153,5 +302,18 @@ export const DelegationIncomingService = {
   getByIdDetailDelegation,
   getByIdReceptionTime,
   downloadTemplateExcel,
-  getLogStatus
+  getLogStatus,
+  getListNhanSu,
+  updateReceptionTime,
+  createReceptionTime,
+  pagingSupporter,
+  createSupporter,
+  pagingDepartmentSupport,
+  createDepartment,
+  getListDelegationIncoming,
+  updateStatus,
+  getLogReceptionTime,
+  updateDepartmentSupport,
+  getByIdDepartmentSupport
+
 };

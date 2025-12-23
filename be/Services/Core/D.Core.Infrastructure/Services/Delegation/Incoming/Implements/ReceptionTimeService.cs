@@ -30,45 +30,49 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<CreateReceptionTimeResponseDto> CreateReceptionTime(CreateReceptionTimeRequestDto dto)
+        public async Task<List<CreateReceptionTimeResponseDto>> CreateReceptionTimeList(CreateReceptionTimeListRequestDto dto)
         {
-            _logger.LogInformation($"{nameof(CreateReceptionTime)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+            _logger.LogInformation($"{nameof(CreateReceptionTimeList)} called, dto: {JsonSerializer.Serialize(dto)}");
 
-            var newReceptionTime = _mapper.Map<ReceptionTime>(dto);          
-            _unitOfWork.iReceptionTimeRepository.Add(newReceptionTime);
-            await _unitOfWork.SaveChangesAsync();
-            #region Log         
+            var receptionTimes = _mapper.Map<List<ReceptionTime>>(dto.Items);
+            _unitOfWork.iReceptionTimeRepository.AddRange(receptionTimes);
+            #region Log
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
-            .FirstOrDefault(u => u.Id == userId);
+                .FirstOrDefault(u => u.Id == userId);
+
             var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
 
-            var log = new LogReceptionTime
+            var logs = receptionTimes.Select(rt => new LogReceptionTime
             {
-                ReceptionTimeId = newReceptionTime.Id, 
+                ReceptionTimeId = rt.Id,
                 Type = LogType.Create,
-                Description = $"Thêm thời gian tiếp đoàn bởi {userName} lúc {DateTime.Now:dd/MM/yyyy HH:mm:ss}",
+                Description = "Thêm thời gian tiếp đoàn",
                 Reason = DelegationStatus.Names[DelegationStatus.Create],
                 CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString()
-            };
+                CreatedBy = userId.ToString(),
+                CreatedByName = userName
+            }).ToList();
 
-            _unitOfWork.iLogReceptionTimeRepository.Add(log);
-            await _unitOfWork.SaveChangesAsync();
+            _unitOfWork.iLogReceptionTimeRepository.AddRange(logs);
             #endregion
-            return _mapper.Map<CreateReceptionTimeResponseDto>(newReceptionTime);
+            await _unitOfWork.SaveChangesAsync();
 
+            return _mapper.Map<List<CreateReceptionTimeResponseDto>>(receptionTimes);
         }
-        public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int id)
-        {
-            _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with id: {id}");
 
+        public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int delegationIncomingId)
+        {
+            _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with DelegationIncomingId: {delegationIncomingId}");
+
+            // Lấy receptionTime theo DelegationIncomingId
             var receptionTime = _unitOfWork.iReceptionTimeRepository.TableNoTracking
-                .FirstOrDefault(r => r.Id == id);
+                .FirstOrDefault(r => r.DelegationIncomingId == delegationIncomingId);
 
             if (receptionTime == null)
                 return null;
 
+            // Lấy thông tin đoàn
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
                 .FirstOrDefault(d => d.Id == receptionTime.DelegationIncomingId);
 
@@ -82,12 +86,13 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 TotalPerson = receptionTime.TotalPerson,
                 Address = receptionTime.Address,
                 DelegationIncomingId = receptionTime.DelegationIncomingId,
-                DelegationName = delegation != null ? delegation.Name : null,
-                DelegationCode = delegation != null ? delegation.Code : null
+                DelegationName = delegation?.Name,
+                DelegationCode = delegation?.Code
             };
 
             return result;
         }
+
         public async Task<UpdateReceptionTimeResponseDto> UpdateReceptionTime(UpdateReceptionTimeRequestDto dto)
         {
             _logger.LogInformation(
@@ -95,7 +100,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             );
 
             var exist = _unitOfWork.iReceptionTimeRepository.Table
-                .FirstOrDefault(x => x.Id == dto.Id);
+                .FirstOrDefault(x => x.DelegationIncomingId == dto.DelegationIncomingId);
 
             if (exist == null)
                 throw new Exception("Không tìm thấy thời gian tiếp đoàn.");
@@ -148,8 +153,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 changes.Add($"Địa điểm: '{oldAddress}' → '{dto.Address}'");
 
             var description = changes.Any()
-                ? $"Cập nhật thời gian tiếp đoàn: {string.Join("; ", changes)}. Bởi {userName} lúc {DateTime.Now:dd/MM/yyyy HH:mm:ss}"
-                : $"Cập nhật thời gian tiếp đoàn nhưng không thay đổi dữ liệu. Bởi {userName} lúc {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
+                ? $"Cập nhật thời gian tiếp đoàn: {string.Join("; ", changes)}."
+                : $"Cập nhật thời gian tiếp đoàn nhưng không thay đổi dữ liệu.";
 
             var log = new LogReceptionTime
             {
@@ -158,7 +163,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 Description = description,
                 Reason = DelegationStatus.Names[DelegationStatus.Edited],
                 CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString()
+                CreatedBy = userId.ToString(),
+                CreatedByName = userName
             };
 
             _unitOfWork.iLogReceptionTimeRepository.Add(log);

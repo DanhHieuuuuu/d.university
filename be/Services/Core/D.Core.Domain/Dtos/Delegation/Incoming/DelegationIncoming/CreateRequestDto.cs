@@ -12,7 +12,7 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
     {
         public string? Code { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public string? Content { get; set; }
 

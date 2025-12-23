@@ -1,78 +1,105 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Card } from 'antd';
+import { Card, Tabs } from 'antd';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getLogStatus } from '@redux/feature/delegation/delegationThunk';
-import { ILogStatus } from '@models/delegation/delegation.model';
-import { formatDateTimeView, formatDateView } from '@utils/index';
+import { getLogStatus, getLogReceptionTime } from '@redux/feature/delegation/delegationThunk';
+import { ILogStatus, IQueryLogStatus, ILogReceptionTime } from '@models/delegation/delegation.model';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { DelegationStatusConst } from '../../consts/delegation-status.consts';
-import { getStatusClass, getStatusName } from '@utils/status.helper';
+import AppTable from '@components/common/Table';
+import { ReduxStatus } from '@redux/const';
+import { IColumn } from '@models/common/table.model';
+import { usePaginationWithFilter } from '@hooks/usePagination';
+import { useDebouncedCallback } from '@hooks/useDebounce';
+import { getStatusName } from '@utils/status.helper';
+import { formatDateTimeView } from '@utils/index';
+
+const { TabPane } = Tabs;
 
 const Page = () => {
   const dispatch = useAppDispatch();
-  const { listLogStatus, status } = useAppSelector((state) => state.delegationState);
+
+  // Lấy data từ redux
+  const { status, total: totalLogStatus, listLogStatus } = useAppSelector((state) => state.delegationState);
+  const { total: totalReception, listLogReceptionTime } = useAppSelector((state) => state.delegationState); // giả sử state chung
+
+  // Column cho logStatus
+  const logStatusColumns: IColumn<ILogStatus>[] = [
+    { key: 'stt',width:60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
+    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center' },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả' ,align: 'left'},
+    { key: 'oldStatus', dataIndex: 'oldStatus', title: 'Trạng thái cũ', render: getStatusName },
+    { key: 'newStatus', dataIndex: 'newStatus', title: 'Trạng thái mới', render: getStatusName },
+    { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
+    { key: 'createdDate', dataIndex: 'createdDate', title: 'Thời gian', align: 'center', render: (value: string) => formatDateTimeView(value) }
+  ];
+
+  // Column cho logReceptionTime
+const receptionColumns: IColumn<ILogReceptionTime>[] = [
+  {key: 'stt',width:60,title: 'STT',align: 'center',render: (_: any, __: any, index: number) => index + 1},
+  {key: 'createdByName',dataIndex: 'createdByName',title: 'Người thực hiện',align: 'center'},
+  {key: 'type',dataIndex: 'type',title: 'Loại',align: 'center'},
+  {key: 'description',dataIndex: 'description',title: 'Mô tả',align: 'left'},
+  {key: 'reason',dataIndex: 'reason',title: 'Lý do'},
+  {key: 'createdDate',dataIndex: 'createdDate',title: 'Thời gian',align: 'center',render: (value: string) => formatDateTimeView(value)}
+];
+
+
+  // Pagination & query
+  const { query: statusQuery, pagination: statusPagination, onFilterChange: onStatusFilter } =
+    usePaginationWithFilter<IQueryLogStatus>({
+      total: totalLogStatus,
+      initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
+      onQueryChange: (newQuery) => dispatch(getLogStatus(newQuery)),
+      triggerFirstLoad: true
+    });
+
+  const { query: receptionQuery, pagination: receptionPagination, onFilterChange: onReceptionFilter } =
+    usePaginationWithFilter<IQueryLogStatus>({
+      total: totalReception,
+      initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
+      onQueryChange: (newQuery) => dispatch(getLogReceptionTime(newQuery)),
+      triggerFirstLoad: true
+    });
+
+  const { debounced: handleDebouncedStatusSearch } = useDebouncedCallback((value: string) => {
+    onStatusFilter({ Keyword: value });
+  }, 500);
+
+  const { debounced: handleDebouncedReceptionSearch } = useDebouncedCallback((value: string) => {
+    onReceptionFilter({ Keyword: value });
+  }, 500);
 
   useEffect(() => {
-    dispatch(getLogStatus());
-  }, [dispatch]);
+    dispatch(getLogStatus(statusQuery));
+    dispatch(getLogReceptionTime(receptionQuery));
+  }, [dispatch, statusQuery, receptionQuery]);
 
   return (
     <Card title="Nhật ký đoàn vào" className="h-full">
-      {status === 'loading' && <p>Đang tải dữ liệu...</p>}
-
-      {listLogStatus && listLogStatus.length === 0 && <p>Không có dữ liệu.</p>}
-
-      <div className="log-list">
-        {listLogStatus &&
-          listLogStatus.map((log: ILogStatus, index: number) => (
-            <div key={index} className="log-item">
-              <div className='log-head'>
-                <p style={{ fontSize: '18px', fontWeight: 'bold' }}>
-                   {formatDateTimeView(log.createdDate)}
-                </p>
-                <p>                 
-                  <span className={getStatusClass(log.newStatus)}>{getStatusName(log.newStatus)}</span>
-                </p>
-              </div>
-
-              <p>
-                <strong>Mô tả:</strong> {log.description || '----'}
-              </p>
-              <p>
-                <strong>Lý do:</strong> {log.reason || '---- '}
-              </p>
-              <p>
-                <strong>Id người tạo:</strong> {log.createdBy}
-              </p>
-            </div>
-          ))}
-      </div>
-
-      <style jsx>{`
-        .log-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        .log-item {
-          padding: 12px;
-          border: 1px solid #e8e8e8;
-          border-radius: 6px;
-          background-color: #fafafa;
-        }
-        .log-item p {
-          margin: 4px 0;
-        }
-        .log-head{
-          display:flex;
-          justify-content: space-between;
-         
-        }
-          
-      `}</style>
+      <Tabs defaultActiveKey="1">
+        <TabPane tab="Log Status" key="1">
+          <AppTable
+            loading={status === ReduxStatus.LOADING}
+            rowKey="id"
+            columns={logStatusColumns}
+            dataSource={listLogStatus}
+            pagination={{ position: ['bottomRight'], ...statusPagination }}
+            scroll={{y: "calc(100vh - 370px)"}}
+          />
+        </TabPane>
+        <TabPane tab="Log Reception Time" key="2">
+          <AppTable
+            loading={status === ReduxStatus.LOADING}
+            rowKey="id"
+            columns={receptionColumns}
+            dataSource={listLogReceptionTime}
+            pagination={{ position: ['bottomRight'], ...receptionPagination }}
+            
+          />
+        </TabPane>
+      </Tabs>
     </Card>
   );
 };

@@ -3,17 +3,12 @@ import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select 
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateToBoMon, IUpdateToBoMon } from '@models/danh-muc/to-bo-mon.model';
-import {
-  clearSeletedToBoMon,
-  createToBoMon,
-  getAllPhongBan,
-  getToBoMonById,
-  resetStatusToBoMon,
-  updateToBoMon
-} from '@redux/feature/danhmucSlice';
+import { createToBoMon, getAllPhongBan, getToBoMonById, updateToBoMon } from '@redux/feature/danh-muc/danhmucThunk';
+import { clearSeletedToBoMon, resetStatusToBoMon } from '@redux/feature/danh-muc/danhmucSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
+
 type PositionModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;

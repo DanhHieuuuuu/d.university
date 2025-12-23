@@ -1,0 +1,171 @@
+import { useEffect, useState } from 'react';
+import { Button, Form, FormProps, Input, Modal, Select, Switch } from 'antd';
+import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { ICreateNganh, IUpdateNganh } from '@models/dao-tao/nganh.model';
+import {
+  clearSelectedNganh,
+  createNganh,
+  getAllKhoa,
+  getNganhById,
+  resetStatusNganh,
+  updateNganh
+} from '@redux/feature/daotaoSlice';
+import { ReduxStatus } from '@redux/const';
+import { toast } from 'react-toastify';
+
+type MajorModalProps = {
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
+  isUpdate: boolean;
+  isView: boolean;
+  refreshData: () => void;
+};
+
+const MajorModal: React.FC<MajorModalProps> = (props) => {
+  const dispatch = useAppDispatch();
+  const [form] = Form.useForm<ICreateNganh>();
+  const [title, setTitle] = useState<string>('');
+
+  const { $selected, $create, $update } = useAppSelector((state) => state.daotaoState.nganh);
+  const listKhoa = useAppSelector((state) => state.daotaoState.listKhoa);
+
+  const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
+
+  useEffect(() => {
+    if (props.isModalOpen) {
+      // Load list Khoa for dropdown
+      dispatch(getAllKhoa({ PageIndex: 1, PageSize: 100 }));
+
+      if (props.isUpdate) setTitle('Chỉnh sửa ngành');
+      else if (props.isView) setTitle('Chi tiết ngành');
+      else setTitle('Thêm mới ngành');
+    }
+  }, [props.isModalOpen, props.isUpdate, props.isView]);
+
+  useEffect(() => {
+    if (props.isModalOpen && (props.isUpdate || props.isView) && $selected.id) {
+      dispatch(getNganhById($selected.id));
+    }
+  }, [props.isModalOpen, props.isUpdate, props.isView, $selected.id]);
+
+  useEffect(() => {
+    if ($selected.data) {
+      form.setFieldsValue($selected.data);
+    }
+  }, [$selected.data]);
+
+  useEffect(() => {
+    if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
+      dispatch(resetStatusNganh());
+      dispatch(clearSelectedNganh());
+      form.resetFields();
+      props.refreshData();
+      props.setIsModalOpen(false);
+    }
+  }, [$create.status, $update.status]);
+
+  const handleClose = () => {
+    form.resetFields();
+    dispatch(clearSelectedNganh());
+    props.setIsModalOpen(false);
+  };
+
+  const handleFinish: FormProps['onFinish'] = async (values: ICreateNganh | IUpdateNganh) => {
+    try {
+      if (props.isUpdate && $selected.id) {
+        await dispatch(updateNganh({ id: $selected.id, ...values })).unwrap();
+        toast.success('Cập nhật thành công');
+      } else {
+        await dispatch(createNganh(values)).unwrap();
+        toast.success('Thêm mới thành công');
+      }
+    } catch (error) {
+      toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+    }
+  };
+
+  return (
+    <Modal
+      title={title}
+      className="app-modal"
+      width="60%"
+      closable={{ 'aria-label': 'Custom Close Button' }}
+      open={props.isModalOpen}
+      onCancel={handleClose}
+      footer={
+        <>
+          {!props.isView && (
+            <Button
+              loading={isSaving}
+              onClick={form.submit}
+              icon={props.isUpdate ? <SaveOutlined /> : <PlusOutlined />}
+              type="primary"
+            >
+              {props.isUpdate ? 'Lưu' : 'Tạo'}
+            </Button>
+          )}
+          <Button color="default" variant="filled" onClick={handleClose} icon={<CloseOutlined />}>
+            Đóng
+          </Button>
+        </>
+      }
+    >
+      <Form
+        name="nganh"
+        layout="vertical"
+        form={form}
+        onFinish={handleFinish}
+        autoComplete="on"
+        disabled={props.isView}
+        labelCol={{ style: { fontWeight: 600 } }}
+        initialValues={{ trangThai: true }}
+      >
+        <div className="grid grid-cols-2 gap-x-5">
+          <Form.Item<ICreateNganh>
+            label="Mã ngành"
+            name="maNganh"
+            rules={[{ required: true, message: 'Vui lòng nhập mã ngành' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item<ICreateNganh>
+            label="Tên ngành"
+            name="tenNganh"
+            rules={[{ required: true, message: 'Vui lòng nhập tên ngành' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item<ICreateNganh> label="Tên tiếng Anh" name="tenTiengAnh">
+            <Input />
+          </Form.Item>
+          <Form.Item<ICreateNganh>
+            label="Khoa"
+            name="khoaId"
+            rules={[{ required: true, message: 'Vui lòng chọn khoa' }]}
+          >
+            <Select
+              placeholder="Chọn khoa"
+              options={listKhoa.map((khoa) => ({
+                label: khoa.tenKhoa,
+                value: khoa.id
+              }))}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+            />
+          </Form.Item>
+          <Form.Item<ICreateNganh> label="Mô tả" name="moTa" className="col-span-2">
+            <Input.TextArea rows={3} />
+          </Form.Item>
+          <Form.Item<ICreateNganh> label="Trạng thái" name="trangThai" valuePropName="checked">
+            <Switch checkedChildren="Hoạt động" unCheckedChildren="Ngừng" />
+          </Form.Item>
+        </div>
+      </Form>
+    </Modal>
+  );
+};
+
+export default MajorModal;

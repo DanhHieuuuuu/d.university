@@ -26,20 +26,18 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int id)
+        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int delegationIncomingId)
         {
-            _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with id: {id}");
-
+            _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with DelegationIncomingId: {delegationIncomingId}");
+          
             var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
-                .FirstOrDefault(d => d.Id == id);
+                .FirstOrDefault(d => d.DelegationIncomingId == delegationIncomingId);
 
             if (detail == null)
-            {
                 return null;
-            }
 
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
-                .FirstOrDefault(d => d.Id == detail.DelegationIncomingId);
+                .FirstOrDefault(d => d.Id == delegationIncomingId);
 
             var result = new DetailDelegationIncomingResponseDto
             {
@@ -52,11 +50,12 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 Email = detail.Email,
                 IsLeader = detail.IsLeader,
                 DelegationIncomingId = detail.DelegationIncomingId,
-                DelegationName = delegation != null ? delegation.Name : null,
-                DelegationCode = delegation != null ? delegation.Code : null
+                DelegationName = delegation?.Name,
+                DelegationCode = delegation?.Code
             };
 
             return result;
         }
+
     }
 }

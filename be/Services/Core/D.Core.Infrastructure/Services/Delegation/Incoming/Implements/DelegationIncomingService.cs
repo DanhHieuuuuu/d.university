@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using d.Shared.Permission.Error;
 using d.Shared.Permission.Role;
 using D.Constants.Core.Delegation;
+using D.ControllerBase.Exceptions;
 using D.Core.Domain;
 using D.Core.Domain.Dtos.Delegation;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
@@ -77,6 +79,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                             TotalPerson = d.TotalPerson,
                             PhoneNumber = d.PhoneNumber,
                             Status = d.Status,
+                            Location = d.Location,
                             RequestDate = d.RequestDate,
                             ReceptionDate = d.ReceptionDate,
                             TotalMoney = d.TotalMoney
@@ -195,10 +198,11 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             {
                 DelegationIncomingCode = newDoanVao.Code,
                 NewStatus = DelegationStatus.Create,
-                OldStatus = null,
-                Description = $"Thêm đoàn vào: Đã được thêm bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}",
+                OldStatus = DelegationStatus.Create,
+                Description = $"Thêm đoàn vào ",
                 CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString()
+                Reason = "Thêm mới đoàn vào",
+                CreatedByName = userName,
             };
 
             _unitOfWork.iLogStatusRepository.Add(log);
@@ -261,6 +265,16 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             _unitOfWork.iDelegationIncomingRepository.Update(exist);
             await _unitOfWork.SaveChangesAsync();
 
+            var staffReceptionName = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                .Where(x => x.Id == exist.IdStaffReception)
+                .Select(x => x.HoDem + " " + x.Ten)
+                .FirstOrDefault();
+
+            var phongBanName = _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                .Where(x => x.Id == exist.IdPhongBan)
+                .Select(x => x.TenPhongBan)
+                .FirstOrDefault();
+
             #region Log
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
@@ -279,27 +293,32 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             if (oldValues.RequestDate != dto.RequestDate) changes.Add($"RequestDate: '{oldValues.RequestDate}' => '{dto.RequestDate}'");
             if (oldValues.ReceptionDate != dto.ReceptionDate) changes.Add($"ReceptionDate: '{oldValues.ReceptionDate}' => '{dto.ReceptionDate}'");
             if (oldValues.TotalMoney != dto.TotalMoney) changes.Add($"TotalMoney: '{oldValues.TotalMoney}' => '{dto.TotalMoney}'");
-            if (oldValues.Status != exist.Status) changes.Add($"Status: '{oldValues.Status}' => '{exist.Status}'");
+            if (oldValues.Status != exist.Status) changes.Add($"Status: '{DelegationStatus.Names[oldValues.Status]} => {DelegationStatus.Names[exist.Status]}'");
 
             var description = changes.Any()
-                ? $"Cập nhật đoàn vào: {string.Join("; ", changes)}.Bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}"
-                : $"Cập nhật đoàn vào nhưng không thay đổi giá trị.Bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
+                ? $"Cập nhật đoàn vào: {string.Join("; ", changes)}."
+                : $"Cập nhật đoàn vào nhưng không thay đổi giá trị.";
 
             var log = new LogStatus
             {
                 DelegationIncomingCode = exist.Code,
                 OldStatus = oldValues.Status,
                 NewStatus = exist.Status,
+                Reason = "Cập nhật",
                 Description = description,
                 CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString()
+                CreatedByName = userName,
             };
 
             _unitOfWork.iLogStatusRepository.Add(log);
             await _unitOfWork.SaveChangesAsync();
             #endregion
 
-            return _mapper.Map<UpdateDelegationIncomingResponseDto>(exist);
+            var result = _mapper.Map<UpdateDelegationIncomingResponseDto>(exist);
+            result.StaffReceptionName = staffReceptionName;
+            result.PhongBan = phongBanName;
+
+            return result;
         }
 
 
@@ -337,6 +356,29 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             return list;
         }
+        public List<ViewNhanSuResponseDto> GetAllNhanSu(ViewNhanSuRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllNhanSu)} called.");
+
+            var list = (from ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                        where ns.DaChamDutHopDong != true
+                           && ns.DaVeHuu != true
+                           && ns.IsThoiViec != true
+                        join sp in _unitOfWork.iSupporterRepository.TableNoTracking
+                            on ns.Id equals sp.SupporterId into spJoin
+                        from sp in spJoin.DefaultIfEmpty() 
+                        select new ViewNhanSuResponseDto
+                        {
+                            IdNhanSu = ns.Id,
+                            TenNhanSu = (ns.HoDem ?? "") + " " + (ns.Ten ?? ""),
+                            SupporterCode = sp != null ? sp.SupporterCode : null
+                        })
+                        .ToList();
+
+            return list;
+        }
+
+
         public List<ViewTrangThaiResponseDto> GetListTrangThai(ViewTrangThaiRequestDto dto)
         {
             _logger.LogInformation($"{nameof(GetListTrangThai)}");
@@ -379,6 +421,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                             TotalPerson = d.TotalPerson,
                             PhoneNumber = d.PhoneNumber,
                             Status = d.Status,
+                            Location = d.Location,
                             RequestDate = d.RequestDate,
                             ReceptionDate = d.ReceptionDate,
                             TotalMoney = d.TotalMoney
@@ -447,6 +490,83 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             };
 
             return result;
+        }
+
+        /// <summary>
+        /// Trạng thái tiếp theo của đoàn vào
+        /// </summary>
+        /// <param name="idDelegation"></param>
+        /// <param name="oldStatus"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        public async Task NextStatus(UpdateStatusRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(NextStatus)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+            // Kiểm check delegation
+            var delegation = _unitOfWork.iDelegationIncomingRepository.FindById(dto.IdDelegation);
+
+            if(delegation == null)
+            {
+                throw new UserFriendlyException(ErrorCodeConstant.DelegationNotFound, "Không tìm thấy đoàn vào.");
+            }
+            if(delegation.Status != dto.OldStatus)
+                throw new UserFriendlyException(4002, "Trạng thái của đoàn vào đã được sửa đổi.");
+
+            if(delegation.Status == DelegationStatus.Done)
+                throw new UserFriendlyException(4003, "Đoàn này đã hoàn thành tiếp đoàn.");
+
+            //if(delegation.Status == DelegationStatus.ReceptionGroup)
+            //    throw new UserFriendlyException(4003, "Đoàn này đang thực hiện tiếp đoàn.");
+
+            if (dto.Action == "upgrade")
+            {
+                if(dto.OldStatus == DelegationStatus.Create)
+                {
+                    delegation.Status = DelegationStatus.Propose;
+                }
+                else if( dto.OldStatus == DelegationStatus.Propose)
+                {
+                    delegation.Status = DelegationStatus.BGHApprove;
+                }
+                else if (dto.OldStatus == DelegationStatus.BGHApprove)
+                {
+                    delegation.Status = DelegationStatus.ReceptionGroup;
+                }
+                else if (dto.OldStatus == DelegationStatus.ReceptionGroup)
+                {
+                    delegation.Status = DelegationStatus.Done;
+                }
+            }
+            else if(dto.Action == "cancel")
+            {
+                delegation.Status = DelegationStatus.Canceled;
+            }
+            _unitOfWork.iDelegationIncomingRepository.Update(delegation);
+            await _unitOfWork.SaveChangesAsync();
+
+            // Ghi log
+            #region Log         
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+            .FirstOrDefault(u => u.Id == userId);
+            var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
+
+            var log = new LogStatus
+            {
+                DelegationIncomingCode = delegation.Code,
+                NewStatus = dto.OldStatus,
+                OldStatus = delegation.Status,
+                Description = $"Đã thay đổi trạng thái từ {DelegationStatus.Names[dto.OldStatus]} => {DelegationStatus.Names[delegation.Status]} ",
+                CreatedDate = DateTime.Now,
+                CreatedByName = userName,
+                Reason = "Trạng thái"
+            };
+
+            _unitOfWork.iLogStatusRepository.Add(log);
+            await _unitOfWork.SaveChangesAsync();
+            #endregion
+
         }
 
         private bool IsValidEmail(string email)

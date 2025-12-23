@@ -20,7 +20,7 @@ namespace D.Core.Application.Query.Delegation.Incoming
         }
         public async Task<DetailDelegationIncomingResponseDto> Handle(DetailDelegationIncomingRequestDto request, CancellationToken cancellationToken)
         {
-            return await _service.GetByIdDetailDelegation(request.Id);
+            return await _service.GetByIdDetailDelegation(request.DelegationIncomingId);
         }
     }
 }

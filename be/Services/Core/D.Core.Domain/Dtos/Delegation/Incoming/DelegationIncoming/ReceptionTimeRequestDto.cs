@@ -9,6 +9,6 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class ReceptionTimeRequestDto : IQuery<ReceptionTimeResponseDto>
     {
-        public int Id {  get; set; }
+        public int DelegationIncomingId {  get; set; }
     }
 }

@@ -61,7 +61,9 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     fixed: 'right',
     render: (value, record, index) => {
       if (listActions?.length) {
-        const actions = listActions.map((act, idx) => {
+        const actions = listActions
+        .filter((act) => !act.hidden?.(record))
+        .map((act, idx) => {
           return (
             <Button
               key={idx}

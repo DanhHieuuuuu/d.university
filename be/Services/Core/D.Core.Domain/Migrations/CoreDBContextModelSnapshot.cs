@@ -721,7 +721,6 @@ namespace D.Core.Domain.Migrations
                         .HasColumnName("Code");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("Content");
@@ -957,6 +956,9 @@ namespace D.Core.Domain.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -1018,6 +1020,9 @@ namespace D.Core.Domain.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()

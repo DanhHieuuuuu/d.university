@@ -8,7 +8,8 @@ import {
   EyeOutlined,
   PlusOutlined,
   SearchOutlined,
-  SyncOutlined
+  SyncOutlined,
+  UserAddOutlined
 } from '@ant-design/icons';
 
 import { ReduxStatus } from '@redux/const';
@@ -21,10 +22,13 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { IDepartmentSupport, IQueryGuestGroup, ISupporter, IViewGuestGroup } from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
+  getListDelegationIncoming,
+  getListDepartmentSupport,
   getListGuestGroup,
+  getListNhanSu,
   getListPhongBan,
   getListStatus
 } from '@redux/feature/delegation/delegationThunk';
@@ -33,17 +37,20 @@ import { ETableColumnType } from '@/constants/e-table.consts';
 import { DelegationStatusConst } from '../../consts/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
+import CreateDepartmentSupportModal from './(dialog)/create';
+import router from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { list, status, total: totalItem, listPhongBan, listStatus } = useAppSelector((state) => state.delegationState);
-
+  const { status, total: totalItem, listDepartmentSupport } = useAppSelector((state) => state.delegationState);
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
 
-  const columns: IColumn<IViewGuestGroup>[] = [
+  const columns: IColumn<IDepartmentSupport>[] = [
     {
       key: 'stt',
       dataIndex: 'stt',
@@ -52,14 +59,13 @@ const Page = () => {
       render: (value, row, index) => index + 1
     },
     {
-      key: 'code',
-      dataIndex: 'code',
-      title: 'Mã đoàn',
-      align: 'center'
+      key: 'departmentSupportName',
+      dataIndex: 'departmentSupportName',
+      title: 'Phòng ban hỗ trợ'
     },
     {
-      key: 'name',
-      dataIndex: 'name',
+      key: 'delegationIncomingName',
+      dataIndex: 'delegationIncomingName',
       title: 'Tên đoàn vào'
     },
     {
@@ -68,62 +74,11 @@ const Page = () => {
       title: 'Nội dung'
     },
     {
-      key: 'idPhongBan',
-      dataIndex: 'idPhongBan',
-      title: 'Phòng ban phụ trách',
-      align: 'center',
-      render: (value: number) => {
-        const pb = listPhongBan.find((p: any) => p.idPhongBan === value);
-        return pb ? pb.tenPhongBan : '';
-      }
-    },
-    {
-      key: 'location',
-      dataIndex: 'location',
-      title: 'Địa điểm'
-    },
-    {
-      key: 'idStaffReception',
-      dataIndex: 'idStaffReception',
-      title: 'Nhân sự tiếp đón',
-      align: 'center'
-    },
-    {
-      key: 'totalPerson',
-      dataIndex: 'totalPerson',
-      title: 'Tổng số người',
-      align: 'center'
-    },
-    {
-      key: 'phoneNumber',
-      dataIndex: 'phoneNumber',
-      title: 'SĐT liên hệ'
-    },
-    // {
-    //   key: 'requestDate',
-    //   dataIndex: 'requestDate',
-    //   title: 'Ngày yêu cầu',
-    //   render: (value) => <p>{formatDateView(value)}</p>
-    // },
-    // {
-    //   key: 'receptionDate',
-    //   dataIndex: 'receptionDate',
-    //   title: 'Ngày tiếp đón',
-    //   render: (value) => <p>{formatDateView(value)}</p>
-    // },
-    {
-      key: 'totalMoney',
-      dataIndex: 'totalMoney',
-      title: 'Tổng chi phí',
-      align: 'right'
-    },
-    {
-      key: 'status',
-      dataIndex: 'status',
-      title: 'Trạng thái',
-      align: 'center',
-      type: ETableColumnType.STATUS,
-      getTagInfo: (status: number) => DelegationStatusConst.getInfo(status)
+      key: 'supporters',
+      dataIndex: 'supporters',
+      title: ' Mã nhân sự hỗ trợ',
+      render: (supporters: ISupporter[]) =>
+        supporters.length > 0 ? supporters.map((s) => s.supporterCode).join(', ') : '-'
     }
   ];
 
@@ -131,41 +86,39 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      command: (record: IViewGuestGroup) => onClickView(record)
+      command: (record: IDepartmentSupport) => onClickView(record)
+    },
+    {
+      label: 'Thêm nhân viên',
+      icon: <UserAddOutlined />,
+      command: (record: IDepartmentSupport) => onClickCreateStaff(record)
     }
-    // {
-    //   label: 'Chỉnh sửa',
-    //   tooltip: 'Sửa danh sách đoàn vào',
-    //   icon: <EditOutlined />,
-    //   command: (record: IViewGuestGroup) => onClickUpdate(record)
-    // },
-    // {
-    //   label: 'Xóa',
-    //   color: 'red',
-    //   icon: <DeleteOutlined />,
-    //   command: (record: IViewGuestGroup) => onClickDelete(record)
-    // }
   ];
-
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryGuestGroup>({
+  const onClickCreateStaff = (data: IDepartmentSupport) => {
+    router.push(`/delegation/incoming/support/create-staff-support?departmentSupportId=${data.id}`);
+  };
+  const onClickView = (data: IDepartmentSupport) => {
+    router.push(`/delegation/incoming/support/edit?departmentSupportId=${data.id}`);
+  };
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
     total: totalItem,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getListGuestGroup(newQuery));
+      dispatch(getListDepartmentSupport(newQuery));
     },
     triggerFirstLoad: true
   });
 
   useEffect(() => {
     if (!isModalOpen) {
-      dispatch(resetStatusCreate());
-      dispatch(getListGuestGroup(query));
+      dispatch(getListDepartmentSupport(query));
       dispatch(getListPhongBan());
-      dispatch(getListStatus());
+      dispatch(getListDelegationIncoming());
+      dispatch(getListNhanSu());
     }
   }, [isModalOpen]);
 
@@ -183,54 +136,18 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
-  const onClickView = (data: IViewGuestGroup) => {
-    dispatch(select(data));
-    setIsModalView(true);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
-  };
-  const onClickUpdate = (data: IViewGuestGroup) => {
-    dispatch(select(data));
-    setIsModalView(false);
-    setIsModalUpdate(true);
-    setIsModalOpen(true);
-  };
-
   return (
     <Card
       title=" Phòng ban hỗ trợ"
       className="h-full"
-      //   extra={
-      //     <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-      //       Thêm mới
-      //     </Button>
-      //   }
+      extra={
+        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+          Thêm mới
+        </Button>
+      }
     >
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex flex-row items-center space-x-3">
-          <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
-            <Select
-              placeholder="Chọn phòng ban phụ trách"
-              allowClear
-              options={listPhongBan.map((pb: any) => ({
-                value: pb.idPhongBan,
-                label: pb.tenPhongBan
-              }))}
-              onChange={(value) => onFilterChange({ idPhongBan: value })}
-            />
-          </Form.Item>
-          <Form.Item name="status" className="!mb-0 w-[200px]">
-            <Select
-              placeholder="Chọn trạng thái"
-              allowClear
-              options={listStatus.map((st: any) => ({
-                value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, 'name') ?? ''
-              }))}
-              onChange={(value) => onFilterChange({ status: value })}
-            />
-          </Form.Item>
-
           <Form.Item name="name" className="!mb-0 w-[300px]">
             <Input placeholder="Nhập tên đoàn vào…" onChange={(e) => handleSearch(e)} />
           </Form.Item>
@@ -240,27 +157,26 @@ const Page = () => {
             icon={<SyncOutlined />}
             onClick={() => {
               form.resetFields();
-              onFilterChange({
-                SkipCount: 0,
-                MaxResultCount: 10,
-                Keyword: '',
-                idPhongBan: undefined,
-                status: undefined
-              });
+              resetFilter();
             }}
           >
             Tải lại
           </Button>
         </div>
       </Form>
-
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
         columns={columns}
-        dataSource={list}
+        dataSource={listDepartmentSupport}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+      />
+      <CreateDepartmentSupportModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        isUpdate={isUpdate}
+        isView={isView}
       />
     </Card>
   );

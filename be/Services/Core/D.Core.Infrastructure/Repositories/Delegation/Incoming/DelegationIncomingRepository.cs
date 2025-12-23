@@ -11,7 +11,7 @@ namespace D.Core.Infrastructure.Repositories.Delegation.Incoming
             : base(dbContext, httpContext) { }
         public bool IsMaDoanVaoExist(string code) 
         { 
-            return TableNoTracking.All(x => x.Code == code);
+            return TableNoTracking.Any(x => x.Code == code);
         }
     }
 

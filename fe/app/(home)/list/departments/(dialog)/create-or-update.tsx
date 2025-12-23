@@ -4,13 +4,12 @@ import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreatePhongBan, IUpdatePhongBan } from '@models/danh-muc/phong-ban.model';
 import {
-  clearSelectedPhongBan,
   createPhongBan,
   getPhongBanById,
-  resetStatusPhongBan,
   updatePhongBan,
   getAllLoaiPhongBan
-} from '@redux/feature/danhmucSlice';
+} from '@redux/feature/danh-muc/danhmucThunk';
+import { clearSelectedPhongBan, resetStatusPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
