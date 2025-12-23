@@ -3,14 +3,9 @@ import { Button, Form, FormProps, Input, Modal, Select, Switch } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateNganh, IUpdateNganh } from '@models/dao-tao/nganh.model';
-import {
-  clearSelectedNganh,
-  createNganh,
-  getAllKhoa,
-  getNganhById,
-  resetStatusNganh,
-  updateNganh
-} from '@redux/feature/daotaoSlice';
+import { getAllKhoa } from '@redux/feature/dao-tao/khoaThunk';
+import { createNganh, getNganhById, updateNganh } from '@redux/feature/dao-tao/nganhThunk';
+import { clearSelectedNganh, resetStatusNganh } from '@redux/feature/dao-tao/daotaoSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 

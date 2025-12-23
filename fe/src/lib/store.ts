@@ -10,7 +10,7 @@ import studentReducer from './feature/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';
 import delegationReducer from './feature/delegation/delegationSlice';
-import daotaoReducer from './feature/daotaoSlice';
+import daotaoReducer from './feature/dao-tao/daotaoSlice';
 const persistConfig = {
   key: 'auth',
   storage,

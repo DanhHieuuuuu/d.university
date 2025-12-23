@@ -11,9 +11,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
-import { getAllKhoa, setSelectedIdKhoa } from '@redux/feature/daotaoSlice';
+import { getAllKhoa } from '@redux/feature/dao-tao/khoaThunk';
+import { setSelectedIdKhoa } from '@redux/feature/dao-tao/daotaoSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';

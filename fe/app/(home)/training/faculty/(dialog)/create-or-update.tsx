@@ -3,20 +3,8 @@ import { Button, Form, FormProps, Input, Modal, Switch } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateKhoa, IUpdateKhoa } from '@models/dao-tao/khoa.model';
-import {
-  createPhongBan,
-  getPhongBanById,
-  updatePhongBan,
-  getAllLoaiPhongBan
-} from '@redux/feature/danh-muc/danhmucThunk';
-import { clearSelectedPhongBan, resetStatusPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
-import {
-  clearSelectedKhoa,
-  createKhoa,
-  getKhoaById,
-  resetStatusKhoa,
-  updateKhoa
-} from '@redux/feature/daotaoSlice';
+import { createKhoa, getKhoaById, updateKhoa } from '@redux/feature/dao-tao/khoaThunk';
+import { clearSelectedKhoa, resetStatusKhoa } from '@redux/feature/dao-tao/daotaoSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 

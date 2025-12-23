@@ -11,7 +11,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllChuyenNganh, setSelectedIdChuyenNganh } from '@redux/feature/daotaoSlice';
+import { getAllChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';
+import { setSelectedIdChuyenNganh } from '@redux/feature/dao-tao/daotaoSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
