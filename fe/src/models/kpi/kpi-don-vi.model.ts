@@ -13,6 +13,7 @@ export type IViewKpiDonVi = {
   mucTieu: string,
   trongSo: number, 
   donVi: string,
+  idDonVi?: number,
   loaiKpi: number,
   namHoc: string,
   trangThai: number,
@@ -21,11 +22,11 @@ export type IViewKpiDonVi = {
 
 export type ICreateKpiDonVi = {
   kpi: string,
-  loaiKPI: number,
-  linhVuc: string,
+  loaiKpi: number,
+  // linhVuc: string,
   mucTieu: string,
   trongSo: string,
-  idNhanSu: number,
+  idDonVi: number,
   namHoc: string,
 };
 

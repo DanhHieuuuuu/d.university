@@ -34,8 +34,8 @@ const Page = () => {
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiRole>({
     total: totalItem || 0,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -121,6 +121,7 @@ const Page = () => {
       key: 'role',
       dataIndex: 'role',
       title: 'Chức vụ',
+      render: (value: string) => KpiRoleConst.getName(value),
     },
   ];
 

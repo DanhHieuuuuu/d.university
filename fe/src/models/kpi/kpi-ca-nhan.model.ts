@@ -21,7 +21,6 @@ export type IViewKpiCaNhan = {
     nhanSu: string,
     idNhanSu?: number,
     trangThai: number,
-    trangThaiText?: string,
     phongBan?:string,
     ketQuaThucTe?: number,
     role?: string,

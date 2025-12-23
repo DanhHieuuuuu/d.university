@@ -51,7 +51,7 @@ export const deleteKpiCaNhan = createAsyncThunk('kpi/delete-canhan', async (payl
 export const getAllKpiDonVi = createAsyncThunk('kpi/list-donvi', async (payload?: IQueryKpiDonVi) => {
   try {
     const res = await KpiService.getListKpiDonVi(payload);
-
+    console.log('res', res);
     return res.data;
   } catch (error: any) {
     console.error(error);

@@ -1,8 +1,8 @@
 export class KpiRoleConst {
-  static HIEU_TRUONG = "Hiệu trưởng";
-  static TRUONG_DON_VI = "Trưởng đơn vị";
-  static NHAN_VIEN = "Nhân viên";
-  static GIANG_VIEN = "Giảng viên";
+  static HIEU_TRUONG = "HIEU_TRUONG";
+  static TRUONG_DON_VI = "TRUONG_DON_VI";
+  static NHAN_VIEN = "NHAN_VIEN";
+  static GIANG_VIEN = "GIANG_VIEN";
 
   static list = [
     {

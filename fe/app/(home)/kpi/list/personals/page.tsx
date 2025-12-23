@@ -1,13 +1,14 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input, Modal } from 'antd';
+import { Button, Card, Form, Input, Modal, Popover, Select, Tag } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined
+  EyeOutlined,
+  FilterOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -20,22 +21,25 @@ import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
 import { KpiLoaiConst } from '../../const/kpiType.const';
 import { toast } from 'react-toastify';
+import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
 
 const Page = () => {
   const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [openFilter, setOpenFilter] = useState(false);
 
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -43,6 +47,63 @@ const Page = () => {
     },
     triggerFirstLoad: true
   });
+
+  const filterContent = (
+    <Form
+      form={filterForm}
+      layout="vertical"
+      // ⭐ thay đổi là query luôn
+      onValuesChange={(_, values: Partial<IQueryKpiCaNhan>) => {
+        onFilterChange(values);
+      }}
+    >
+      {/* ===== LOẠI KPI ===== */}
+      <Form.Item<IQueryKpiCaNhan>
+        label="Loại KPI"
+        name="loaiKpi"
+      >
+        <Select
+          allowClear
+          placeholder="Chọn loại KPI"
+          options={KpiLoaiConst.list.map(x => ({
+            value: x.value,
+            label: x.name,
+          }))}
+        />
+      </Form.Item>
+
+      {/* ===== TRẠNG THÁI ===== */}
+      <Form.Item<IQueryKpiCaNhan>
+        label="Trạng thái"
+        name="trangThai"
+      >
+        <Select
+          allowClear
+          placeholder="Chọn trạng thái"
+          options={KpiTrangThaiConst.list.map(x => ({
+            value: x.value,
+            label: x.text,
+          }))}
+        />
+      </Form.Item>
+
+      {/* ===== RESET ===== */}
+      <div className="flex justify-end">
+        <Button
+          size="small"
+          onClick={() => {
+            filterForm.resetFields();
+            onFilterChange({
+              loaiKpi: undefined,
+              trangThai: undefined,
+            });
+          }}
+        >
+          Xóa lọc
+        </Button>
+      </div>
+    </Form>
+  );
 
   const onClickAdd = () => {
     setIsModalView(false);
@@ -119,7 +180,7 @@ const Page = () => {
     {
       key: 'nhanSu',
       dataIndex: 'nhanSu',
-      title: 'Nhân sự'
+      title: 'Nhân sự',
     },
     {
       key: 'ketQuaThucTe',
@@ -128,8 +189,14 @@ const Page = () => {
     },
     {
       key: 'trangThai',
-      dataIndex: 'trangThaiText',
-      title: 'Trạng thái'
+      dataIndex: 'trangThai',
+      title: 'Trạng thái',
+      render: (value: number) => {
+        const status = KpiTrangThaiConst.get(value);
+        return status ? (
+          <Tag color={status.color}>{status.text}</Tag>
+        ) : null;
+      },
     },
   ];
 
@@ -158,8 +225,14 @@ const Page = () => {
     onFilterChange({ Keyword: value });
   }, 500);
 
-  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    handleDebouncedSearch(event.target.value);
+  const { debounced: debouncedFilter } = useDebouncedCallback(
+    (values: Partial<IQueryKpiCaNhan>) => {
+      onFilterChange(values);
+    },
+    300
+  );
+  const handleSearch = (value: string) => {
+    handleDebouncedSearch(value);
   };
 
   return (
@@ -173,11 +246,53 @@ const Page = () => {
       }
     >
       <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-2">
-          <Form.Item<IQueryKpiCaNhan> label="Tên phòng ban:" name="Keyword">
-            <Input onChange={(e) => handleSearch(e)} />
-          </Form.Item>
+        {/* HÀNG 1: Ô TÌM KIẾM, CÁC FILTER THÊM VÀ NÚT BỘ LỌC */}
+        <div className="flex items-center justify-between mb-4 gap-4">
+
+          {/* Cụm bên trái: Bạn có thể thêm bao nhiêu trường filter vào đây tùy thích */}
+          <div className="flex items-center gap-2 flex-1">
+            <Input
+              placeholder="Tìm KPI..."
+              prefix={<SearchOutlined />}
+              allowClear
+              onChange={(e) => handleSearch(e.target.value)}
+              className="max-w-[250px]" // Khống chế độ rộng ô tìm kiếm
+            />
+
+            {/* VÍ DỤ: Thêm trường Filter khác ở đây (Select, DatePicker...) */}
+            <Select
+              placeholder="Chọn loại nhanh"
+              style={{ width: 160 }}
+              allowClear
+              options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
+              onChange={(val) => onFilterChange({ loaiKpi: val })}
+            />
+
+            {/* Bạn có thể thêm tiếp các Select khác vào đây, chúng sẽ tự dàn hàng ngang */}
+          </div>
+
+          {/* Cụm bên phải: Chỉ chứa nút Bộ lọc (Popover) */}
+          <div className="flex items-center">
+            <Popover
+              content={filterContent}
+              title="Bộ lọc nâng cao"
+              trigger="click"
+              open={openFilter}
+              onOpenChange={setOpenFilter}
+              placement="bottomRight" // Quan trọng để không lệch màn hình
+              styles={{ body: { padding: 16, minWidth: 280 } }}
+            >
+              <Button
+                icon={<FilterOutlined />}
+                type={openFilter ? "primary" : "default"}
+              >
+                Bộ lọc
+              </Button>
+            </Popover>
+          </div>
         </div>
+
+
         <Form.Item>
           <div className="flex flex-row justify-center space-x-2">
             <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
@@ -211,6 +326,9 @@ const Page = () => {
         isUpdate={isUpdate}
         isView={isView}
         setIsModalOpen={setIsModalOpen}
+        onSuccess={() => {
+          dispatch(getAllKpiCaNhan(query));
+        }}
       />
     </Card>
   );

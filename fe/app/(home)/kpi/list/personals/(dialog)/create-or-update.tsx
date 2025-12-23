@@ -21,6 +21,7 @@ type PositionModalProps = {
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
   isView: boolean;
+  onSuccess: () => void;
 };
 
 const PositionModal: React.FC<PositionModalProps> = (props) => {
@@ -30,7 +31,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiCaNhan);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
-  const { list: users, status } = useAppSelector(state => state.userState);
+  const { list: users = [], status } = useAppSelector(state => state.userState);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -66,14 +67,15 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       dispatch(clearSeletedKpiCaNhan());
       form.resetFields();
       setIsModalOpen(false);
+      props.onSuccess(); 
     }
   }, [$create.status, $update.status, dispatch, form, setIsModalOpen]);
 
   useEffect(() => {
-    dispatch(getAllUser({ SkipCount: 0, MaxResultCount: 2000 }));
+    dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
   }, [dispatch]);
 
-  const userOptions: UserOption[] = users.map(u => ({
+  const userOptions: UserOption[] = (users || []).map(u => ({
     value: u.id!,
     label: `${u.maNhanSu} - ${u.hoDem ?? ''} ${u.ten ?? ''} - ${u.tenPhongBan}`.trim(),
     searchText: `${u.maNhanSu} ${u.hoDem} ${u.ten} ${u.tenPhongBan}`

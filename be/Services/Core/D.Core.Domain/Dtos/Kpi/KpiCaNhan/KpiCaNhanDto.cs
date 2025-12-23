@@ -20,5 +20,6 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
         public int? TrangThai { get; set; }
         public string? TrangThaiText { get; set; }
         public decimal? KetQuaThucTe { get; set; }
+        public float? TyLeThamGia { get; set; }
     }
 }

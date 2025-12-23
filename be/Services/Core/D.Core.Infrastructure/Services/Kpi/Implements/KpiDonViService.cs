@@ -44,15 +44,15 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             if (donVi == null)
                 throw new Exception("Không tìm thấy đơn vị");
 
-            var maxSTT = _unitOfWork.iKpiDonViRepository.TableNoTracking
-                    .Where(k =>
-                        k.IdDonVi == donVi.Id
-                        && k.LoaiKpi == dto.LoaiKpi
-                        && !k.Deleted
-                    )
-                    .Max(k => (int?)k.STT) ?? 0;
+            //var maxSTT = _unitOfWork.iKpiDonViRepository.TableNoTracking
+            //        .Where(k =>
+            //            k.IdDonVi == donVi.Id
+            //            && k.LoaiKpi == dto.LoaiKpi
+            //            && !k.Deleted
+            //        )
+            //        .Max(k => (int?)k.STT) ?? 0;
             var entity = _mapper.Map<KpiDonVi>(dto);
-            entity.STT = maxSTT + 1;
+            //entity.STT = maxSTT + 1;
             _unitOfWork.iKpiDonViRepository.Add(entity);
             _unitOfWork.iKpiDonViRepository.SaveChange();
         }
@@ -158,6 +158,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     Kpi = kpi.Kpi,
                     MucTieu = kpi.MucTieu,
                     TrongSo = kpi.TrongSo,
+                    IdDonVi = kpi.IdDonVi,
                     DonVi = kpi.IdDonVi != null && donvis.ContainsKey(kpi.IdDonVi.Value)
                             ? donvis[kpi.IdDonVi.Value]
                             : string.Empty,
@@ -361,14 +362,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 throw new Exception($"Không tìm thấy KPI cá nhân với Id={dto.Id}");
             }
-            if (kpi.IdDonVi != dto.IdDonVi)
-            {
-                var maxSTT = _unitOfWork.iKpiDonViRepository.TableNoTracking
-                    .Where(k => k.IdDonVi == dto.IdDonVi && k.LoaiKpi == dto.LoaiKpi && !k.Deleted)
-                    .Select(k => (int?)k.STT)
-                    .Max() ?? 0;
-                kpi.STT = maxSTT + 1;
-            }
+            //if (kpi.IdDonVi != dto.IdDonVi)
+            //{
+            //    var maxSTT = _unitOfWork.iKpiDonViRepository.TableNoTracking
+            //        .Where(k => k.IdDonVi == dto.IdDonVi && k.LoaiKpi == dto.LoaiKpi && !k.Deleted)
+            //        .Select(k => (int?)k.STT)
+            //        .Max() ?? 0;
+            //    kpi.STT = maxSTT + 1;
+            //}
 
             // Cập nhật thông tin
             kpi.Kpi = dto.Kpi;

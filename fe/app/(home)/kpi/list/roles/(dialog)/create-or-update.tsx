@@ -35,7 +35,7 @@ const PositionModal: React.FC<PositionModalProps> = ({
   const { $selected, $create, $update } = useAppSelector(
     (state) => state.kpiState.kpiRole
   );
-  const { list: users, status } = useAppSelector(
+  const { list: users = [], status } = useAppSelector(
     (state) => state.userState
   );
   const { phongBan } = useAppSelector((state) => state.danhmucState);
@@ -52,13 +52,13 @@ const PositionModal: React.FC<PositionModalProps> = ({
   
   useEffect(() => {
     if (!isModalOpen) return;
-    dispatch(getAllUser({ SkipCount: 0, MaxResultCount: 2000 }));
-    dispatch(getAllPhongBan({ SkipCount: 0, MaxResultCount: 2000 }));
+    dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
+    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 2000 }));
   }, [isModalOpen]);
 
   const userOptions: UserOption[] = useMemo(
     () =>
-      users.map((u) => ({
+      (users || []).map((u) => ({
         value: u.id!,
         label: `${u.maNhanSu} - ${u.hoDem ?? ''} ${u.ten ?? ''} - ${u.tenPhongBan}`.trim(),
         searchText: `${u.maNhanSu} ${u.hoDem} ${u.ten} ${u.tenPhongBan}`,

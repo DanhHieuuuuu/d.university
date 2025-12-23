@@ -1,6 +1,6 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input, Modal } from 'antd';
+import { Button, Card, Form, Input, Modal, Tag } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -20,6 +20,7 @@ import { IQueryKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import PositionModal from './(dialog)/create-or-update';
 import { KpiLoaiConst } from '../../const/kpiType.const';
 import { toast } from 'react-toastify';
+import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -34,8 +35,8 @@ const Page = () => {
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiDonVi>({
     total: totalItem || 0,
     initialQuery: {
-      SkipCount: 0,
-      MaxResultCount: 10,
+      PageIndex: 1,
+      PageSize: 10,
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
@@ -83,21 +84,12 @@ const Page = () => {
     });
   };
 
-  // const refreshData = () => {
-  //   dispatch(getAllKpiDonVi(query));
-  // };
-
   const columns: IColumn<IViewKpiDonVi>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
       title: 'ID',
       showOnConfig: false
-    },
-    {
-      key: 'linhVuc',
-      dataIndex: 'linhVuc',
-      title: 'Lĩnh Vực'
     },
     {
       key: 'kpi',
@@ -116,7 +108,7 @@ const Page = () => {
     },
     {
       key: 'loaiKpi',
-      dataIndex: 'loaiKPI',
+      dataIndex: 'loaiKpi',
       title: 'Loại KPI',
       render: (value: number) => KpiLoaiConst.getName(value),
     },
@@ -127,8 +119,14 @@ const Page = () => {
     },
     {
       key: 'trangThai',
-      dataIndex: 'trangThaiText',
-      title: 'Trạng thái'
+      dataIndex: 'trangThai',
+      title: 'Trạng thái',
+      render: (value: number) => {
+        const status = KpiTrangThaiConst.get(value);
+        return status ? (
+          <Tag color={status.color}>{status.text}</Tag>
+        ) : null;
+      },
     },
   ];
 
@@ -210,6 +208,9 @@ const Page = () => {
         isUpdate={isUpdate}
         isView={isView}
         setIsModalOpen={setIsModalOpen}
+        onSuccess={() => {
+          dispatch(getAllKpiDonVi(query));
+        }}
       />
     </Card>
   );

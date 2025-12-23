@@ -2,107 +2,104 @@ import { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ICreateKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
-import UserSelect, { UserOption } from '@components/bthanh-custom/userSelect';
 import {
-  clearSeletedKpiCaNhan,
-  createKpiCaNhan,
-  resetStatusKpiCaNhan,
-  updateKpiCaNhan,
+  clearSeletedKpiDonVi,
+  createKpiDonVi,
+  resetStatusKpiDonVi,
+  updateKpiDonVi,
 } from '@redux/feature/kpiSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { KpiLoaiConst } from '../../../const/kpiType.const';
 import { getAllPhongBan } from '@redux/feature/danhmucSlice';
+import { ICreateKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 
 type PositionModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
   isView: boolean;
+  onSuccess: () => void;
 };
 
 const PositionModal: React.FC<PositionModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm<any>();
   const [title, setTitle] = useState<string>('Thêm mới Kpi Đơn vị');
-  const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiCaNhan);
+  const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiDonVi);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
-  const { list: users, status } = useAppSelector(state => state.userState);
+  const { phongBan } = useAppSelector((state) => state.danhmucState);
 
   useEffect(() => {
     if (isModalOpen) {
       if (isUpdate || isView) {
         setTitle(isView ? 'Xem thông tin KPI Đơn vị' : 'Cập nhật KPI Đơn vị');
       } else {
-        setTitle('Thêm mới KPI Cá nhân');
+        setTitle('Thêm mới KPI đơn vị');
       }
     }
   }, [dispatch, isModalOpen, isUpdate, isView]);
 
   useEffect(() => {
-    if (!$selected.data || users.length === 0) return;
+    if (!$selected.data || phongBan.$list.data.length === 0) return;
 
     const selectedData = $selected.data;
 
-    const donViOption = selectedData.idNhanSu
-      ? userOptions.find(u => u.value === selectedData.idNhanSu)
-      : undefined;
+    const donVi = phongBan.$list.data.find(
+      pb => pb.id === selectedData.idDonVi
+    );
 
     form.setFieldsValue({
       ...selectedData,
-      idNhanSu: nhanSuOption, // ✅ ĐÚNG SHAPE
+      idDonVi: donVi
+        ? { value: donVi.id, label: donVi.tenPhongBan }
+        : undefined,
       namHoc: selectedData.namHoc
         ? dayjs(selectedData.namHoc, 'YYYY')
         : undefined,
     });
-  }, [$selected.data, users]);
+  }, [$selected.data, phongBan.$list.data]);
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
-      dispatch(resetStatusKpiCaNhan());
-      dispatch(clearSeletedKpiCaNhan());
+      dispatch(resetStatusKpiDonVi());
+      dispatch(clearSeletedKpiDonVi());
       form.resetFields();
       setIsModalOpen(false);
+      props.onSuccess();
     }
   }, [$create.status, $update.status, dispatch, form, setIsModalOpen]);
 
   useEffect(() => {
-    dispatch(getAllPhongBan({ SkipCount: 0, MaxResultCount: 2000 }));
+    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 2000 }));
   }, [dispatch]);
 
-  const userOptions: UserOption[] = users.map(u => ({
-    value: u.id!,
-    label: `${u.maNhanSu} - ${u.hoDem ?? ''} ${u.ten ?? ''} - ${u.tenPhongBan}`.trim(),
-    searchText: `${u.maNhanSu} ${u.hoDem} ${u.ten} ${u.tenPhongBan}`
-  }));
 
   const handleClose = () => {
     form.resetFields();
-    dispatch(clearSeletedKpiCaNhan());
+    dispatch(clearSeletedKpiDonVi());
     setIsModalOpen(false);
   };
 
   const handleFinish: FormProps['onFinish'] = async (values: any) => {
     const payload = {
       ...values,
-      idNhanSu: values.idNhanSu?.value,
+      idDonVi: values.idDonVi?.value,
       namHoc: values.namHoc.format('YYYY'),
     };
 
-    console.log('PAYLOAD GỬI BE', payload);
 
     try {
       if (isUpdate && $selected.data) {
         await dispatch(
-          updateKpiCaNhan({ id: $selected.data.id, ...payload })
+          updateKpiDonVi({ id: $selected.data.id, ...payload })
         ).unwrap();
-        toast.success('Cập nhật KPI cá nhân thành công');
+        toast.success('Cập nhật KPI đơn vị thành công');
       } else {
-        await dispatch(createKpiCaNhan(payload)).unwrap();
-        toast.success('Thêm mới KPI cá nhân thành công');
+        await dispatch(createKpiDonVi(payload)).unwrap();
+        toast.success('Thêm mới KPI đơn vị thành công');
       }
     } catch {
       toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
@@ -135,7 +132,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       }
     >
       <Form
-        name="kpi-ca-nhan-form"
+        name="kpi-don-vi-form"
         layout="vertical"
         form={form}
         onFinish={handleFinish}
@@ -144,7 +141,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         labelCol={{ style: { fontWeight: 600 } }}
       >
         <div className="grid grid-cols-2 gap-x-5">
-          <Form.Item<ICreateKpiCaNhan>
+          <Form.Item<ICreateKpiDonVi>
             label="Tên KPI"
             name="kpi"
             rules={[{ required: true, message: 'Vui lòng nhập tên KPI' }]}
@@ -152,16 +149,16 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Input />
           </Form.Item>
 
-          <Form.Item<ICreateKpiCaNhan>
+          {/* <Form.Item<ICreateKpiDonVi>
             label="Lĩnh Vực"
             name="linhVuc"
             rules={[{ required: true, message: 'Vui lòng nhập lĩnh vực' }]}
           >
             <Input />
-          </Form.Item>
+          </Form.Item> */}
 
 
-          <Form.Item<ICreateKpiCaNhan>
+          <Form.Item<ICreateKpiDonVi>
             label="Mục tiêu"
             name="mucTieu"
             rules={[{ required: true, message: 'Vui lòng nhập mục tiêu' }]}
@@ -169,7 +166,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Input />
           </Form.Item>
 
-          <Form.Item<ICreateKpiCaNhan>
+          <Form.Item<ICreateKpiDonVi>
             label="Trọng số"
             name="trongSo"
             rules={[{ required: true, message: 'Vui lòng nhập trọng số' }]}
@@ -179,7 +176,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Form.Item
             label="Loại KPI"
-            name="loaiKPI"
+            name="loaiKpi"
             rules={[{ required: true, message: 'Vui lòng chọn loại KPI' }]}
           >
             <Select
@@ -192,19 +189,25 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           </Form.Item>
 
 
-          <Form.Item<ICreateKpiCaNhan>
-            label="Nhân sự"
-            name="idNhanSu"
-            rules={[{ required: true, message: 'Vui lòng chọn nhân sự' }]}
+          <Form.Item<ICreateKpiDonVi>
+            label="Đơn vị"
+            name="idDonVi"
+            rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}
           >
-            <UserSelect
-              options={userOptions}
-              loading={status === ReduxStatus.LOADING}
+            <Select
+              options={phongBan.$list.data.map((pb) => ({
+                value: pb.id,
+                label: pb.tenPhongBan,
+              }))}
+              loading={phongBan.$list.status === ReduxStatus.LOADING}
+              showSearch
+              optionFilterProp="label"
+              placeholder="Chọn đơn vị"
             />
           </Form.Item>
 
 
-          <Form.Item<ICreateKpiCaNhan>
+          <Form.Item<ICreateKpiDonVi>
             label="Năm học"
             name="namHoc"
             rules={[{ required: true, message: 'Vui lòng chọn năm học' }]}
