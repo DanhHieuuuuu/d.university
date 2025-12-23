@@ -50,6 +50,18 @@ export const listMenuCore: IMenu[] = [
     ]
   },
   {
+    label: 'Đào tạo',
+    routerLink: '/training',
+    icon: <BarsOutlined />,
+    items: [
+      {
+        label: 'Khoa',
+        routerLink: '/training/faculty',
+        icon: <ApartmentOutlined />
+      }
+    ]
+  },
+  {
     label: 'Admin',
     routerLink: '/manager',
     permissionKeys: [PermissionCoreConst.UserMenuAdmin],
