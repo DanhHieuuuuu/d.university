@@ -12,7 +12,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllChucVu, getChucVuById, setSelectedIdChucVu } from '@redux/feature/danhmucSlice';
+import { setSelectedIdChucVu } from '@redux/feature/danh-muc/danhmucSlice';
+import { getAllChucVu } from '@redux/feature/danh-muc/danhmucThunk';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';

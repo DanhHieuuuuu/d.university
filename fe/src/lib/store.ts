@@ -5,7 +5,7 @@ import authReducer from './feature/auth/authSlice';
 import loadingReducer from './feature/loadingSlice';
 import nhanSuReducer from './feature/nhansu/nhansuSlice';
 import userReducer from './feature/userSlice';
-import danhmucReducer from './feature/danhmucSlice';
+import danhmucReducer from './feature/danh-muc/danhmucSlice';
 import studentReducer from './feature/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';

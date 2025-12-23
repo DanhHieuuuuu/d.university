@@ -11,7 +11,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllToBoMon, setSelectedIdToBoMon } from '@redux/feature/danhmucSlice';
+import { setSelectedIdToBoMon } from '@redux/feature/danh-muc/danhmucSlice';
+import { getAllToBoMon } from '@redux/feature/danh-muc/danhmucThunk';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';

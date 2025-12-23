@@ -4,6 +4,13 @@ import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateKhoa, IUpdateKhoa } from '@models/dao-tao/khoa.model';
 import {
+  createPhongBan,
+  getPhongBanById,
+  updatePhongBan,
+  getAllLoaiPhongBan
+} from '@redux/feature/danh-muc/danhmucThunk';
+import { clearSelectedPhongBan, resetStatusPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
+import {
   clearSelectedKhoa,
   createKhoa,
   getKhoaById,
