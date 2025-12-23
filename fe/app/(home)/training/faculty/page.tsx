@@ -11,7 +11,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan, setSelectedIdPhongBan } from '@redux/feature/danhmucSlice';
+import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
+import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';

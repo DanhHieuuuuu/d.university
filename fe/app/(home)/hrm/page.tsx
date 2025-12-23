@@ -121,7 +121,7 @@ const Page = () => {
     onQueryChange: (newQuery) => {
       dispatch(getListNhanSu(newQuery));
     },
-    triggerFirstLoad: true,
+    triggerFirstLoad: true
   });
 
   useEffect(() => {
