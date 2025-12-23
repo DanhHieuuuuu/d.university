@@ -3,13 +3,8 @@ import { Button, Form, FormProps, Input, InputNumber, Modal, Select, Switch } fr
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateMonHoc, IUpdateMonHoc } from '@models/dao-tao/monHoc.model';
-import {
-  clearSelectedMonHoc,
-  createMonHoc,
-  getMonHocById,
-  resetStatusMonHoc,
-  updateMonHoc
-} from '@redux/feature/daotaoSlice';
+import { createMonHoc, getMonHocById, updateMonHoc } from '@redux/feature/dao-tao/monHocThunk';
+import { clearSelectedMonHoc, resetStatusMonHoc } from '@redux/feature/dao-tao/daotaoSlice';
 import { getAllToBoMon } from '@redux/feature/danh-muc/danhmucThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';

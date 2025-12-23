@@ -3,14 +3,9 @@ import { Button, Form, FormProps, Input, Modal, Select } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateMonTienQuyet, IUpdateMonTienQuyet } from '@models/dao-tao/monTienQuyet.model';
-import {
-  clearSelectedMonTienQuyet,
-  createMonTienQuyet,
-  getAllMonHoc,
-  getMonTienQuyetById,
-  resetStatusMonTienQuyet,
-  updateMonTienQuyet
-} from '@redux/feature/daotaoSlice';
+import { getAllMonHoc } from '@redux/feature/dao-tao/monHocThunk';
+import { createMonTienQuyet, getMonTienQuyetById, updateMonTienQuyet } from '@redux/feature/dao-tao/monTienQuyetThunk';
+import { clearSelectedMonTienQuyet, resetStatusMonTienQuyet } from '@redux/feature/dao-tao/daotaoSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 

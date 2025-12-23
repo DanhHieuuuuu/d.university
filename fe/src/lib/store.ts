@@ -11,7 +11,7 @@ import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';
 import kpiReducer from './feature/kpiSlice';
 import delegationReducer from './feature/delegation/delegationSlice';
-import daotaoReducer from './feature/daotaoSlice';
+import daotaoReducer from './feature/dao-tao/daotaoSlice';
 const persistConfig = {
   key: 'auth',
   storage,

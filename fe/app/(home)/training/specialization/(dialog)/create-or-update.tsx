@@ -3,14 +3,9 @@ import { Button, Form, FormProps, Input, Modal, Select, Switch } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateChuyenNganh, IUpdateChuyenNganh } from '@models/dao-tao/chuyenNganh.model';
-import {
-  clearSelectedChuyenNganh,
-  createChuyenNganh,
-  getAllNganh,
-  getChuyenNganhById,
-  resetStatusChuyenNganh,
-  updateChuyenNganh
-} from '@redux/feature/daotaoSlice';
+import { getAllNganh } from '@redux/feature/dao-tao/nganhThunk';
+import { createChuyenNganh, getChuyenNganhById, updateChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';
+import { clearSelectedChuyenNganh, resetStatusChuyenNganh } from '@redux/feature/dao-tao/daotaoSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 

@@ -11,7 +11,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllMonHoc, setSelectedIdMonHoc } from '@redux/feature/daotaoSlice';
+import { getAllMonHoc } from '@redux/feature/dao-tao/monHocThunk';
+import { setSelectedIdMonHoc } from '@redux/feature/dao-tao/daotaoSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
