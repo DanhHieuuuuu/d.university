@@ -11,28 +11,26 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
+import { getAllMonHoc, setSelectedIdMonHoc } from '@redux/feature/daotaoSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryPhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
-import PositionModal from './(dialog)/create-or-update';
-import { formatDateView } from '@utils/index';
+import { IQueryMonHoc, IViewMonHoc } from '@models/dao-tao/monHoc.model';
+import CourseModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.phongBan.$list);
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.daotaoState.monHoc.$list);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryPhongBan>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryMonHoc>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -40,7 +38,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllPhongBan(newQuery));
+      dispatch(getAllMonHoc(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -66,10 +64,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllPhongBan(query));
+    dispatch(getAllMonHoc(query));
   };
 
-  const columns: IColumn<IViewPhongBan>[] = [
+  const columns: IColumn<IViewMonHoc>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -77,72 +75,58 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maPhongBan',
-      dataIndex: 'maPhongBan',
-      title: 'Mã phòng ban'
+      key: 'maMonHoc',
+      dataIndex: 'maMonHoc',
+      title: 'Mã môn học'
     },
     {
-      key: 'tenPhongBan',
-      dataIndex: 'tenPhongBan',
-      title: 'Tên phòng ban'
+      key: 'tenMonHoc',
+      dataIndex: 'tenMonHoc',
+      title: 'Tên môn học'
     },
     {
-      key: 'loaiPhongBan',
-      dataIndex: 'loaiPhongBan',
-      title: 'Loại phòng ban'
+      key: 'soTinChi',
+      dataIndex: 'soTinChi',
+      title: 'Số tín chỉ'
     },
     {
-      key: 'diaChi',
-      dataIndex: 'diaChi',
-      title: 'Địa chỉ'
+      key: 'soTietLyThuyet',
+      dataIndex: 'soTietLyThuyet',
+      title: 'Số tiết lý thuyết'
     },
     {
-      key: 'hotline',
-      dataIndex: 'hotline',
-      title: 'Hotline'
+      key: 'soTietThucHanh',
+      dataIndex: 'soTietThucHanh',
+      title: 'Số tiết thực hành'
     },
     {
-      key: 'fax',
-      dataIndex: 'fax',
-      title: 'Fax'
-    },
-    {
-      key: 'ngayThanhLap',
-      dataIndex: 'ngayThanhLap',
-      title: 'Ngày thành lập',
-      render: (value) => {
-        const date = formatDateView(value);
-        return <p>{date}</p>;
-      }
-    },
-    {
-      key: 'nguoiDaiDien',
-      dataIndex: 'nguoiDaiDien',
-      title: 'Người đại diện'
-    },
-    {
-      key: 'chucVuNguoiDaiDien',
-      dataIndex: 'chucVuNguoiDaiDien',
-      title: 'Chức vụ người đại diện'
+      key: 'trangThai',
+      dataIndex: 'trangThai',
+      title: 'Trạng thái',
+      render: (value: boolean) => (
+        <span className={value ? 'text-green-600' : 'text-red-600'}>
+          {value ? 'Hoạt động' : 'Ngừng'}
+        </span>
+      )
     }
   ];
 
   const actions: IAction[] = [
     {
       label: 'Chi tiết',
-      tooltip: 'Xem thông tin phòng ban',
+      tooltip: 'Xem thông tin môn học',
       icon: <EyeOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewMonHoc) => {
+        dispatch(setSelectedIdMonHoc(record.id));
         onClickView(record.id);
       }
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin phòng ban',
+      tooltip: 'Sửa thông tin môn học',
       icon: <EditOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewMonHoc) => {
+        dispatch(setSelectedIdMonHoc(record.id));
         onClickUpdate(record.id);
       }
     },
@@ -150,8 +134,8 @@ const Page = () => {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewMonHoc) => {
+        dispatch(setSelectedIdMonHoc(record.id));
       }
     }
   ];
@@ -166,7 +150,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách phòng ban"
+      title="Danh sách môn học"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -176,7 +160,7 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryPhongBan> label="Tên phòng ban:" name="Keyword">
+          <Form.Item<IQueryMonHoc> label="Tên môn học:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
@@ -199,6 +183,7 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
+
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
@@ -208,7 +193,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <PositionModal
+      <CourseModal
         isModalOpen={isModalOpen}
         isUpdate={isUpdate}
         isView={isView}

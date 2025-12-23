@@ -5,12 +5,12 @@ import authReducer from './feature/auth/authSlice';
 import loadingReducer from './feature/loadingSlice';
 import nhanSuReducer from './feature/nhansu/nhansuSlice';
 import userReducer from './feature/userSlice';
-import danhmucReducer from './feature/danhmucSlice';
+import danhmucReducer from './feature/danh-muc/danhmucSlice';
 import studentReducer from './feature/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';
 import delegationReducer from './feature/delegation/delegationSlice';
-
+import daotaoReducer from './feature/daotaoSlice';
 const persistConfig = {
   key: 'auth',
   storage,
@@ -30,7 +30,8 @@ export const makeStore = () => {
       danhmucState: danhmucReducer,
       studentState: studentReducer,
       roleConfigState: roleConfigReducer,
-      noticeState: noticeReducer
+      noticeState: noticeReducer,
+      daotaoState: daotaoReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

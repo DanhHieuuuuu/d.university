@@ -6,33 +6,32 @@ import {
   SearchOutlined,
   SyncOutlined,
   EditOutlined,
+  StopOutlined,
   DeleteOutlined,
   EyeOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
+import { getAllChucVu, getChucVuById, setSelectedIdChucVu } from '@redux/feature/danhmucSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryPhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
+import { IQueryChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
 import PositionModal from './(dialog)/create-or-update';
-import { formatDateView } from '@utils/index';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.phongBan.$list);
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.chucVu.$list);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryPhongBan>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryChucVu>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -40,7 +39,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllPhongBan(newQuery));
+      dispatch(getAllChucVu(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -66,10 +65,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllPhongBan(query));
+    dispatch(getAllChucVu(query));
   };
 
-  const columns: IColumn<IViewPhongBan>[] = [
+  const columns: IColumn<IViewChucVu>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -77,72 +76,43 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maPhongBan',
-      dataIndex: 'maPhongBan',
-      title: 'Mã phòng ban'
+      key: 'maChucVu',
+      dataIndex: 'maChucVu',
+      title: 'Mã chức vụ'
     },
     {
-      key: 'tenPhongBan',
-      dataIndex: 'tenPhongBan',
-      title: 'Tên phòng ban'
+      key: 'tenChucVu',
+      dataIndex: 'tenChucVu',
+      title: 'Tên chức vụ'
     },
     {
-      key: 'loaiPhongBan',
-      dataIndex: 'loaiPhongBan',
-      title: 'Loại phòng ban'
+      key: 'hsChucVu',
+      dataIndex: 'hsChucVu',
+      title: 'Hệ số'
     },
     {
-      key: 'diaChi',
-      dataIndex: 'diaChi',
-      title: 'Địa chỉ'
-    },
-    {
-      key: 'hotline',
-      dataIndex: 'hotline',
-      title: 'Hotline'
-    },
-    {
-      key: 'fax',
-      dataIndex: 'fax',
-      title: 'Fax'
-    },
-    {
-      key: 'ngayThanhLap',
-      dataIndex: 'ngayThanhLap',
-      title: 'Ngày thành lập',
-      render: (value) => {
-        const date = formatDateView(value);
-        return <p>{date}</p>;
-      }
-    },
-    {
-      key: 'nguoiDaiDien',
-      dataIndex: 'nguoiDaiDien',
-      title: 'Người đại diện'
-    },
-    {
-      key: 'chucVuNguoiDaiDien',
-      dataIndex: 'chucVuNguoiDaiDien',
-      title: 'Chức vụ người đại diện'
+      key: 'hsTrachNhiem',
+      dataIndex: 'hsTrachNhiem',
+      title: 'Hệ số trách nhiệm'
     }
   ];
 
   const actions: IAction[] = [
     {
       label: 'Chi tiết',
-      tooltip: 'Xem thông tin phòng ban',
+      tooltip: 'Xem thông tin chức vụ',
       icon: <EyeOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewChucVu) => {
+        dispatch(setSelectedIdChucVu(record.id));
         onClickView(record.id);
       }
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin phòng ban',
+      tooltip: 'Sửa thông tin chức vụ',
       icon: <EditOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewChucVu) => {
+        dispatch(setSelectedIdChucVu(record.id));
         onClickUpdate(record.id);
       }
     },
@@ -150,8 +120,8 @@ const Page = () => {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewChucVu) => {
+        dispatch(setSelectedIdChucVu(record.id));
       }
     }
   ];
@@ -166,7 +136,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách phòng ban"
+      title="Danh sách chức vụ"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -176,7 +146,7 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryPhongBan> label="Tên phòng ban:" name="Keyword">
+          <Form.Item<IQueryChucVu> label="Tên chức vụ:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
@@ -199,6 +169,7 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
+
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"

@@ -3,8 +3,13 @@ import { Button, Form, FormProps, Input, InputNumber, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateChucVu, IUpdateChucVu } from '@models/danh-muc/chuc-vu.model';
-import { createChucVu, getChucVuById, updateChucVu } from '@redux/feature/danh-muc/danhmucThunk';
-import { clearSeletedChucVu, resetStatusChucVu } from '@redux/feature/danh-muc/danhmucSlice';
+import {
+  clearSeletedChucVu,
+  createChucVu,
+  getChucVuById,
+  resetStatusChucVu,
+  updateChucVu
+} from '@redux/feature/danhmucSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 

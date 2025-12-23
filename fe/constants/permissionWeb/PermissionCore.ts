@@ -18,7 +18,7 @@ export class PermissionCoreConst {
 
   // Admin
   public static readonly UserMenuAdmin = `${PermissionCoreConst.Menu}admin_permission`;
-  
+
   //Phân quyền Website
   public static readonly UserMenuPermission = `${PermissionCoreConst.Menu}user_permission`;
   public static readonly UserTableRolePermission = `${PermissionCoreConst.Table}user_role_permission`;

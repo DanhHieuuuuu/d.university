@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input } from 'antd';
 import {
   PlusOutlined,
@@ -11,28 +11,37 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
+import { getAllMonTienQuyet, getAllMonHoc, setSelectedIdMonTienQuyet } from '@redux/feature/daotaoSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryPhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
-import PositionModal from './(dialog)/create-or-update';
-import { formatDateView } from '@utils/index';
+import { IQueryMonTienQuyet, IViewMonTienQuyet } from '@models/dao-tao/monTienQuyet.model';
+import PrerequisiteCourseModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.phongBan.$list);
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.daotaoState.monTienQuyet.$list);
+  const listMonHoc = useAppSelector((state) => state.daotaoState.listMonHoc);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryPhongBan>({
+  // Load list MonHoc for display
+  useEffect(() => {
+    dispatch(getAllMonHoc({ PageIndex: 1, PageSize: 100 }));
+  }, [dispatch]);
+
+  const getMonHocName = (monHocId: number) => {
+    const monHoc = listMonHoc.find((m) => m.id === monHocId);
+    return monHoc ? monHoc.tenMonHoc : monHocId;
+  };
+
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryMonTienQuyet>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -40,7 +49,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllPhongBan(newQuery));
+      dispatch(getAllMonTienQuyet(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -66,10 +75,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllPhongBan(query));
+    dispatch(getAllMonTienQuyet(query));
   };
 
-  const columns: IColumn<IViewPhongBan>[] = [
+  const columns: IColumn<IViewMonTienQuyet>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -77,72 +86,45 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maPhongBan',
-      dataIndex: 'maPhongBan',
-      title: 'Mã phòng ban'
+      key: 'monHocId',
+      dataIndex: 'monHocId',
+      title: 'Môn học',
+      render: (value: number) => getMonHocName(value)
     },
     {
-      key: 'tenPhongBan',
-      dataIndex: 'tenPhongBan',
-      title: 'Tên phòng ban'
+      key: 'monTienQuyetId',
+      dataIndex: 'monTienQuyetId',
+      title: 'Môn tiên quyết',
+      render: (value: number) => getMonHocName(value)
     },
     {
-      key: 'loaiPhongBan',
-      dataIndex: 'loaiPhongBan',
-      title: 'Loại phòng ban'
+      key: 'loaiDieuKien',
+      dataIndex: 'loaiDieuKien',
+      title: 'Loại điều kiện'
     },
     {
-      key: 'diaChi',
-      dataIndex: 'diaChi',
-      title: 'Địa chỉ'
-    },
-    {
-      key: 'hotline',
-      dataIndex: 'hotline',
-      title: 'Hotline'
-    },
-    {
-      key: 'fax',
-      dataIndex: 'fax',
-      title: 'Fax'
-    },
-    {
-      key: 'ngayThanhLap',
-      dataIndex: 'ngayThanhLap',
-      title: 'Ngày thành lập',
-      render: (value) => {
-        const date = formatDateView(value);
-        return <p>{date}</p>;
-      }
-    },
-    {
-      key: 'nguoiDaiDien',
-      dataIndex: 'nguoiDaiDien',
-      title: 'Người đại diện'
-    },
-    {
-      key: 'chucVuNguoiDaiDien',
-      dataIndex: 'chucVuNguoiDaiDien',
-      title: 'Chức vụ người đại diện'
+      key: 'ghiChu',
+      dataIndex: 'ghiChu',
+      title: 'Ghi chú'
     }
   ];
 
   const actions: IAction[] = [
     {
       label: 'Chi tiết',
-      tooltip: 'Xem thông tin phòng ban',
+      tooltip: 'Xem thông tin môn tiên quyết',
       icon: <EyeOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewMonTienQuyet) => {
+        dispatch(setSelectedIdMonTienQuyet(record.id));
         onClickView(record.id);
       }
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin phòng ban',
+      tooltip: 'Sửa thông tin môn tiên quyết',
       icon: <EditOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewMonTienQuyet) => {
+        dispatch(setSelectedIdMonTienQuyet(record.id));
         onClickUpdate(record.id);
       }
     },
@@ -150,8 +132,8 @@ const Page = () => {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewPhongBan) => {
-        dispatch(setSelectedIdPhongBan(record.id));
+      command: (record: IViewMonTienQuyet) => {
+        dispatch(setSelectedIdMonTienQuyet(record.id));
       }
     }
   ];
@@ -166,7 +148,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách phòng ban"
+      title="Danh sách môn tiên quyết"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -176,7 +158,7 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryPhongBan> label="Tên phòng ban:" name="Keyword">
+          <Form.Item<IQueryMonTienQuyet> label="Tìm kiếm:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
@@ -199,6 +181,7 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
+
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
@@ -208,7 +191,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <PositionModal
+      <PrerequisiteCourseModal
         isModalOpen={isModalOpen}
         isUpdate={isUpdate}
         isView={isView}
