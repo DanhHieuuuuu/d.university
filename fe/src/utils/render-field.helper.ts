@@ -20,7 +20,7 @@ export function renderField(
   const { isEdit, displayValueFormatter } = options;
 
   const child = isEdit
-    ? input
+    ? input 
     : React.createElement(
         Text,
         null,

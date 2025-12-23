@@ -111,15 +111,18 @@ export interface ILogStatus {
   description:string,
   reason:string,
   createdBy:string,
+  createdByName:string,
   createdDate:string
 }
 export interface ILogReceptionTime {
   id:number,
   receptionTimeId:number,
+  description:string,
   type:string,
   reason:string,
   createdBy:string,
-  createdDate:string
+  createdDate:string,
+  createdByName:string
 }
 export type ICreateReceptionTime = {
   startDate: number,
@@ -129,6 +132,9 @@ export type ICreateReceptionTime = {
   totalPerson:number,
   address:string,
   delegationIncomingId: number,
+};
+export type ICreateReceptionTimeList = {
+  items: ICreateReceptionTime[];
 };
 export type IUpdateReceptionTime = ICreateReceptionTime & {
   id: number;
@@ -152,4 +158,13 @@ export interface IUpdateStatus {
   idDelegation: number;
   oldStatus: number;
   action: string;
+}
+export interface IUpdateDepartmentSupport {
+  departmentSupportId: number;
+  delegationIncomingId: number;
+  content: string;
+  supporters: {
+    supporterId: number;
+    supporterCode: string;
+  }[]; 
 }

@@ -52,7 +52,7 @@ export default function JobTab() {
       <Form.Item<ICreateHopDongNs>
         name="idChucVu"
         label="Chức vụ"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+       
       >
         <Select
           options={chucVu.$list.data?.map((item) => {

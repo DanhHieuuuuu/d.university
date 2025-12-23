@@ -9,6 +9,7 @@ import {
   EyeOutlined,
   PlusOutlined,
   SearchOutlined,
+  SendOutlined,
   SyncOutlined
 } from '@ant-design/icons';
 
@@ -133,29 +134,27 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
+      hidden: (r) => r.status == DelegationStatusConst.DONE,
       command: (record: IViewGuestGroup) => onClickView(record)
     },
     {
       label: 'Chỉnh sửa',
       tooltip: 'Sửa danh sách đoàn vào',
       icon: <EditOutlined />,
+      hidden: (r) => r.status == DelegationStatusConst.DONE,
       command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
     {
-      label: 'Phê duyệt',
-      icon: <CheckOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
-      command: (record: IViewGuestGroup) => onClickPheDuyet(record)
+      label: 'Đề xuất',
+      icon: <SendOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.TAO_MOI,
+      command: (record: IViewGuestGroup) => onClickUpdateStatus(record)
     },
-    {
-      label: 'Báo cáo kết quả',
-      icon: <CheckOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
-      command: (record: IViewGuestGroup) => onClickBaoCao(record)
-    },
+
     {
       label: 'Thêm thời gian',
       icon: <PlusOutlined />,
+      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
     },
     {
@@ -171,13 +170,19 @@ const Page = () => {
     initialQuery: {
       PageIndex: 1,
       PageSize: 10,
-      Keyword: ''
+      Keyword: '',
+      status: DelegationStatusConst.TAO_MOI
     },
     onQueryChange: (newQuery) => {
       dispatch(getListGuestGroup(newQuery));
     },
     triggerFirstLoad: true
   });
+  useEffect(() => {
+    form.setFieldsValue({
+      status: DelegationStatusConst.TAO_MOI
+    });
+  }, []);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -202,26 +207,11 @@ const Page = () => {
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
-  const onClickPheDuyet = (data: IViewGuestGroup) => {
+  const onClickUpdateStatus = (data: IViewGuestGroup) => {
     openConfirmStatusModal({
-      title: 'Xác nhận tiếp đoàn',
-      content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,
-      okText: 'Đồng ý',
-      cancelText: 'Không đồng ý',
-      okAction: 'upgrade',
-      cancelAction: 'cancel',
-      data,
-      dispatch,
-      onSuccess: () => {
-        dispatch(getListGuestGroup(query));
-      }
-    });
-  };
-  const onClickBaoCao = (data: IViewGuestGroup) => {
-    openConfirmStatusModal({
-      title: 'Xác nhận',
-      content: `Bạn có hoàn thành đoàn vào "${data.name}" không?`,
-      okText: 'Hoàn thành',
+      title: 'Xác nhận đề xuất',
+      content: `Bạn có muốn đề xuất đoàn vào "${data.name}" không?`,
+      okText: 'Đề xuất',
       okAction: 'upgrade',
       data,
       dispatch,

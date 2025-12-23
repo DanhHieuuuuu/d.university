@@ -14,5 +14,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
         Task<CreateDepartmentSupportResponseDto> CreateDepartmentSupport(CreateDepartmentSupportRequestDto dto);
         PageResultDto<PageDepartmentSupportResultDto> PagingDepartmentSupport(FilterDepartmentSupportDto dto);
         List<ViewDelegationIncomingResponseDto> GetAllDelegationIncoming(ViewDelegationIncomingRequestDto dto);
+        Task<UpdateDepartmentSupportResponseDto> UpdateDepartmentSupport(UpdateDepartmentSupportRequestDto dto);
+        Task<DetailDepartmentSupportResponseDto?> GetByIdDepartmentSupport(int id);
     }
 }

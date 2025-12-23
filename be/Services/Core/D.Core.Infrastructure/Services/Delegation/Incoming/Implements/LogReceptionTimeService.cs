@@ -33,7 +33,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         public void InsertLogReceptionTime(InsertReceptionTimeLogDto dto)
         {
             _logger.LogInformation($"{nameof(InsertLogReceptionTime)} dto = {JsonSerializer.Serialize(dto)}");
-
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+            .FirstOrDefault(u => u.Id == userId);
+            var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
             try
             {
                 var log = new LogReceptionTime
@@ -43,7 +46,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     Description = dto.Description,
                     Reason = dto.Reason,
                     CreatedDate = DateTime.Now,
-                    CreatedBy = CommonUntil.GetCurrentUserId(_contextAccessor).ToString()
+                    CreatedBy = userId.ToString(),
+                    CreatedByName = userName,
                 };
 
                 _unitOfWork.iLogReceptionTimeRepository.Add(log);

@@ -35,7 +35,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             _logger.LogInformation(
                 $"{nameof(InsertLog)} dto = {JsonSerializer.Serialize(dto)}"
             );
-
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+            .FirstOrDefault(u => u.Id == userId);
+            var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
             try
             {
                 var log = new LogStatus
@@ -46,7 +49,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     Description = dto.Description,
                     Reason = dto.Reason,
                     CreatedDate = DateTime.Now,
-                    CreatedBy = CommonUntil.GetCurrentUserId(_contextAccessor).ToString()
+                    CreatedBy = userId.ToString(),
+                    CreatedByName = userName,
                 };
 
                 _unitOfWork.iLogStatusRepository.Add(log);

@@ -95,8 +95,8 @@ const onFinish: FormProps<ICreateDoanVao>['onFinish'] = async (values) => {
     }
 
     onCloseModal();
-  } catch (error) {
-    toast.error('Lỗi khi lưu dữ liệu');
+  } catch (err) {
+    toast.error(String(err));
   }
 };
 

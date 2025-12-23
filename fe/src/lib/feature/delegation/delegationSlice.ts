@@ -7,6 +7,7 @@ import {
   createReceptionTime,
   createSupporter,
   deleteDoanVao,
+  getByIdDepartmentSupport,
   getByIdDetailDelegation,
   getByIdGuestGroup,
   getByIdReceptionTime,
@@ -18,11 +19,17 @@ import {
   getListStatus,
   getLogReceptionTime,
   getLogStatus,
+  updateDepartmentSupport,
   updateDoanVao,
   updateReceptionTime,
   updateStatus
 } from './delegationThunk';
-import { IDepartmentSupport, ILogReceptionTime, ILogStatus, IViewGuestGroup } from '@models/delegation/delegation.model';
+import {
+  IDepartmentSupport,
+  ILogReceptionTime,
+  ILogStatus,
+  IViewGuestGroup
+} from '@models/delegation/delegation.model';
 
 interface DelegationState {
   status: ReduxStatus;
@@ -38,9 +45,16 @@ interface DelegationState {
   listPhongBan: any[];
   listNhanSu: any[];
   listStatus: any[];
-  listDelegationIncoming: any[]
+  listDelegationIncoming: any[];
   total: number;
   $create: {
+    status: ReduxStatus;
+  };
+  $update: {
+    status: ReduxStatus;
+    error?: string;
+  };
+  $delete: {
     status: ReduxStatus;
   };
 }
@@ -54,13 +68,19 @@ const initialState: DelegationState = {
   list: [],
   listDepartmentSupport: [],
   listLogStatus: [],
-  listLogReceptionTime:[],
+  listLogReceptionTime: [],
   listPhongBan: [],
   listNhanSu: [],
-  listDelegationIncoming:[],
+  listDelegationIncoming: [],
   listStatus: [],
   total: 0,
   $create: {
+    status: ReduxStatus.IDLE
+  },
+  $update: {
+    status: ReduxStatus.IDLE
+  },
+  $delete: {
     status: ReduxStatus.IDLE
   }
 };
@@ -227,7 +247,7 @@ const delegationSlice = createSlice({
       .addCase(getLogReceptionTime.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
-      .addCase(getLogReceptionTime.fulfilled, (state, action: PayloadAction<any>) => {    
+      .addCase(getLogReceptionTime.fulfilled, (state, action: PayloadAction<any>) => {
         state.status = ReduxStatus.SUCCESS;
         state.listLogReceptionTime = action.payload?.items ?? [];
         state.total = action.payload?.totalItem ?? 0;
@@ -308,6 +328,28 @@ const delegationSlice = createSlice({
       .addCase(updateStatus.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
+      // update departmentSupport
+      .addCase(updateDepartmentSupport.pending, (state) => {
+        state.$update.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateDepartmentSupport.fulfilled, (state, action) => {
+        state.$update.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateDepartmentSupport.rejected, (state) => {
+        state.$update.status = ReduxStatus.FAILURE;
+      })
+      // Get by Id departmentSupport
+      .addCase(getByIdDepartmentSupport.pending, (state) => {
+        state.selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getByIdDepartmentSupport.fulfilled, (state, action: PayloadAction<any>) => {
+        state.selected.status = ReduxStatus.SUCCESS;
+        state.selected.data = action.payload;
+        state.selected.id = action.payload?.id;
+      })
+      .addCase(getByIdDepartmentSupport.rejected, (state) => {
+        state.selected.status = ReduxStatus.FAILURE;
+      });
   }
 });
 

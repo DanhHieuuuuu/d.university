@@ -21,5 +21,6 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
         public DateTime CreatedDate { get; set; }
 
         public string CreatedBy { get; set; }
+        public string CreatedByName { get; set; }
     }
 }

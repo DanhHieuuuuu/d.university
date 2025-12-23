@@ -26,9 +26,9 @@ const Page = () => {
 
   // Column cho logStatus
   const logStatusColumns: IColumn<ILogStatus>[] = [
-    { key: 'stt', title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
-    { key: 'createdBy', dataIndex: 'createdBy', title: 'Người thực hiện', align: 'center' },
-    { key: 'description', dataIndex: 'description', title: 'Mô tả' },
+    { key: 'stt',width:60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
+    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center' },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả' ,align: 'left'},
     { key: 'oldStatus', dataIndex: 'oldStatus', title: 'Trạng thái cũ', render: getStatusName },
     { key: 'newStatus', dataIndex: 'newStatus', title: 'Trạng thái mới', render: getStatusName },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
@@ -37,10 +37,11 @@ const Page = () => {
 
   // Column cho logReceptionTime
 const receptionColumns: IColumn<ILogReceptionTime>[] = [
-  {key: 'stt',title: 'STT',align: 'center',render: (_: any, __: any, index: number) => index + 1},
+  {key: 'stt',width:60,title: 'STT',align: 'center',render: (_: any, __: any, index: number) => index + 1},
+  {key: 'createdByName',dataIndex: 'createdByName',title: 'Người thực hiện',align: 'center'},
   {key: 'type',dataIndex: 'type',title: 'Loại',align: 'center'},
+  {key: 'description',dataIndex: 'description',title: 'Mô tả',align: 'left'},
   {key: 'reason',dataIndex: 'reason',title: 'Lý do'},
-  {key: 'createdBy',dataIndex: 'createdBy',title: 'Người thực hiện',align: 'center'},
   {key: 'createdDate',dataIndex: 'createdDate',title: 'Thời gian',align: 'center',render: (value: string) => formatDateTimeView(value)}
 ];
 
@@ -85,7 +86,7 @@ const receptionColumns: IColumn<ILogReceptionTime>[] = [
             columns={logStatusColumns}
             dataSource={listLogStatus}
             pagination={{ position: ['bottomRight'], ...statusPagination }}
-            scroll={{y: "calc(100vh - 380px)"}}
+            scroll={{y: "calc(100vh - 370px)"}}
           />
         </TabPane>
         <TabPane tab="Log Reception Time" key="2">

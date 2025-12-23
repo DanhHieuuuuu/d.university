@@ -4,10 +4,13 @@ import {
   ICreateDepartment,
   ICreateDoanVao,
   ICreateReceptionTime,
+  ICreateReceptionTimeList,
   ICreateSupporter,
+  IDepartmentSupport,
   IDetailDelegationIncoming,
   ILogStatus,
   IReceptionTime,
+  IUpdateDepartmentSupport,
   IUpdateDoanVao,
   IUpdateReceptionTime,
   IUpdateStatus,
@@ -77,7 +80,7 @@ const createDoanVao = async (formData: FormData) => {
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
+    throw err;
   }
 };
 const updateDoanVao = async (formData: FormData) => {
@@ -188,7 +191,7 @@ const updateReceptionTime = async (body: IUpdateReceptionTime) => {
     return Promise.reject(err);
   }
 };
-const createReceptionTime = async (body: ICreateReceptionTime) => {
+const createReceptionTime = async (body: ICreateReceptionTimeList) => {
   try {
     const res = await axios.post(`${apiDelegationEndpoint}/create-reception-time`, body);
     return Promise.resolve(res.data);
@@ -267,6 +270,27 @@ const updateStatus = async (body: IUpdateStatus) => {
   }
 };
 
+const updateDepartmentSupport = async (body: IUpdateDepartmentSupport) => {
+  try {
+    const res = await axios.put(`${apiDelegationEndpoint}/update-department-support`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const getByIdDepartmentSupport = async (departmentSupportId: number) => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-id-department-support?DepartmentSupportId=${departmentSupportId}`);
+
+    const data: IResponseItem<IDepartmentSupport> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
 export const DelegationIncomingService = {
   paging,
   getListPhongBan,
@@ -288,6 +312,8 @@ export const DelegationIncomingService = {
   createDepartment,
   getListDelegationIncoming,
   updateStatus,
-  getLogReceptionTime
+  getLogReceptionTime,
+  updateDepartmentSupport,
+  getByIdDepartmentSupport
 
 };

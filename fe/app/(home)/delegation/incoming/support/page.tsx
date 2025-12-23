@@ -39,7 +39,7 @@ import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
 import CreateDepartmentSupportModal from './(dialog)/create';
 import router from 'next/router';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -86,7 +86,7 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      command: (record: IViewGuestGroup) => onClickView(record)
+      command: (record: IDepartmentSupport) => onClickView(record)
     },
     {
       label: 'Thêm nhân viên',
@@ -94,9 +94,12 @@ const Page = () => {
       command: (record: IDepartmentSupport) => onClickCreateStaff(record)
     }
   ];
-const onClickCreateStaff = (data: IDepartmentSupport) => {
-  router.push(`/delegation/incoming/support/create-staff-support?departmentSupportId=${data.id}`);
-};
+  const onClickCreateStaff = (data: IDepartmentSupport) => {
+    router.push(`/delegation/incoming/support/create-staff-support?departmentSupportId=${data.id}`);
+  };
+  const onClickView = (data: IDepartmentSupport) => {
+    router.push(`/delegation/incoming/support/edit?departmentSupportId=${data.id}`);
+  };
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
     total: totalItem,
     initialQuery: {
@@ -133,22 +136,15 @@ const onClickCreateStaff = (data: IDepartmentSupport) => {
     setIsModalOpen(true);
   };
 
-  const onClickView = (data: IViewGuestGroup) => {
-    dispatch(select(data));
-    setIsModalView(true);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
-  };
-
   return (
     <Card
       title=" Phòng ban hỗ trợ"
       className="h-full"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-            Thêm mới
-          </Button>
-        }
+      extra={
+        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+          Thêm mới
+        </Button>
+      }
     >
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex flex-row items-center space-x-3">

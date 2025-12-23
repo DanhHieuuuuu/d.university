@@ -3,6 +3,7 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, message, Modal, Select } from 'antd';
 import {
+  CheckOutlined,
   DeleteOutlined,
   DeploymentUnitOutlined,
   EditOutlined,
@@ -89,7 +90,7 @@ const Page = () => {
     },
     {
       key: 'idStaffReception',
-      dataIndex: 'idStaffReception',
+      dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
       align: 'center'
     },
@@ -127,9 +128,16 @@ const Page = () => {
       command: (record: IViewGuestGroup) => onClickView(record)
     },
     {
-      label: 'Đề xuất',
-      icon: <SendOutlined />,
-      command: (record: IViewGuestGroup) => onClickUpdateStatus(record)
+      label: 'Báo cáo kết quả',
+      icon: <CheckOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
+      command: (record: IViewGuestGroup) => onClickBaoCao(record)
+    },
+    {
+      label: 'Phê duyệt',
+      icon: <CheckOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
+      command: (record: IViewGuestGroup) => onClickPheDuyet(record)
     },
     {
       label: 'Tiếp đoàn',
@@ -175,19 +183,6 @@ const Page = () => {
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
-  const onClickUpdateStatus = (data: IViewGuestGroup) => {
-    openConfirmStatusModal({
-      title: 'Xác nhận đề xuất',
-      content: `Bạn có muốn đề xuất đoàn vào "${data.name}" không?`,
-      okText: 'Đề xuất',
-      okAction: 'upgrade',
-      data,
-      dispatch,
-      onSuccess: () => {
-        dispatch(getListGuestGroup(query));
-      }
-    });
-  };
 
   const onClickTiepDoan = (data: IViewGuestGroup) => {
     openConfirmStatusModal({
@@ -197,6 +192,34 @@ const Page = () => {
       cancelText: 'Không đồng ý',
       okAction: 'upgrade',
       cancelAction: 'cancel',
+      data,
+      dispatch,
+      onSuccess: () => {
+        dispatch(getListGuestGroup(query));
+      }
+    });
+  };
+   const onClickPheDuyet = (data: IViewGuestGroup) => {
+    openConfirmStatusModal({
+      title: 'Xác nhận tiếp đoàn',
+      content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,
+      okText: 'Đồng ý',
+      cancelText: 'Không đồng ý',
+      okAction: 'upgrade',
+      cancelAction: 'cancel',
+      data,
+      dispatch,
+      onSuccess: () => {
+        dispatch(getListGuestGroup(query));
+      }
+    });
+  };
+  const onClickBaoCao = (data: IViewGuestGroup) => {
+    openConfirmStatusModal({
+      title: 'Xác nhận',
+      content: `Bạn có hoàn thành đoàn vào "${data.name}" không?`,
+      okText: 'Hoàn thành',
+      okAction: 'upgrade',
       data,
       dispatch,
       onSuccess: () => {

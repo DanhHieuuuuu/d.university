@@ -24,7 +24,6 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps>(({ data
 
   const onFinish = async (values: any) => {
     try {
-      // Chuyển dữ liệu thành format gửi API nếu cần
       const payload = {
         ...values,
         delegationIncomingId: data?.delegationIncomingId,
@@ -36,8 +35,6 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps>(({ data
       await dispatch(updateReceptionTime(payload)).unwrap();
       onUpdated?.();
     } catch (err) {
-      toast.error('Cập nhật thất bại');
-      console.error(err);
     }
   };
 

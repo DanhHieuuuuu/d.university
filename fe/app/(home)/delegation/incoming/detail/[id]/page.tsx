@@ -12,6 +12,7 @@ import {
 import { DelegationIncomingTab, DetailGuestGroupTab, ReceptionTimeTab } from './(tab)';
 import { IDetailDelegationIncoming, IReceptionTime, IViewGuestGroup } from '@models/delegation/delegation.model';
 import type { FormInstance } from 'antd';
+import { toast } from 'react-toastify';
 export default function DetailDoanVaoPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -59,9 +60,10 @@ const onClickSave = async () => {
       staffFormRef.current?.submit(),
       receptionTimeFormRef.current?.submit()
     ]);
-
+    toast.success('Cập nhật thành công');
     setIsEdit(false);
   } catch (err) {
+    toast.error(String(err));
     
   }
 };

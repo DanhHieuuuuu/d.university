@@ -5,7 +5,7 @@ import { Card, Form, Input, Button, DatePicker, TimePicker, InputNumber, message
 import { useRouter, useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import { useAppDispatch } from '@redux/hooks';
-import { ICreateReceptionTime } from '@models/delegation/delegation.model';
+import { ICreateReceptionTime, ICreateReceptionTimeList } from '@models/delegation/delegation.model';
 import { createReceptionTime } from '@redux/feature/delegation/delegationThunk';
 import { toast } from 'react-toastify';
 import { ArrowLeftOutlined } from '@ant-design/icons';

@@ -69,7 +69,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     DelegationIncomingId = ds.DelegationIncoming.Id,
                     DelegationIncomingName = ds.DelegationIncoming.Name,
                     Content = ds.Content,
-                    Supporters = ds.Supporters.ToList(),
+                    Supporters = ds.Supporters.Where(s => !s.Deleted).ToList(),
                 };
 
             var totalCount = query.Count();
@@ -101,6 +101,155 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             return list;
         }
+
+        public async Task<UpdateDepartmentSupportResponseDto> UpdateDepartmentSupport(UpdateDepartmentSupportRequestDto dto)
+        {
+            _logger.LogInformation($"{nameof(UpdateDepartmentSupport)} called. Dto: {JsonSerializer.Serialize(dto)}");
+
+            dto.Supporters ??= new();
+
+            var departmentSupport = _unitOfWork
+                .iDepartmentSupportRepository
+                .Table
+                .Include(x => x.Supporters)
+                .FirstOrDefault(x => x.DepartmentSupportId == dto.DepartmentSupportId);
+
+            if (departmentSupport == null)
+                throw new Exception("Không tìm thấy Phòng ban hỗ trợ.");
+
+            // Update Phòng ban hỗ trợ
+            departmentSupport.Content = dto.Content;
+            departmentSupport.DelegationIncomingId = dto.DelegationIncomingId;
+
+            // Check trùng code trong request
+            var duplicateCodes = dto.Supporters
+                .Where(x => !string.IsNullOrWhiteSpace(x.SupporterCode))
+                .GroupBy(x => x.SupporterCode)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (duplicateCodes.Any())
+                throw new Exception($"SupporterCode bị trùng trong request: {string.Join(", ", duplicateCodes)}");
+
+            // Check trùng code trong DB
+            var allSupporters = departmentSupport.Supporters.ToList();
+
+            foreach (var item in dto.Supporters)
+            {
+                if (string.IsNullOrWhiteSpace(item.SupporterCode))
+                    continue;
+
+                var existed = allSupporters.FirstOrDefault(x =>
+                    x.SupporterCode == item.SupporterCode &&
+                    (x.SupporterId != item.SupporterId));
+
+                if (existed != null)
+                {
+                    throw new Exception($"SupporterCode '{item.SupporterCode}' đã tồn tại.");
+                }
+            }
+            // Xoá mềm những nguòi nếu request gửi lên ko có 
+            var requestIds = dto.Supporters      
+                .Select(x => x.SupporterId)
+                .ToList();
+
+            var supportersToSoftDelete = departmentSupport.Supporters
+                .Where(x => !x.Deleted && !requestIds.Contains(x.SupporterId))
+                .ToList();
+
+            foreach (var supporter in supportersToSoftDelete)
+            {
+                supporter.Deleted = true;
+            }
+            // Update supporter
+            foreach (var item in dto.Supporters)
+            {
+                if (item.SupporterId > 0)
+                {
+                    var supporter = departmentSupport.Supporters
+                        .FirstOrDefault(x => x.SupporterId == item.SupporterId);
+
+                    if (supporter != null)
+                    {
+                        supporter.SupporterCode = item.SupporterCode;
+                        supporter.Deleted = false;
+                    }
+                    else
+                    {
+                        var supporterNew = new Supporter
+                        {
+                            SupporterId = item.SupporterId,
+                            SupporterCode = item.SupporterCode,
+                            DepartmentSupportId = departmentSupport.DepartmentSupportId,
+                            Deleted = false
+                        };
+                        departmentSupport.Supporters.Add(supporterNew);
+                    }
+                }
+         
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return new UpdateDepartmentSupportResponseDto
+            {
+                DepartmentSupportId = departmentSupport.DepartmentSupportId,
+                DelegationIncomingId = departmentSupport.DelegationIncomingId,
+                Content = departmentSupport.Content,
+                Supporters = departmentSupport.Supporters
+                    .Where(x => !x.Deleted)
+                    .Select(x => new UpdateSupporterItemDto
+                    {
+                        SupporterId = x.SupporterId,
+                        SupporterCode = x.SupporterCode
+                    })
+                    .ToList()
+            };
+        }
+
+        public async Task<DetailDepartmentSupportResponseDto?> GetByIdDepartmentSupport(int id)
+        {
+            _logger.LogInformation($"{nameof(GetByIdDepartmentSupport)} called with id: {id}");
+
+            var detail = await _unitOfWork.iDepartmentSupportRepository
+                .TableNoTracking
+                .Include(x => x.DelegationIncoming)
+                .Include(x => x.Supporters)
+                .FirstOrDefaultAsync(x => x.Id == id && !x.Deleted);
+
+            if (detail == null)
+                return null;
+
+            var phongBan = await _unitOfWork.iDmPhongBanRepository
+                .TableNoTracking
+                .FirstOrDefaultAsync(x => x.Id == detail.DepartmentSupportId);
+
+            var result = new DetailDepartmentSupportResponseDto
+            {
+                DepartmentSupportId = detail.Id,
+                DelegationIncomingId = detail.DelegationIncomingId,
+
+                DepartmentSupportName = phongBan?.TenPhongBan,
+                DelegationIncomingName = detail.DelegationIncoming?.Name,
+
+                Content = detail.Content,
+
+                Supporters = detail.Supporters
+                    .Where(s => !s.Deleted)
+                    .Select(s => new DepartmentSupporterDto
+                    {
+                        SupporterId = s.SupporterId,
+                        SupporterCode = s.SupporterCode
+                    })            
+                    .ToList()
+            };
+
+            return result;
+        }
+
+
+
 
     }
 }

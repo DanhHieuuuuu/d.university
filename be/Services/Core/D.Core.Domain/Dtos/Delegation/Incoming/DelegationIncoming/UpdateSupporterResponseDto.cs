@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class ViewNhanSuResponseDto
+    public class UpdateSupporterResponseDto
     {
-        public int IdNhanSu { get; set; }
-        public string? TenNhanSu { get; set; }
+        public int Id { get; set; }
+        public int SupporterId { get; set; }
         public string? SupporterCode { get; set; }
+        public int DepartmentSupportId { get; set; }
     }
 }

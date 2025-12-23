@@ -36,5 +36,6 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [Description("Lý do")]
         [MaxLength(255)]
         public string? Reason { get; set; }
+        public string? CreatedByName { get; set; }
     }
 }

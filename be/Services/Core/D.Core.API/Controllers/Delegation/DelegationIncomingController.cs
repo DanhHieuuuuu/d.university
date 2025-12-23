@@ -237,7 +237,7 @@ namespace D.Core.API.Controllers.Delegation
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("create-reception-time")]
-        public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeRequestDto dto)
+        public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeListRequestDto dto)
         {
             try
             {
@@ -471,6 +471,42 @@ namespace D.Core.API.Controllers.Delegation
         /// <returns></returns>
         [HttpPost("create-department-support")]
         public async Task<ResponseAPI> CreateDepartmentSupport([FromBody] CreateDepartmentSupportRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Cập nhật Phòng ban hỗ trợ
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("update-department-support")]
+        public async Task<ResponseAPI> UpdateDepartmentSupport([FromBody] UpdateDepartmentSupportRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy phòng ban theo id
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-id-department-support")]
+        public async Task<ResponseAPI> GetByIdDepartmentSupport([FromQuery] DetailDepartmentSupportRequestDto dto)
         {
             try
             {

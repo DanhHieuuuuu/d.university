@@ -46,7 +46,6 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
         }
 
         await dispatch(updateDoanVao(formData)).unwrap();
-        toast.success('Cập nhật thành công');
         onUpdated?.();
       } catch (err) {
         throw err;
@@ -54,9 +53,14 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
     };
 
     useEffect(() => {
-      dispatch(getListPhongBan());
-      dispatch(getListNhanSu());
-    }, [dispatch]);
+      if (!listPhongBan || listPhongBan.length === 0) {
+        dispatch(getListPhongBan());
+      }
+
+      if (!listNhanSu || listNhanSu.length === 0) {
+        dispatch(getListNhanSu());
+      }
+    }, [dispatch, listPhongBan, listNhanSu]);
 
     const rows: DetailRow[] = useMemo(() => {
       if (!data) return [];
@@ -66,7 +70,7 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
       return [
         {
           label: 'Mã đoàn',
-          value: renderField('code', data.code, <Input  disabled/>, options)
+          value: renderField('code', data.code, <Input disabled />, options)
         },
         {
           label: 'Tên đoàn vào',
@@ -153,7 +157,7 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
           )
         }
       ];
-    }, [data, isEdit]);
+    }, [data, isEdit, listNhanSu, listPhongBan]);
 
     return (
       <Form form={form} layout="vertical" onFinish={onFinish}>

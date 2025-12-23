@@ -199,10 +199,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 DelegationIncomingCode = newDoanVao.Code,
                 NewStatus = DelegationStatus.Create,
                 OldStatus = DelegationStatus.Create,
-                Description = $"Thêm đoàn vào: Đã được thêm bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}",
+                Description = $"Thêm đoàn vào ",
                 CreatedDate = DateTime.Now,
                 Reason = "Thêm mới đoàn vào",
-                CreatedBy = userId.ToString()
+                CreatedByName = userName,
             };
 
             _unitOfWork.iLogStatusRepository.Add(log);
@@ -293,11 +293,11 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             if (oldValues.RequestDate != dto.RequestDate) changes.Add($"RequestDate: '{oldValues.RequestDate}' => '{dto.RequestDate}'");
             if (oldValues.ReceptionDate != dto.ReceptionDate) changes.Add($"ReceptionDate: '{oldValues.ReceptionDate}' => '{dto.ReceptionDate}'");
             if (oldValues.TotalMoney != dto.TotalMoney) changes.Add($"TotalMoney: '{oldValues.TotalMoney}' => '{dto.TotalMoney}'");
-            if (oldValues.Status != exist.Status) changes.Add($"Status: '{oldValues.Status}' => '{exist.Status}'");
+            if (oldValues.Status != exist.Status) changes.Add($"Status: '{DelegationStatus.Names[oldValues.Status]} => {DelegationStatus.Names[exist.Status]}'");
 
             var description = changes.Any()
-                ? $"Cập nhật đoàn vào: {string.Join("; ", changes)}.Bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}"
-                : $"Cập nhật đoàn vào nhưng không thay đổi giá trị.Bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
+                ? $"Cập nhật đoàn vào: {string.Join("; ", changes)}."
+                : $"Cập nhật đoàn vào nhưng không thay đổi giá trị.";
 
             var log = new LogStatus
             {
@@ -307,7 +307,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 Reason = "Cập nhật",
                 Description = description,
                 CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString()
+                CreatedByName = userName,
             };
 
             _unitOfWork.iLogStatusRepository.Add(log);
@@ -360,20 +360,24 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(GetAllNhanSu)} called.");
 
-            var list = _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                .Where(x => x.DaChamDutHopDong != true
-                    && x.DaVeHuu != true
-                    && x.IsThoiViec != true
-                )
-                .Select(x => new ViewNhanSuResponseDto
-                {
-                    IdNhanSu = x.Id,         
-                    TenNhanSu = x.HoDem + x.Ten
-                })
-                .ToList();
+            var list = (from ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                        where ns.DaChamDutHopDong != true
+                           && ns.DaVeHuu != true
+                           && ns.IsThoiViec != true
+                        join sp in _unitOfWork.iSupporterRepository.TableNoTracking
+                            on ns.Id equals sp.SupporterId into spJoin
+                        from sp in spJoin.DefaultIfEmpty() 
+                        select new ViewNhanSuResponseDto
+                        {
+                            IdNhanSu = ns.Id,
+                            TenNhanSu = (ns.HoDem ?? "") + " " + (ns.Ten ?? ""),
+                            SupporterCode = sp != null ? sp.SupporterCode : null
+                        })
+                        .ToList();
 
             return list;
         }
+
 
         public List<ViewTrangThaiResponseDto> GetListTrangThai(ViewTrangThaiRequestDto dto)
         {
@@ -512,8 +516,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             if(delegation.Status == DelegationStatus.Done)
                 throw new UserFriendlyException(4003, "Đoàn này đã hoàn thành tiếp đoàn.");
 
-            if(delegation.Status == DelegationStatus.ReceptionGroup)
-                throw new UserFriendlyException(4003, "Đoàn này đang thực hiện tiếp đoàn.");
+            //if(delegation.Status == DelegationStatus.ReceptionGroup)
+            //    throw new UserFriendlyException(4003, "Đoàn này đang thực hiện tiếp đoàn.");
 
             if (dto.Action == "upgrade")
             {
@@ -553,9 +557,9 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 DelegationIncomingCode = delegation.Code,
                 NewStatus = dto.OldStatus,
                 OldStatus = delegation.Status,
-                Description = $"Đã thay đổi trạng thái từ {dto.OldStatus} => {delegation.Status} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}",
+                Description = $"Đã thay đổi trạng thái từ {DelegationStatus.Names[dto.OldStatus]} => {DelegationStatus.Names[delegation.Status]} ",
                 CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString(),
+                CreatedByName = userName,
                 Reason = "Trạng thái"
             };
 
