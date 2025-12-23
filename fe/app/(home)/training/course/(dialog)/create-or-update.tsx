@@ -10,7 +10,7 @@ import {
   resetStatusMonHoc,
   updateMonHoc
 } from '@redux/feature/daotaoSlice';
-import { getAllToBoMon } from '@redux/feature/danhmucSlice';
+import { getAllToBoMon } from '@redux/feature/danh-muc/danhmucThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 
@@ -144,7 +144,7 @@ const CourseModal: React.FC<CourseModalProps> = (props) => {
             <Select
               placeholder="Chọn tổ bộ môn"
               options={listToBoMon.map((toBoMon) => ({
-                label: toBoMon.tenToBoMon,
+                label: toBoMon.tenBoMon,
                 value: toBoMon.id
               }))}
               showSearch
