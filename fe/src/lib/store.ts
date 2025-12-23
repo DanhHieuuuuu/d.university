@@ -9,6 +9,7 @@ import danhmucReducer from './feature/danhmucSlice';
 import studentReducer from './feature/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';
+import daotaoReducer from './feature/daotaoSlice';
 
 const persistConfig = {
   key: 'auth',
@@ -28,7 +29,8 @@ export const makeStore = () => {
       danhmucState: danhmucReducer,
       studentState: studentReducer,
       roleConfigState: roleConfigReducer,
-      noticeState: noticeReducer
+      noticeState: noticeReducer,
+      daotaoState: daotaoReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

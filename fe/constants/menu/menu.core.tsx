@@ -58,6 +58,31 @@ export const listMenuCore: IMenu[] = [
         label: 'Khoa',
         routerLink: '/training/faculty',
         icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Ngành',
+        routerLink: '/training/major',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Chuyên ngành',
+        routerLink: '/training/specialization',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Môn học',
+        routerLink: '/training/course',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Môn học tiên quyết',
+        routerLink: '/training/prerequisiteCourse',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Khung chương trình',
+        routerLink: '/training/curriculumFramework',
+        icon: <ApartmentOutlined />
       }
     ]
   },

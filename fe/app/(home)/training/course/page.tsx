@@ -11,26 +11,26 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllKhoa, setSelectedIdKhoa } from '@redux/feature/daotaoSlice';
+import { getAllMonHoc, setSelectedIdMonHoc } from '@redux/feature/daotaoSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryKhoa, IViewKhoa } from '@models/dao-tao/khoa.model';
-import FacultyModal from './(dialog)/create-or-update';
+import { IQueryMonHoc, IViewMonHoc } from '@models/dao-tao/monHoc.model';
+import CourseModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.daotaoState.khoa.$list);
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.daotaoState.monHoc.$list);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKhoa>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryMonHoc>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -38,7 +38,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllKhoa(newQuery));
+      dispatch(getAllMonHoc(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -64,10 +64,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllKhoa(query));
+    dispatch(getAllMonHoc(query));
   };
 
-  const columns: IColumn<IViewKhoa>[] = [
+  const columns: IColumn<IViewMonHoc>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -75,53 +75,58 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maKhoa',
-      dataIndex: 'maKhoa',
-      title: 'Mã khoa'
+      key: 'maMonHoc',
+      dataIndex: 'maMonHoc',
+      title: 'Mã môn học'
     },
     {
-      key: 'tenKhoa',
-      dataIndex: 'tenKhoa',
-      title: 'Tên khoa'
+      key: 'tenMonHoc',
+      dataIndex: 'tenMonHoc',
+      title: 'Tên môn học'
     },
     {
-      key: 'tenTiengAnh',
-      dataIndex: 'tenTiengAnh',
-      title: 'Tên tiếng Anh'
+      key: 'soTinChi',
+      dataIndex: 'soTinChi',
+      title: 'Số tín chỉ'
     },
     {
-      key: 'vietTat',
-      dataIndex: 'vietTat',
-      title: 'Viết tắt'
+      key: 'soTietLyThuyet',
+      dataIndex: 'soTietLyThuyet',
+      title: 'Số tiết lý thuyết'
     },
     {
-      key: 'email',
-      dataIndex: 'email',
-      title: 'Email'
+      key: 'soTietThucHanh',
+      dataIndex: 'soTietThucHanh',
+      title: 'Số tiết thực hành'
     },
     {
-      key: 'sdt',
-      dataIndex: 'sdt',
-      title: 'Số điện thoại'
+      key: 'trangThai',
+      dataIndex: 'trangThai',
+      title: 'Trạng thái',
+      render: (value: boolean) => (
+        <span className={value ? 'text-green-600' : 'text-red-600'}>
+          {value ? 'Hoạt động' : 'Ngừng'}
+        </span>
+      )
     }
   ];
 
   const actions: IAction[] = [
     {
       label: 'Chi tiết',
-      tooltip: 'Xem thông tin khoa',
+      tooltip: 'Xem thông tin môn học',
       icon: <EyeOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewMonHoc) => {
+        dispatch(setSelectedIdMonHoc(record.id));
         onClickView(record.id);
       }
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin khoa',
+      tooltip: 'Sửa thông tin môn học',
       icon: <EditOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewMonHoc) => {
+        dispatch(setSelectedIdMonHoc(record.id));
         onClickUpdate(record.id);
       }
     },
@@ -129,8 +134,8 @@ const Page = () => {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewMonHoc) => {
+        dispatch(setSelectedIdMonHoc(record.id));
       }
     }
   ];
@@ -145,7 +150,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách khoa"
+      title="Danh sách môn học"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -155,7 +160,7 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryKhoa> label="Tên khoa:" name="Keyword">
+          <Form.Item<IQueryMonHoc> label="Tên môn học:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
@@ -188,7 +193,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <FacultyModal
+      <CourseModal
         isModalOpen={isModalOpen}
         isUpdate={isUpdate}
         isView={isView}
