@@ -6,33 +6,32 @@ import {
   SearchOutlined,
   SyncOutlined,
   EditOutlined,
+  StopOutlined,
   DeleteOutlined,
   EyeOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
-import { getAllKhoa, setSelectedIdKhoa } from '@redux/feature/daotaoSlice';
+import { getAllChucVu, getChucVuById, setSelectedIdChucVu } from '@redux/feature/danhmucSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryKhoa, IViewKhoa } from '@models/dao-tao/khoa.model';
-import FacultyModal from './(dialog)/create-or-update';
+import { IQueryChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
+import PositionModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.daotaoState.khoa.$list);
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.chucVu.$list);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKhoa>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryChucVu>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -40,7 +39,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllKhoa(newQuery));
+      dispatch(getAllChucVu(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -66,10 +65,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllKhoa(query));
+    dispatch(getAllChucVu(query));
   };
 
-  const columns: IColumn<IViewKhoa>[] = [
+  const columns: IColumn<IViewChucVu>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -77,53 +76,43 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maKhoa',
-      dataIndex: 'maKhoa',
-      title: 'Mã khoa'
+      key: 'maChucVu',
+      dataIndex: 'maChucVu',
+      title: 'Mã chức vụ'
     },
     {
-      key: 'tenKhoa',
-      dataIndex: 'tenKhoa',
-      title: 'Tên khoa'
+      key: 'tenChucVu',
+      dataIndex: 'tenChucVu',
+      title: 'Tên chức vụ'
     },
     {
-      key: 'tenTiengAnh',
-      dataIndex: 'tenTiengAnh',
-      title: 'Tên tiếng Anh'
+      key: 'hsChucVu',
+      dataIndex: 'hsChucVu',
+      title: 'Hệ số'
     },
     {
-      key: 'vietTat',
-      dataIndex: 'vietTat',
-      title: 'Viết tắt'
-    },
-    {
-      key: 'email',
-      dataIndex: 'email',
-      title: 'Email'
-    },
-    {
-      key: 'sdt',
-      dataIndex: 'sdt',
-      title: 'Số điện thoại'
+      key: 'hsTrachNhiem',
+      dataIndex: 'hsTrachNhiem',
+      title: 'Hệ số trách nhiệm'
     }
   ];
 
   const actions: IAction[] = [
     {
       label: 'Chi tiết',
-      tooltip: 'Xem thông tin khoa',
+      tooltip: 'Xem thông tin chức vụ',
       icon: <EyeOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewChucVu) => {
+        dispatch(setSelectedIdChucVu(record.id));
         onClickView(record.id);
       }
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin khoa',
+      tooltip: 'Sửa thông tin chức vụ',
       icon: <EditOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewChucVu) => {
+        dispatch(setSelectedIdChucVu(record.id));
         onClickUpdate(record.id);
       }
     },
@@ -131,8 +120,8 @@ const Page = () => {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewChucVu) => {
+        dispatch(setSelectedIdChucVu(record.id));
       }
     }
   ];
@@ -147,7 +136,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách khoa"
+      title="Danh sách chức vụ"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -157,7 +146,7 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryKhoa> label="Tên khoa:" name="Keyword">
+          <Form.Item<IQueryChucVu> label="Tên chức vụ:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
@@ -190,7 +179,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <FacultyModal
+      <PositionModal
         isModalOpen={isModalOpen}
         isUpdate={isUpdate}
         isView={isView}

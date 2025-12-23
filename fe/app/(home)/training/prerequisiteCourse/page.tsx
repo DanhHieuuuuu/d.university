@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input } from 'antd';
 import {
   PlusOutlined,
@@ -11,28 +11,37 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
-import { getAllKhoa, setSelectedIdKhoa } from '@redux/feature/daotaoSlice';
+import { getAllMonTienQuyet, getAllMonHoc, setSelectedIdMonTienQuyet } from '@redux/feature/daotaoSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryKhoa, IViewKhoa } from '@models/dao-tao/khoa.model';
-import FacultyModal from './(dialog)/create-or-update';
+import { IQueryMonTienQuyet, IViewMonTienQuyet } from '@models/dao-tao/monTienQuyet.model';
+import PrerequisiteCourseModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.daotaoState.khoa.$list);
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.daotaoState.monTienQuyet.$list);
+  const listMonHoc = useAppSelector((state) => state.daotaoState.listMonHoc);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKhoa>({
+  // Load list MonHoc for display
+  useEffect(() => {
+    dispatch(getAllMonHoc({ PageIndex: 1, PageSize: 100 }));
+  }, [dispatch]);
+
+  const getMonHocName = (monHocId: number) => {
+    const monHoc = listMonHoc.find((m) => m.id === monHocId);
+    return monHoc ? monHoc.tenMonHoc : monHocId;
+  };
+
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryMonTienQuyet>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -40,7 +49,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllKhoa(newQuery));
+      dispatch(getAllMonTienQuyet(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -66,10 +75,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllKhoa(query));
+    dispatch(getAllMonTienQuyet(query));
   };
 
-  const columns: IColumn<IViewKhoa>[] = [
+  const columns: IColumn<IViewMonTienQuyet>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -77,53 +86,45 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maKhoa',
-      dataIndex: 'maKhoa',
-      title: 'Mã khoa'
+      key: 'monHocId',
+      dataIndex: 'monHocId',
+      title: 'Môn học',
+      render: (value: number) => getMonHocName(value)
     },
     {
-      key: 'tenKhoa',
-      dataIndex: 'tenKhoa',
-      title: 'Tên khoa'
+      key: 'monTienQuyetId',
+      dataIndex: 'monTienQuyetId',
+      title: 'Môn tiên quyết',
+      render: (value: number) => getMonHocName(value)
     },
     {
-      key: 'tenTiengAnh',
-      dataIndex: 'tenTiengAnh',
-      title: 'Tên tiếng Anh'
+      key: 'loaiDieuKien',
+      dataIndex: 'loaiDieuKien',
+      title: 'Loại điều kiện'
     },
     {
-      key: 'vietTat',
-      dataIndex: 'vietTat',
-      title: 'Viết tắt'
-    },
-    {
-      key: 'email',
-      dataIndex: 'email',
-      title: 'Email'
-    },
-    {
-      key: 'sdt',
-      dataIndex: 'sdt',
-      title: 'Số điện thoại'
+      key: 'ghiChu',
+      dataIndex: 'ghiChu',
+      title: 'Ghi chú'
     }
   ];
 
   const actions: IAction[] = [
     {
       label: 'Chi tiết',
-      tooltip: 'Xem thông tin khoa',
+      tooltip: 'Xem thông tin môn tiên quyết',
       icon: <EyeOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewMonTienQuyet) => {
+        dispatch(setSelectedIdMonTienQuyet(record.id));
         onClickView(record.id);
       }
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin khoa',
+      tooltip: 'Sửa thông tin môn tiên quyết',
       icon: <EditOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewMonTienQuyet) => {
+        dispatch(setSelectedIdMonTienQuyet(record.id));
         onClickUpdate(record.id);
       }
     },
@@ -131,8 +132,8 @@ const Page = () => {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+      command: (record: IViewMonTienQuyet) => {
+        dispatch(setSelectedIdMonTienQuyet(record.id));
       }
     }
   ];
@@ -147,7 +148,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách khoa"
+      title="Danh sách môn tiên quyết"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -157,7 +158,7 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryKhoa> label="Tên khoa:" name="Keyword">
+          <Form.Item<IQueryMonTienQuyet> label="Tìm kiếm:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
@@ -190,7 +191,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <FacultyModal
+      <PrerequisiteCourseModal
         isModalOpen={isModalOpen}
         isUpdate={isUpdate}
         isView={isView}

@@ -1,26 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Button, Form, FormProps, Input, Modal, Switch } from 'antd';
+import { Button, Form, FormProps, Input, InputNumber, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ICreateKhoa, IUpdateKhoa } from '@models/dao-tao/khoa.model';
+import { ICreateChucVu, IUpdateChucVu } from '@models/danh-muc/chuc-vu.model';
 import {
-  createPhongBan,
-  getPhongBanById,
-  updatePhongBan,
-  getAllLoaiPhongBan
-} from '@redux/feature/danh-muc/danhmucThunk';
-import { clearSelectedPhongBan, resetStatusPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
-import {
-  clearSelectedKhoa,
-  createKhoa,
-  getKhoaById,
-  resetStatusKhoa,
-  updateKhoa
-} from '@redux/feature/daotaoSlice';
+  clearSeletedChucVu,
+  createChucVu,
+  getChucVuById,
+  resetStatusChucVu,
+  updateChucVu
+} from '@redux/feature/danhmucSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 
-type FacultyModalProps = {
+type PositionModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
@@ -28,26 +21,26 @@ type FacultyModalProps = {
   refreshData: () => void;
 };
 
-const FacultyModal: React.FC<FacultyModalProps> = (props) => {
+const PositionModal: React.FC<PositionModalProps> = (props) => {
   const dispatch = useAppDispatch();
-  const [form] = Form.useForm<ICreateKhoa>();
+  const [form] = Form.useForm<ICreateChucVu>();
   const [title, setTitle] = useState<string>('');
 
-  const { $selected, $create, $update } = useAppSelector((state) => state.daotaoState.khoa);
+  const { $selected, $create, $update } = useAppSelector((state) => state.danhmucState.chucVu);
 
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
 
   useEffect(() => {
     if (props.isModalOpen) {
-      if (props.isUpdate) setTitle('Chỉnh sửa khoa');
-      else if (props.isView) setTitle('Chi tiết khoa');
-      else setTitle('Thêm mới khoa');
+      if (props.isUpdate) setTitle('Chỉnh sửa');
+      else if (props.isView) setTitle('Chi tiết');
+      else setTitle('Thêm mới');
     }
   }, [props.isModalOpen, props.isUpdate, props.isView]);
 
   useEffect(() => {
     if (props.isModalOpen && (props.isUpdate || props.isView) && $selected.id) {
-      dispatch(getKhoaById($selected.id));
+      dispatch(getChucVuById($selected.id));
     }
   }, [props.isModalOpen, props.isUpdate, props.isView, $selected.id]);
 
@@ -59,8 +52,8 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
-      dispatch(resetStatusKhoa());
-      dispatch(clearSelectedKhoa());
+      dispatch(resetStatusChucVu());
+      dispatch(clearSeletedChucVu());
       form.resetFields();
       props.refreshData();
       props.setIsModalOpen(false);
@@ -69,17 +62,17 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
 
   const handleClose = () => {
     form.resetFields();
-    dispatch(clearSelectedKhoa());
+    dispatch(clearSeletedChucVu());
     props.setIsModalOpen(false);
   };
 
-  const handleFinish: FormProps['onFinish'] = async (values: ICreateKhoa | IUpdateKhoa) => {
+  const handleFinish: FormProps['onFinish'] = async (values: ICreateChucVu | IUpdateChucVu) => {
     try {
       if (props.isUpdate && $selected.id) {
-        await dispatch(updateKhoa({ id: $selected.id, ...values })).unwrap();
+        await dispatch(updateChucVu({ id: $selected.id, ...values })).unwrap();
         toast.success('Cập nhật thành công');
       } else {
-        await dispatch(createKhoa(values)).unwrap();
+        await dispatch(createChucVu(values)).unwrap();
         toast.success('Thêm mới thành công');
       }
     } catch (error) {
@@ -91,7 +84,7 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
     <Modal
       title={title}
       className="app-modal"
-      width="60%"
+      width="50%"
       closable={{ 'aria-label': 'Custom Close Button' }}
       open={props.isModalOpen}
       onCancel={handleClose}
@@ -114,47 +107,34 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
       }
     >
       <Form
-        name="khoa"
+        name="chucvu"
         layout="vertical"
         form={form}
         onFinish={handleFinish}
         autoComplete="on"
         disabled={props.isView}
         labelCol={{ style: { fontWeight: 600 } }}
-        initialValues={{ trangThai: true }}
       >
         <div className="grid grid-cols-2 gap-x-5">
-          <Form.Item<ICreateKhoa>
-            label="Mã khoa"
-            name="maKhoa"
-            rules={[{ required: true, message: 'Vui lòng nhập mã khoa' }]}
+          <Form.Item<ICreateChucVu>
+            label="Mã chức vụ"
+            name="maChucVu"
+            rules={[{ required: true, message: 'Vui lòng nhập mã chức vụ' }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item<ICreateKhoa>
-            label="Tên khoa"
-            name="tenKhoa"
-            rules={[{ required: true, message: 'Vui lòng nhập tên khoa' }]}
+          <Form.Item<ICreateChucVu>
+            label="Tên chức vụ"
+            name="tenChucVu"
+            rules={[{ required: true, message: 'Vui lòng nhập tên chức vụ' }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item<ICreateKhoa> label="Tên tiếng Anh" name="tenTiengAnh">
-            <Input />
+          <Form.Item<ICreateChucVu> label="Hệ số chức vụ" name="hsChucVu">
+            <InputNumber className="!w-full" min={0} step={0.01} stringMode precision={2} />
           </Form.Item>
-          <Form.Item<ICreateKhoa> label="Viết tắt" name="vietTat">
-            <Input />
-          </Form.Item>
-          <Form.Item<ICreateKhoa> label="Email" name="email">
-            <Input type="email" />
-          </Form.Item>
-          <Form.Item<ICreateKhoa> label="Số điện thoại" name="sdt">
-            <Input />
-          </Form.Item>
-          <Form.Item<ICreateKhoa> label="Địa chỉ" name="diaChi" className="col-span-2">
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item<ICreateKhoa> label="Trạng thái" name="trangThai" valuePropName="checked">
-            <Switch checkedChildren="Hoạt động" unCheckedChildren="Ngừng" />
+          <Form.Item<ICreateChucVu> label="Hệ số trách nhiệm" name="hsTrachNhiem">
+            <InputNumber className="!w-full" min={0} step={0.01} stringMode precision={2} />
           </Form.Item>
         </div>
       </Form>
@@ -162,4 +142,4 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
   );
 };
 
-export default FacultyModal;
+export default PositionModal;

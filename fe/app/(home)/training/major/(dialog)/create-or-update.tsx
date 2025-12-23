@@ -1,26 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Button, Form, FormProps, Input, Modal, Switch } from 'antd';
+import { Button, Form, FormProps, Input, Modal, Select, Switch } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ICreateKhoa, IUpdateKhoa } from '@models/dao-tao/khoa.model';
+import { ICreateNganh, IUpdateNganh } from '@models/dao-tao/nganh.model';
 import {
-  createPhongBan,
-  getPhongBanById,
-  updatePhongBan,
-  getAllLoaiPhongBan
-} from '@redux/feature/danh-muc/danhmucThunk';
-import { clearSelectedPhongBan, resetStatusPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
-import {
-  clearSelectedKhoa,
-  createKhoa,
-  getKhoaById,
-  resetStatusKhoa,
-  updateKhoa
+  clearSelectedNganh,
+  createNganh,
+  getAllKhoa,
+  getNganhById,
+  resetStatusNganh,
+  updateNganh
 } from '@redux/feature/daotaoSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 
-type FacultyModalProps = {
+type MajorModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
@@ -28,26 +22,30 @@ type FacultyModalProps = {
   refreshData: () => void;
 };
 
-const FacultyModal: React.FC<FacultyModalProps> = (props) => {
+const MajorModal: React.FC<MajorModalProps> = (props) => {
   const dispatch = useAppDispatch();
-  const [form] = Form.useForm<ICreateKhoa>();
+  const [form] = Form.useForm<ICreateNganh>();
   const [title, setTitle] = useState<string>('');
 
-  const { $selected, $create, $update } = useAppSelector((state) => state.daotaoState.khoa);
+  const { $selected, $create, $update } = useAppSelector((state) => state.daotaoState.nganh);
+  const listKhoa = useAppSelector((state) => state.daotaoState.listKhoa);
 
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
 
   useEffect(() => {
     if (props.isModalOpen) {
-      if (props.isUpdate) setTitle('Chỉnh sửa khoa');
-      else if (props.isView) setTitle('Chi tiết khoa');
-      else setTitle('Thêm mới khoa');
+      // Load list Khoa for dropdown
+      dispatch(getAllKhoa({ PageIndex: 1, PageSize: 100 }));
+
+      if (props.isUpdate) setTitle('Chỉnh sửa ngành');
+      else if (props.isView) setTitle('Chi tiết ngành');
+      else setTitle('Thêm mới ngành');
     }
   }, [props.isModalOpen, props.isUpdate, props.isView]);
 
   useEffect(() => {
     if (props.isModalOpen && (props.isUpdate || props.isView) && $selected.id) {
-      dispatch(getKhoaById($selected.id));
+      dispatch(getNganhById($selected.id));
     }
   }, [props.isModalOpen, props.isUpdate, props.isView, $selected.id]);
 
@@ -59,8 +57,8 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
-      dispatch(resetStatusKhoa());
-      dispatch(clearSelectedKhoa());
+      dispatch(resetStatusNganh());
+      dispatch(clearSelectedNganh());
       form.resetFields();
       props.refreshData();
       props.setIsModalOpen(false);
@@ -69,17 +67,17 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
 
   const handleClose = () => {
     form.resetFields();
-    dispatch(clearSelectedKhoa());
+    dispatch(clearSelectedNganh());
     props.setIsModalOpen(false);
   };
 
-  const handleFinish: FormProps['onFinish'] = async (values: ICreateKhoa | IUpdateKhoa) => {
+  const handleFinish: FormProps['onFinish'] = async (values: ICreateNganh | IUpdateNganh) => {
     try {
       if (props.isUpdate && $selected.id) {
-        await dispatch(updateKhoa({ id: $selected.id, ...values })).unwrap();
+        await dispatch(updateNganh({ id: $selected.id, ...values })).unwrap();
         toast.success('Cập nhật thành công');
       } else {
-        await dispatch(createKhoa(values)).unwrap();
+        await dispatch(createNganh(values)).unwrap();
         toast.success('Thêm mới thành công');
       }
     } catch (error) {
@@ -114,7 +112,7 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
       }
     >
       <Form
-        name="khoa"
+        name="nganh"
         layout="vertical"
         form={form}
         onFinish={handleFinish}
@@ -124,36 +122,44 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
         initialValues={{ trangThai: true }}
       >
         <div className="grid grid-cols-2 gap-x-5">
-          <Form.Item<ICreateKhoa>
-            label="Mã khoa"
-            name="maKhoa"
-            rules={[{ required: true, message: 'Vui lòng nhập mã khoa' }]}
+          <Form.Item<ICreateNganh>
+            label="Mã ngành"
+            name="maNganh"
+            rules={[{ required: true, message: 'Vui lòng nhập mã ngành' }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item<ICreateKhoa>
-            label="Tên khoa"
-            name="tenKhoa"
-            rules={[{ required: true, message: 'Vui lòng nhập tên khoa' }]}
+          <Form.Item<ICreateNganh>
+            label="Tên ngành"
+            name="tenNganh"
+            rules={[{ required: true, message: 'Vui lòng nhập tên ngành' }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item<ICreateKhoa> label="Tên tiếng Anh" name="tenTiengAnh">
+          <Form.Item<ICreateNganh> label="Tên tiếng Anh" name="tenTiengAnh">
             <Input />
           </Form.Item>
-          <Form.Item<ICreateKhoa> label="Viết tắt" name="vietTat">
-            <Input />
+          <Form.Item<ICreateNganh>
+            label="Khoa"
+            name="khoaId"
+            rules={[{ required: true, message: 'Vui lòng chọn khoa' }]}
+          >
+            <Select
+              placeholder="Chọn khoa"
+              options={listKhoa.map((khoa) => ({
+                label: khoa.tenKhoa,
+                value: khoa.id
+              }))}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+            />
           </Form.Item>
-          <Form.Item<ICreateKhoa> label="Email" name="email">
-            <Input type="email" />
+          <Form.Item<ICreateNganh> label="Mô tả" name="moTa" className="col-span-2">
+            <Input.TextArea rows={3} />
           </Form.Item>
-          <Form.Item<ICreateKhoa> label="Số điện thoại" name="sdt">
-            <Input />
-          </Form.Item>
-          <Form.Item<ICreateKhoa> label="Địa chỉ" name="diaChi" className="col-span-2">
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item<ICreateKhoa> label="Trạng thái" name="trangThai" valuePropName="checked">
+          <Form.Item<ICreateNganh> label="Trạng thái" name="trangThai" valuePropName="checked">
             <Switch checkedChildren="Hoạt động" unCheckedChildren="Ngừng" />
           </Form.Item>
         </div>
@@ -162,4 +168,4 @@ const FacultyModal: React.FC<FacultyModalProps> = (props) => {
   );
 };
 
-export default FacultyModal;
+export default MajorModal;
