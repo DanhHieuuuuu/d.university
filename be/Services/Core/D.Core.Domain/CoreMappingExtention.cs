@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Reflection;
+using AutoMapper;
 using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhung;
 using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon;
 using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
@@ -32,7 +33,6 @@ using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Entities.Survey;
 using D.Core.Domain.Entities.Survey.Constants;
-using System.Reflection;
 
 namespace D.Core.Domain
 {
@@ -79,12 +79,14 @@ namespace D.Core.Domain
 
             CreateMap<CreateNsQuanHeGiaDinhDto, NsQuanHeGiaDinh>();
             CreateMap<CreateNhanSuDto, NsNhanSu>()
-                .BeforeMap(
-                    (src, dest) =>
-                    {
-                        TrimAllStringProperties(src);
-                    }
-                );
+                .ForMember(
+                    dest => dest.NhomMau,
+                    opt =>
+                        opt.MapFrom(src =>
+                            !string.IsNullOrEmpty(src.NhomMau) ? src.NhomMau.ToUpper() : src.NhomMau
+                        )
+                )
+                .ForMember(dst => dst.NgayCapNhatSk, opt => opt.MapFrom(src => DateTime.Now));
 
             CreateMap<NsNhanSu, NsNhanSuFindByIdResponseDto>()
                 .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id));
@@ -98,7 +100,10 @@ namespace D.Core.Domain
             CreateMap<UpdateSinhVienDto, SvSinhVien>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<SvSinhVien, SvSinhVienGetAllResponseDto>()
-                .ForMember(dest => dest.HoTen, opt => opt.MapFrom(src => src.HoDem + " " + src.Ten));
+                .ForMember(
+                    dest => dest.HoTen,
+                    opt => opt.MapFrom(src => src.HoDem + " " + src.Ten)
+                );
 
             #endregion
 
@@ -152,11 +157,11 @@ namespace D.Core.Domain
             CreateMap<ReceptionTime, CreateReceptionTimeResponseDto>();
             CreateMap<ReceptionTime, UpdateReceptionTimeResponseDto>();
             CreateMap<Supporter, CreateSupporterResponseDto>();
-            CreateMap<CreateSupporterResponseDto,Supporter>();
+            CreateMap<CreateSupporterResponseDto, Supporter>();
             CreateMap<CreateSupporterRequestDto, Supporter>();
             CreateMap<CreateDepartmentSupportResponseDto, DepartmentSupport>();
             CreateMap<CreateDepartmentSupportRequestDto, DepartmentSupport>();
-            CreateMap<DepartmentSupport, CreateDepartmentSupportResponseDto>();                
+            CreateMap<DepartmentSupport, CreateDepartmentSupportResponseDto>();
 
             #endregion
 

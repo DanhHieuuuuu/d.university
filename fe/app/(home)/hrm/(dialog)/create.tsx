@@ -30,7 +30,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
     if (props.isModalOpen) {
       if (props.isUpdate) {
         if (selected) {
-          setTitle('Chỉnh sủa');
+          setTitle('Chỉnh sửa');
           initData();
         }
       } else if (props.isView) {

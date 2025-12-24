@@ -10,6 +10,7 @@ import {
   SearchOutlined,
   SyncOutlined
 } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -28,6 +29,7 @@ import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 import CreateNhanSuModal from './(dialog)/create';
 
 const Page = () => {
+  const router = useRouter();
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem } = useAppSelector((state) => state.nhanSuState);
@@ -147,9 +149,7 @@ const Page = () => {
 
   const onClickView = (data: IViewNhanSu) => {
     dispatch(selectMaNhanSu(data.idNhanSu));
-    setIsModalView(true);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
+    router.push(`/hrm/${data.idNhanSu}`);
   };
 
   const onClickUpdate = (data: IViewNhanSu) => {
