@@ -114,6 +114,7 @@ namespace D.Core.Domain
         public DbSet<KsSurveyReport> KsSurveyReport { get; set; }
         public DbSet<KsAIResponse> KsAIResponse { get; set; }
         public DbSet<KsSurveyLog> KsSurveyLog { get; set; }
+        public DbSet<KsSurveySubmissionLog> KsSurveySubmissionLog { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

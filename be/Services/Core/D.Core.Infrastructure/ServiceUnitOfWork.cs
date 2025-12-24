@@ -72,6 +72,10 @@ namespace D.Core.Infrastructure
         private SurveyRequestRepository _surveyRequestRepository;
         private SurveyRepository _surveyRepository;
         private SurveyLogRepository _surveyLogRepository;
+        private SurveySubmissionRepository _surveySubmissionRepository;
+        private SurveySubmissionAnswerRepository _surveySubmissionAnswerRepository;
+        private SurveySubmissionLogRepository _surveySubmissionLogRepository;
+
         #endregion
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -575,6 +579,42 @@ namespace D.Core.Infrastructure
                     _surveyRepository = new SurveyRepository(_dbContext, _httpContext);
                 }
                 return _surveyRepository;
+            }
+        }
+
+        public IKsSurveySubmissionRepository iKsSurveySubmissionRepository
+        {
+            get
+            {
+                if (_surveySubmissionRepository == null)
+                {
+                    _surveySubmissionRepository = new SurveySubmissionRepository(_dbContext, _httpContext);
+                }
+                return _surveySubmissionRepository;
+            }
+        }
+
+        public IKsSurveySubmissionAnswerRepository iKsSurveySubmissionAnswerRepository
+        {
+            get
+            {
+                if (_surveySubmissionAnswerRepository == null)
+                {
+                    _surveySubmissionAnswerRepository = new SurveySubmissionAnswerRepository(_dbContext, _httpContext);
+                }
+                return _surveySubmissionAnswerRepository;
+            }
+        }
+
+        public IKsSurveySubmissionLogRepository iKsSurveySubmissionLogRepository
+        {
+            get
+            {
+                if (_surveySubmissionLogRepository == null)
+                {
+                    _surveySubmissionLogRepository = new SurveySubmissionLogRepository(_dbContext, _httpContext);
+                }
+                return _surveySubmissionLogRepository;
             }
         }
 

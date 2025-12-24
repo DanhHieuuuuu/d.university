@@ -2,7 +2,6 @@
 using D.InfrastructureBase.Database;
 using D.InfrastructureBase.Repository;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +10,13 @@ using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure.Repositories.Survey
 {
-    public class SurveyRepository : RepositoryBase<KsSurvey>, IKsSurveyRepository
+    public class SurveySubmissionLogRepository : RepositoryBase<KsSurveySubmissionLog>, IKsSurveySubmissionLogRepository
     {
-        public SurveyRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
+        public SurveySubmissionLogRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
             : base(dbContext, httpContext) { }
     }
 
-    public interface IKsSurveyRepository : IRepositoryBase<KsSurvey>
+    public interface IKsSurveySubmissionLogRepository : IRepositoryBase<KsSurveySubmissionLog>
     {
     }
 }
-

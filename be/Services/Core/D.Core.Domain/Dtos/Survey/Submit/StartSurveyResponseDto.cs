@@ -11,7 +11,6 @@ namespace D.Core.Domain.Dtos.Survey.Submit
         public int SubmissionId { get; set; }
         public int SurveyId { get; set; }
         public string TenKhaoSat { get; set; }
-        public int ThoiGianLamBaiPhut { get; set; }
         public DateTime ThoiGianBatDau { get; set; }
 
         public List<SurveyExamDto> Questions { get; set; } = new();

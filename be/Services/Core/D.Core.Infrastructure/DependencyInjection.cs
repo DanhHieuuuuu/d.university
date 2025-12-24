@@ -107,7 +107,10 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKsSurveyRequestRepository, SurveyRequestRepository>()
                 .AddScoped<IKsSurveyRepository, SurveyRepository>()
                 .AddScoped<IKsSurveyReportRepository, SurveyReportRepository>()
-                .AddScoped<IKsSurveyLogRepository, SurveyLogRepository>();
+                .AddScoped<IKsSurveyLogRepository, SurveyLogRepository>()
+                .AddScoped<IKsSurveySubmissionRepository, SurveySubmissionRepository>()
+                .AddScoped<IKsSurveySubmissionAnswerRepository, SurveySubmissionAnswerRepository>()
+                .AddScoped<IKsSurveySubmissionLogRepository, SurveySubmissionLogRepository>();
             #endregion
         }
 

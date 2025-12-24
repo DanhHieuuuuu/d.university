@@ -4,6 +4,7 @@ using D.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    partial class CoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251224203307_updatesurvey")]
+    partial class updatesurvey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4990,9 +4993,17 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("ThoiGian")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedDate");
+
                     b.HasKey("Id");
 
-                    b.ToTable("KsSurveySubmissionLog", "ks");
+                    b.ToTable("KsSurveySubmissionLog", "ks", t =>
+                        {
+                            t.Property("CreatedDate")
+                                .HasColumnName("CreatedDate1");
+                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsSurveyTarget", b =>

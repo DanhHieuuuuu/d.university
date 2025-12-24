@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhung;
 using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon;
 using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
@@ -24,6 +23,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Dtos.Survey.Request;
+using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
@@ -33,6 +33,7 @@ using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Entities.Survey;
 using D.Core.Domain.Entities.Survey.Constants;
+using System.Reflection;
 
 namespace D.Core.Domain
 {
@@ -188,6 +189,14 @@ namespace D.Core.Domain
                 .ForMember(dest => dest.MaKhaoSat, opt => opt.MapFrom(src => src.MaYeuCau))
                 .ForMember(dest => dest.TenKhaoSat, opt => opt.MapFrom(src => src.TenKhaoSatYeuCau));
 
+            CreateMap<KsSurvey, SurveyResponseDto>();
+            CreateMap<KsSurveyQuestion, SurveyExamDto>();
+            CreateMap<KsQuestionAnswer, AnswerExamDto>();          
+            CreateMap<KsSurveySubmissionAnswer, SavedAnswerDto>()
+                .ForMember(dest => dest.QuestionId, opt => opt.MapFrom(src => src.IdCauHoi))
+                .ForMember(dest => dest.SelectedAnswerId, opt => opt.MapFrom(src => src.IdDapAnChon))
+                .ForMember(dest => dest.TextResponse, opt => opt.MapFrom(src => src.CauTraLoiText));
+            
             #endregion
         }
 

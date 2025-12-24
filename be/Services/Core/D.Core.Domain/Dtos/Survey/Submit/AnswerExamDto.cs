@@ -10,5 +10,6 @@ namespace D.Core.Domain.Dtos.Survey.Submit
     {
         public int Id { get; set; }
         public string NoiDung { get; set; }
+        public int ThuTu { get; set; }
     }
 }
