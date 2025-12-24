@@ -6,6 +6,8 @@ import { ICreateNganh, IQueryNganh, IUpdateNganh, IViewNganh } from "@models/dao
 import { ICreateChuyenNganh, IQueryChuyenNganh, IUpdateChuyenNganh, IViewChuyenNganh } from "@models/dao-tao/chuyenNganh.model";
 import { ICreateMonHoc, IQueryMonHoc, IUpdateMonHoc, IViewMonHoc } from "@models/dao-tao/monHoc.model";
 import { ICreateMonTienQuyet, IQueryMonTienQuyet, IUpdateMonTienQuyet, IViewMonTienQuyet } from "@models/dao-tao/monTienQuyet.model";
+import { ICreateChuongTrinhKhung, IQueryChuongTrinhKhung, IUpdateChuongTrinhKhung, IViewChuongTrinhKhung } from "@models/dao-tao/chuongTrinhKhung.model";
+import { ICreateChuongTrinhKhungMon, IQueryChuongTrinhKhungMon, IUpdateChuongTrinhKhungMon, IViewChuongTrinhKhungMon } from "@models/dao-tao/chuongTrinhKhungMon.model";
 
 const apiDaoTaoEndpoint = 'daotao';
 const apiKhoaEndpoint = `${apiDaoTaoEndpoint}/khoa`;
@@ -13,6 +15,8 @@ const apiNganhEndpoint = `${apiDaoTaoEndpoint}/nganh`;
 const apiChuyenNganhEndpoint = `${apiDaoTaoEndpoint}/chuyen-nganh`;
 const apiMonHocEndpoint = `${apiDaoTaoEndpoint}/mon-hoc`;
 const apiMonTienQuyetEndpoint = `${apiDaoTaoEndpoint}/mon-tien-quyet`;
+const apiChuongTrinhKhungEndpoint = `${apiDaoTaoEndpoint}/chuong-trinh-khung`;
+const apiChuongTrinhKhungMonEndpoint = `${apiDaoTaoEndpoint}/chuong-trinh-khung-mon`;
 
 // Khoa
 const getListKhoa = async (query?: IQueryKhoa) => {
@@ -309,30 +313,164 @@ const deleteMonTienQuyet = async (id: number) => {
     }
 };
 
+// Chương trình khung
+const getListChuongTrinhKhung = async (query?: IQueryChuongTrinhKhung) => {
+    try {
+        const res = await axios.get(`${apiChuongTrinhKhungEndpoint}/find`, {
+            params: {
+                ...query
+            }
+        });
+
+        const data: IResponseList<IViewChuongTrinhKhung> = res.data;
+        return Promise.resolve(data);
+    } catch (err) {
+        processApiMsgError(err, '');
+        return Promise.reject(err);
+    }
+};
+
+const getChuongTrinhKhungById = async (idChuongTrinhKhung: number) => {
+    try {
+        const res = await axios.get(`${apiChuongTrinhKhungEndpoint}/get-by-id?Id=${idChuongTrinhKhung}`);
+
+        const data: IResponseItem<IViewChuongTrinhKhung> = res.data;
+        return Promise.resolve(data);
+    } catch (err) {
+        processApiMsgError(err, '');
+        return Promise.reject(err);
+    }
+};
+
+const createChuongTrinhKhung = async (body: ICreateChuongTrinhKhung) => {
+    try {
+        const res = await axios.post(`${apiChuongTrinhKhungEndpoint}/create`, body);
+        return Promise.resolve(res.data);
+    } catch (err) {
+        processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+        return Promise.reject(err);
+    }
+};
+
+const updateChuongTrinhKhung = async (body: IUpdateChuongTrinhKhung) => {
+    try {
+        const res = await axios.put(`${apiChuongTrinhKhungEndpoint}/update`, body);
+        return Promise.resolve(res.data);
+    } catch (err) {
+        processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+        return Promise.reject(err);
+    }
+};
+
+const deleteChuongTrinhKhung = async (id: number) => {
+    try {
+        const res = await axios.delete(`${apiChuongTrinhKhungEndpoint}/${id}`);
+        return Promise.resolve(res.data);
+    } catch (err) {
+        processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+        return Promise.reject(err);
+    }
+};
+
+// Chương trình khung môn
+const getListChuongTrinhKhungMon = async (query?: IQueryChuongTrinhKhungMon) => {
+    try {
+        const res = await axios.get(`${apiChuongTrinhKhungMonEndpoint}/find`, {
+            params: {
+                ...query
+            }
+        });
+
+        const data: IResponseList<IViewChuongTrinhKhungMon> = res.data;
+        return Promise.resolve(data);
+    } catch (err) {
+        processApiMsgError(err, '');
+        return Promise.reject(err);
+    }
+};
+
+const getChuongTrinhKhungMonById = async (idChuongTrinhKhungMon: number) => {
+    try {
+        const res = await axios.get(`${apiChuongTrinhKhungMonEndpoint}/get-by-id?Id=${idChuongTrinhKhungMon}`);
+
+        const data: IResponseItem<IViewChuongTrinhKhungMon> = res.data;
+        return Promise.resolve(data);
+    } catch (err) {
+        processApiMsgError(err, '');
+        return Promise.reject(err);
+    }
+};
+
+const createChuongTrinhKhungMon = async (body: ICreateChuongTrinhKhungMon) => {
+    try {
+        const res = await axios.post(`${apiChuongTrinhKhungMonEndpoint}/create`, body);
+        return Promise.resolve(res.data);
+    } catch (err) {
+        processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+        return Promise.reject(err);
+    }
+};
+
+const updateChuongTrinhKhungMon = async (body: IUpdateChuongTrinhKhungMon) => {
+    try {
+        const res = await axios.put(`${apiChuongTrinhKhungMonEndpoint}/update`, body);
+        return Promise.resolve(res.data);
+    } catch (err) {
+        processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+        return Promise.reject(err);
+    }
+};
+
+const deleteChuongTrinhKhungMon = async (id: number) => {
+    try {
+        const res = await axios.delete(`${apiChuongTrinhKhungMonEndpoint}/${id}`);
+        return Promise.resolve(res.data);
+    } catch (err) {
+        processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+        return Promise.reject(err);
+    }
+};
+
 export const DaoTaoService = {
     getListKhoa,
     getKhoaById,
     createKhoa,
     updateKhoa,
     deleteKhoa,
+
     getListNganh,
     getNganhById,
     createNganh,
     updateNganh,
     deleteNganh,
+
     getListChuyenNganh,
     getChuyenNganhById,
     createChuyenNganh,
     updateChuyenNganh,
     deleteChuyenNganh,
+
     getListMonHoc,
     getMonHocById,
     createMonHoc,
     updateMonHoc,
     deleteMonHoc,
+
     getListMonTienQuyet,
     getMonTienQuyetById,
     createMonTienQuyet,
     updateMonTienQuyet,
-    deleteMonTienQuyet
+    deleteMonTienQuyet,
+
+    getListChuongTrinhKhung,
+    getChuongTrinhKhungById,
+    createChuongTrinhKhung,
+    updateChuongTrinhKhung,
+    deleteChuongTrinhKhung,
+
+    getListChuongTrinhKhungMon,
+    getChuongTrinhKhungMonById,
+    createChuongTrinhKhungMon,
+    updateChuongTrinhKhungMon,
+    deleteChuongTrinhKhungMon
 };
