@@ -355,6 +355,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
         }
 
+        // chỉ thêm mới thông tin nhân sự
         private NsNhanSuEntity CreateNewNhanSu(CreateNhanSuDto dto)
         {
             var entity = _mapper.Map<NsNhanSuEntity>(dto);
