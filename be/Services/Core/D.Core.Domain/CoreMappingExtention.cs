@@ -59,6 +59,7 @@ namespace D.Core.Domain
             CreateMap<CreateDmChucVuDto, DmChucVu>();
             CreateMap<CreateDmToBoMonDto, DmToBoMon>();
             CreateMap<CreateDmKhoaHocDto, DmKhoaHoc>();
+            CreateMap<DmKhoaHoc, DmKhoaHocResponseDto>();
 
             CreateMap<CreateHopDongDto, NsHopDong>();
             CreateMap<NsNhanSu, NsNhanSuResponseDto>()
