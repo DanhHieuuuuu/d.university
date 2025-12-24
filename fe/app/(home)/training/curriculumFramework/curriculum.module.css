@@ -1,0 +1,202 @@
+.filterSection {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filterItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filterItem label {
+    font-weight: 500;
+    color: #5a6a85;
+    min-width: 100px;
+}
+
+.curriculumContent {
+    margin-top: 16px;
+}
+
+.curriculumInfo {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.curriculumInfo h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.curriculumInfo p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.semesterSection {
+    margin-bottom: 16px;
+}
+
+/* Collapse Accordion Styles */
+.semesterCollapse {
+    background: transparent;
+    border: none;
+}
+
+.semesterCollapse :global(.ant-collapse-item) {
+    margin-bottom: 12px;
+    border: 1px solid #d6e4ff;
+    border-radius: 8px !important;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.semesterCollapse :global(.ant-collapse-item:hover) {
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    border-color: #1890ff;
+}
+
+.semesterCollapse :global(.ant-collapse-item-active) {
+    border-color: #1890ff;
+}
+
+.semesterCollapse :global(.ant-collapse-header) {
+    padding: 0 !important;
+    background: linear-gradient(135deg, #f0f5ff 0%, #e6f0ff 100%);
+}
+
+.semesterCollapse :global(.ant-collapse-header:hover) {
+    background: linear-gradient(135deg, #e6f0ff 0%, #d6e4ff 100%);
+}
+
+.semesterCollapse :global(.ant-collapse-expand-icon) {
+    padding-left: 16px !important;
+    color: #1890ff;
+}
+
+.semesterCollapse :global(.ant-collapse-content) {
+    border-top: 1px solid #d6e4ff;
+}
+
+.semesterCollapse :global(.ant-collapse-content-box) {
+    padding: 0 !important;
+}
+
+.semesterHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.semesterTitle {
+    font-weight: 600;
+    color: #1890ff;
+    font-size: 15px;
+}
+
+.semesterCredits {
+    font-weight: 700;
+    color: #1890ff;
+    font-size: 14px;
+    background: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    min-width: 60px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.courseTable {
+    margin-bottom: 0;
+}
+
+.courseTable :global(.ant-table-thead > tr > th) {
+    background: #e6f4ff !important;
+    color: #5a6a85;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.courseTable :global(.ant-table-tbody > tr > td) {
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.courseTable :global(.ant-table-tbody > tr:hover > td) {
+    background: #f0f7ff !important;
+}
+
+.summarySection {
+    margin-top: 24px;
+    border: 2px solid #d6e4ff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.summaryRow:last-child {
+    border-bottom: none;
+}
+
+.summaryLabel {
+    font-weight: 600;
+    color: #1890ff;
+    font-size: 14px;
+}
+
+.summaryValue {
+    font-weight: 700;
+    font-size: 16px;
+    min-width: 80px;
+    text-align: center;
+}
+
+.summaryValue.required {
+    color: #ff4d4f;
+}
+
+.summaryValue.optional {
+    color: #ff4d4f;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filterSection {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .filterItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .filterItem label {
+        min-width: auto;
+    }
+
+    .filterItem :global(.ant-select) {
+        width: 100% !important;
+    }
+}
