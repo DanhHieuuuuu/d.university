@@ -12,5 +12,6 @@ namespace D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon
     public class DtChuongTrinhKhungMonRequestDto : FilterBaseDto, IQuery<PageResultDto<DtChuongTrinhKhungMonResponseDto>>
     {
         public int? ChuongTrinhKhungId { get; set; }
+        public int? HocKy { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace D.Core.Domain.Dtos.DaoTao.ChuyenNganh
 {
     public class DtChuyenNganhRequestDto : FilterBaseDto, IQuery<PageResultDto<DtChuyenNganhResponseDto>>
     {
+        public int? NganhId { get; set; }
     }
 }

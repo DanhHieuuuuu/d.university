@@ -7,12 +7,16 @@ import { IViewNganh } from '@models/dao-tao/nganh.model';
 import { IViewChuyenNganh } from '@models/dao-tao/chuyenNganh.model';
 import { IViewMonHoc } from '@models/dao-tao/monHoc.model';
 import { IViewMonTienQuyet } from '@models/dao-tao/monTienQuyet.model';
+import { IViewChuongTrinhKhung } from '@models/dao-tao/chuongTrinhKhung.model';
+import { IViewChuongTrinhKhungMon } from '@models/dao-tao/chuongTrinhKhungMon.model';
 
 import { getAllKhoa, getKhoaById, createKhoa, updateKhoa, deleteKhoa } from './khoaThunk';
 import { getAllNganh, getNganhById, createNganh, updateNganh, deleteNganh } from './nganhThunk';
 import { getAllChuyenNganh, getChuyenNganhById, createChuyenNganh, updateChuyenNganh, deleteChuyenNganh } from './chuyenNganhThunk';
 import { getAllMonHoc, getMonHocById, createMonHoc, updateMonHoc, deleteMonHoc } from './monHocThunk';
 import { getAllMonTienQuyet, getMonTienQuyetById, createMonTienQuyet, updateMonTienQuyet, deleteMonTienQuyet } from './monTienQuyetThunk';
+import { getAllChuongTrinhKhung, getChuongTrinhKhungById, createChuongTrinhKhung, updateChuongTrinhKhung, deleteChuongTrinhKhung } from './chuongTrinhKhungThunk';
+import { getAllChuongTrinhKhungMon, getChuongTrinhKhungMonById, createChuongTrinhKhungMon, updateChuongTrinhKhungMon, deleteChuongTrinhKhungMon } from './chuongTrinhKhungMonThunk';
 
 interface DaoTaoState {
     khoa: CRUD<IViewKhoa>;
@@ -20,8 +24,11 @@ interface DaoTaoState {
     chuyenNganh: CRUD<IViewChuyenNganh>;
     monHoc: CRUD<IViewMonHoc>;
     monTienQuyet: CRUD<IViewMonTienQuyet>;
+    chuongTrinhKhung: CRUD<IViewChuongTrinhKhung>;
+    chuongTrinhKhungMon: CRUD<IViewChuongTrinhKhungMon>;
     listKhoa: IViewKhoa[];
     listNganh: IViewNganh[];
+    listChuyenNganh: IViewChuyenNganh[];
     listMonHoc: IViewMonHoc[];
 }
 
@@ -61,8 +68,23 @@ const initialState: DaoTaoState = {
         $delete: { status: ReduxStatus.IDLE },
         $selected: { status: ReduxStatus.IDLE, id: null, data: null }
     },
+    chuongTrinhKhung: {
+        $create: { status: ReduxStatus.IDLE },
+        $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
+        $update: { status: ReduxStatus.IDLE },
+        $delete: { status: ReduxStatus.IDLE },
+        $selected: { status: ReduxStatus.IDLE, id: null, data: null }
+    },
+    chuongTrinhKhungMon: {
+        $create: { status: ReduxStatus.IDLE },
+        $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
+        $update: { status: ReduxStatus.IDLE },
+        $delete: { status: ReduxStatus.IDLE },
+        $selected: { status: ReduxStatus.IDLE, id: null, data: null }
+    },
     listKhoa: [],
     listNganh: [],
+    listChuyenNganh: [],
     listMonHoc: []
 };
 
@@ -129,6 +151,30 @@ const daotaoSlice = createSlice({
             state.monTienQuyet.$create.status = ReduxStatus.IDLE;
             state.monTienQuyet.$update.status = ReduxStatus.IDLE;
             state.monTienQuyet.$delete.status = ReduxStatus.IDLE;
+        },
+        // ChuongTrinhKhung reducers
+        clearSelectedChuongTrinhKhung: (state) => {
+            state.chuongTrinhKhung.$selected = { status: ReduxStatus.IDLE, id: null, data: null };
+        },
+        setSelectedIdChuongTrinhKhung: (state, action: PayloadAction<number>) => {
+            state.chuongTrinhKhung.$selected.id = action.payload;
+        },
+        resetStatusChuongTrinhKhung: (state) => {
+            state.chuongTrinhKhung.$create.status = ReduxStatus.IDLE;
+            state.chuongTrinhKhung.$update.status = ReduxStatus.IDLE;
+            state.chuongTrinhKhung.$delete.status = ReduxStatus.IDLE;
+        },
+        // ChuongTrinhKhungMon reducers
+        clearSelectedChuongTrinhKhungMon: (state) => {
+            state.chuongTrinhKhungMon.$selected = { status: ReduxStatus.IDLE, id: null, data: null };
+        },
+        setSelectedIdChuongTrinhKhungMon: (state, action: PayloadAction<number>) => {
+            state.chuongTrinhKhungMon.$selected.id = action.payload;
+        },
+        resetStatusChuongTrinhKhungMon: (state) => {
+            state.chuongTrinhKhungMon.$create.status = ReduxStatus.IDLE;
+            state.chuongTrinhKhungMon.$update.status = ReduxStatus.IDLE;
+            state.chuongTrinhKhungMon.$delete.status = ReduxStatus.IDLE;
         }
     },
     extraReducers: (builder) => {
@@ -249,6 +295,7 @@ const daotaoSlice = createSlice({
                 state.chuyenNganh.$list.status = ReduxStatus.SUCCESS;
                 state.chuyenNganh.$list.data = action.payload?.items || [];
                 state.chuyenNganh.$list.total = action.payload?.totalItem || 0;
+                state.listChuyenNganh = action.payload?.items || [];
             })
             .addCase(getAllChuyenNganh.rejected, (state) => {
                 state.chuyenNganh.$list.status = ReduxStatus.FAILURE;
@@ -400,6 +447,112 @@ const daotaoSlice = createSlice({
             })
             .addCase(deleteMonTienQuyet.rejected, (state) => {
                 state.monTienQuyet.$delete.status = ReduxStatus.FAILURE;
+            })
+            // getAllChuongTrinhKhung
+            .addCase(getAllChuongTrinhKhung.pending, (state) => {
+                state.chuongTrinhKhung.$list.status = ReduxStatus.LOADING;
+            })
+            .addCase(getAllChuongTrinhKhung.fulfilled, (state, action) => {
+                state.chuongTrinhKhung.$list.status = ReduxStatus.SUCCESS;
+                state.chuongTrinhKhung.$list.data = action.payload?.items || [];
+                state.chuongTrinhKhung.$list.total = action.payload?.totalItem || 0;
+            })
+            .addCase(getAllChuongTrinhKhung.rejected, (state) => {
+                state.chuongTrinhKhung.$list.status = ReduxStatus.FAILURE;
+            })
+            // getChuongTrinhKhungById
+            .addCase(getChuongTrinhKhungById.pending, (state) => {
+                state.chuongTrinhKhung.$selected.status = ReduxStatus.LOADING;
+            })
+            .addCase(getChuongTrinhKhungById.fulfilled, (state, action) => {
+                state.chuongTrinhKhung.$selected.status = ReduxStatus.SUCCESS;
+                state.chuongTrinhKhung.$selected.data = action.payload || null;
+            })
+            .addCase(getChuongTrinhKhungById.rejected, (state) => {
+                state.chuongTrinhKhung.$selected.status = ReduxStatus.FAILURE;
+            })
+            // createChuongTrinhKhung
+            .addCase(createChuongTrinhKhung.pending, (state) => {
+                state.chuongTrinhKhung.$create.status = ReduxStatus.LOADING;
+            })
+            .addCase(createChuongTrinhKhung.fulfilled, (state) => {
+                state.chuongTrinhKhung.$create.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(createChuongTrinhKhung.rejected, (state) => {
+                state.chuongTrinhKhung.$create.status = ReduxStatus.FAILURE;
+            })
+            // updateChuongTrinhKhung
+            .addCase(updateChuongTrinhKhung.pending, (state) => {
+                state.chuongTrinhKhung.$update.status = ReduxStatus.LOADING;
+            })
+            .addCase(updateChuongTrinhKhung.fulfilled, (state) => {
+                state.chuongTrinhKhung.$update.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(updateChuongTrinhKhung.rejected, (state) => {
+                state.chuongTrinhKhung.$update.status = ReduxStatus.FAILURE;
+            })
+            // deleteChuongTrinhKhung
+            .addCase(deleteChuongTrinhKhung.pending, (state) => {
+                state.chuongTrinhKhung.$delete.status = ReduxStatus.LOADING;
+            })
+            .addCase(deleteChuongTrinhKhung.fulfilled, (state) => {
+                state.chuongTrinhKhung.$delete.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(deleteChuongTrinhKhung.rejected, (state) => {
+                state.chuongTrinhKhung.$delete.status = ReduxStatus.FAILURE;
+            })
+            // getAllChuongTrinhKhungMon
+            .addCase(getAllChuongTrinhKhungMon.pending, (state) => {
+                state.chuongTrinhKhungMon.$list.status = ReduxStatus.LOADING;
+            })
+            .addCase(getAllChuongTrinhKhungMon.fulfilled, (state, action) => {
+                state.chuongTrinhKhungMon.$list.status = ReduxStatus.SUCCESS;
+                state.chuongTrinhKhungMon.$list.data = action.payload?.items || [];
+                state.chuongTrinhKhungMon.$list.total = action.payload?.totalItem || 0;
+            })
+            .addCase(getAllChuongTrinhKhungMon.rejected, (state) => {
+                state.chuongTrinhKhungMon.$list.status = ReduxStatus.FAILURE;
+            })
+            // getChuongTrinhKhungMonById
+            .addCase(getChuongTrinhKhungMonById.pending, (state) => {
+                state.chuongTrinhKhungMon.$selected.status = ReduxStatus.LOADING;
+            })
+            .addCase(getChuongTrinhKhungMonById.fulfilled, (state, action) => {
+                state.chuongTrinhKhungMon.$selected.status = ReduxStatus.SUCCESS;
+                state.chuongTrinhKhungMon.$selected.data = action.payload || null;
+            })
+            .addCase(getChuongTrinhKhungMonById.rejected, (state) => {
+                state.chuongTrinhKhungMon.$selected.status = ReduxStatus.FAILURE;
+            })
+            // createChuongTrinhKhungMon
+            .addCase(createChuongTrinhKhungMon.pending, (state) => {
+                state.chuongTrinhKhungMon.$create.status = ReduxStatus.LOADING;
+            })
+            .addCase(createChuongTrinhKhungMon.fulfilled, (state) => {
+                state.chuongTrinhKhungMon.$create.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(createChuongTrinhKhungMon.rejected, (state) => {
+                state.chuongTrinhKhungMon.$create.status = ReduxStatus.FAILURE;
+            })
+            // updateChuongTrinhKhungMon
+            .addCase(updateChuongTrinhKhungMon.pending, (state) => {
+                state.chuongTrinhKhungMon.$update.status = ReduxStatus.LOADING;
+            })
+            .addCase(updateChuongTrinhKhungMon.fulfilled, (state) => {
+                state.chuongTrinhKhungMon.$update.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(updateChuongTrinhKhungMon.rejected, (state) => {
+                state.chuongTrinhKhungMon.$update.status = ReduxStatus.FAILURE;
+            })
+            // deleteChuongTrinhKhungMon
+            .addCase(deleteChuongTrinhKhungMon.pending, (state) => {
+                state.chuongTrinhKhungMon.$delete.status = ReduxStatus.LOADING;
+            })
+            .addCase(deleteChuongTrinhKhungMon.fulfilled, (state) => {
+                state.chuongTrinhKhungMon.$delete.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(deleteChuongTrinhKhungMon.rejected, (state) => {
+                state.chuongTrinhKhungMon.$delete.status = ReduxStatus.FAILURE;
             });
     }
 });
@@ -421,7 +574,13 @@ export const {
     resetStatusMonHoc,
     clearSelectedMonTienQuyet,
     setSelectedIdMonTienQuyet,
-    resetStatusMonTienQuyet
+    resetStatusMonTienQuyet,
+    clearSelectedChuongTrinhKhung,
+    setSelectedIdChuongTrinhKhung,
+    resetStatusChuongTrinhKhung,
+    clearSelectedChuongTrinhKhungMon,
+    setSelectedIdChuongTrinhKhungMon,
+    resetStatusChuongTrinhKhungMon
 } = daotaoSlice.actions;
 
 export default daotaoReducer;
