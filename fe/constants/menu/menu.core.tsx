@@ -83,9 +83,8 @@ export const listMenuCore: IMenu[] = [
         label: 'Nhật ký đoàn vào',
         routerLink: '/delegation/incoming/diary',
         icon: <HistoryOutlined />
-
       }
-    ],
+    ]
   },
   {
     label: 'Đào tạo',

@@ -51,11 +51,7 @@ export default function JobTab() {
           })}
         />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs>
-        name="idChucVu"
-        label="Chức vụ"
-       
-      >
+      <Form.Item<ICreateHopDongNs> name="idChucVu" label="Chức vụ">
         <Select
           allowClear
           options={chucVu.$list.data?.map((item) => {

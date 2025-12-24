@@ -22,6 +22,7 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
+using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
@@ -85,6 +86,20 @@ namespace D.Core.Domain
 
             CreateMap<NsNhanSu, NsNhanSuFindByIdResponseDto>()
                 .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id));
+            CreateMap<NsNhanSu, NsNhanSuHoSoChiTietResponseDto>()
+                .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id))
+                .ForMember(
+                    dest => dest.HoTen,
+                    opt =>
+                        opt.MapFrom(src =>
+                            string.Join(
+                                " ",
+                                new[] { src.HoDem, src.Ten }.Where(x =>
+                                    !string.IsNullOrWhiteSpace(x)
+                                )
+                            )
+                        )
+                );
 
             #endregion
 

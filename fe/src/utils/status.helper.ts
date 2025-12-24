@@ -1,4 +1,4 @@
-import { DelegationStatusConst } from "@/app/(home)/delegation/consts/delegation-status.consts";
+import { DelegationStatusConst } from '@/app/(home)/delegation/consts/delegation-status.consts';
 
 export const getStatusName = (value: number) => {
   const info = DelegationStatusConst.getInfo(value);

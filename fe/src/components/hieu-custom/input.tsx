@@ -1,5 +1,5 @@
-import { Input, Form, Typography } from "antd";
-import type { Rule } from "antd/es/form";
+import { Input, Form, Typography } from 'antd';
+import type { Rule } from 'antd/es/form';
 
 // Định nghĩa kiểu dữ liệu props
 interface InputAntdWithTitleProps {
@@ -18,21 +18,16 @@ const InputAntdWithTitle: React.FC<InputAntdWithTitleProps> = ({
   name,
   placeholder,
   rules = [],
-  type = "text",
+  type = 'text',
   disabled = false,
-  allowClear = true,
+  allowClear = true
 }) => {
   return (
     <div style={{ marginBottom: 16 }}>
-      <p>{ title }</p>
+      <p>{title}</p>
 
       <Form.Item name={name} rules={rules} style={{ marginBottom: 0 }}>
-        <Input
-          type={type}
-          placeholder={placeholder}
-          disabled={disabled}
-          allowClear={allowClear}
-        />
+        <Input type={type} placeholder={placeholder} disabled={disabled} allowClear={allowClear} />
       </Form.Item>
     </div>
   );

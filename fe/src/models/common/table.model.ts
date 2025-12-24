@@ -15,5 +15,4 @@ export type IAction = {
   icon: React.ReactNode;
   color?: BaseButtonProps['color'];
   hidden?: (record: any) => boolean;
-  
 };

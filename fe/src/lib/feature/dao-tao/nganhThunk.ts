@@ -57,38 +57,32 @@ export const updateNganh = createAsyncThunk(
   }
 );
 
-export const deleteNganh = createAsyncThunk(
-  'daotao/delete-nganh',
-  async (payload: number, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.deleteNganh(payload);
+export const deleteNganh = createAsyncThunk('daotao/delete-nganh', async (payload: number, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.deleteNganh(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});
 
-export const getNganhById = createAsyncThunk(
-  'daotao/get-nganh',
-  async (payload: number, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.getNganhById(payload);
+export const getNganhById = createAsyncThunk('daotao/get-nganh', async (payload: number, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.getNganhById(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});

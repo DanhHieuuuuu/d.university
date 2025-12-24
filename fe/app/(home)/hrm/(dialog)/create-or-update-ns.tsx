@@ -4,13 +4,14 @@ import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
 import { Button, Form, FormProps, Modal, Tabs } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { ICreateNhanSu } from '@models/nhansu/nhansu.model';
 import { clearSelected } from '@redux/feature/nhansu/nhansuSlice';
-import { createNhanSu, getDetailNhanSu } from '@redux/feature/nhansu/nhansuThunk';
-import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab)';
+import { createNhanSu } from '@redux/feature/nhansu/nhansuThunk';
+import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab-ns)';
 
 type NhanSuModalProps = {
   isModalOpen: boolean;
@@ -23,26 +24,35 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const { selected, $create } = useAppSelector((state) => state.nhanSuState);
 
-  const [form] = Form.useForm<ICreateHopDongNs>();
+  const [form] = Form.useForm<ICreateNhanSu>();
   const [title, setTitle] = useState<string>('');
+  const [tabActive, setTabActive] = useState<string>('personal');
 
   useEffect(() => {
     if (props.isModalOpen) {
-      if (props.isUpdate) {
-        if (selected) {
-          setTitle('Chỉnh sửa');
-          initData();
-        }
-      } else if (props.isView) {
-        if (selected) {
-          setTitle('Chi tiết');
-          initData();
-        }
-      } else {
-        setTitle('Thêm mới');
-      }
+      if (props.isUpdate) setTitle('Chỉnh sửa');
+      else if (props.isView) setTitle('Chi tiết');
+      else setTitle('Thêm mới');
+
+      setTabActive('personal');
     }
-  }, [props.isModalOpen]);
+  }, [props.isModalOpen, props.isUpdate, props.isView]);
+
+  useEffect(() => {
+    if (props.isModalOpen && selected.status === ReduxStatus.SUCCESS && selected.data) {
+      const rawData = selected.data;
+
+      form.setFieldsValue({
+        ...rawData,
+        ngaySinh: rawData.ngaySinh ? dayjs(rawData.ngaySinh) : null,
+        ngayCapCccd: rawData.ngayCapCccd ? dayjs(rawData.ngayCapCccd) : null,
+        thongTinGiaDinh: rawData.thongTinGiaDinh?.map((member: any) => ({
+          ...member,
+          ngaySinh: member.ngaySinh ? dayjs(member.ngaySinh) : null
+        }))
+      });
+    }
+  }, [props.isModalOpen, selected.status, selected.data, form]);
 
   const tabItems = [
     {
@@ -54,25 +64,28 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
       key: 'family',
       label: 'Thông tin gia đình',
       children: <FamilyTab />
-    },
-    {
-      key: 'job',
-      label: 'Thông tin vị trí làm việc',
-      children: <JobTab />
-    },
-    {
-      key: 'salary',
-      label: 'Mức lương',
-      children: <SalaryTab />
     }
+    // {
+    //   key: 'job',
+    //   label: 'Thông tin vị trí làm việc',
+    //   children: <JobTab />
+    // },
+    // {
+    //   key: 'salary',
+    //   label: 'Mức lương',
+    //   children: <SalaryTab />
+    // }
   ];
 
-  const initData = async () => {
-    await dispatch(getDetailNhanSu(selected.idNhanSu));
-
-    if (selected.status === ReduxStatus.SUCCESS) {
-      console.log(selected.data);
-      form.setFieldsValue(selected.data);
+  const initData = () => {
+    if (selected.status == ReduxStatus.SUCCESS) {
+      const rawData = selected.data;
+      form.setFieldsValue({
+        ...rawData,
+        ngaySinh: rawData.ngaySinh ? dayjs(rawData.ngaySinh) : null,
+        ngayCapCccd: rawData.ngayCapCccd ? dayjs(rawData.ngayCapCccd) : null
+      });
+      console.log('load success');
     }
   };
 
@@ -86,7 +99,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
     props.setIsModalOpen(true);
   };
 
-  const onFinish: FormProps<ICreateHopDongNs>['onFinish'] = async (values) => {
+  const onFinish: FormProps<ICreateNhanSu>['onFinish'] = async (values) => {
     // if (props.isUpdate) {
     //   JobPositionService.update(props.selectedId || '', {
     //     id: props.selectedId,
@@ -110,9 +123,8 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
       console.log('All form data:', values);
       onCloseModal();
     } else {
-      console.log(values);
-
       await dispatch(createNhanSu(values));
+
       if ($create.status === ReduxStatus.SUCCESS) {
         toast.success('Thêm mới thành công');
       }
@@ -151,7 +163,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
         disabled={props.isView}
         labelCol={{ style: { fontWeight: 600 } }}
       >
-        <Tabs type="card" items={tabItems} />
+        <Tabs type="card" items={tabItems} activeKey={tabActive} onChange={(key) => setTabActive(key)} />
       </Form>
     </Modal>
   );

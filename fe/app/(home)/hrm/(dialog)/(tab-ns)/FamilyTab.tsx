@@ -2,15 +2,15 @@
 
 import { Button, DatePicker, Form, Input, Select } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { ICreateNhanSu } from '@models/nhansu/nhansu.model';
 import { useAppSelector } from '@redux/hooks';
 
 export default function FamilyTab() {
-  const form = Form.useFormInstance<ICreateHopDongNs>();
+  const form = Form.useFormInstance<ICreateNhanSu>();
   const { listQuanHe, listQuocTich } = useAppSelector((state) => state.danhmucState);
 
   return (
-    <Form.List name={['thongTinNhanSu', 'thongTinGiaDinh']}>
+    <Form.List name={['thongTinGiaDinh']}>
       {(fields, { add, remove }) => (
         <div>
           {fields.map((field, index) => (
@@ -40,7 +40,7 @@ export default function FamilyTab() {
                   label="Ngày sinh"
                   rules={[{ required: true, message: 'Không được để trống!' }]}
                 >
-                  <DatePicker className="!w-full" />
+                  <DatePicker format="DD/MM/YYYY" className="!w-full" />
                 </Form.Item>
                 <Form.Item name={[field.name, 'quocTich']} label="Quốc tịch">
                   <Select

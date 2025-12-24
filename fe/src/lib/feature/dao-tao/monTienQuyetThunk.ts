@@ -1,9 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  ICreateMonTienQuyet,
-  IQueryMonTienQuyet,
-  IUpdateMonTienQuyet
-} from '@models/dao-tao/monTienQuyet.model';
+import { ICreateMonTienQuyet, IQueryMonTienQuyet, IUpdateMonTienQuyet } from '@models/dao-tao/monTienQuyet.model';
 import { DaoTaoService } from '@services/daotao.service';
 
 // MonTienQuyet actions

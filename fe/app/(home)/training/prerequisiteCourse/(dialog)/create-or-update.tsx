@@ -141,9 +141,7 @@ const PrerequisiteCourseModal: React.FC<PrerequisiteCourseModalProps> = (props) 
                 value: monHoc.id
               }))}
               showSearch
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
             />
           </Form.Item>
           <Form.Item<ICreateMonTienQuyet>
@@ -159,9 +157,7 @@ const PrerequisiteCourseModal: React.FC<PrerequisiteCourseModalProps> = (props) 
                 value: monHoc.id
               }))}
               showSearch
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
             />
           </Form.Item>
           <Form.Item<ICreateMonTienQuyet>
@@ -169,10 +165,7 @@ const PrerequisiteCourseModal: React.FC<PrerequisiteCourseModalProps> = (props) 
             name="loaiDieuKien"
             rules={[{ required: true, message: 'Vui lòng chọn loại điều kiện' }]}
           >
-            <Select
-              placeholder="Chọn loại điều kiện"
-              options={LOAI_DIEU_KIEN_OPTIONS}
-            />
+            <Select placeholder="Chọn loại điều kiện" options={LOAI_DIEU_KIEN_OPTIONS} />
           </Form.Item>
           <Form.Item<ICreateMonTienQuyet> label="Ghi chú" name="ghiChu" className="col-span-2">
             <Input.TextArea rows={3} />

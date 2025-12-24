@@ -2,7 +2,7 @@
 
 namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {
-    public class NsNhanSuFindByIdResponseDto
+    public class NsNhanSuHoSoChiTietResponseDto 
     {
         public int? IdNhanSu { get; set; }
         public string? MaNhanSu { get; set; }
@@ -10,6 +10,7 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         // Thông tin cá nhân
         public string? HoDem { get; set; }
         public string? Ten { get; set; }
+        public string? HoTen { get; set; }
         public DateTime? NgaySinh { get; set; }
         public string? NoiSinh { get; set; }
         public int? GioiTinh { get; set; }
@@ -25,7 +26,7 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? Email { get; set; }
         public string? KhanCapSoDienThoai { get; set; }
         public string? KhanCapNguoiLienHe { get; set; }
-        public List<CreateNsQuanHeGiaDinhDto>? ThongTinGiaDinh { get; set; }
+        public List<NsQuanHeGiaDinhResponseDto>? ThongTinGiaDinh { get; set; }
 
         // Thông tin thuế
         public string? MaSoThue { get; set; }
@@ -34,13 +35,17 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? TenNganHang2 { get; set; }
         public string? Atm2 { get; set; }
 
+        // Thông tin sức khỏe
+        public decimal? ChieuCao { get; set; }
+        public decimal? CanNang { get; set; }
+        public string? NhomMau { get; set; }
+
         // Thông tin công việc
-        public string? Email2 { get; set; }
-        public int? LuongCoBan { get; set; }
-        public int? IdToBoMon { get; set; }
         public int? HienTaiChucVu { get; set; }
         public string? TenChucVu { get; set; }
         public int? HienTaiPhongBan { get; set; }
-        public string? TenPhongBan  { get; set; }
+        public string? TenPhongBan { get; set; }
+        public string? Email2 { get; set; }
+        public int? IdToBoMon { get; set; }
     }
 }
