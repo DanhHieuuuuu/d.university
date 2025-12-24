@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Entities.Survey.Constants
 {
-    public static class SurveyTarget
+    public static class SubmitssionStatus
     {
-        public const int All = 0;
-        public const int Student = 1;
-        public const int Lecturer = 2;
+        public const int NotStarted = 1;
+        public const int InProgress = 2;
+        public const int Submitted = 3;
 
         public static Dictionary<int, string> Names = new Dictionary<int, string>()
         {
-            { All, "Tất cả" },
-            { Student, "Sinh viên" },
-            { Lecturer, "Giảng viên" },
+            { NotStarted, "Chưa làm" },
+            { InProgress, "Đang làm" },
+            { Submitted, "Đã nộp" },
         };
     }
 }

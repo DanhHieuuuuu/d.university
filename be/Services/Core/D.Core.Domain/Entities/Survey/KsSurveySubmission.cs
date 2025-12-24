@@ -30,7 +30,7 @@ namespace D.Core.Domain.Entities.Survey
         public DateTime? ThoiGianNop { get; set; }
 
         [Column("Status")]
-        [Description("Trạng thái (0: Đang làm, 1: Đã nộp)")]
+        [Description("Trạng thái (0: Chưa làm, 1: Đang làm, 2: Đã nộp)")]
         public int TrangThai { get; set; }
 
         [Column("TotalScore")]

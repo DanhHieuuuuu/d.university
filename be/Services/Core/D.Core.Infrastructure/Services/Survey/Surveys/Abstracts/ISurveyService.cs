@@ -1,4 +1,5 @@
-﻿using D.Core.Domain.Dtos.Survey.Surveys;
+﻿using D.Core.Domain.Dtos.Survey.Submit;
+using D.Core.Domain.Dtos.Survey.Surveys;
 using D.DomainBase.Dto;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,10 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Abstracts
 
         Task OpenSurveyAsync(int id);
         Task CloseSurveyAsync(int id);
+
+        Task<PageResultDto<SurveyResponseDto>> GetMySurveysAsync(FilterMySurveyDto dto);
+        Task<StartSurveyResponseDto> StartSurveyAsync(int surveyId);
+        Task SaveDraftAsync(SubmitSurveyRequestDto dto);
+        Task<SurveyResultDto> SubmitSurveyAsync(SubmitSurveyRequestDto dto);
     }
 }
