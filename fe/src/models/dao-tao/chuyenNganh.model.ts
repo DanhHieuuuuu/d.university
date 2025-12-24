@@ -1,7 +1,7 @@
 import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryChuyenNganh = IQueryPaging & {
-
+    NganhId?: number;
 };
 
 export type IViewChuyenNganh = {
@@ -12,6 +12,7 @@ export type IViewChuyenNganh = {
     moTa: string;
     trangThai: boolean;
     nganhId: number;
+    tenNganh?: string;
 };
 
 export type ICreateChuyenNganh = {
