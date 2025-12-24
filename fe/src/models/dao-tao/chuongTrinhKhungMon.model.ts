@@ -1,7 +1,8 @@
 import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryChuongTrinhKhungMon = IQueryPaging & {
-
+    ChuongTrinhKhungId?: number;
+    HocKy?: string;
 };
 
 export type IViewChuongTrinhKhungMon = {
@@ -11,6 +12,13 @@ export type IViewChuongTrinhKhungMon = {
     hocKy: string;
     namHoc: string;
     trangThai: boolean;
+    // Joined fields from MonHoc
+    maMonHoc?: string;
+    tenMonHoc?: string;
+    soTinChi?: number;
+    soTietLyThuyet?: number;
+    soTietThucHanh?: number;
+    loaiMonHoc?: string; // 'Bắt buộc' | 'Tự chọn'
 };
 
 export type ICreateChuongTrinhKhungMon = {
