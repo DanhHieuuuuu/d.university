@@ -26,6 +26,7 @@ export default function PersonalTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'gioiTinh']} label="Giới tính">
         <Select
+          allowClear
           options={listGioiTinh?.map((item) => {
             return { label: item.tenGioiTinh, value: item.id };
           })}
@@ -40,6 +41,7 @@ export default function PersonalTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'quocTich']} label="Quốc tịch">
         <Select
+          allowClear
           options={listQuocTich?.map((item) => {
             return { label: item.tenQuocGia, value: item.id };
           })}
@@ -54,6 +56,7 @@ export default function PersonalTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'danToc']} label="Dân tộc">
         <Select
+          allowClear
           options={listDanToc?.map((item) => {
             return { label: item.tenDanToc, value: item.id };
           })}
@@ -61,6 +64,7 @@ export default function PersonalTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'tonGiao']} label="Tôn giáo">
         <Select
+          allowClear
           options={listTonGiao?.map((item) => {
             return { label: item.tenTonGiao, value: item.id };
           })}

@@ -55,7 +55,6 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        //[PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpGet("logout")]
         public async Task<ResponseAPI> Logout([FromQuery] LogoutRequestDto dto)
         {
@@ -93,7 +92,6 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpPost("create-user-role")]
         public async Task<ResponseAPI> CreateUserRole(CreateUserRoleDto dto)
         {

@@ -104,7 +104,6 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        //[PermissionFilter(PermissionKeyConstant.Admin)]
         [HttpPut("update-image-user")]
         public async Task<IActionResult> UpdateImageUser(UpdateImageUserDto dto)
         {

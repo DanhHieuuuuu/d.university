@@ -10,7 +10,7 @@ export type IViewNhanSu = {
   hoDem?: string;
   ten?: string;
   hoTen?: string;
-  ngaySinh?: Date;
+  ngaySinh?: Date | string;
   noiSinh?: string;
   gioiTinh?: number;
   quocTich?: number;
@@ -19,7 +19,7 @@ export type IViewNhanSu = {
   nguyenQuan?: string;
   noiOHienTai?: string;
   soCccd?: string;
-  ngayCapCccd?: Date;
+  ngayCapCccd?: Date | string;
   noiCapCccd?: string;
   soDienThoai?: string;
   email?: string;
