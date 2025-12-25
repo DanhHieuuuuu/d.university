@@ -79,7 +79,7 @@ const receptionColumns: IColumn<ILogReceptionTime>[] = [
   return (
     <Card title="Nhật ký đoàn vào" className="h-full">
       <Tabs defaultActiveKey="1">
-        <TabPane tab="Log Status" key="1">
+        <TabPane tab="Nhật ký đoàn vào" key="1">
           <AppTable
             loading={status === ReduxStatus.LOADING}
             rowKey="id"
@@ -89,7 +89,7 @@ const receptionColumns: IColumn<ILogReceptionTime>[] = [
             scroll={{y: "calc(100vh - 370px)"}}
           />
         </TabPane>
-        <TabPane tab="Log Reception Time" key="2">
+        <TabPane tab="Nhật ký thời gian tiếp đoàn" key="2">
           <AppTable
             loading={status === ReduxStatus.LOADING}
             rowKey="id"

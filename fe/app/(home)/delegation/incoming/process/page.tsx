@@ -199,7 +199,7 @@ const Page = () => {
       }
     });
   };
-   const onClickPheDuyet = (data: IViewGuestGroup) => {
+  const onClickPheDuyet = (data: IViewGuestGroup) => {
     openConfirmStatusModal({
       title: 'Xác nhận tiếp đoàn',
       content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,
@@ -242,8 +242,11 @@ const Page = () => {
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
             <Select
-              placeholder="Chọn phòng ban phụ trách"
+              showSearch
               allowClear
+              placeholder="Chọn phòng ban phụ trách"
+              optionFilterProp="label"
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
               options={listPhongBan.map((pb: any) => ({
                 value: pb.idPhongBan,
                 label: pb.tenPhongBan
