@@ -12,12 +12,13 @@ import { DelegationStatusConst } from '@/app/(home)/delegation/consts/delegation
 interface AppTableProps<T> extends TableProps<T> {
   columns: IColumn<T>[];
   listActions?: IAction[];
+  rowSelection?: TableProps<T>['rowSelection'];
 }
 
 const AppTable = <T extends object>(props: AppTableProps<T>) => {
   const [openConfig, setOpenConfig] = useState<boolean>(false);
   const [openActionIndex, setOpenActionIndex] = useState<number | null>(null);
-  const { columns, listActions, ...rest } = props;
+  const { columns, listActions, rowSelection, ...rest } = props;
 
   const openPopupConfig = () => {
     setOpenConfig(true);
@@ -126,7 +127,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
 
   return (
     <>
-      <Table<T> size="small" columns={newColumns} scroll={{ x: 'max-content' }} {...rest} />
+      <Table<T> size="small" columns={newColumns} scroll={{ x: 'max-content' }} rowSelection={rowSelection} {...rest} />
       <Modal width={250} title="Cấu hình hiển thị" open={openConfig} onCancel={closePopupConfig} footer={null}>
         <Checkbox.Group
           style={{ flexDirection: 'column' }}

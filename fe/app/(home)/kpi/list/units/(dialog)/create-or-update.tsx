@@ -2,17 +2,13 @@ import { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import {
-  clearSeletedKpiDonVi,
-  createKpiDonVi,
-  resetStatusKpiDonVi,
-  updateKpiDonVi,
-} from '@redux/feature/kpiSlice';
+import {clearSeletedKpiDonVi, resetStatusKpiDonVi} from '@redux/feature/kpi/kpiSlice';
+import {createKpiDonVi, updateKpiDonVi } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { KpiLoaiConst } from '../../../const/kpiType.const';
-import { getAllPhongBan } from '@redux/feature/danhmucSlice';
+import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { ICreateKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 
 type PositionModalProps = {

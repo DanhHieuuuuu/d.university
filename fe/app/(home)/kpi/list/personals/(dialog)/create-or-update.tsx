@@ -4,12 +4,8 @@ import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import UserSelect, { UserOption } from '@components/bthanh-custom/userSelect';
-import {
-  clearSeletedKpiCaNhan,
-  createKpiCaNhan,
-  resetStatusKpiCaNhan,
-  updateKpiCaNhan,
-} from '@redux/feature/kpiSlice';
+import {clearSeletedKpiCaNhan, resetStatusKpiCaNhan} from '@redux/feature/kpi/kpiSlice';
+import {createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';

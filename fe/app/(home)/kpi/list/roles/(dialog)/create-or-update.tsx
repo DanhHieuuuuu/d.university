@@ -4,17 +4,13 @@ import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateKpiRole } from '@models/kpi/kpi-role.model';
 import UserSelect, { UserOption } from '@components/bthanh-custom/userSelect';
-import {
-  clearSeletedKpiRole,
-  createKpiRole,
-  resetStatusKpiRole,
-  updateKpiRole,
-} from '@redux/feature/kpiSlice';
+import { createKpiRole, updateKpiRole } from '@redux/feature/kpi/kpiThunk';
+import {clearSeletedKpiRole, resetStatusKpiRole} from '@redux/feature/kpi/kpiSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import { KpiRoleConst } from '../../../const/kpiRole.const';
 import { getAllUser } from '@redux/feature/userSlice';
-import { getAllPhongBan } from '@redux/feature/danhmucSlice';
+import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -49,7 +45,7 @@ const PositionModal: React.FC<PositionModalProps> = ({
     if (isUpdate) return 'Cập nhật KPI Cá nhân';
     return 'Thêm mới KPI Cá nhân';
   }, [isView, isUpdate]);
-  
+
   useEffect(() => {
     if (!isModalOpen) return;
     dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));

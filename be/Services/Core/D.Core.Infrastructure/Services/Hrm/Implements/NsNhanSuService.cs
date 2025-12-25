@@ -110,6 +110,10 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     || (x.SoCccd ?? "").Contains(kw)
                 );
             }
+            if (dto.IdPhongBan.HasValue)
+            {
+                query = query.Where(x => x.HienTaiPhongBan == dto.IdPhongBan.Value);
+            }
 
             var totalCount = query.Count();
 

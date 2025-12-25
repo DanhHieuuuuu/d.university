@@ -11,12 +11,15 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
 
         void DeleteKpiDonVi(DeleteKpiDonViDto dto);
         void UpdateTrangThaiKpiDonVi(UpdateTrangThaiKpiDonViDto dto);
-        //List<ViewDonViDto> GetAllDonVi();
+        //List<GetAllDonViResponseDto> GetAllDonVi();
         List<GetListYearKpiDonViDto> GetListYear();
         void GiaoKpiDonVi(GiaoKpiDonViDto dto);
         List<NhanSuDaGiaoDto> GetNhanSuByKpiDonVi(GetNhanSuFromKpiDonViDto dto);
         PageResultDto<KpiDonViDto> FindPagingKeKhai(FilterKpiDonViKeKhaiDto dto);
         void UpdateKetQuaThucTe(UpdateKpiThucTeKpiDonViListDto dto);
+        //void UpdateKetQuaCapTren(UpdateKetQuaCapTrenListDto dto);
         List<TrangThaiKpiDonViResponseDto> GetListTrangThai();
+        //Task<GetTrangThaiKpiTruongByKpiDonViResponseDto> GetTrangThaiKpiTruongByKpiDonViAsync(GetTrangThaiKpiTruongByKpiDonViRequestDto dto);
+
     }
 }

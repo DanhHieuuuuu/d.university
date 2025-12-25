@@ -1,7 +1,7 @@
 import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseList, IResponseItem } from '@models/common/response.model';
-import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
+import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateKpiCaNhanThucTeList, IUpdateTrangThaiKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 
@@ -53,6 +53,50 @@ const deleteKpiCaNhan = async (id: number) => {
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+const updateTrangThaiKpiCaNhan = async (
+  body: IUpdateTrangThaiKpiCaNhan
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiCaNhanEndpoint}/update-trang-thai`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Cập nhật trạng thái thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật trạng thái');
+    return Promise.reject(err);
+  }
+};
+
+const updateKetQuaThucTeKpiCaNhan = async (
+  body: IUpdateKpiCaNhanThucTeList
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiCaNhanEndpoint}/update-ket-qua-thuc-te`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Cập nhật kết quả thực tế thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả thực tế');
     return Promise.reject(err);
   }
 };
@@ -150,6 +194,8 @@ export const KpiService = {
   createKpiCaNhan,
   updateKpiCaNhan,
   deleteKpiCaNhan,
+  updateTrangThaiKpiCaNhan,
+  updateKetQuaThucTeKpiCaNhan,
   getListKpiDonVi,
   createKpiDonVi,
   updateKpiDonVi,

@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Modal, Tag } from 'antd';
 import {
   PlusOutlined,
@@ -11,7 +11,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { deleteKpiDonVi, getAllKpiDonVi, setSelectedKpiDonVi } from '@redux/feature/kpiSlice';
+import { setSelectedKpiDonVi } from '@redux/feature/kpi/kpiSlice';
+import { deleteKpiDonVi, getAllKpiDonVi } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -21,16 +22,24 @@ import PositionModal from './(dialog)/create-or-update';
 import { KpiLoaiConst } from '../../const/kpiType.const';
 import { toast } from 'react-toastify';
 import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
+import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiDonVi.$list);
+  const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBan.$list);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [openFilter, setOpenFilter] = useState(false);
+  const [openBulkAction, setOpenBulkAction] = useState(false); 
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
+  useEffect(() => {
+      dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
+    }, [dispatch]);
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiDonVi>({
     total: totalItem || 0,
@@ -44,6 +53,12 @@ const Page = () => {
     },
     triggerFirstLoad: true
   });
+
+  // const handlePhongBanChange = (value: number | undefined) => {
+  //     onFilterChange({ idDonVi: value, idNhanSu: undefined });
+  //     form.setFieldValue('idNhanSu', undefined);
+  //     dispatch(getAllUser({ IdPhongBan: value, PageIndex: 1, PageSize: 2000 }));
+  //   };
 
   const onClickAdd = () => {
     setIsModalView(false);

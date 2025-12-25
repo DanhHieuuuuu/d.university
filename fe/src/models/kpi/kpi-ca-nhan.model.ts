@@ -41,6 +41,11 @@ export type IUpdateKpiCaNhan = ICreateKpiCaNhan & {
   id: number,
 };
 
+export type IUpdateTrangThaiKpiCaNhan = {
+  ids: number[];
+  trangThai: number;
+  note?: string;
+};
 export type IViewGetTrangThai = {
   trangThai?: number,
 };

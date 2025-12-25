@@ -1,6 +1,6 @@
 'use client';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { Button, Card, Form, Input, Modal, Select } from 'antd';
+import { Button, Card, Form, Input, Modal, Select, Table } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -11,7 +11,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { deleteKpiRole, getAllKpiRole, setSelectedKpiRole } from '@redux/feature/kpiSlice';
+import { setSelectedKpiRole } from '@redux/feature/kpi/kpiSlice';
+import { deleteKpiRole, getAllIdsKpiRole, getAllKpiRole } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -29,7 +30,7 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
-
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiRole>({
     total: totalItem || 0,
@@ -153,7 +154,50 @@ const Page = () => {
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     handleDebouncedSearch(event.target.value);
   };
+  const rowSelection = {
+    selectedRowKeys,
+    preserveSelectedRowKeys: true,
+    onChange: (newSelectedRowKeys: React.Key[]) => {      
+      const currentPageIds = list?.map(item => item.id) || [];
+      const isUnselectingAllOnPage = currentPageIds.every(id => !newSelectedRowKeys.includes(id));
+      if (isUnselectingAllOnPage && selectedRowKeys.length > list?.length) {
+        setSelectedRowKeys([]);
+      } else {
+        setSelectedRowKeys(newSelectedRowKeys);
+      }
+    },
+    selections: [
+      {
+        key: 'current-page',
+        text: 'Chọn 1 trang',
+        onSelect: (changableRowKeys: React.Key[]) => {
+          setSelectedRowKeys(changableRowKeys);
+        },
+      },
+      {
+        key: 'all-pages',
+        text: 'Chọn tất cả',
+        onSelect: () => {
+          handleSelectAllPages();
+        },
+      },
+    ]
+  };
 
+  const handleSelectAllPages = async () => {
+    try {
+      const allIds = await dispatch(getAllIdsKpiRole({
+        ...query,
+        PageIndex: 1,
+        PageSize: totalItem
+      })).unwrap();
+
+      setSelectedRowKeys(allIds);
+      toast.success(`Đã chọn tất cả ${allIds.length} bản ghi`);
+    } catch (error) {
+      toast.error("Không thể chọn tất cả");
+    }
+  };
   return (
     <Card
       title="Danh sách KPI Cá nhân"
@@ -206,6 +250,7 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+        rowSelection={rowSelection}
       />
 
       <PositionModal
