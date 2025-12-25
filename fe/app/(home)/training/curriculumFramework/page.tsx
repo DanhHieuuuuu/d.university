@@ -1,192 +1,313 @@
 'use client';
-import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
-import {
-  PlusOutlined,
-  SearchOutlined,
-  SyncOutlined,
-  EditOutlined,
-  StopOutlined,
-  DeleteOutlined,
-  EyeOutlined
-} from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
+import { Card, Select, Table, Spin, Empty, Tag, Collapse } from 'antd';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { setSelectedIdChucVu } from '@redux/feature/danh-muc/danhmucSlice';
-import { getAllChucVu } from '@redux/feature/danh-muc/danhmucThunk'
+import { getAllNganh } from '@redux/feature/dao-tao/nganhThunk';
+import { getAllChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';
+import { getAllMonHoc } from '@redux/feature/dao-tao/monHocThunk';
+import { getAllChuongTrinhKhung } from '@redux/feature/dao-tao/chuongTrinhKhungThunk';
+import { getAllChuongTrinhKhungMon } from '@redux/feature/dao-tao/chuongTrinhKhungMonThunk';
+import { IViewChuongTrinhKhungMon } from '@models/dao-tao/chuongTrinhKhungMon.model';
+import { IViewMonHoc } from '@models/dao-tao/monHoc.model';
 
-import AppTable from '@components/common/Table';
-import { useDebouncedCallback } from '@hooks/useDebounce';
-import { usePaginationWithFilter } from '@hooks/usePagination';
-import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryChucVu, IViewChucVu } from '@models/danh-muc/chuc-vu.model';
-import PositionModal from './(dialog)/create-or-update';
+import styles from './curriculum.module.css';
+
+// Extended type with joined MonHoc data
+interface IChuongTrinhKhungMonWithMonHoc extends IViewChuongTrinhKhungMon {
+  monHoc?: IViewMonHoc;
+}
+
+interface GroupedCourse {
+  hocKy: string;
+  courses: IChuongTrinhKhungMonWithMonHoc[];
+  totalCredits: number;
+}
 
 const Page = () => {
-  const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.chucVu.$list);
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
-  const [isView, setIsModalView] = useState<boolean>(false);
-  const [selectedId, setSelectedId] = useState<number>(0);
+  // State for filters
+  const [selectedNganhId, setSelectedNganhId] = useState<number | null>(null);
+  const [selectedChuyenNganhId, setSelectedChuyenNganhId] = useState<number | null>(null);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryChucVu>({
-    total: totalItem || 0,
-    initialQuery: {
-      PageIndex: 1,
-      PageSize: 10,
-      Keyword: ''
-    },
-    onQueryChange: (newQuery) => {
-      dispatch(getAllChucVu(newQuery));
-    },
-    triggerFirstLoad: true
-  });
+  // Redux state
+  const { data: listNganh, status: nganhStatus } = useAppSelector((state) => state.daotaoState.nganh.$list);
+  const { data: listChuyenNganh, status: chuyenNganhStatus } = useAppSelector(
+    (state) => state.daotaoState.chuyenNganh.$list
+  );
+  const { data: listMonHoc, status: monHocStatus } = useAppSelector((state) => state.daotaoState.monHoc.$list);
+  const { data: listChuongTrinhKhung, status: chuongTrinhKhungStatus } = useAppSelector(
+    (state) => state.daotaoState.chuongTrinhKhung.$list
+  );
+  const { data: listChuongTrinhKhungMon, status: chuongTrinhKhungMonStatus } = useAppSelector(
+    (state) => state.daotaoState.chuongTrinhKhungMon.$list
+  );
 
-  const onClickAdd = () => {
-    setIsModalView(false);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
+  // Load danh sách ngành và môn học khi mount
+  useEffect(() => {
+    dispatch(getAllNganh({ PageSize: 1000 }));
+    dispatch(getAllMonHoc({ PageSize: 1000 }));
+  }, [dispatch]);
+
+  // Load danh sách chuyên ngành khi chọn ngành (sử dụng API filter)
+  useEffect(() => {
+    if (selectedNganhId) {
+      dispatch(getAllChuyenNganh({ NganhId: selectedNganhId, PageSize: 1000 }));
+    }
+  }, [dispatch, selectedNganhId]);
+
+  // Load chương trình khung khi có đủ filter
+  useEffect(() => {
+    if (selectedNganhId && selectedChuyenNganhId) {
+      dispatch(
+        getAllChuongTrinhKhung({
+          NganhId: selectedNganhId,
+          ChuyenNganhId: selectedChuyenNganhId,
+          PageSize: 10
+        })
+      );
+    }
+  }, [dispatch, selectedNganhId, selectedChuyenNganhId]);
+
+  // Get current ChuongTrinhKhung
+  const currentChuongTrinhKhung = listChuongTrinhKhung?.[0];
+
+  // Load ChuongTrinhKhungMon khi có ChuongTrinhKhung (sử dụng API filter)
+  useEffect(() => {
+    if (currentChuongTrinhKhung) {
+      dispatch(
+        getAllChuongTrinhKhungMon({
+          ChuongTrinhKhungId: currentChuongTrinhKhung.id,
+          PageSize: 1000
+        })
+      );
+    }
+  }, [dispatch, currentChuongTrinhKhung]);
+
+  // Handle filter changes
+  const handleNganhChange = (value: number) => {
+    setSelectedNganhId(value);
+    setSelectedChuyenNganhId(null); // Reset chuyên ngành khi đổi ngành
   };
 
-  const onClickUpdate = (id: number) => {
-    setSelectedId(id);
-    setIsModalView(false);
-    setIsModalUpdate(true);
-    setIsModalOpen(true);
+  const handleChuyenNganhChange = (value: number) => {
+    setSelectedChuyenNganhId(value);
   };
 
-  const onClickView = (id: number) => {
-    setSelectedId(id);
-    setIsModalView(true);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
-  };
+  // Join ChuongTrinhKhungMon with MonHoc data (không cần filter local vì đã filter từ API)
+  const joinedChuongTrinhKhungMon = useMemo((): IChuongTrinhKhungMonWithMonHoc[] => {
+    if (!listChuongTrinhKhungMon || !listMonHoc) return [];
 
-  const refreshData = () => {
-    dispatch(getAllChucVu(query));
-  };
+    // Create a map for quick lookup
+    const monHocMap = new Map(listMonHoc.map((mh) => [mh.id, mh]));
 
-  const columns: IColumn<IViewChucVu>[] = [
+    // Join with MonHoc data
+    return listChuongTrinhKhungMon.map((ctkm) => ({
+      ...ctkm,
+      monHoc: monHocMap.get(ctkm.monHocId)
+    }));
+  }, [listChuongTrinhKhungMon, listMonHoc]);
+
+  // Group courses by học kỳ
+  const groupedCourses = useMemo((): GroupedCourse[] => {
+    if (!joinedChuongTrinhKhungMon || joinedChuongTrinhKhungMon.length === 0) {
+      return [];
+    }
+
+    const grouped = joinedChuongTrinhKhungMon.reduce(
+      (acc, course) => {
+        const key = course.hocKy || 'Chưa xác định';
+        if (!acc[key]) {
+          acc[key] = {
+            hocKy: key,
+            courses: [],
+            totalCredits: 0
+          };
+        }
+        acc[key].courses.push(course);
+        acc[key].totalCredits += course.monHoc?.soTinChi || 0;
+        return acc;
+      },
+      {} as Record<string, GroupedCourse>
+    );
+
+    // Sort by học kỳ
+    return Object.values(grouped).sort((a, b) => {
+      const numA = parseInt(a.hocKy.replace(/\D/g, '')) || 0;
+      const numB = parseInt(b.hocKy.replace(/\D/g, '')) || 0;
+      return numA - numB;
+    });
+  }, [joinedChuongTrinhKhungMon]);
+
+  // Tính tổng tín chỉ
+  const totalCredits = useMemo(() => {
+    return groupedCourses.reduce((sum, group) => sum + group.totalCredits, 0);
+  }, [groupedCourses]);
+
+  // Table columns
+  const columns = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
+      title: 'STT',
+      key: 'stt',
+      width: 60,
+      align: 'center' as const,
+      render: (_: any, __: any, index: number) => index + 1
     },
     {
-      key: 'maChucVu',
-      dataIndex: 'maChucVu',
-      title: 'Mã chức vụ'
+      title: 'Tên môn học/Học phần',
+      key: 'tenMonHoc',
+      width: 250,
+      render: (_: any, record: IChuongTrinhKhungMonWithMonHoc) => record.monHoc?.tenMonHoc || '-'
     },
     {
-      key: 'tenChucVu',
-      dataIndex: 'tenChucVu',
-      title: 'Tên chức vụ'
+      title: 'Mã Học phần',
+      key: 'maMonHoc',
+      width: 120,
+      align: 'center' as const,
+      render: (_: any, record: IChuongTrinhKhungMonWithMonHoc) => record.monHoc?.maMonHoc || '-'
     },
     {
-      key: 'hsChucVu',
-      dataIndex: 'hsChucVu',
-      title: 'Hệ số'
+      title: 'Học phần',
+      key: 'loaiMonHoc',
+      width: 100,
+      align: 'center' as const,
+      render: (_: any, record: IChuongTrinhKhungMonWithMonHoc) => {
+        const trangThai = record.trangThai;
+        return <Tag color={trangThai ? 'blue' : 'green'}>{trangThai ? 'Bắt buộc' : 'Tự chọn'}</Tag>;
+      }
     },
     {
-      key: 'hsTrachNhiem',
-      dataIndex: 'hsTrachNhiem',
-      title: 'Hệ số trách nhiệm'
+      title: 'Số TC',
+      key: 'soTinChi',
+      width: 80,
+      align: 'center' as const,
+      render: (_: any, record: IChuongTrinhKhungMonWithMonHoc) => record.monHoc?.soTinChi || 0
+    },
+    {
+      title: 'Số tiết LT',
+      key: 'soTietLyThuyet',
+      width: 100,
+      align: 'center' as const,
+      render: (_: any, record: IChuongTrinhKhungMonWithMonHoc) => record.monHoc?.soTietLyThuyet || 0
+    },
+    {
+      title: 'Số tiết TH',
+      key: 'soTietThucHanh',
+      width: 100,
+      align: 'center' as const,
+      render: (_: any, record: IChuongTrinhKhungMonWithMonHoc) => record.monHoc?.soTietThucHanh || 0
     }
   ];
 
-  const actions: IAction[] = [
-    {
-      label: 'Chi tiết',
-      tooltip: 'Xem thông tin chức vụ',
-      icon: <EyeOutlined />,
-      command: (record: IViewChucVu) => {
-        dispatch(setSelectedIdChucVu(record.id));
-        onClickView(record.id);
-      }
-    },
-    {
-      label: 'Sửa',
-      tooltip: 'Sửa thông tin chức vụ',
-      icon: <EditOutlined />,
-      command: (record: IViewChucVu) => {
-        dispatch(setSelectedIdChucVu(record.id));
-        onClickUpdate(record.id);
-      }
-    },
-    {
-      label: 'Xóa',
-      color: 'red',
-      icon: <DeleteOutlined />,
-      command: (record: IViewChucVu) => {
-        dispatch(setSelectedIdChucVu(record.id));
-      }
-    }
-  ];
-
-  const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
-    onFilterChange({ Keyword: value });
-  }, 500);
-
-  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    handleDebouncedSearch(event.target.value);
-  };
+  const isLoading =
+    nganhStatus === ReduxStatus.LOADING ||
+    chuyenNganhStatus === ReduxStatus.LOADING ||
+    monHocStatus === ReduxStatus.LOADING ||
+    chuongTrinhKhungStatus === ReduxStatus.LOADING ||
+    chuongTrinhKhungMonStatus === ReduxStatus.LOADING;
 
   return (
-    <Card
-      title="Danh sách chức vụ"
-      className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
-      }
-    >
-      <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-2">
-          <Form.Item<IQueryChucVu> label="Tên chức vụ:" name="Keyword">
-            <Input onChange={(e) => handleSearch(e)} />
-          </Form.Item>
+    <Card title="Chương trình khung" className="min-h-full">
+      {/* Filter Section */}
+      <div className={styles.filterSection}>
+        <div className={styles.filterItem}>
+          <label>Ngành:</label>
+          <Select
+            placeholder="Chọn ngành"
+            value={selectedNganhId}
+            onChange={handleNganhChange}
+            loading={nganhStatus === ReduxStatus.LOADING}
+            style={{ width: 300 }}
+            options={listNganh?.map((nganh) => ({
+              value: nganh.id,
+              label: nganh.tenNganh
+            }))}
+            allowClear
+          />
         </div>
-        <Form.Item>
-          <div className="flex flex-row justify-center space-x-2">
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              Tìm kiếm
-            </Button>
-            <Button
-              color="default"
-              variant="filled"
-              icon={<SyncOutlined />}
-              onClick={() => {
-                form.resetFields();
-                resetFilter();
-              }}
-            >
-              Tải lại
-            </Button>
+
+        <div className={styles.filterItem}>
+          <label>Chuyên ngành:</label>
+          <Select
+            placeholder="Chọn chuyên ngành"
+            value={selectedChuyenNganhId}
+            onChange={handleChuyenNganhChange}
+            loading={chuyenNganhStatus === ReduxStatus.LOADING}
+            disabled={!selectedNganhId}
+            style={{ width: 300 }}
+            options={listChuyenNganh?.map((cn) => ({
+              value: cn.id,
+              label: cn.tenChuyenNganh
+            }))}
+            allowClear
+          />
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <Spin spinning={isLoading}>
+        {!selectedNganhId || !selectedChuyenNganhId ? (
+          <Empty description="Vui lòng chọn Ngành và Chuyên ngành để xem chương trình khung" />
+        ) : groupedCourses.length === 0 ? (
+          <Empty description="Không có dữ liệu chương trình khung" />
+        ) : (
+          <div className={styles.curriculumContent}>
+            {/* Thông tin chương trình khung */}
+            {currentChuongTrinhKhung && (
+              <div className={styles.curriculumInfo}>
+                <h3>{currentChuongTrinhKhung.tenChuongTrinhKhung}</h3>
+                <p>Mã: {currentChuongTrinhKhung.maChuongTrinhKhung}</p>
+              </div>
+            )}
+
+            {/* Bảng theo học kỳ - sử dụng Collapse */}
+            <Collapse
+              className={styles.semesterCollapse}
+              defaultActiveKey={[]}
+              expandIcon={() => null}
+              items={groupedCourses.map((group) => ({
+                key: group.hocKy,
+                label: (
+                  <div className={styles.semesterHeader}>
+                    <span className={styles.semesterTitle}>Học kỳ {group.hocKy}</span>
+                    <span className={styles.semesterCredits}>{group.totalCredits} TC</span>
+                  </div>
+                ),
+                children: (
+                  <Table
+                    rowKey="id"
+                    columns={columns}
+                    dataSource={group.courses}
+                    pagination={false}
+                    size="small"
+                    bordered
+                    className={styles.courseTable}
+                  />
+                )
+              }))}
+            />
+
+            {/* Tổng kết */}
+            <div className={styles.summarySection}>
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryLabel}>Tổng TC yêu cầu</span>
+                <span className={styles.summaryValue + ' ' + styles.required}>
+                  {currentChuongTrinhKhung?.tongSoTinChi || totalCredits}
+                </span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryLabel}>Tổng TC bắt buộc</span>
+                <span className={styles.summaryValue + ' ' + styles.required}>{totalCredits}</span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryLabel}>Tổng TC tự chọn</span>
+                <span className={styles.summaryValue + ' ' + styles.optional}>0</span>
+              </div>
+            </div>
           </div>
-        </Form.Item>
-      </Form>
-
-      <AppTable
-        loading={status === ReduxStatus.LOADING}
-        rowKey="id"
-        columns={columns}
-        dataSource={list}
-        listActions={actions}
-        pagination={{ position: ['bottomRight'], ...pagination }}
-      />
-
-      <PositionModal
-        isModalOpen={isModalOpen}
-        isUpdate={isUpdate}
-        isView={isView}
-        setIsModalOpen={setIsModalOpen}
-        refreshData={refreshData}
-      />
+        )}
+      </Spin>
     </Card>
   );
 };

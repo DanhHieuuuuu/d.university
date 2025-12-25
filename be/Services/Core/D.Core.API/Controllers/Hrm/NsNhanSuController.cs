@@ -138,5 +138,26 @@ namespace D.Core.API.Controllers.Hrm
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Lấy thông tin hiển thị hồ sơ nhân sự theo Id
+        /// </summary>
+        /// <param name="idNhanSu"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
+        [HttpGet("ho-so/{idNhanSu}")]
+        public async Task<ResponseAPI> GetHoSoNhanSu(int idNhanSu)
+        {
+            try
+            {
+                var dto = new NsNhanSuHoSoChiTietRequestDto { IdNhanSu = idNhanSu };
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

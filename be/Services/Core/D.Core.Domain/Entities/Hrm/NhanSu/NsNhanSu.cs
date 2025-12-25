@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using D.Core.Domain.Shared.Constants;
 using D.DomainBase.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace D.Core.Domain.Entities.Hrm.NhanSu
 {
@@ -28,6 +30,17 @@ namespace D.Core.Domain.Entities.Hrm.NhanSu
         public string? Email { get; set; }
         public string? KhanCapSoDienThoai { get; set; }
         public string? KhanCapNguoiLienHe { get; set; }
+
+        // Thông tin sức khỏe
+        [Precision(4, 1)]
+        public decimal? ChieuCao { get; set; }
+
+        [Precision(4, 1)]
+        public decimal? CanNang { get; set; }
+
+        [StringLength(3)]
+        public string? NhomMau { get; set; }
+        public DateTime? NgayCapNhatSk { get; set; }
 
         // Thông tin công việc
         public string? MaSoThue { get; set; }

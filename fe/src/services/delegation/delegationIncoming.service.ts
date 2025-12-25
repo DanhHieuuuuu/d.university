@@ -72,7 +72,7 @@ const getListStatus = async () => {
 };
 const createDoanVao = async (formData: FormData) => {
   try {
-    const res = await axios.post(`${apiDelegationEndpoint}/create`,formData, {
+    const res = await axios.post(`${apiDelegationEndpoint}/create`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -85,7 +85,7 @@ const createDoanVao = async (formData: FormData) => {
 };
 const updateDoanVao = async (formData: FormData) => {
   try {
-    const res = await axios.put(`${apiDelegationEndpoint}/update`, formData,{
+    const res = await axios.put(`${apiDelegationEndpoint}/update`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -118,7 +118,9 @@ const getByIdGuestGroup = async (id: number) => {
 };
 const getByIdDetailDelegation = async (delegationIncomingId: number) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-staff-by-id?DelegationIncomingId=${delegationIncomingId}`);
+    const res = await axios.get(
+      `${apiDelegationEndpoint}/get-staff-by-id?DelegationIncomingId=${delegationIncomingId}`
+    );
 
     const data: IResponseItem<IDetailDelegationIncoming> = res.data;
     return Promise.resolve(data);
@@ -129,7 +131,9 @@ const getByIdDetailDelegation = async (delegationIncomingId: number) => {
 };
 const getByIdReceptionTime = async (delegationIncomingId: number) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-reception-time-by-id?DelegationIncomingId=${delegationIncomingId}`);
+    const res = await axios.get(
+      `${apiDelegationEndpoint}/get-reception-time-by-id?DelegationIncomingId=${delegationIncomingId}`
+    );
 
     const data: IResponseItem<IReceptionTime> = res.data;
     return Promise.resolve(data);
@@ -140,12 +144,9 @@ const getByIdReceptionTime = async (delegationIncomingId: number) => {
 };
 const downloadTemplateExcel = async () => {
   try {
-    const res = await axios.get(
-      `${apiDelegationEndpoint}/download-excel`,
-      {
-        responseType: 'blob',
-      }
-    );
+    const res = await axios.get(`${apiDelegationEndpoint}/download-excel`, {
+      responseType: 'blob'
+    });
     return Promise.resolve(res);
   } catch (err) {
     processApiMsgError(err, 'Không tải được file Excel mẫu');
@@ -281,7 +282,9 @@ const updateDepartmentSupport = async (body: IUpdateDepartmentSupport) => {
 };
 const getByIdDepartmentSupport = async (departmentSupportId: number) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-id-department-support?DepartmentSupportId=${departmentSupportId}`);
+    const res = await axios.get(
+      `${apiDelegationEndpoint}/get-id-department-support?DepartmentSupportId=${departmentSupportId}`
+    );
 
     const data: IResponseItem<IDepartmentSupport> = res.data;
     return Promise.resolve(data);
@@ -315,5 +318,4 @@ export const DelegationIncomingService = {
   getLogReceptionTime,
   updateDepartmentSupport,
   getByIdDepartmentSupport
-
 };

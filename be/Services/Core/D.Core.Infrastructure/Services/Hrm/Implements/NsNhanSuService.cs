@@ -1,8 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Linq;
+using System.Text.Json;
 using AutoMapper;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
+using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.DomainBase.Dto;
@@ -53,7 +55,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 .Take(dto.PageSize)
                 .ToList();
 
-            // Lấy tên phòng ban, chức vụ 
+            // Lấy tên phòng ban, chức vụ
             var (pbDict, cvDict) = GetPhongBanChucVuDict(items);
 
             var result = items
@@ -219,7 +221,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var newNhanSuDto = dto.ThongTinNhanSu;
             var newNhanSu = CreateNhanSu(newNhanSuDto);
 
-            // Lấy HsChucVu 
+            // Lấy HsChucVu
             var hsChucVu = _unitOfWork.iDmChucVuRepository.FindById(dto.IdChucVu)?.HsChucVu;
 
             var chiTietHopDong = new NsHopDongChiTiet
@@ -273,7 +275,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 );
             }
 
-            // Gán tên phòng ban & chức vụ 
+            // Gán tên phòng ban & chức vụ
             var (pbDict, cvDict) = GetPhongBanChucVuDict(new[] { nhanSu });
 
             var result = new NsNhanSuResponseDto
@@ -340,6 +342,50 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             return result;
         }
 
+        public NsNhanSuHoSoChiTietResponseDto HoSoChiTietNhanSu(int idNhanSu)
+        {
+            _logger.LogInformation(
+                $"{nameof(HoSoChiTietNhanSu)} method called. IdNhanSu: {idNhanSu}"
+            );
+
+            var nhanSu = _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefault(x =>
+                idNhanSu == x.Id
+            );
+
+            if (nhanSu == null)
+            {
+                throw new UserFriendlyException(
+                    ErrorCodeConstant.CodeNotFound,
+                    $"Không tìm thấy nhân sự với Id: {idNhanSu}"
+                );
+            }
+
+            var result = _mapper.Map<NsNhanSuHoSoChiTietResponseDto>(nhanSu);
+
+            var (pbDict, cvDict) = GetPhongBanChucVuDict(new[] { nhanSu });
+
+            result.TenPhongBan =
+                nhanSu.HienTaiPhongBan.HasValue
+                && pbDict.TryGetValue(nhanSu.HienTaiPhongBan.Value, out var pbName)
+                    ? pbName
+                    : null;
+            result.TenChucVu =
+                nhanSu.HienTaiChucVu.HasValue
+                && cvDict.TryGetValue(nhanSu.HienTaiChucVu.Value, out var cvName)
+                    ? cvName
+                    : null;
+
+            var hopDongChiTiet =
+                _unitOfWork.iNsHopDongChiTietRepository.TableNoTracking.FirstOrDefault(d =>
+                    d.IdNhanSu == idNhanSu
+                );
+            result.IdToBoMon = hopDongChiTiet?.IdToBoMon;
+
+            result.ThongTinGiaDinh = GetThongTinGiaDinh(idNhanSu);
+
+            return result;
+        }
+
         #endregion
 
         #region Private helpers
@@ -355,6 +401,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
         }
 
+        // chỉ thêm mới thông tin nhân sự
         private NsNhanSuEntity CreateNewNhanSu(CreateNhanSuDto dto)
         {
             var entity = _mapper.Map<NsNhanSuEntity>(dto);
@@ -363,6 +410,41 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             _unitOfWork.iNsNhanSuRepository.SaveChange();
 
             return entity;
+        }
+
+        private List<NsQuanHeGiaDinhResponseDto> GetThongTinGiaDinh(int idNhanSu)
+        {
+            var thanhViens = _unitOfWork
+                .iNsQuanHeGiaDinhRepository.TableNoTracking.Where(x => x.IdNhanSu == idNhanSu)
+                .ToList();
+
+            if (!thanhViens.Any())
+                return new List<NsQuanHeGiaDinhResponseDto>();
+
+            var quanHeIds = thanhViens.Select(x => x.QuanHe).Distinct().ToList();
+
+            var quanHeDict = _unitOfWork
+                .iDmQuanHeGiaDinhRepository.TableNoTracking.Where(x => quanHeIds.Contains(x.Id))
+                .ToDictionary(x => x.Id, x => x.TenQuanHe);
+
+            var result = thanhViens
+                .Select(tv => new NsQuanHeGiaDinhResponseDto
+                {
+                    HoTen = tv.HoTen,
+                    DonViCongTac = tv.DonViCongTac,
+                    NgaySinh = tv.NgaySinh,
+                    NgheNghiep = tv.NgheNghiep,
+                    QueQuan = tv.QueQuan,
+                    QuocTich = tv.QuocTich,
+                    SoDienThoai = tv.SoDienThoai,
+                    QuanHe = tv.QuanHe,
+                    TenQuanHe = quanHeDict.ContainsKey(tv.QuanHe.Value)
+                        ? quanHeDict[tv.QuanHe.Value]
+                        : null,
+                })
+                .ToList();
+
+            return result;
         }
 
         private bool HasFamilyInfo(CreateNhanSuDto dto) =>

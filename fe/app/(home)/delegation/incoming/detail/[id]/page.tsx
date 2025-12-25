@@ -46,44 +46,43 @@ export default function DetailDoanVaoPage() {
         .then((res) => setReceptionTime(res));
     }
   };
-const onClickUpdate = () => {
-  setIsEdit(true);
-};
-const onClickCancel = () => {
-  setIsEdit(false);
-};
-
-const onClickSave = async () => {
-  try {
-    await Promise.all([
-      delegationFormRef.current?.submit(),
-      staffFormRef.current?.submit(),
-      receptionTimeFormRef.current?.submit()
-    ]);
-    toast.success('Cập nhật thành công');
+  const onClickUpdate = () => {
+    setIsEdit(true);
+  };
+  const onClickCancel = () => {
     setIsEdit(false);
-  } catch (err) {
-    toast.error(String(err));
-    
-  }
-};
-const reloadDelegation = async () => {
-  if (!id) return;
-  const res = await dispatch(getByIdGuestGroup(Number(id))).unwrap();
-  setDelegation(res);
-};
-const reloadReceptionTime = async () => {
-  if (!id) return;
-  const res = await dispatch(getByIdReceptionTime(Number(id))).unwrap();
-  setReceptionTime(res);
-};
+  };
+
+  const onClickSave = async () => {
+    try {
+      await Promise.all([
+        delegationFormRef.current?.submit(),
+        staffFormRef.current?.submit(),
+        receptionTimeFormRef.current?.submit()
+      ]);
+      toast.success('Cập nhật thành công');
+      setIsEdit(false);
+    } catch (err) {
+      toast.error(String(err));
+    }
+  };
+  const reloadDelegation = async () => {
+    if (!id) return;
+    const res = await dispatch(getByIdGuestGroup(Number(id))).unwrap();
+    setDelegation(res);
+  };
+  const reloadReceptionTime = async () => {
+    if (!id) return;
+    const res = await dispatch(getByIdReceptionTime(Number(id))).unwrap();
+    setReceptionTime(res);
+  };
 
   const tabItems = [
     {
       key: 'delegation',
       label: 'Thông tin đoàn vào',
       children: delegation ? (
-        <DelegationIncomingTab data={delegation} isEdit={isEdit} ref={delegationFormRef}  onUpdated={reloadDelegation}/>
+        <DelegationIncomingTab data={delegation} isEdit={isEdit} ref={delegationFormRef} onUpdated={reloadDelegation} />
       ) : (
         <Empty description="Không có dữ liệu đoàn vào" />
       )
@@ -92,7 +91,7 @@ const reloadReceptionTime = async () => {
       key: 'staffReception',
       label: 'Thông tin nhân sự tiếp đoàn',
       children: detailDelegation ? (
-        <DetailGuestGroupTab data={detailDelegation} isEdit={isEdit}  />
+        <DetailGuestGroupTab data={detailDelegation} isEdit={isEdit} />
       ) : (
         <Empty description="Không có dữ liệu nhân sự tiếp đoàn" />
       )
@@ -101,7 +100,12 @@ const reloadReceptionTime = async () => {
       key: 'receptionTime',
       label: 'Thông tin thời gian tiếp đoàn',
       children: receptionTime ? (
-        <ReceptionTimeTab data={receptionTime} isEdit={isEdit} ref={receptionTimeFormRef}  onUpdated={reloadReceptionTime}/>
+        <ReceptionTimeTab
+          data={receptionTime}
+          isEdit={isEdit}
+          ref={receptionTimeFormRef}
+          onUpdated={reloadReceptionTime}
+        />
       ) : (
         <Empty description="Không có dữ liệu thời gian tiếp đoàn" />
       )
@@ -133,23 +137,20 @@ const reloadReceptionTime = async () => {
           <span>Chi tiết đoàn vào</span>
         </div>
       }
-  extra={
-  !isEdit ? (
-    <Button type="primary" icon={<EditOutlined />} onClick={onClickUpdate}>
-      Chỉnh sửa
-    </Button>
-  ) : (
-    <div style={{ display: 'flex', gap: 8 }}>
-      <Button onClick={onClickCancel}>
-        Huỷ
-      </Button>
-      <Button type="primary" onClick={onClickSave}>
-        Lưu
-      </Button>
-    </div>
-  )
-}
-
+      extra={
+        !isEdit ? (
+          <Button type="primary" icon={<EditOutlined />} onClick={onClickUpdate}>
+            Chỉnh sửa
+          </Button>
+        ) : (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button onClick={onClickCancel}>Huỷ</Button>
+            <Button type="primary" onClick={onClickSave}>
+              Lưu
+            </Button>
+          </div>
+        )
+      }
     >
       <Tabs type="card" items={tabItems} activeKey={activeKey} onChange={handleTabChange} />
     </Card>

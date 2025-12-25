@@ -30,6 +30,7 @@ export default function JobTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name="idLoaiHopDong" label="Loại hợp đồng">
         <Select
+          allowClear
           options={listLoaiHopDong?.map((item) => {
             return { label: item.tenLoaiHopDong, value: item.id };
           })}
@@ -44,17 +45,15 @@ export default function JobTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name="idPhongBan" label="Phòng ban">
         <Select
+          allowClear
           options={phongBan.$list.data?.map((item) => {
             return { label: item.tenPhongBan, value: item.id };
           })}
         />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs>
-        name="idChucVu"
-        label="Chức vụ"
-       
-      >
+      <Form.Item<ICreateHopDongNs> name="idChucVu" label="Chức vụ">
         <Select
+          allowClear
           options={chucVu.$list.data?.map((item) => {
             return { label: item.tenChucVu, value: item.id };
           })}
@@ -62,6 +61,7 @@ export default function JobTab() {
       </Form.Item>
       <Form.Item<ICreateHopDongNs> name="idToBoMon" label="Tổ bộ môn">
         <Select
+          allowClear
           options={listToBoMon?.map((item) => {
             return { label: item.tenBoMon, value: item.id };
           })}

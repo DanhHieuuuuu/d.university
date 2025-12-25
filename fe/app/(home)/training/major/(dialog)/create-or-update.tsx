@@ -146,9 +146,7 @@ const MajorModal: React.FC<MajorModalProps> = (props) => {
                 value: khoa.id
               }))}
               showSearch
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
             />
           </Form.Item>
           <Form.Item<ICreateNganh> label="Mô tả" name="moTa" className="col-span-2">
