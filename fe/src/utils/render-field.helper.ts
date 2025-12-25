@@ -20,11 +20,13 @@ export function renderField(
   const { isEdit, displayValueFormatter } = options;
 
   const child = isEdit
-    ? input 
+    ? input
     : React.createElement(
         Text,
         null,
-        displayValueFormatter ? displayValueFormatter(initialValue) : formatDisplayValue(initialValue, options.displayType)
+        displayValueFormatter
+          ? displayValueFormatter(initialValue)
+          : formatDisplayValue(initialValue, options.displayType)
       );
 
   return React.createElement(
@@ -42,9 +44,9 @@ function formatDisplayValue(value: any, type?: 'date' | 'time'): string {
   if (value === null || value === undefined) return '-';
 
   if (dayjs.isDayjs(value)) {
-    if (type === 'time') return value.format('HH:mm');      // chỉ giờ
+    if (type === 'time') return value.format('HH:mm'); // chỉ giờ
     if (type === 'date') return value.format('DD/MM/YYYY'); // chỉ ngày
-    return value.format('DD/MM/YYYY HH:mm');               // default: ngày + giờ
+    return value.format('DD/MM/YYYY HH:mm'); // default: ngày + giờ
   }
 
   if (typeof value === 'number') return value.toLocaleString();

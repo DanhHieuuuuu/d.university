@@ -7,7 +7,14 @@ import {
   HomeOutlined,
   HourglassOutlined,
   PartitionOutlined,
-  TeamOutlined
+  TeamOutlined,
+  ReadOutlined,
+  BankOutlined,
+  BranchesOutlined,
+  ForkOutlined,
+  BookOutlined,
+  LinkOutlined,
+  ProfileOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
@@ -111,44 +118,43 @@ export const listMenuCore: IMenu[] = [
         label: 'Nhật ký đoàn vào',
         routerLink: '/delegation/incoming/diary',
         icon: <HistoryOutlined />
-
       }
-    ],
+    ]
   },
   {
     label: 'Đào tạo',
     routerLink: '/training',
-    icon: <BarsOutlined />,
+    icon: <ReadOutlined />,
     items: [
       {
         label: 'Khoa',
         routerLink: '/training/faculty',
-        icon: <ApartmentOutlined />
+        icon: <BankOutlined />
       },
       {
         label: 'Ngành',
         routerLink: '/training/major',
-        icon: <ApartmentOutlined />
+        icon: <BranchesOutlined />
       },
       {
         label: 'Chuyên ngành',
         routerLink: '/training/specialization',
-        icon: <ApartmentOutlined />
+        icon: <ForkOutlined />
       },
       {
         label: 'Môn học',
         routerLink: '/training/course',
-        icon: <ApartmentOutlined />
+        icon: <BookOutlined />
       },
       {
         label: 'Môn học tiên quyết',
         routerLink: '/training/prerequisiteCourse',
-        icon: <ApartmentOutlined />
+        icon: <LinkOutlined />
       },
       {
         label: 'Khung chương trình',
         routerLink: '/training/curriculumFramework',
-        icon: <ApartmentOutlined />
+        icon: <ProfileOutlined />
       }
     ]
   },

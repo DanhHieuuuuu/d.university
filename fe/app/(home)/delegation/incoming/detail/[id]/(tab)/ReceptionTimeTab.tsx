@@ -34,8 +34,7 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps>(({ data
 
       await dispatch(updateReceptionTime(payload)).unwrap();
       onUpdated?.();
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const rows: DetailRow[] = useMemo(() => {
@@ -53,13 +52,10 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps>(({ data
       },
       {
         label: 'Ngày tiếp đón',
-        value: renderField(
-          'date',
-          data.date ? dayjs(data.date) : undefined,
-          <DatePicker style={{ width: '100%' }} />,
-           { ...options, displayType: 'date' } 
-          
-        )
+        value: renderField('date', data.date ? dayjs(data.date) : undefined, <DatePicker style={{ width: '100%' }} />, {
+          ...options,
+          displayType: 'date'
+        })
       },
       {
         label: 'Thời gian bắt đầu',
@@ -67,7 +63,7 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps>(({ data
           'startDate',
           data.startDate ? dayjs(data.startDate, 'HH:mm:ss') : undefined,
           <TimePicker format="HH:mm" style={{ width: '100%' }} disabled={!isEdit} />,
-         { isEdit, displayType: 'time' }
+          { isEdit, displayType: 'time' }
         )
       },
       {

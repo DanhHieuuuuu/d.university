@@ -39,8 +39,8 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     if (col.type === ETableColumnType.STATUS) {
       return {
         ...col,
-         fixed: col.fixed ?? 'right', 
-         width: col.width ?? 200,         
+        fixed: col.fixed ?? 'right',
+        width: col.width ?? 200,
         render: (value: any, record: any, index: number) => {
           if (col.render) {
             return col.render(value, record, index);
@@ -63,25 +63,25 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     render: (value, record, index) => {
       if (listActions?.length) {
         const actions = listActions
-        .filter((act) => !act.hidden?.(record))
-        .map((act, idx) => {
-          return (
-            <Button
-              key={idx}
-              size="middle"
-              title={act?.tooltip ?? act.label}
-              color={act.color ?? 'default'}
-              variant="dashed"
-              icon={act.icon}
-              onClick={() => {
-                act.command(record);
-                setOpenActionIndex(null);
-              }}
-            >
-              {act.label}
-            </Button>
-          );
-        });
+          .filter((act) => !act.hidden?.(record))
+          .map((act, idx) => {
+            return (
+              <Button
+                key={idx}
+                size="middle"
+                title={act?.tooltip ?? act.label}
+                color={act.color ?? 'default'}
+                variant="dashed"
+                icon={act.icon}
+                onClick={() => {
+                  act.command(record);
+                  setOpenActionIndex(null);
+                }}
+              >
+                {act.label}
+              </Button>
+            );
+          });
 
         const content = (
           <Space.Compact size="middle" direction="vertical">

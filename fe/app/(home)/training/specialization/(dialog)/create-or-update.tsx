@@ -146,9 +146,7 @@ const SpecializationModal: React.FC<SpecializationModalProps> = (props) => {
                 value: nganh.id
               }))}
               showSearch
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
             />
           </Form.Item>
           <Form.Item<ICreateChuyenNganh> label="Mô tả" name="moTa" className="col-span-2">

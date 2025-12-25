@@ -234,6 +234,11 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
                          || x.TenChuyenNganh.Contains(dto.Keyword)
                          || x.MaChuyenNganh.Contains(dto.Keyword));
 
+            if (dto.NganhId.HasValue)
+            {
+                query = query.Where(x => x.NganhId == dto.NganhId);
+            }
+
             var totalCount = await query.CountAsync();
 
             var items = await query
@@ -525,6 +530,21 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
                          || x.TenChuongTrinhKhung.Contains(dto.Keyword)
                          || x.MaChuongTrinhKhung.Contains(dto.Keyword));
 
+            if (dto.NganhId.HasValue)
+            {
+                query = query.Where(x => x.NganhId == dto.NganhId);
+            }
+
+            if (dto.ChuyenNganhId.HasValue)
+            {
+                query = query.Where(x => x.ChuyenNganhId == dto.ChuyenNganhId);
+            }
+
+            if (dto.KhoaHocId.HasValue)
+            {
+                query = query.Where(x => x.KhoaHocId == dto.KhoaHocId);
+            }
+
             var totalCount = await query.CountAsync();
 
             var items = await query
@@ -620,6 +640,11 @@ namespace D.Core.Infrastructure.Services.DaoTao.Implements
             if (dto.ChuongTrinhKhungId.HasValue)
             {
                 query = query.Where(x => x.ChuongTrinhKhungId == dto.ChuongTrinhKhungId);
+            }
+
+            if (dto.HocKy.HasValue)
+            {
+                query = query.Where(x => x.HocKy == dto.HocKy);
             }
 
             if (!string.IsNullOrEmpty(dto.Keyword))

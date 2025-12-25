@@ -61,54 +61,52 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
     form.resetFields();
     setIsModalOpen(false);
   };
-const onFinish: FormProps<ICreateDoanVao>['onFinish'] = async (values) => {
-  try {
-    if (!isUpdate && !excelFile) {
-      toast.error('Vui lòng upload file');
-      return;
+  const onFinish: FormProps<ICreateDoanVao>['onFinish'] = async (values) => {
+    try {
+      if (!isUpdate && !excelFile) {
+        toast.error('Vui lòng upload file');
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append('Code', values.code);
+      formData.append('Name', values.name);
+      formData.append('Content', values.content ?? '');
+      formData.append('IdPhongBan', values.idPhongBan.toString() ?? '0');
+      formData.append('IdStaffReception', values.idStaffReception.toString() ?? '0');
+      formData.append('Location', values.location ?? '');
+      formData.append('PhoneNumber', values.phoneNumber ?? '');
+      formData.append('RequestDate', dayjs(values.requestDate).format('YYYY-MM-DD'));
+      formData.append('ReceptionDate', dayjs(values.receptionDate).format('YYYY-MM-DD'));
+      formData.append('TotalMoney', values.totalMoney?.toString() ?? '0');
+      formData.append('TotalPerson', values.totalPerson?.toString() ?? '0');
+      if (excelFile) {
+        formData.append('DetailDelegation', excelFile, excelFile.name);
+      }
+
+      if (isUpdate && selected.data) {
+        formData.append('Id', selected.data.id.toString());
+        await dispatch(updateDoanVao(formData)).unwrap();
+        toast.success('Cập nhật thành công');
+      } else {
+        await dispatch(createDoanVao(formData)).unwrap();
+        toast.success('Thêm mới thành công');
+      }
+
+      onCloseModal();
+    } catch (err) {
+      toast.error(String(err));
     }
+  };
 
-    const formData = new FormData();
-
-    formData.append('Code', values.code);
-    formData.append('Name', values.name);
-    formData.append('Content', values.content?? '');
-    formData.append('IdPhongBan', values.idPhongBan.toString() ?? '0');
-    formData.append('IdStaffReception', values.idStaffReception.toString() ?? '0');
-    formData.append('Location', values.location ?? '');
-    formData.append('PhoneNumber', values.phoneNumber ?? '');
-    formData.append('RequestDate', dayjs(values.requestDate).format('YYYY-MM-DD'));
-    formData.append('ReceptionDate', dayjs(values.receptionDate).format('YYYY-MM-DD'));
-    formData.append('TotalMoney', values.totalMoney?.toString() ?? '0');
-    formData.append('TotalPerson', values.totalPerson?.toString() ?? '0');
-    if (excelFile) {
-      formData.append('DetailDelegation', excelFile, excelFile.name);
-    }
-
-    if (isUpdate && selected.data) {
-      formData.append('Id', selected.data.id.toString());
-      await dispatch(updateDoanVao(formData)).unwrap();
-      toast.success('Cập nhật thành công');
-    } else {
-      await dispatch(createDoanVao(formData)).unwrap();
-      toast.success('Thêm mới thành công');
-    }
-
-    onCloseModal();
-  } catch (err) {
-    toast.error(String(err));
-  }
-};
-
-
-
-const uploadProps: UploadProps = {
-  beforeUpload: (file) => {
-    setExcelFile(file as File); 
-    return false; 
-  },
-  maxCount: 1,
-};
+  const uploadProps: UploadProps = {
+    beforeUpload: (file) => {
+      setExcelFile(file as File);
+      return false;
+    },
+    maxCount: 1
+  };
 
   return (
     <Modal
@@ -152,7 +150,7 @@ const uploadProps: UploadProps = {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Tên đoàn vào" name="name" rules={[{  required: true,message: 'Nhập tên đoàn' }]}>
+            <Form.Item label="Tên đoàn vào" name="name" rules={[{ required: true, message: 'Nhập tên đoàn' }]}>
               <Input />
             </Form.Item>
           </Col>
@@ -209,40 +207,40 @@ const uploadProps: UploadProps = {
           <Input.TextArea rows={2} />
         </Form.Item>
         {!isUpdate && !isView && (
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Danh sách thành viên">
-              <Upload {...uploadProps}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Danh sách thành viên">
+                <Upload {...uploadProps}>
+                  <Button
+                    icon={<UploadOutlined />}
+                    style={{
+                      background: '#69b1ff',
+                      borderColor: '#69b1ff',
+                      color: '#fff'
+                    }}
+                  >
+                    Upload file
+                  </Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Tải mẫu Upload file">
                 <Button
-                  icon={<UploadOutlined />}
+                  icon={<DownloadOutlined />}
+                  onClick={downloadDelegationTemplateExcel}
                   style={{
-                    background: '#69b1ff',
-                    borderColor: '#69b1ff',
+                    background: '#52c41a',
+                    borderColor: '#52c41a',
                     color: '#fff'
                   }}
+                  type="default"
                 >
-                  Upload file
+                  Dowload file
                 </Button>
-              </Upload>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Tải mẫu Upload file">
-              <Button
-                icon={<DownloadOutlined />}
-                onClick={downloadDelegationTemplateExcel}
-                style={{
-                  background: '#52c41a',
-                  borderColor: '#52c41a',
-                  color: '#fff'
-                }}
-                type="default"
-              >
-                Dowload file
-              </Button>
-            </Form.Item>
-          </Col>
-        </Row>
+              </Form.Item>
+            </Col>
+          </Row>
         )}
       </Form>
     </Modal>

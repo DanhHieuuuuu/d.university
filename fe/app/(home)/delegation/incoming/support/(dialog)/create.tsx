@@ -59,14 +59,12 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
   };
   const onFinish: FormProps<ICreateDepartment>['onFinish'] = async (values) => {
     try {
-    const payload: ICreateDepartment = {
-      ...values,
-      content: values.content?.trim() || '' 
-    };
+      const payload: ICreateDepartment = {
+        ...values,
+        content: values.content?.trim() || ''
+      };
       if (isUpdate && selected.data) {
-        await dispatch(
-          updateDepartmentSupport(payload)
-        ).unwrap();
+        await dispatch(updateDepartmentSupport(payload)).unwrap();
 
         toast.success('Cập nhật thành công');
       } else {

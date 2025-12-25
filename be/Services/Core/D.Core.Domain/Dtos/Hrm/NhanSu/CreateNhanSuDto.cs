@@ -1,4 +1,5 @@
-﻿using D.DomainBase.Common;
+﻿using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
+using D.DomainBase.Common;
 
 namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {
@@ -32,5 +33,10 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? Atm1 { get; set; }
         public string? TenNganHang2 { get; set; }
         public string? Atm2 { get; set; }
+
+        // Thông tin sức khỏe
+        public decimal? ChieuCao { get; set; }
+        public decimal? CanNang { get; set; }
+        public string? NhomMau { get; set; }
     }
 }

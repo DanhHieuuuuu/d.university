@@ -1,5 +1,6 @@
 ﻿using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
+using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
 using D.DomainBase.Dto;
 
 namespace D.Core.Infrastructure.Services.Hrm.Abstracts
@@ -13,5 +14,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         void CreateHopDong(CreateHopDongDto dto);
         NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto);
         NsNhanSuFindByIdResponseDto FindById(int idNhanSu);
+        NsNhanSuHoSoChiTietResponseDto HoSoChiTietNhanSu(int idNhanSu);
     }
 }

@@ -143,9 +143,7 @@ const CourseModal: React.FC<CourseModalProps> = (props) => {
                 value: toBoMon.id
               }))}
               showSearch
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
             />
           </Form.Item>
           <Form.Item<ICreateMonHoc>
@@ -155,16 +153,10 @@ const CourseModal: React.FC<CourseModalProps> = (props) => {
           >
             <InputNumber className="!w-full" min={0} max={20} />
           </Form.Item>
-          <Form.Item<ICreateMonHoc>
-            label="Số tiết lý thuyết"
-            name="soTietLyThuyet"
-          >
+          <Form.Item<ICreateMonHoc> label="Số tiết lý thuyết" name="soTietLyThuyet">
             <InputNumber className="!w-full" min={0} max={100} />
           </Form.Item>
-          <Form.Item<ICreateMonHoc>
-            label="Số tiết thực hành"
-            name="soTietThucHanh"
-          >
+          <Form.Item<ICreateMonHoc> label="Số tiết thực hành" name="soTietThucHanh">
             <InputNumber className="!w-full" min={0} max={100} />
           </Form.Item>
           <Form.Item<ICreateMonHoc> label="Mô tả" name="moTa" className="col-span-2">

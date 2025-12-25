@@ -4,10 +4,7 @@ import { processApiMsgError } from '@utils/index';
 /**
  * Helper function để download file từ blob response
  */
-export const downloadBlobFile = (
-  blob: Blob,
-  fileName: string
-) => {
+export const downloadBlobFile = (blob: Blob, fileName: string) => {
   const url = window.URL.createObjectURL(blob);
 
   const a = document.createElement('a');
@@ -32,8 +29,7 @@ export const downloadDelegationTemplateExcel = async () => {
 
     if (disposition) {
       // support filename & filename*
-      const match =
-        disposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/);
+      const match = disposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/);
 
       if (match?.[1]) {
         fileName = decodeURIComponent(match[1]);

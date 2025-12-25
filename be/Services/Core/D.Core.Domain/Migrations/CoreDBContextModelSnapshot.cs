@@ -3419,6 +3419,14 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("Atm2")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("CanNang")
+                        .HasPrecision(4, 1)
+                        .HasColumnType("decimal(4,1)");
+
+                    b.Property<decimal?>("ChieuCao")
+                        .HasPrecision(4, 1)
+                        .HasColumnType("decimal(4,1)");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -3494,11 +3502,18 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("NgayCapCccd")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("NgayCapNhatSk")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NguyenQuan")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NhomMau")
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
 
                     b.Property<string>("NoiCapCccd")
                         .HasColumnType("nvarchar(max)");

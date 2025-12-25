@@ -1,4 +1,5 @@
 import { IQueryPaging } from '@models/common/model.common';
+import { ICreateNsQuanHe } from './quanHeGiaDinh.model';
 
 export type IQueryNhanSu = IQueryPaging & {
   cccd?: string;
@@ -10,7 +11,7 @@ export type IViewNhanSu = {
   hoDem?: string;
   ten?: string;
   hoTen?: string;
-  ngaySinh?: Date;
+  ngaySinh?: Date | string;
   noiSinh?: string;
   gioiTinh?: number;
   quocTich?: number;
@@ -19,7 +20,7 @@ export type IViewNhanSu = {
   nguyenQuan?: string;
   noiOHienTai?: string;
   soCccd?: string;
-  ngayCapCccd?: Date;
+  ngayCapCccd?: Date | string;
   noiCapCccd?: string;
   soDienThoai?: string;
   email?: string;
@@ -27,6 +28,7 @@ export type IViewNhanSu = {
   khanCapNguoiLienHe?: string;
   tenChucVu: string;
   tenPhongBan: string;
+  thongTinGiaDinh?: ICreateNsQuanHe[];
 };
 
 export type ICreateNhanSu = {
@@ -54,17 +56,9 @@ export type ICreateNhanSu = {
   tenNganHang2?: string;
   atm2?: string;
   thongTinGiaDinh?: ICreateNsQuanHe[];
-};
-
-export type ICreateNsQuanHe = {
-  quanHe?: number;
-  hoTen?: string;
-  ngaySinh?: Date;
-  queQuan?: string;
-  quocTich?: number;
-  soDienThoai?: string;
-  ngheNghiep?: string;
-  donViCongTac?: string;
+  chieuCao?: number;
+  canNang?: number;
+  nhomMau?: string;
 };
 
 export type ICreateHopDongNs = {
