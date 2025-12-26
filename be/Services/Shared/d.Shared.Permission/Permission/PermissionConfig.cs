@@ -36,6 +36,10 @@ namespace d.Shared.Permission.Permission
             #region Delegation - đoàn vào / ra
             { PermissionCoreKeys.CoreMenuDelegation, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuDelegation, PermissionName = "Quản lý đoàn vào / ra", ParentKey = null } },
             #endregion
+
+            #region Survey - Khảo sát
+
+            #endregion
         };
     }
 }

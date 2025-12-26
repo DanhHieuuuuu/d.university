@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhung;
 using D.Core.Domain.Dtos.DaoTao.ChuongTrinhKhungMon;
 using D.Core.Domain.Dtos.DaoTao.ChuyenNganh;
@@ -29,6 +28,9 @@ using D.Core.Domain.Dtos.Kpi.KpiTemplate;
 using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Dtos.Survey.Request;
+using D.Core.Domain.Dtos.Survey.Submit;
+using D.Core.Domain.Dtos.Survey.Surveys;
 using D.Core.Domain.Entities.DaoTao;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
@@ -37,6 +39,9 @@ using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
 using D.Core.Domain.Entities.SinhVien;
+using D.Core.Domain.Entities.Survey;
+using D.Core.Domain.Entities.Survey.Constants;
+using System.Reflection;
 
 namespace D.Core.Domain
 {
@@ -63,6 +68,7 @@ namespace D.Core.Domain
             CreateMap<CreateDmChucVuDto, DmChucVu>();
             CreateMap<CreateDmToBoMonDto, DmToBoMon>();
             CreateMap<CreateDmKhoaHocDto, DmKhoaHoc>();
+            CreateMap<DmKhoaHoc, DmKhoaHocResponseDto>();
 
             CreateMap<CreateHopDongDto, NsHopDong>();
             CreateMap<NsNhanSu, NsNhanSuResponseDto>()
@@ -154,7 +160,7 @@ namespace D.Core.Domain
             CreateMap<UpdateDtChuongTrinhKhungMonDto, DtChuongTrinhKhungMon>();
 
             #endregion
-
+ 
             #region file
 
             CreateMap<FileManagement, FileResponseDto>();
@@ -180,6 +186,38 @@ namespace D.Core.Domain
             CreateMap<CreateDepartmentSupportRequestDto, DepartmentSupport>();
             CreateMap<DepartmentSupport, CreateDepartmentSupportResponseDto>();
 
+            #endregion
+
+            #region Survey
+            CreateMap<KsSurveyTarget, RequestSurveyTargetDto>().ReverseMap();
+            CreateMap<KsSurveyCriteria, RequestSurveyCriteriaDto>().ReverseMap();
+            CreateMap<KsSurveyQuestion, RequestSurveyQuestionDto>().ReverseMap();
+            CreateMap<KsQuestionAnswer, RequestQuestionAnswerDto>().ReverseMap();
+
+            CreateMap<KsSurveyRequest, RequestSurveyResponseDto>();
+            CreateMap<KsSurveyRequest, RequestSurveyDetailDto>();
+
+            CreateMap<CreateRequestSurveyRequestDto, KsSurveyRequest>();
+            CreateMap<KsSurveyRequest, CreateRequestSurveyResponseDto>();
+            CreateMap<UpdateRequestSurveyRequestDto, KsSurveyRequest>();
+            CreateMap<KsSurveyRequest, UpdateRequestSurveyResponseDto>();
+
+            CreateMap<KsSurvey, SurveyResponseDto>();
+            CreateMap<KsSurvey, SurveyDetailDto>();
+
+            CreateMap<KsSurveyRequest, KsSurvey>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.IdYeuCau, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.MaKhaoSat, opt => opt.MapFrom(src => src.MaYeuCau))
+                .ForMember(dest => dest.TenKhaoSat, opt => opt.MapFrom(src => src.TenKhaoSatYeuCau));
+
+            CreateMap<KsSurvey, SurveyResponseDto>();
+            CreateMap<KsSurveyQuestion, SurveyExamDto>();
+            CreateMap<KsQuestionAnswer, AnswerExamDto>();          
+            CreateMap<KsSurveySubmissionAnswer, SavedAnswerDto>()
+                .ForMember(dest => dest.QuestionId, opt => opt.MapFrom(src => src.IdCauHoi))
+                .ForMember(dest => dest.SelectedAnswerId, opt => opt.MapFrom(src => src.IdDapAnChon))
+                .ForMember(dest => dest.TextResponse, opt => opt.MapFrom(src => src.CauTraLoiText));
             #endregion
             #region Kpi
             CreateMap<KpiRole, KpiRoleResponseDto>();

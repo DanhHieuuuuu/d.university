@@ -4,6 +4,7 @@ using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.Kpi;
 using D.Core.Infrastructure.Repositories.SinhVien;
+using D.Core.Infrastructure.Repositories.Survey;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -66,6 +67,16 @@ namespace D.Core.Infrastructure
         private KpiLogStatusRepository _kpiLogStatusRepository;
         private KpiTemplateRepository _kpiTemplateRepository;
         private KpiTruongRepository _kpiTruongRepository;
+        #endregion
+
+        #region Survey
+        private SurveyRequestRepository _surveyRequestRepository;
+        private SurveyRepository _surveyRepository;
+        private SurveyLogRepository _surveyLogRepository;
+        private SurveySubmissionRepository _surveySubmissionRepository;
+        private SurveySubmissionAnswerRepository _surveySubmissionAnswerRepository;
+        private SurveySubmissionLogRepository _surveySubmissionLogRepository;
+        private SurveyReportRepository _surveyReportRepository;
         #endregion
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -546,5 +557,91 @@ namespace D.Core.Infrastructure
 
         #endregion
 
+        #region Survey
+        public IKsSurveyRequestRepository iKsSurveyRequestRepository
+        {
+            get
+            {
+                if (_surveyRequestRepository == null)
+                {
+                    _surveyRequestRepository = new SurveyRequestRepository(_dbContext, _httpContext);
+                }
+                return _surveyRequestRepository;
+            }
+        }
+
+        public IKsSurveyLogRepository iKsSurveyLogRepository
+        {
+            get
+            {
+                if (_surveyLogRepository == null)
+                {
+                    _surveyLogRepository = new SurveyLogRepository(_dbContext, _httpContext);
+                }
+                return _surveyLogRepository;
+            }
+        }
+
+        public IKsSurveyRepository iKsSurveyRepository
+        {
+            get
+            {
+                if (_surveyRepository == null)
+                {
+                    _surveyRepository = new SurveyRepository(_dbContext, _httpContext);
+                }
+                return _surveyRepository;
+            }
+        }
+
+        public IKsSurveySubmissionRepository iKsSurveySubmissionRepository
+        {
+            get
+            {
+                if (_surveySubmissionRepository == null)
+                {
+                    _surveySubmissionRepository = new SurveySubmissionRepository(_dbContext, _httpContext);
+                }
+                return _surveySubmissionRepository;
+            }
+        }
+
+        public IKsSurveySubmissionAnswerRepository iKsSurveySubmissionAnswerRepository
+        {
+            get
+            {
+                if (_surveySubmissionAnswerRepository == null)
+                {
+                    _surveySubmissionAnswerRepository = new SurveySubmissionAnswerRepository(_dbContext, _httpContext);
+                }
+                return _surveySubmissionAnswerRepository;
+            }
+        }
+
+        public IKsSurveySubmissionLogRepository iKsSurveySubmissionLogRepository
+        {
+            get
+            {
+                if (_surveySubmissionLogRepository == null)
+                {
+                    _surveySubmissionLogRepository = new SurveySubmissionLogRepository(_dbContext, _httpContext);
+                }
+                return _surveySubmissionLogRepository;
+            }
+        }
+
+        public IKsSurveyReportRepository iKsSurveyReportRepository
+        {
+            get
+            {
+                if (_surveyReportRepository == null)
+                {
+                    _surveyReportRepository = new SurveyReportRepository(_dbContext, _httpContext);
+                }
+                return _surveyReportRepository;
+            }
+        }
+
+        #endregion
     }
 }

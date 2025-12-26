@@ -251,7 +251,16 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         {
             _logger.LogInformation($"{nameof(GetAllDmKhoaHoc)} method called.");
 
-            var query = _unitOfWork.iDmKhoaHocRepository.TableNoTracking;
+            var query = _unitOfWork.iDmKhoaHocRepository.TableNoTracking.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(dto.Keyword))
+            {
+                var keyword = dto.Keyword.Trim();
+
+                query = query.Where(x =>
+                    x.MaKhoaHoc.Contains(keyword) ||
+                    x.TenKhoaHoc.Contains(keyword)
+                );
+            }
 
             var totalCount = query.Count();
             var items = query.ToList();

@@ -27,7 +27,7 @@ namespace D.Core.Domain.Entities.Survey
 
         [Column("TextResponse")]
         [Description("Nội dung trả lời tự luận (hoặc ý kiến khác)")]
-        public string CauTraLoiText { get; set; }
+        public string? CauTraLoiText { get; set; }
 
         [ForeignKey(nameof(IdPhienLamBai))]
         public virtual KsSurveySubmission Submission { get; set; }
