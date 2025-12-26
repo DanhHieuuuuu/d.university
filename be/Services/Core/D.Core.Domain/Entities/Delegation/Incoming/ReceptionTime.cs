@@ -31,7 +31,7 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [Column("Content")]
         [Description("Nội dung")]
         [MaxLength(255)]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [Column("TotalPerson")]
         [Description("Tổng số người tham gia")]
@@ -40,7 +40,7 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [Column("Address")]
         [Description("Vị trí tiếp đón")]
         [MaxLength (255)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [Column("DelegationIncomingId")]
         [Description("Khóa ngoại của đoàn vào")]

@@ -130,9 +130,19 @@ export type ICreateReceptionTime = {
 export type ICreateReceptionTimeList = {
   items: ICreateReceptionTime[];
 };
-export type IUpdateReceptionTime = ICreateReceptionTime & {
+export interface IUpdateReceptionTime {
   id: number;
-};
+  delegationIncomingId: number;
+  date: string;
+  startDate: string;
+  endDate: string;
+  content?: string;
+  totalPerson?: number;
+  address?: string;
+}
+export interface IUpdateReceptionTimes {
+  items: IUpdateReceptionTime[];
+}
 
 export type ICreateSupporter = {
   departmentSupportId: number;

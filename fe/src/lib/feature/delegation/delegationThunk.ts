@@ -13,6 +13,7 @@ import {
   IUpdateDepartmentSupport,
   IUpdateDoanVao,
   IUpdateReceptionTime,
+  IUpdateReceptionTimes,
   IUpdateStatus
 } from '@models/delegation/delegation.model';
 import { DelegationIncomingService } from '@services/delegation/delegationIncoming.service';
@@ -187,10 +188,10 @@ export const getLogReceptionTime = createAsyncThunk(
     }
   }
 );
-export const updateReceptionTime = createAsyncThunk(
+export const updateReceptionTimes = createAsyncThunk(
   'delegation-incoming/updateReceptionTime',
-  async (payload: IUpdateReceptionTime, { rejectWithValue }) => {
-    const data = await DelegationIncomingService.updateReceptionTime(payload);
+  async (payload: IUpdateReceptionTimes, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.updateReceptionTimes(payload);
     if (data?.code !== 200) {
       return rejectWithValue(data.message);
     }

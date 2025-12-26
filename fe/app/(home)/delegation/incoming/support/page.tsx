@@ -56,6 +56,7 @@ const Page = () => {
       dataIndex: 'stt',
       title: 'STT',
       align: 'center',
+      fixed: 'left',
       render: (value, row, index) => index + 1
     },
     {

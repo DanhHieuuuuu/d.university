@@ -256,7 +256,7 @@ namespace D.Core.API.Controllers.Delegation
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("update-reception-time")]
-        public async Task<ResponseAPI> UpdateReceptionTime([FromBody] UpdateReceptionTimeRequestDto dto)
+        public async Task<ResponseAPI> UpdateReceptionTime([FromBody] UpdateReceptionTimesRequestDto dto)
         {
             try
             {

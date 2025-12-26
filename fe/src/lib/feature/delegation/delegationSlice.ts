@@ -21,7 +21,7 @@ import {
   getLogStatus,
   updateDepartmentSupport,
   updateDoanVao,
-  updateReceptionTime,
+  updateReceptionTimes,
   updateStatus
 } from './delegationThunk';
 import {
@@ -256,13 +256,13 @@ const delegationSlice = createSlice({
         state.status = ReduxStatus.FAILURE;
       })
       // update receptionTime
-      .addCase(updateReceptionTime.pending, (state) => {
+      .addCase(updateReceptionTimes.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
-      .addCase(updateReceptionTime.fulfilled, (state, action) => {
+      .addCase(updateReceptionTimes.fulfilled, (state, action) => {
         state.status = ReduxStatus.SUCCESS;
       })
-      .addCase(updateReceptionTime.rejected, (state) => {
+      .addCase(updateReceptionTimes.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
       // create ReceptionTime

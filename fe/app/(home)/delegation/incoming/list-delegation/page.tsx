@@ -56,40 +56,49 @@ const Page = () => {
       dataIndex: 'stt',
       title: 'STT',
       align: 'center',
+      width:60,
+      fixed: 'left',
       render: (value, row, index) => index + 1
     },
     {
       key: 'code',
       dataIndex: 'code',
       title: 'Mã đoàn',
-      align: 'center'
+      align: 'center',
+      width:100
+      
     },
     {
       key: 'name',
       dataIndex: 'name',
-      title: 'Tên đoàn vào'
+      title: 'Tên đoàn vào',
+      width:200
     },
     {
       key: 'content',
       dataIndex: 'content',
-      title: 'Nội dung'
+      title: 'Nội dung',
+      width:200
     },
     {
       key: 'phongBan',
       dataIndex: 'phongBan',
       title: 'Phòng ban phụ trách',
-      align: 'center'
+      align: 'center',
+      width:200
     },
     {
       key: 'location',
       dataIndex: 'location',
-      title: 'Địa điểm'
+      title: 'Địa điểm',
+      width:100
     },
     {
       key: 'staffReceptionName',
       dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
-      align: 'center'
+      align: 'center',
+      width:200
     },
     {
       key: 'totalPerson',
@@ -100,18 +109,21 @@ const Page = () => {
     {
       key: 'phoneNumber',
       dataIndex: 'phoneNumber',
-      title: 'SĐT liên hệ'
+      title: 'SĐT liên hệ',
+      width:200
     },
     {
       key: 'requestDate',
       dataIndex: 'requestDate',
       title: 'Ngày yêu cầu',
+      width:200,
       render: (value) => <p>{formatDateView(value)}</p>
     },
     {
       key: 'receptionDate',
       dataIndex: 'receptionDate',
       title: 'Ngày tiếp đón',
+      width:200,
       render: (value) => <p>{formatDateView(value)}</p>
     },
     {
@@ -154,7 +166,7 @@ const Page = () => {
     {
       label: 'Thêm thời gian',
       icon: <PlusOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE,
+      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE ,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
     },
     {
@@ -313,7 +325,7 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        scroll={{ x: 'max-content', y: 'calc(100vh - 370px)' }}
+        scroll={{ x:"max-content" }}
       />
       <CreateDoanVaoModal
         isModalOpen={isModalOpen}

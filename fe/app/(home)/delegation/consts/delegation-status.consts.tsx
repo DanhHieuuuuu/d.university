@@ -32,7 +32,7 @@ export class DelegationStatusConst {
     {
       value: this.PHE_DUYET,
       name: 'Phê duyệt',
-      class: 'tag-init'
+      class: 'tag-approve'
     },
     {
       value: this.DANG_TIEP_DOAN,

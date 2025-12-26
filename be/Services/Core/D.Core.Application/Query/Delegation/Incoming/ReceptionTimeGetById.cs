@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Application.Query.Delegation.Incoming
 {
-    public class ReceptionTimeGetById : IQueryHandler<ReceptionTimeRequestDto, ReceptionTimeResponseDto>
+    public class ReceptionTimeGetById : IQueryHandler<ReceptionTimeRequestDto, List<ReceptionTimeResponseDto>>
     {
         private readonly IReceptionTimeService _service;
 
@@ -18,7 +18,7 @@ namespace D.Core.Application.Query.Delegation.Incoming
         {
             _service = service;
         }
-        public async Task<ReceptionTimeResponseDto> Handle(ReceptionTimeRequestDto request, CancellationToken cancellationToken)
+        public async Task<List<ReceptionTimeResponseDto>> Handle(ReceptionTimeRequestDto request, CancellationToken cancellationToken)
         {
             return await _service.GetByIdReceptionTime(request.DelegationIncomingId);
         }
