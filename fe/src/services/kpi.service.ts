@@ -2,7 +2,7 @@ import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseList, IResponseItem } from '@models/common/response.model';
 import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateKpiCaNhanThucTeList, IUpdateTrangThaiKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
-import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
+import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 
 const apiDanhMucEndpoint = 'kpi';
@@ -53,6 +53,22 @@ const deleteKpiCaNhan = async (id: number) => {
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
+export const getListTrangThaiKpiCaNhan = async () => {
+  try {
+    const res = await axios.get(
+      `${apiKpiCaNhanEndpoint}/trang-thai`
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject(res.data?.message);
+    }
+
+    return res.data.data;
+  } catch (err) {
     return Promise.reject(err);
   }
 };
@@ -147,6 +163,83 @@ const deleteKpiDonVi = async (id: number) => {
   }
 };
 
+const updateTrangThaiKpiDonVi = async (
+  body: IUpdateTrangThaiKpiDonVi
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiDonViEndpoint}/update-trang-thai`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Cập nhật trạng thái thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật trạng thái');
+    return Promise.reject(err);
+  }
+};
+
+const updateKetQuaThucTeKpiDonVi = async (
+  body: IUpdateKpiDonViThucTeList
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiDonViEndpoint}/update-ket-qua-thuc-te`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Cập nhật kết quả thực tế thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả thực tế');
+    return Promise.reject(err);
+  }
+};
+
+export const getListNamHocKpiDonVi = async () => {
+  try {
+    const res = await axios.get(
+      `${apiKpiDonViEndpoint}/list-nam-hoc`
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject(res.data?.message);
+    }
+
+    return res.data.data;
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
+export const getListTrangThaiKpiDonVi = async () => {
+  try {
+    const res = await axios.get(
+      `${apiKpiDonViEndpoint}/trang-thai`
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject(res.data?.message);
+    }
+
+    return res.data.data;
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
+
 // KPI Role
 const getListKpiRole = async (query?: IQueryKpiRole) => {
   try {
@@ -194,12 +287,17 @@ export const KpiService = {
   createKpiCaNhan,
   updateKpiCaNhan,
   deleteKpiCaNhan,
+  getListTrangThaiKpiCaNhan,
   updateTrangThaiKpiCaNhan,
   updateKetQuaThucTeKpiCaNhan,
   getListKpiDonVi,
   createKpiDonVi,
   updateKpiDonVi,
   deleteKpiDonVi,
+  getListTrangThaiKpiDonVi,
+  getListNamHocKpiDonVi,
+  updateTrangThaiKpiDonVi,
+  updateKetQuaThucTeKpiDonVi,
   getListKpiRole,
   createKpiRole,
   updateKpiRole,

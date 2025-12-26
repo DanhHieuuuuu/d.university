@@ -7,13 +7,31 @@ import { ICreateKpiDonVi, IQueryKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-
 import { IViewKpiRole } from '@models/kpi/kpi-role.model';
 import {
     createKpiCaNhan, createKpiDonVi, createKpiRole, deleteKpiCaNhan, deleteKpiDonVi, deleteKpiRole, getAllKpiCaNhan, updateTrangThaiKpiCaNhan,
-    updateKetQuaThucTeKpiCaNhan, getAllKpiDonVi, getAllKpiRole, updateKpiCaNhan, updateKpiDonVi, updateKpiRole
+    updateKetQuaThucTeKpiCaNhan, getAllKpiDonVi, getAllKpiRole, updateKpiCaNhan, updateKpiDonVi, updateKpiRole,
+    getListNamHocKpiDonVi,
+    getListTrangThaiKpiDonVi,
+    getListTrangThaiKpiCaNhan
 } from './kpiThunk';
+
+interface MetaList<T> {
+    status: ReduxStatus;
+    data: T[];
+}
 
 interface KpiState {
     kpiCaNhan: CRUD<IViewKpiCaNhan>;
     kpiDonVi: CRUD<IViewKpiDonVi>;
     kpiRole: CRUD<IViewKpiRole>;
+    meta: {
+        trangThai: {
+            caNhan: MetaList<{ value: number; label: string }>;
+            donVi: MetaList<{ value: number; label: string }>;
+        };
+        namHoc: {
+            caNhan: MetaList<{ namHoc: string }>;
+            donVi: MetaList<{ namHoc: string }>;
+        };
+    }
 }
 
 const initialState: KpiState = {
@@ -29,7 +47,7 @@ const initialState: KpiState = {
         $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
         $update: { status: ReduxStatus.IDLE },
         $delete: { status: ReduxStatus.IDLE },
-        $selected: { status: ReduxStatus.IDLE, id: null, data: null }
+        $selected: { status: ReduxStatus.IDLE, id: null, data: null },
     },
     kpiRole: {
         $create: { status: ReduxStatus.IDLE },
@@ -37,7 +55,17 @@ const initialState: KpiState = {
         $update: { status: ReduxStatus.IDLE },
         $delete: { status: ReduxStatus.IDLE },
         $selected: { status: ReduxStatus.IDLE, id: null, data: null }
-    }
+    },
+    meta: {
+        trangThai: {
+            caNhan: { status: ReduxStatus.IDLE, data: [] },
+            donVi: { status: ReduxStatus.IDLE, data: [] },
+        },
+        namHoc: {
+            caNhan: { status: ReduxStatus.IDLE, data: [] },
+            donVi: { status: ReduxStatus.IDLE, data: [] },
+        },
+    },
 
 };
 
@@ -136,6 +164,13 @@ const kpiSlice = createSlice({
             .addCase(deleteKpiCaNhan.rejected, (state) => {
                 state.kpiCaNhan.$delete.status = ReduxStatus.FAILURE;
             })
+            .addCase(getListTrangThaiKpiCaNhan.pending, (state) => {
+                state.meta.trangThai.caNhan.status = ReduxStatus.LOADING;
+            })
+            .addCase(getListTrangThaiKpiCaNhan.fulfilled, (state, action) => {
+                state.meta.trangThai.caNhan.status = ReduxStatus.SUCCESS;
+                state.meta.trangThai.caNhan.data = action.payload;
+            })
             .addCase(updateTrangThaiKpiCaNhan.pending, (state) => {
                 state.kpiCaNhan.$update.status = ReduxStatus.LOADING;
             })
@@ -196,6 +231,21 @@ const kpiSlice = createSlice({
             .addCase(deleteKpiDonVi.rejected, (state) => {
                 state.kpiDonVi.$delete.status = ReduxStatus.FAILURE;
             })
+            .addCase(getListTrangThaiKpiDonVi.pending, (state) => {
+                state.meta.trangThai.donVi.status = ReduxStatus.LOADING;
+            })
+            .addCase(getListTrangThaiKpiDonVi.fulfilled, (state, action) => {
+                state.meta.trangThai.donVi.status = ReduxStatus.SUCCESS;
+                state.meta.trangThai.donVi.data = action.payload;
+            })
+            .addCase(getListNamHocKpiDonVi.pending, (state) => {
+                state.meta.namHoc.donVi.status = ReduxStatus.LOADING;
+            })
+            .addCase(getListNamHocKpiDonVi.fulfilled, (state, action) => {
+                state.meta.namHoc.donVi.status = ReduxStatus.SUCCESS;
+                state.meta.namHoc.donVi.data = action.payload;
+            })
+
             //Kpi Role
             .addCase(getAllKpiRole.pending, (state) => {
                 state.kpiRole.$list.status = ReduxStatus.LOADING;

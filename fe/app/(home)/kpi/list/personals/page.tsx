@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Button, Card, Form, Input, Modal, Popover, Select, Space, Tag } from 'antd';
+import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -15,7 +15,7 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getListTrangThaiKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -37,17 +37,20 @@ const Page = () => {
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { list: listNhanSu } = useAppSelector((state) => state.userState);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBan.$list);
+  const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector(
+    (state) => state.kpiState.meta.trangThai.caNhan
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
   const [isView, setIsModalView] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
-  const [openBulkAction, setOpenBulkAction] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   useEffect(() => {
     dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
     dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
+    dispatch(getListTrangThaiKpiCaNhan());
   }, [dispatch]);
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
@@ -66,7 +69,7 @@ const Page = () => {
   const approveSelected = () => {
     const ids = selectedRowKeys.map(Number);
     const kpiToApprove = list.filter(
-      (item) => ids.includes(item.id)
+      (item) => ids.includes(item.id) && item.trangThai === KpiTrangThaiConst.DE_XUAT
     );
 
     if (kpiToApprove.length === 0) {
@@ -75,7 +78,7 @@ const Page = () => {
     }
 
     Modal.confirm({
-      title: 'Phê duyệt',
+      title: 'Phê duyệt hàng loạt',
       content: `Xác nhận phê duyệt ${kpiToApprove.length} KPI đã chọn?`,
       okText: 'Duyệt',
       onOk: async () => {
@@ -86,10 +89,10 @@ const Page = () => {
               trangThai: KpiTrangThaiConst.PHE_DUYET
             })
           ).unwrap();
-
           toast.success('Phê duyệt thành công!');
           setSelectedRowKeys([]);
           dispatch(getAllKpiCaNhan(query));
+          dispatch(getListTrangThaiKpiCaNhan());
         } catch {
           toast.error('Phê duyệt thất bại!');
         }
@@ -99,57 +102,39 @@ const Page = () => {
 
 
   const scoreSelected = () => {
-    toast.info('Chức năng chấm KPI đang được cập nhật.');
+    toast.info('Chức năng chấm KPI hàng loạt đang được cập nhật.');
   };
 
-  const actionLists = [
-    {
-      key: 'APPROVE',
-      label: 'Phê duyệt',
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-      command: approveSelected,
-    },
-    {
-      key: 'SCORE',
-      label: 'Chấm KPI',
-      icon: <EditOutlined style={{ color: '#1890ff' }} />,
-      command: scoreSelected,
-    },
-  ];
-
-  const onExecuteAction = (command: () => void) => {
-    if (selectedRowKeys.length === 0) {
-      toast.warning('Vui lòng chọn ít nhất một KPI để thực hiện.');
+  const requiredSelect = (cb: () => void) => {
+    if (!selectedRowKeys.length) {
+      toast.warning('Vui lòng chọn ít nhất một KPI');
       return;
     }
-    setOpenBulkAction(false);
-    command();
+    cb();
   };
-
-  const bulkActionMenu = (
-    <div className="flex flex-col min-w-[180px] py-1">
-      <div className="px-3 py-2 text-gray-400 text-[10px] font-bold uppercase border-b mb-1">
-        Thao tác ({selectedRowKeys.length})
-      </div>
-      {actionLists.map((action) => (
-        <Button
-          key={action.key}
-          type="text"
-          icon={action.icon}
-          className="flex items-center w-full text-left h-9 px-3 hover:bg-slate-50"
-          onClick={() => onExecuteAction(action.command)}
-        >
-          {action.label}
-        </Button>
-      ))}
-    </div>
-  );
+  const bulkActionItems: MenuProps['items'] = [
+    {
+      key: 'approve',
+      label: 'Phê duyệt',
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      onClick: () => requiredSelect(approveSelected),
+    },
+    {
+      key: 'score',
+      label: 'Chấm KPI',
+      icon: <EditOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(scoreSelected),
+    },
+  ];
 
   const filterContent = (
     <Form
       form={filterForm}
       layout="vertical"
-      onValuesChange={(_, values: Partial<IQueryKpiCaNhan>) => onFilterChange(values)}
+      onValuesChange={(_, values) => {
+        onFilterChange(values);
+        setOpenFilter(false);
+      }}
     >
       <Form.Item label="Loại KPI" name="loaiKpi">
         <Select
@@ -162,7 +147,8 @@ const Page = () => {
         <Select
           allowClear
           placeholder="Chọn trạng thái"
-          options={KpiTrangThaiConst.list.map(x => ({ value: x.value, label: x.text }))}
+          loading={trangThaiStatus === ReduxStatus.LOADING}
+          options={trangThaiCaNhan}
         />
       </Form.Item>
     </Form>
@@ -210,7 +196,6 @@ const Page = () => {
 
   const handleSelectAllPages = async () => {
     try {
-      // Giả định bác đã tạo thunk này trong kpiThunk.ts tương tự cái trước
       const allIds = await dispatch(getAllIdsKpiCaNhan({
         ...query,
         PageIndex: 1,
@@ -301,21 +286,19 @@ const Page = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Popover
-              content={bulkActionMenu}
-              trigger="click"
-              open={openBulkAction}
-              onOpenChange={setOpenBulkAction}
-              placement="bottomRight"
-              styles={{ body: { padding: 0 } }}
+            <Dropdown
+              menu={{ items: bulkActionItems }}
+              trigger={['click']}
+              disabled={selectedRowKeys.length === 0}
             >
               <Button
+                type={selectedRowKeys.length > 0 ? 'primary' : 'default'}
                 icon={<EllipsisOutlined />}
-                type={selectedRowKeys.length > 0 ? "primary" : "default"}
               >
-                Thao tác {selectedRowKeys.length > 0 && `(${selectedRowKeys.length})`}
+                Thao tác
+                {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
               </Button>
-            </Popover>
+            </Dropdown>
 
             <Popover
               content={filterContent}
@@ -370,7 +353,10 @@ const Page = () => {
         isUpdate={isUpdate}
         isView={isView}
         setIsModalOpen={setIsModalOpen}
-        onSuccess={() => dispatch(getAllKpiCaNhan(query))}
+        onSuccess={() => {
+          dispatch(getAllKpiCaNhan(query));
+          dispatch(getListTrangThaiKpiCaNhan());
+        }}
       />
     </Card>
   );

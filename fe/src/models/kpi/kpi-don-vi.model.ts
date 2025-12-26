@@ -30,6 +30,12 @@ export type ICreateKpiDonVi = {
   namHoc: string,
 };
 
+export type IUpdateTrangThaiKpiDonVi = {
+  ids: number[];
+  trangThai: number;
+  note?: string;
+};
+
 export type IUpdateKpiDonVi = ICreateKpiDonVi & {
   id: number,
 };
