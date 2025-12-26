@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-import { getListNhanSu, createNhanSu, getDetailNhanSu } from './nhansuThunk';
+import { getListNhanSu, createHopDongNhanSu, getHoSoNhanSu, createNhanSu } from './nhansuThunk';
 
 interface NhanSuState {
   status: ReduxStatus;
@@ -10,9 +10,12 @@ interface NhanSuState {
     idNhanSu: number;
     data: any | null;
   };
+  $create: {
+    status: ReduxStatus;
+  };
   list: IViewNhanSu[];
   total: number;
-  $create: {
+  $createHopDong: {
     status: ReduxStatus;
   };
 }
@@ -23,9 +26,12 @@ const initialState: NhanSuState = {
     idNhanSu: 0,
     data: null
   },
+  $create: {
+    status: ReduxStatus.IDLE
+  },
   list: [],
   total: 0,
-  $create: {
+  $createHopDong: {
     status: ReduxStatus.IDLE
   }
 };
@@ -62,24 +68,35 @@ const nhanSuSlice = createSlice({
       .addCase(getListNhanSu.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
-      .addCase(getDetailNhanSu.pending, (state) => {
+      .addCase(getHoSoNhanSu.pending, (state) => {
         state.selected.status = ReduxStatus.LOADING;
+        state.selected.data = null;
       })
-      .addCase(getDetailNhanSu.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(getHoSoNhanSu.fulfilled, (state, action: PayloadAction<any>) => {
         state.selected.status = ReduxStatus.SUCCESS;
         state.selected.data = action.payload;
       })
-      .addCase(getDetailNhanSu.rejected, (state) => {
+      .addCase(getHoSoNhanSu.rejected, (state) => {
         state.selected.status = ReduxStatus.FAILURE;
+        state.selected.data = null;
       })
       .addCase(createNhanSu.pending, (state) => {
-        state.$create.status = ReduxStatus.LOADING;
+        state.$createHopDong.status = ReduxStatus.LOADING;
       })
       .addCase(createNhanSu.fulfilled, (state) => {
-        state.$create.status = ReduxStatus.SUCCESS;
+        state.$createHopDong.status = ReduxStatus.SUCCESS;
       })
       .addCase(createNhanSu.rejected, (state) => {
-        state.$create.status = ReduxStatus.FAILURE;
+        state.$createHopDong.status = ReduxStatus.FAILURE;
+      })
+      .addCase(createHopDongNhanSu.pending, (state) => {
+        state.$createHopDong.status = ReduxStatus.LOADING;
+      })
+      .addCase(createHopDongNhanSu.fulfilled, (state) => {
+        state.$createHopDong.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createHopDongNhanSu.rejected, (state) => {
+        state.$createHopDong.status = ReduxStatus.FAILURE;
       });
   }
 });

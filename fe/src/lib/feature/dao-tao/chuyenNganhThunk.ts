@@ -1,9 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  ICreateChuyenNganh,
-  IQueryChuyenNganh,
-  IUpdateChuyenNganh
-} from '@models/dao-tao/chuyenNganh.model';
+import { ICreateChuyenNganh, IQueryChuyenNganh, IUpdateChuyenNganh } from '@models/dao-tao/chuyenNganh.model';
 import { DaoTaoService } from '@services/daotao.service';
 
 // ChuyenNganh actions

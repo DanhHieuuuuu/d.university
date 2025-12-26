@@ -1,4 +1,5 @@
-﻿using D.DomainBase.Common;
+﻿using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
+using D.DomainBase.Common;
 
 namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {

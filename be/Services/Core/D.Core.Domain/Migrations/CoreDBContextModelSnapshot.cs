@@ -3725,10 +3725,13 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("KetQuaThucTe")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("LinhVuc")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("LoaiCongThuc")
                         .HasColumnType("int");
 
-                    b.Property<int>("LoaiKPI")
+                    b.Property<int?>("LoaiKPI")
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedBy")
@@ -3760,6 +3763,9 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("TrongSo")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<float?>("TyLeThamGia")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -3951,8 +3957,8 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("TiLe")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("decimal(4,2)");
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.HasKey("Id");
 

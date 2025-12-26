@@ -199,7 +199,7 @@ const Page = () => {
       }
     });
   };
-   const onClickPheDuyet = (data: IViewGuestGroup) => {
+  const onClickPheDuyet = (data: IViewGuestGroup) => {
     openConfirmStatusModal({
       title: 'Xác nhận tiếp đoàn',
       content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,

@@ -32,15 +32,11 @@ const Page = () => {
   const [selectedChuyenNganhId, setSelectedChuyenNganhId] = useState<number | null>(null);
 
   // Redux state
-  const { data: listNganh, status: nganhStatus } = useAppSelector(
-    (state) => state.daotaoState.nganh.$list
-  );
+  const { data: listNganh, status: nganhStatus } = useAppSelector((state) => state.daotaoState.nganh.$list);
   const { data: listChuyenNganh, status: chuyenNganhStatus } = useAppSelector(
     (state) => state.daotaoState.chuyenNganh.$list
   );
-  const { data: listMonHoc, status: monHocStatus } = useAppSelector(
-    (state) => state.daotaoState.monHoc.$list
-  );
+  const { data: listMonHoc, status: monHocStatus } = useAppSelector((state) => state.daotaoState.monHoc.$list);
   const { data: listChuongTrinhKhung, status: chuongTrinhKhungStatus } = useAppSelector(
     (state) => state.daotaoState.chuongTrinhKhung.$list
   );
@@ -119,19 +115,22 @@ const Page = () => {
       return [];
     }
 
-    const grouped = joinedChuongTrinhKhungMon.reduce((acc, course) => {
-      const key = course.hocKy || 'Chưa xác định';
-      if (!acc[key]) {
-        acc[key] = {
-          hocKy: key,
-          courses: [],
-          totalCredits: 0
-        };
-      }
-      acc[key].courses.push(course);
-      acc[key].totalCredits += course.monHoc?.soTinChi || 0;
-      return acc;
-    }, {} as Record<string, GroupedCourse>);
+    const grouped = joinedChuongTrinhKhungMon.reduce(
+      (acc, course) => {
+        const key = course.hocKy || 'Chưa xác định';
+        if (!acc[key]) {
+          acc[key] = {
+            hocKy: key,
+            courses: [],
+            totalCredits: 0
+          };
+        }
+        acc[key].courses.push(course);
+        acc[key].totalCredits += course.monHoc?.soTinChi || 0;
+        return acc;
+      },
+      {} as Record<string, GroupedCourse>
+    );
 
     // Sort by học kỳ
     return Object.values(grouped).sort((a, b) => {
@@ -175,11 +174,7 @@ const Page = () => {
       align: 'center' as const,
       render: (_: any, record: IChuongTrinhKhungMonWithMonHoc) => {
         const trangThai = record.trangThai;
-        return (
-          <Tag color={trangThai ? 'blue' : 'green'}>
-            {trangThai ? 'Bắt buộc' : 'Tự chọn'}
-          </Tag>
-        );
+        return <Tag color={trangThai ? 'blue' : 'green'}>{trangThai ? 'Bắt buộc' : 'Tự chọn'}</Tag>;
       }
     },
     {
@@ -211,7 +206,6 @@ const Page = () => {
     monHocStatus === ReduxStatus.LOADING ||
     chuongTrinhKhungStatus === ReduxStatus.LOADING ||
     chuongTrinhKhungMonStatus === ReduxStatus.LOADING;
-
 
   return (
     <Card title="Chương trình khung" className="min-h-full">
@@ -304,9 +298,7 @@ const Page = () => {
               </div>
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Tổng TC bắt buộc</span>
-                <span className={styles.summaryValue + ' ' + styles.required}>
-                  {totalCredits}
-                </span>
+                <span className={styles.summaryValue + ' ' + styles.required}>{totalCredits}</span>
               </div>
               <div className={styles.summaryRow}>
                 <span className={styles.summaryLabel}>Tổng TC tự chọn</span>

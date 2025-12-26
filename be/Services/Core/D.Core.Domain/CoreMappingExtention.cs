@@ -21,6 +21,12 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmQuocTich;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmToBoMon;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmTonGiao;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
+using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
+using D.Core.Domain.Dtos.Kpi.KpiDonVi;
+using D.Core.Domain.Dtos.Kpi.KpiRole;
+using D.Core.Domain.Dtos.Kpi.KpiTemplate;
+using D.Core.Domain.Dtos.Kpi.KpiTruong;
+using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Dtos.Survey.Request;
 using D.Core.Domain.Dtos.Survey.Submit;
@@ -30,6 +36,8 @@ using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.File;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Hrm.NhanSu;
+using D.Core.Domain.Entities.Kpi;
+using D.Core.Domain.Entities.Kpi.Constants;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Entities.Survey;
 using D.Core.Domain.Entities.Survey.Constants;
@@ -91,6 +99,20 @@ namespace D.Core.Domain
 
             CreateMap<NsNhanSu, NsNhanSuFindByIdResponseDto>()
                 .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id));
+            CreateMap<NsNhanSu, NsNhanSuHoSoChiTietResponseDto>()
+                .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id))
+                .ForMember(
+                    dest => dest.HoTen,
+                    opt =>
+                        opt.MapFrom(src =>
+                            string.Join(
+                                " ",
+                                new[] { src.HoDem, src.Ten }.Where(x =>
+                                    !string.IsNullOrWhiteSpace(x)
+                                )
+                            )
+                        )
+                );
 
             #endregion
 
@@ -196,7 +218,21 @@ namespace D.Core.Domain
                 .ForMember(dest => dest.QuestionId, opt => opt.MapFrom(src => src.IdCauHoi))
                 .ForMember(dest => dest.SelectedAnswerId, opt => opt.MapFrom(src => src.IdDapAnChon))
                 .ForMember(dest => dest.TextResponse, opt => opt.MapFrom(src => src.CauTraLoiText));
-            
+            #endregion
+            #region Kpi
+            CreateMap<KpiRole, KpiRoleResponseDto>();
+            CreateMap<CreateKpiRoleDto, KpiRole>();
+            CreateMap<CreateKpiCaNhanDto, KpiCaNhan>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => KpiStatus.Create));
+            CreateMap<KpiDonVi, KpiDonViDto>();
+            CreateMap<CreateKpiDonViDto, KpiDonVi>()
+            .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => KpiStatus.Create));
+            CreateMap<KpiTruong, KpiTruongDto>();
+            CreateMap<CreateKpiTruongDto, KpiTruong>()
+            .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => KpiStatus.Create));
+
+            CreateMap<KpiTemplate, KpiTemplateDto>();
+            CreateMap<CreateKpiTemplateDto, KpiTemplate>();
             #endregion
         }
 

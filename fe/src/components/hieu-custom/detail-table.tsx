@@ -25,22 +25,24 @@ export default function DetailTable({ rows, bordered = false }: DetailTableProps
             return (
               <tr key={i} className="align-top">
                 {/* Label */}
-                <td className="px-1.5 py-1 text-sm font-medium text-gray-600" style={{ width: '40%' ,verticalAlign: 'top' }}>
+                <td
+                  className="px-1.5 py-1 text-sm font-medium text-gray-600"
+                  style={{ width: '40%', verticalAlign: 'top' }}
+                >
                   {item.label}
                 </td>
 
                 {/* Value */}
-                <td
-                  className="px-1.5 py-1 pl-8 text-sm text-gray-900"
-                  style={{ width: '60%' ,verticalAlign: 'top' }}
-                >
+                <td className="px-1.5 py-1 pl-8 text-sm text-gray-900" style={{ width: '60%', verticalAlign: 'top' }}>
                   {isArray ? (
                     <ul className="ml-3 list-disc space-y-0.5">
                       {item.value.map((v: any, idx: number) => (
                         <li key={idx}>{v}</li>
                       ))}
                     </ul>
-                  ) : (item.value)}
+                  ) : (
+                    item.value
+                  )}
                 </td>
               </tr>
             );

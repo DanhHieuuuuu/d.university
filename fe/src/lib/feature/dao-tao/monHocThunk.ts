@@ -57,38 +57,32 @@ export const updateMonHoc = createAsyncThunk(
   }
 );
 
-export const deleteMonHoc = createAsyncThunk(
-  'daotao/delete-monhoc',
-  async (payload: number, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.deleteMonHoc(payload);
+export const deleteMonHoc = createAsyncThunk('daotao/delete-monhoc', async (payload: number, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.deleteMonHoc(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});
 
-export const getMonHocById = createAsyncThunk(
-  'daotao/get-monhoc',
-  async (payload: number, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.getMonHocById(payload);
+export const getMonHocById = createAsyncThunk('daotao/get-monhoc', async (payload: number, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.getMonHocById(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});

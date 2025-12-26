@@ -11,7 +11,7 @@ namespace D.Core.Domain.Entities.Kpi
         public string? Role { get; set; }
         public int IdNhanSu { get; set; }
         public int? IdDonVi { get; set; }
-        [Precision(4, 2)]
+        [Precision(5, 2)]
         public decimal? TiLe { get; set; }
     }
 }

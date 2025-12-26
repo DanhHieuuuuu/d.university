@@ -10,12 +10,12 @@ import {
   SearchOutlined,
   SyncOutlined
 } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from '@hooks/navigate';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansu/nhansuSlice';
-import { getListNhanSu } from '@redux/feature/nhansu/nhansuThunk';
+import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
@@ -26,10 +26,10 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
-import CreateNhanSuModal from './(dialog)/create';
+import CreateNhanSuModal from './(dialog)/create-or-update-ns';
 
 const Page = () => {
-  const router = useRouter();
+  const { navigateTo } = useNavigate();
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem } = useAppSelector((state) => state.nhanSuState);
@@ -149,11 +149,13 @@ const Page = () => {
 
   const onClickView = (data: IViewNhanSu) => {
     dispatch(selectMaNhanSu(data.idNhanSu));
-    router.push(`/hrm/${data.idNhanSu}`);
+    dispatch(getHoSoNhanSu(data.idNhanSu));
+    navigateTo(`/hrm/${data.idNhanSu}`);
   };
 
   const onClickUpdate = (data: IViewNhanSu) => {
     dispatch(selectMaNhanSu(data.idNhanSu));
+    dispatch(getHoSoNhanSu(data.idNhanSu));
     setIsModalView(false);
     setIsModalUpdate(true);
     setIsModalOpen(true);

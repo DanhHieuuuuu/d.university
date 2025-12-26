@@ -62,9 +62,9 @@ export const generateHuceEmail = (hoDem: string | null, ten: string | null, tenC
 
 export const removeVietnameseTones = (str: string) => {
   return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
     .toLowerCase();
 };

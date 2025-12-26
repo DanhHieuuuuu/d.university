@@ -21,74 +21,62 @@ export const getAllKhoa = createAsyncThunk(
   }
 );
 
-export const createKhoa = createAsyncThunk(
-  'daotao/create-khoa',
-  async (payload: ICreateKhoa, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.createKhoa(payload);
+export const createKhoa = createAsyncThunk('daotao/create-khoa', async (payload: ICreateKhoa, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.createKhoa(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});
 
-export const updateKhoa = createAsyncThunk(
-  'daotao/update-khoa',
-  async (payload: IUpdateKhoa, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.updateKhoa(payload);
+export const updateKhoa = createAsyncThunk('daotao/update-khoa', async (payload: IUpdateKhoa, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.updateKhoa(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});
 
-export const deleteKhoa = createAsyncThunk(
-  'daotao/delete-khoa',
-  async (payload: number, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.deleteKhoa(payload);
+export const deleteKhoa = createAsyncThunk('daotao/delete-khoa', async (payload: number, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.deleteKhoa(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});
 
-export const getKhoaById = createAsyncThunk(
-  'daotao/get-khoa',
-  async (payload: number, { rejectWithValue }) => {
-    try {
-      const res = await DaoTaoService.getKhoaById(payload);
+export const getKhoaById = createAsyncThunk('daotao/get-khoa', async (payload: number, { rejectWithValue }) => {
+  try {
+    const res = await DaoTaoService.getKhoaById(payload);
 
-      return res.data;
-    } catch (error: any) {
-      console.error(error);
-      return rejectWithValue({
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
-      });
-    }
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
-);
+});

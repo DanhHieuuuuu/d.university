@@ -14,6 +14,8 @@ using D.Core.Infrastructure.Services.File.Abstracts;
 using D.Core.Infrastructure.Services.File.Implements;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.Core.Infrastructure.Services.Hrm.Implements;
+using D.Core.Infrastructure.Services.Kpi.Abstracts;
+using D.Core.Infrastructure.Services.Kpi.Implements;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.Core.Infrastructure.Services.SinhVien.Implements;
 using D.Core.Infrastructure.Services.Survey.Report.Abstracts;
@@ -52,7 +54,14 @@ namespace D.Core.Infrastructure
                 .AddScoped<ISurveyService, SurveyService>()
                 .AddScoped<IReportSurveyService, ReportSurveyService>()
             #endregion
-                .AddScoped<IFileService, FileService>();
+                .AddScoped<IFileService, FileService>()
+            #region Kpi
+                .AddScoped<IKpiRoleService, KpiRoleService>()
+                .AddScoped<IKpiCaNhanService, KpiCaNhanService>()
+                .AddScoped<IKpiDonViService, KpiDonViService>()
+                .AddScoped<IKpiTruongService, KpiTruongService>()
+                .AddScoped<IKpiTemplateService, KpiTemplateService>();
+            #endregion
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)

@@ -35,6 +35,7 @@ const find = async (keyword: string) => {
     throw err;
   }
 };
+
 const findById = async (id: number) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/${id}`);
@@ -66,4 +67,15 @@ const createHopDong = async (body: ICreateHopDongNs) => {
   }
 };
 
-export const NhanSuService = { findPaging, find, findById, createNhanSu, createHopDong };
+const getHoSoNhanSu = async (id: number) => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/ho-so/${id}`);
+
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tìm kiếm nhân sự.');
+    throw err;
+  }
+};
+
+export const NhanSuService = { findPaging, find, findById, createNhanSu, createHopDong, getHoSoNhanSu };

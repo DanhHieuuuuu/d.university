@@ -61,6 +61,7 @@ namespace D.Core.Infrastructure
         #endregion
 
         #region Kpi
+        private KpiRoleRepository _kpiRoleRepository;
         private KpiCaNhanRepository _kpiCaNhanRepository;
         private KpiDonViRepository _kpiDonViRepository;
         private KpiLogStatusRepository _kpiLogStatusRepository;
@@ -486,6 +487,17 @@ namespace D.Core.Infrastructure
         #endregion
 
         #region Kpi
+        public IKpiRoleRepository iKpiRoleRepository
+        {
+            get
+            {
+                if (_kpiRoleRepository == null)
+                {
+                    _kpiRoleRepository = new KpiRoleRepository(_dbContext, _httpContext);
+                }
+                return _kpiRoleRepository;
+            }
+        }
         public IKpiCaNhanRepository iKpiCaNhanRepository
         {
             get

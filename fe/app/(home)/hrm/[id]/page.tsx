@@ -1,13 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Breadcrumb, Card, ConfigProvider, Empty, Spin, Typography } from 'antd';
+import { Breadcrumb, Card, Empty, Typography } from 'antd';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ReduxStatus } from '@redux/const';
-import { getDetailNhanSu } from '@redux/feature/nhansu/nhansuThunk';
-import { selectedNhanSu, selectedNhanSuStatus } from '@redux/feature/nhansu/nhansuSelectors';
-import '@styles/hrm/ho-so-ns.style.scss';
 import { formatDateView } from '@utils/index';
+
+import { ReduxStatus } from '@redux/const';
+import { getHoSoNhanSu } from '@redux/feature/nhansu/nhansuThunk';
+import { selectedNhanSu, selectedNhanSuStatus } from '@redux/feature/nhansu/nhansuSelectors';
+
+import HoSoNhanSuLoading from './loading';
+import '@styles/hrm/ho-so-ns.style.scss';
 
 const breadcrumbItems = [
   {
@@ -29,12 +32,8 @@ const Page = ({ params }: { params: { id: string } }) => {
   const nhansu = useAppSelector(selectedNhanSu);
   const status = useAppSelector(selectedNhanSuStatus);
 
-  useEffect(() => {
-    dispatch(getDetailNhanSu(Number.parseInt(idNhanSu)));
-  }, [idNhanSu]);
-
   if (status === ReduxStatus.LOADING) {
-    return <Spin />;
+    return <HoSoNhanSuLoading />;
   }
 
   if (!nhansu) {
@@ -113,7 +112,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             <div className="grid grid-cols-2 gap-2">
               <div className="field">
                 <p className="label">Email:</p>
-                <p className="value">{nhansu.email2}</p>
+                <p className="value">{nhansu.email}</p>
               </div>
               <div className="field">
                 <p className="label">Điện thoại:</p>

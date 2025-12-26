@@ -105,9 +105,7 @@ const Page = () => {
       dataIndex: 'trangThai',
       title: 'Trạng thái',
       render: (value: boolean) => (
-        <span className={value ? 'text-green-600' : 'text-red-600'}>
-          {value ? 'Hoạt động' : 'Ngừng'}
-        </span>
+        <span className={value ? 'text-green-600' : 'text-red-600'}>{value ? 'Hoạt động' : 'Ngừng'}</span>
       )
     }
   ];

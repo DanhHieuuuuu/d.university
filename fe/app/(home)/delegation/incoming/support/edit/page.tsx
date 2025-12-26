@@ -6,7 +6,11 @@ import { toast } from 'react-toastify';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
 import DetailTable, { DetailRow } from '@components/hieu-custom/detail-table';
-import { getByIdDepartmentSupport, getListNhanSu, updateDepartmentSupport } from '@redux/feature/delegation/delegationThunk';
+import {
+  getByIdDepartmentSupport,
+  getListNhanSu,
+  updateDepartmentSupport
+} from '@redux/feature/delegation/delegationThunk';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { IUpdateDepartmentSupport } from '@models/delegation/delegation.model';
 import { renderField } from '@utils/render-field.helper';
@@ -45,10 +49,10 @@ const DepartmentSupport = () => {
   }, [detail, isEdit]);
 
   useEffect(() => {
-  if (!listNhanSu || listNhanSu.length === 0) {
-    dispatch(getListNhanSu());
-  }
-}, [listNhanSu, dispatch]);
+    if (!listNhanSu || listNhanSu.length === 0) {
+      dispatch(getListNhanSu());
+    }
+  }, [listNhanSu, dispatch]);
 
   /* ===== Save ===== */
   const onFinish = async (values: any) => {
@@ -76,7 +80,7 @@ const DepartmentSupport = () => {
       toast.error(String(err));
     }
   };
-  // View and edit 
+  // View and edit
   const rows: DetailRow[] = useMemo(() => {
     if (!detail) return [];
     const options = { isEdit };
@@ -123,41 +127,40 @@ const DepartmentSupport = () => {
               <>
                 {fields.map(({ key, name }) => (
                   <div key={key} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                   <Form.Item
-  name={[name, 'supporterId']}
-  rules={[{ required: true, message: 'Chọn nhân sự' }]}
-  style={{ flex: 2, marginBottom: 0 ,minWidth: 0}}
->
-  <Select
-    placeholder="Chọn nhân sự"
-    showSearch
-    optionFilterProp="label"
-    options={listNhanSu.map((n) => ({
-      value: n.idNhanSu,
-      label: n.tenNhanSu
-    }))}
-    onChange={(value) => {
-      const supporters = form.getFieldValue('supporters') || [];
+                    <Form.Item
+                      name={[name, 'supporterId']}
+                      rules={[{ required: true, message: 'Chọn nhân sự' }]}
+                      style={{ flex: 2, marginBottom: 0, minWidth: 0 }}
+                    >
+                      <Select
+                        placeholder="Chọn nhân sự"
+                        showSearch
+                        optionFilterProp="label"
+                        options={listNhanSu.map((n) => ({
+                          value: n.idNhanSu,
+                          label: n.tenNhanSu
+                        }))}
+                        onChange={(value) => {
+                          const supporters = form.getFieldValue('supporters') || [];
 
-      // Lấy supporterCode tương ứng nếu đã có trong listNhanSu
-      const selectedNhanSu = listNhanSu.find((n) => n.idNhanSu === value);
-      const supporterCode = selectedNhanSu?.supporterCode ?? '';
+                          // Lấy supporterCode tương ứng nếu đã có trong listNhanSu
+                          const selectedNhanSu = listNhanSu.find((n) => n.idNhanSu === value);
+                          const supporterCode = selectedNhanSu?.supporterCode ?? '';
 
-      supporters[name] = {
-        supporterId: value,
-        supporterCode // tự điền mã NV
-      };
+                          supporters[name] = {
+                            supporterId: value,
+                            supporterCode // tự điền mã NV
+                          };
 
-      form.setFieldsValue({ supporters });
-    }}
-  />
-</Form.Item>
-
+                          form.setFieldsValue({ supporters });
+                        }}
+                      />
+                    </Form.Item>
 
                     <Form.Item
                       name={[name, 'supporterCode']}
                       rules={[{ required: true, message: 'Nhập mã NV' }]}
-                      style={{ flex: 1, marginBottom: 0,minWidth: 0 }}
+                      style={{ flex: 1, marginBottom: 0, minWidth: 0 }}
                     >
                       <Input placeholder="Mã NV" />
                     </Form.Item>

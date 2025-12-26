@@ -1,12 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '@redux/feature/loadingSlice';
 
 export function useNavigate() {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
   const [isPending, startTransition] = useTransition();
 
@@ -21,7 +22,7 @@ export function useNavigate() {
     if (!isPending) {
       dispatch(setLoading(false));
     }
-  }, [isPending, dispatch]);
+  }, [isPending, dispatch, pathname]);
 
   return { navigateTo };
 }

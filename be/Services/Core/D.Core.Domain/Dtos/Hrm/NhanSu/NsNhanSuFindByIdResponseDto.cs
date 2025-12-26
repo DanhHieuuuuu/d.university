@@ -1,4 +1,6 @@
-﻿namespace D.Core.Domain.Dtos.Hrm.NhanSu
+﻿using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
+
+namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {
     public class NsNhanSuFindByIdResponseDto
     {
