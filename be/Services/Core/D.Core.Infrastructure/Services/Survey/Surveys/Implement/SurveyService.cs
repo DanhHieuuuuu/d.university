@@ -90,18 +90,47 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             return _mapper.Map<SurveyDetailDto>(entity);
         }
 
+        //public async Task CreateSurveyFromRequestAsync(int requestId)
+        //{
+        //    _logger.LogInformation($"{nameof(CreateSurveyFromRequestAsync)} method called, dto: {JsonSerializer.Serialize(requestId)}.");
+
+        //    using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        //    var request = _unitOfWork.iKsSurveyRequestRepository.FindById(requestId);
+        //    if (request == null) throw new Exception("Không tìm thấy yêu cầu gốc.");
+
+        //    var exists = await _unitOfWork.iKsSurveyRepository.TableNoTracking
+        //        .AnyAsync(x => x.IdYeuCau == requestId);
+        //    if (exists) return;
+
+        //    var survey = new KsSurvey
+        //    {
+        //        IdYeuCau = request.Id,
+        //        MaKhaoSat = request.MaYeuCau,
+        //        TenKhaoSat = request.TenKhaoSatYeuCau,
+        //        MoTa = request.MoTa,
+        //        ThoiGianBatDau = request.ThoiGianBatDau,
+        //        ThoiGianKetThuc = request.ThoiGianKetThuc,
+        //        IdPhongBan = request.IdPhongBan,
+        //        Status = SurveyStatus.Close,
+        //        CreatedDate = DateTime.Now,
+        //        CreatedBy = CommonUntil.GetCurrentUserId(_httpContextAccessor).ToString()
+        //    };
+
+        //    await _unitOfWork.iKsSurveyRepository.AddAsync(survey);
+        //    await _unitOfWork.SaveChangesAsync();
+
+        //    await LogActionAsync(survey.MaKhaoSat, "Create", "Khởi tạo khảo sát", null, "Close");
+        //}
         public async Task CreateSurveyFromRequestAsync(int requestId)
         {
             _logger.LogInformation($"{nameof(CreateSurveyFromRequestAsync)} method called, dto: {JsonSerializer.Serialize(requestId)}.");
-
-            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             var request = _unitOfWork.iKsSurveyRequestRepository.FindById(requestId);
             if (request == null) throw new Exception("Không tìm thấy yêu cầu gốc.");
 
             var exists = await _unitOfWork.iKsSurveyRepository.TableNoTracking
-                .AnyAsync(x => x.IdYeuCau == requestId);
-
+                .AnyAsync(x => x.IdYeuCau == requestId && x.Deleted == false);
             if (exists) return;
 
             var survey = new KsSurvey
@@ -114,6 +143,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                 ThoiGianKetThuc = request.ThoiGianKetThuc,
                 IdPhongBan = request.IdPhongBan,
                 Status = SurveyStatus.Close,
+
                 CreatedDate = DateTime.Now,
                 CreatedBy = CommonUntil.GetCurrentUserId(_httpContextAccessor).ToString()
             };
@@ -121,8 +151,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             await _unitOfWork.iKsSurveyRepository.AddAsync(survey);
             await _unitOfWork.SaveChangesAsync();
 
-            await LogActionAsync(survey.MaKhaoSat, "Create", "Khởi tạo khảo sát", null, "Close");
-            scope.Complete();
+            await LogActionAsync(survey.MaKhaoSat, "Create", "Hệ thống tạo khảo sát từ yêu cầu", null, "Open");
         }
 
         public async Task OpenSurveyAsync(int id)
@@ -265,7 +294,9 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             var surveyEntity = _unitOfWork.iKsSurveyRepository.FindById(surveyId);
             if (surveyEntity == null) throw new Exception("Khảo sát không tồn tại.");
-
+            if (surveyEntity.ThoiGianKetThuc < DateTime.Now)            
+                throw new Exception("Đợt khảo sát đã kết thúc, bạn không thể thực hiện hành động này.");
+            
             var questionsEntities = await _unitOfWork.iKsSurveyRequestRepository
                 .GetQuestionsByRequestIdAsync(surveyEntity.IdYeuCau);
 

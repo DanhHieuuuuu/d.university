@@ -1,5 +1,8 @@
 ﻿using D.ControllerBase;
+using D.Core.Application.Command.Survey;
+using D.Core.Domain.Dtos.Survey.Report;
 using D.Core.Domain.Dtos.Survey.Request;
+using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -166,7 +169,7 @@ namespace D.Core.API.Controllers.Survey
             try
             {
                 await _mediator.Send(new ApproveRequestDto(id));
-                return new ResponseAPI("Đã duyệt yêu cầu thành công.");
+                return new ResponseAPI("Đã duyệt yêu cầu và tạo khảo sát thành công.");
             }
             catch (Exception ex)
             {
@@ -255,6 +258,137 @@ namespace D.Core.API.Controllers.Survey
             {
                 await _mediator.Send(new CloseSurveyDto(id));
                 return Ok(new ResponseAPI("Đã đóng khảo sát thành công."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseAPI(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách khảo sát phải làm (Paging)
+        /// </summary>
+        [HttpGet("paging-my-surveys")]
+        public async Task<ResponseAPI> GetMySurveys([FromQuery] FilterMySurveyDto query)
+        {
+            try
+            {
+                var result = await _mediator.Send(query);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Bắt đầu khảo sát (lấy thông tin khảo sát để làm)
+        /// </summary>
+        [HttpPost("start-survey/{surveyId}")]
+        public async Task<ResponseAPI> StartSurvey([FromRoute] int surveyId)
+        {
+            try
+            {
+                var command = new StartSurveyDto(surveyId);
+                var result = await _mediator.Send(command);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lưu nháp khảo sát
+        /// </summary>
+        [HttpPost("save-draft-survey")]
+        public async Task<ResponseAPI> SaveDraft([FromBody] SubmitSurveyRequestDto dto)
+        {
+            try
+            {
+                var command = new SaveDraftDto
+                {
+                    SubmissionId = dto.SubmissionId,
+                    Answers = dto.Answers
+                };
+                await _mediator.Send(command);
+                return new ResponseAPI("Lưu nháp thành công.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Nộp khảo sát
+        /// </summary>
+        [HttpPost("submit-survey")]
+        public async Task<ResponseAPI> SubmitSurvey([FromBody] SubmitSurveyRequestDto dto)
+        {
+            try
+            {
+                var command = new SubmitSurveyDto
+                {
+                    SubmissionId = dto.SubmissionId,
+                    Answers = dto.Answers
+                };
+                var result = await _mediator.Send(command);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tạo báo cáo khảo sát
+        /// </summary>
+        [HttpPost("generate-report/{surveyId}")]
+        public async Task<IActionResult> GenerateReport([FromRoute] int surveyId)
+        {
+            try
+            {
+                await _mediator.Send(new GenerateReportDto(surveyId));
+                return Ok(new ResponseAPI("Đã tạo báo cáo thành công."));               
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseAPI(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách báo cáo khảo sát (Paging)
+        /// </summary>
+        [HttpGet("paging-report")]
+        public async Task<ResponseAPI> PagingReport([FromQuery] FilterReportSurveyDto query)
+        {
+            try
+            {
+                var result = await _mediator.Send(query);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy chi tiết báo cáo khảo sát theo Id
+        /// </summary>
+        [HttpGet("get-report-by-id/{id}")]
+        public async Task<IActionResult> GetReportDetail([FromRoute] int id)
+        {
+            try
+            {
+                var query = new GetReportDetailDto(id);
+                var result = await _mediator.Send(new GetReportDetailDto(id));
+                return Ok(new ResponseAPI(result));
             }
             catch (Exception ex)
             {

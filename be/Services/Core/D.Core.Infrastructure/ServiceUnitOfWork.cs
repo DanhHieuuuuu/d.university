@@ -75,7 +75,7 @@ namespace D.Core.Infrastructure
         private SurveySubmissionRepository _surveySubmissionRepository;
         private SurveySubmissionAnswerRepository _surveySubmissionAnswerRepository;
         private SurveySubmissionLogRepository _surveySubmissionLogRepository;
-
+        private SurveyReportRepository _surveyReportRepository;
         #endregion
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -615,6 +615,18 @@ namespace D.Core.Infrastructure
                     _surveySubmissionLogRepository = new SurveySubmissionLogRepository(_dbContext, _httpContext);
                 }
                 return _surveySubmissionLogRepository;
+            }
+        }
+
+        public IKsSurveyReportRepository iKsSurveyReportRepository
+        {
+            get
+            {
+                if (_surveyReportRepository == null)
+                {
+                    _surveyReportRepository = new SurveyReportRepository(_dbContext, _httpContext);
+                }
+                return _surveyReportRepository;
             }
         }
 
