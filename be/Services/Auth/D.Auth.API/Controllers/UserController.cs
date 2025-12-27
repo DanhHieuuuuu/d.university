@@ -13,7 +13,7 @@ namespace D.Auth.API.Controllers
 
     [Route("/api/user")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UserController : APIControllerBase
     {
         private IMediator _mediator;

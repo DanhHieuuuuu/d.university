@@ -28,10 +28,48 @@ namespace D.S3Bucket
 
         private string BuildFullPath(string fileName)
         {
-            if (string.IsNullOrWhiteSpace(_config.FolderPrefix))
-                return fileName;
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                throw new ArgumentException("File name is required", nameof(fileName));
+            }
 
-            return $"{_config.FolderPrefix.TrimEnd('/')}/{fileName.TrimStart('/')}";
+            var objectName = fileName.Trim();
+
+            if (Uri.TryCreate(objectName, UriKind.Absolute, out var uri))
+            {
+                objectName = uri.AbsolutePath;
+            }
+
+            objectName = objectName.TrimStart('/');
+
+            if (!string.IsNullOrWhiteSpace(_config.BucketName))
+            {
+                var bucketPrefix = $"{_config.BucketName.TrimEnd('/')}/";
+                if (objectName.StartsWith(bucketPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    objectName = objectName.Substring(bucketPrefix.Length);
+                }
+            }
+
+            var folderPrefix = _config.FolderPrefix?.Trim().Trim('/');
+
+            if (string.IsNullOrWhiteSpace(folderPrefix))
+            {
+                return objectName;
+            }
+
+            if (objectName.Length == 0)
+            {
+                return folderPrefix;
+            }
+
+            if (objectName.Equals(folderPrefix, StringComparison.OrdinalIgnoreCase) ||
+                objectName.StartsWith(folderPrefix + "/", StringComparison.OrdinalIgnoreCase))
+            {
+                return objectName;
+            }
+
+            return $"{folderPrefix}/{objectName}";
         }
 
         public async Task<bool> TestConnectionAsync()
