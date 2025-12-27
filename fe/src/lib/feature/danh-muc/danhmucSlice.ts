@@ -5,6 +5,7 @@ import { CRUD } from '@models/common/common';
 import { IViewChucVu } from '@models/danh-muc/chuc-vu.model';
 import { IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
+import { IViewKhoaHoc } from '@models/danh-muc/khoa-hoc.model';
 import {
   IViewDanToc,
   IViewGioiTinh,
@@ -25,6 +26,7 @@ import {
   deleteToBoMon,
   getAllDanToc,
   getAllGioiTinh,
+  getAllKhoaHoc,
   getAllLoaiHopDong,
   getAllLoaiPhongBan,
   getAllPhongBan,
@@ -46,6 +48,7 @@ interface DanhMucState {
   phongBan: CRUD<IViewPhongBan>;
   listDanToc: IViewDanToc[];
   listGioiTinh: IViewGioiTinh[];
+  listKhoaHoc: IViewKhoaHoc[];
   listLoaiHopDong: IViewLoaiHopDong[];
   listLoaiPhongBan: IViewLoaiPhongBan[];
   listQuanHe: IViewQuanHeGiaDinh[];
@@ -78,6 +81,7 @@ const initialState: DanhMucState = {
   },
   listDanToc: [],
   listGioiTinh: [],
+  listKhoaHoc: [],
   listLoaiHopDong: [],
   listLoaiPhongBan: [],
   listQuanHe: [],
@@ -296,6 +300,10 @@ const danhmucSlice = createSlice({
       //TonGiao
       .addCase(getAllTonGiao.fulfilled, (state, action) => {
         state.listTonGiao = action.payload!.items;
+      })
+      //KhoaHoc
+      .addCase(getAllKhoaHoc.fulfilled, (state, action) => {
+        state.listKhoaHoc = action.payload!.items;
       });
   }
 });

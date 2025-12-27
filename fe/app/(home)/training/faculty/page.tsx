@@ -1,17 +1,18 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal, message } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined
+  EyeOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllKhoa } from '@redux/feature/dao-tao/khoaThunk';
+import { getAllKhoa, deleteKhoa } from '@redux/feature/dao-tao/khoaThunk';
 import { setSelectedIdKhoa } from '@redux/feature/dao-tao/daotaoSlice';
 
 import AppTable from '@components/common/Table';
@@ -66,6 +67,26 @@ const Page = () => {
 
   const refreshData = () => {
     dispatch(getAllKhoa(query));
+  };
+
+  const handleDelete = (id: number, tenKhoa: string) => {
+    Modal.confirm({
+      title: 'Xác nhận xóa',
+      icon: <ExclamationCircleOutlined />,
+      content: `Bạn có chắc chắn muốn xóa khoa "${tenKhoa}"?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await dispatch(deleteKhoa(id)).unwrap();
+          message.success('Xóa khoa thành công!');
+          refreshData();
+        } catch (error: any) {
+          message.error(error?.message || 'Xóa khoa thất bại!');
+        }
+      }
+    });
   };
 
   const columns: IColumn<IViewKhoa>[] = [
@@ -131,7 +152,7 @@ const Page = () => {
       color: 'red',
       icon: <DeleteOutlined />,
       command: (record: IViewKhoa) => {
-        dispatch(setSelectedIdKhoa(record.id));
+        handleDelete(record.id, record.tenKhoa);
       }
     }
   ];

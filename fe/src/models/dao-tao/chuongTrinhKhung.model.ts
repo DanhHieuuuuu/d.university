@@ -3,7 +3,6 @@ import { IQueryPaging } from '@models/common/model.common';
 export type IQueryChuongTrinhKhung = IQueryPaging & {
   NganhId?: number;
   ChuyenNganhId?: number;
-  KhoaHocId?: number;
 };
 
 export type IViewChuongTrinhKhung = {
