@@ -152,7 +152,7 @@ export const listMenuCore: IMenu[] = [
         icon: <LinkOutlined />
       },
       {
-        label: 'Khung chương trình',
+        label: 'Chương trình khung',
         routerLink: '/training/curriculumFramework',
         icon: <ProfileOutlined />
       }

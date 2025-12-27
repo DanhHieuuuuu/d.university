@@ -89,7 +89,7 @@ const updateKhoa = async (body: IUpdateKhoa) => {
 
 const deleteKhoa = async (id: number) => {
   try {
-    const res = await axios.delete(`${apiKhoaEndpoint}/${id}`);
+    const res = await axios.delete(`${apiKhoaEndpoint}/delete/${id}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -148,7 +148,7 @@ const updateNganh = async (body: IUpdateNganh) => {
 
 const deleteNganh = async (id: number) => {
   try {
-    const res = await axios.delete(`${apiNganhEndpoint}/${id}`);
+    const res = await axios.delete(`${apiNganhEndpoint}/delete/${id}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -207,7 +207,7 @@ const updateChuyenNganh = async (body: IUpdateChuyenNganh) => {
 
 const deleteChuyenNganh = async (id: number) => {
   try {
-    const res = await axios.delete(`${apiChuyenNganhEndpoint}/${id}`);
+    const res = await axios.delete(`${apiChuyenNganhEndpoint}/delete/${id}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -266,7 +266,7 @@ const updateMonHoc = async (body: IUpdateMonHoc) => {
 
 const deleteMonHoc = async (id: number) => {
   try {
-    const res = await axios.delete(`${apiMonHocEndpoint}/${id}`);
+    const res = await axios.delete(`${apiMonHocEndpoint}/delete/${id}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -325,7 +325,7 @@ const updateMonTienQuyet = async (body: IUpdateMonTienQuyet) => {
 
 const deleteMonTienQuyet = async (id: number) => {
   try {
-    const res = await axios.delete(`${apiMonTienQuyetEndpoint}/${id}`);
+    const res = await axios.delete(`${apiMonTienQuyetEndpoint}/delete/${id}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');

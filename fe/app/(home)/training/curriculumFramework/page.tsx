@@ -8,6 +8,7 @@ import { getAllChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';
 import { getAllMonHoc } from '@redux/feature/dao-tao/monHocThunk';
 import { getAllChuongTrinhKhung } from '@redux/feature/dao-tao/chuongTrinhKhungThunk';
 import { getAllChuongTrinhKhungMon } from '@redux/feature/dao-tao/chuongTrinhKhungMonThunk';
+import { getAllKhoaHoc } from '@redux/feature/danh-muc/danhmucThunk';
 import { IViewChuongTrinhKhungMon } from '@models/dao-tao/chuongTrinhKhungMon.model';
 import { IViewMonHoc } from '@models/dao-tao/monHoc.model';
 
@@ -32,6 +33,7 @@ const Page = () => {
   const [selectedChuyenNganhId, setSelectedChuyenNganhId] = useState<number | null>(null);
 
   // Redux state
+  const listKhoaHoc = useAppSelector((state) => state.danhmucState.listKhoaHoc);
   const { data: listNganh, status: nganhStatus } = useAppSelector((state) => state.daotaoState.nganh.$list);
   const { data: listChuyenNganh, status: chuyenNganhStatus } = useAppSelector(
     (state) => state.daotaoState.chuyenNganh.$list
@@ -44,8 +46,9 @@ const Page = () => {
     (state) => state.daotaoState.chuongTrinhKhungMon.$list
   );
 
-  // Load danh sách ngành và môn học khi mount
+  // Load danh sách khóa học, ngành và môn học khi mount
   useEffect(() => {
+    dispatch(getAllKhoaHoc({ PageSize: 1000 }));
     dispatch(getAllNganh({ PageSize: 1000 }));
     dispatch(getAllMonHoc({ PageSize: 1000 }));
   }, [dispatch]);
@@ -144,6 +147,12 @@ const Page = () => {
   const totalCredits = useMemo(() => {
     return groupedCourses.reduce((sum, group) => sum + group.totalCredits, 0);
   }, [groupedCourses]);
+
+  // Get Khóa học info
+  const currentKhoaHoc = useMemo(() => {
+    if (!currentChuongTrinhKhung?.khoaHocId || !listKhoaHoc) return null;
+    return listKhoaHoc.find((kh) => kh.id === currentChuongTrinhKhung.khoaHocId);
+  }, [currentChuongTrinhKhung, listKhoaHoc]);
 
   // Table columns
   const columns = [
@@ -258,6 +267,7 @@ const Page = () => {
               <div className={styles.curriculumInfo}>
                 <h3>{currentChuongTrinhKhung.tenChuongTrinhKhung}</h3>
                 <p>Mã: {currentChuongTrinhKhung.maChuongTrinhKhung}</p>
+                {currentKhoaHoc && <p>Khóa học: {currentKhoaHoc.tenKhoaHoc}</p>}
               </div>
             )}
 
