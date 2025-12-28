@@ -2,15 +2,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
-  PlusOutlined,
-  SearchOutlined,
-  SyncOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  FilterOutlined,
-  CheckCircleOutlined,
-  EllipsisOutlined
+  PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
+  EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -27,7 +20,7 @@ import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
 import { toast } from 'react-toastify';
 import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUser } from '@redux/feature/userSlice';
-import { buildKpiGroupedTable } from '@helpers/kpi/kpi.helper';
+import { buildKpiGroupedTable, KpiTableRow } from '@helpers/kpi/kpi.helper';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -38,24 +31,15 @@ const Page = () => {
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { list: listNhanSu } = useAppSelector((state) => state.userState);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBan.$list);
-  const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector(
-    (state) => state.kpiState.meta.trangThai.caNhan
-  );
+  const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.caNhan);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
   const [isView, setIsModalView] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const tableData = useMemo(() => {
-    return buildKpiGroupedTable<IViewKpiCaNhan>(list || []);
-  }, [list]);
 
-  useEffect(() => {
-    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
-    dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
-    dispatch(getListTrangThaiKpiCaNhan());
-  }, [dispatch]);
+  const tableData = useMemo(() => buildKpiGroupedTable<IViewKpiCaNhan>(list || []), [list]);
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
@@ -64,96 +48,51 @@ const Page = () => {
     triggerFirstLoad: true
   });
 
-  const handlePhongBanChange = (value: number | undefined) => {
-    onFilterChange({ idPhongBan: value, idNhanSu: undefined });
-    form.setFieldValue('idNhanSu', undefined);
-    dispatch(getAllUser({ IdPhongBan: value, PageIndex: 1, PageSize: 2000 }));
-  };
+  useEffect(() => {
+    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
+    dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
+    dispatch(getListTrangThaiKpiCaNhan());
+  }, [dispatch]);
 
   const approveSelected = () => {
     const ids = selectedRowKeys.map(Number);
     const kpiToApprove = list.filter(
       (item) => ids.includes(item.id) && item.trangThai === KpiTrangThaiConst.DE_XUAT
     );
-
-    if (kpiToApprove.length === 0) {
-      toast.error('Chỉ có KPI đang ở trạng thái "Đề xuất" mới được phê duyệt.');
-      return;
-    }
-
+    if (!kpiToApprove.length) return toast.error('Chỉ KPI "Đề xuất" mới được phê duyệt.');
     Modal.confirm({
       title: 'Phê duyệt hàng loạt',
       content: `Xác nhận phê duyệt ${kpiToApprove.length} KPI đã chọn?`,
       okText: 'Duyệt',
       onOk: async () => {
         try {
-          await dispatch(
-            updateTrangThaiKpiCaNhan({
-              ids,
-              trangThai: KpiTrangThaiConst.PHE_DUYET
-            })
-          ).unwrap();
+          await dispatch(updateTrangThaiKpiCaNhan({ ids, trangThai: KpiTrangThaiConst.PHE_DUYET })).unwrap();
           toast.success('Phê duyệt thành công!');
           setSelectedRowKeys([]);
           dispatch(getKpiCaNhanKeKhai(query));
-          dispatch(getListTrangThaiKpiCaNhan());
-        } catch {
-          toast.error('Phê duyệt thất bại!');
-        }
+        } catch { toast.error('Phê duyệt thất bại!'); }
       }
     });
   };
-
-
-  const scoreSelected = () => {
-    toast.info('Chức năng chấm KPI hàng loạt đang được cập nhật.');
-  };
+  const scoreSelected = () => toast.info('Chức năng chấm KPI hàng loạt đang được cập nhật.');
 
   const requiredSelect = (cb: () => void) => {
-    if (!selectedRowKeys.length) {
-      toast.warning('Vui lòng chọn ít nhất một KPI');
-      return;
-    }
+    if (!selectedRowKeys.length) return toast.warning('Vui lòng chọn ít nhất một KPI');
     cb();
   };
+
   const bulkActionItems: MenuProps['items'] = [
-    {
-      key: 'approve',
-      label: 'Phê duyệt',
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-      onClick: () => requiredSelect(approveSelected),
-    },
-    {
-      key: 'score',
-      label: 'Chấm KPI',
-      icon: <EditOutlined style={{ color: '#1890ff' }} />,
-      onClick: () => requiredSelect(scoreSelected),
-    },
+    { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
+    { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(scoreSelected) },
   ];
 
   const filterContent = (
-    <Form
-      form={filterForm}
-      layout="vertical"
-      onValuesChange={(_, values) => {
-        onFilterChange(values);
-        setOpenFilter(false);
-      }}
-    >
+    <Form form={filterForm} layout="vertical" onValuesChange={(_, values) => { onFilterChange(values); setOpenFilter(false); }}>
       <Form.Item label="Loại KPI" name="loaiKpi">
-        <Select
-          allowClear
-          placeholder="Chọn loại KPI"
-          options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
-        />
+        <Select allowClear placeholder="Chọn loại KPI" options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))} />
       </Form.Item>
       <Form.Item label="Trạng thái" name="trangThai">
-        <Select
-          allowClear
-          placeholder="Chọn trạng thái"
-          loading={trangThaiStatus === ReduxStatus.LOADING}
-          options={trangThaiCaNhan}
-        />
+        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiCaNhan} />
       </Form.Item>
     </Form>
   );
@@ -166,33 +105,38 @@ const Page = () => {
       title: `Xóa Kpi ${record.kpi} của ${record.nhanSu}?`,
       okText: 'Xóa', okType: 'danger', cancelText: 'Hủy',
       onOk: async () => {
-        try {
-          await dispatch(deleteKpiCaNhan(record.id)).unwrap();
-          toast.success('Xóa thành công!');
-          dispatch(getKpiCaNhanKeKhai(query));
-        } catch { toast.error('Xóa thất bại!'); }
+        try { await dispatch(deleteKpiCaNhan(record.id)).unwrap(); toast.success('Xóa thành công!'); dispatch(getKpiCaNhanKeKhai(query)); }
+        catch { toast.error('Xóa thất bại!'); }
       }
     });
   };
+  const handlePhongBanChange = (value: number | undefined) => {
+    onFilterChange({ idPhongBan: value, idNhanSu: undefined });
+    form.setFieldValue('idNhanSu', undefined);
+    dispatch(getAllUser({ IdPhongBan: value, PageIndex: 1, PageSize: 2000 }));
+  };
+  const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => onFilterChange({ Keyword: value }), 500);
 
-  const hideMeta = (record: any) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : undefined);
+  const hideMeta = (record: any) => record.rowType !== 'data' ? { props: { colSpan: 0 } } : undefined;
 
-  const columns: IColumn<IViewKpiCaNhan>[] = [
+  const columns: IColumn<KpiTableRow<IViewKpiCaNhan>>[] = [
     {
       key: 'linhVuc',
-      dataIndex: 'linhVuc',
-      title: 'Lĩnh Vực',
-      render: (val, record: any) => record.rowType !== 'data' ? { props: { colSpan: 0 } } : val
+      dataIndex: 'linhVuc', title: 'Lĩnh Vực',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
     },
     {
-      key: 'kpi',
-      dataIndex: 'kpi',
-      title: 'Tên KPI',
-      render: (value: any, record: any) => {
+      key: 'kpi', dataIndex: 'kpi', title: 'Tên KPI',
+      render: (value, record) => {
         if (record.rowType === 'group') {
           return {
             children: (
-              <div style={{ fontSize: 16, fontWeight: 700, textAlign: 'center', color: '#0958d9' }}>
+              <div style={{
+                fontSize: 14, // Giảm từ 16 xuống 14
+                fontWeight: 600,
+                textAlign: 'center', // Để left cho giống các hàng khác
+                color: '#0958d9',
+              }}>
                 {KpiLoaiConst.getName(record.loaiKpi)}
               </div>
             ),
@@ -203,13 +147,18 @@ const Page = () => {
         if (record.rowType === 'total') {
           return {
             children: (
-              <div style={{ fontSize: 15, fontWeight: 700, paddingRight: '20px' }}>
+              <div style={{
+                fontSize: 15,
+                fontWeight: 600,
+                textAlign: 'left',
+              }}>
                 TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{record.trongSo}%</span>
               </div>
             ),
             props: { colSpan: columns.length },
           };
         }
+
         return value;
       },
     },
@@ -217,102 +166,53 @@ const Page = () => {
       key: 'mucTieu',
       dataIndex: 'mucTieu',
       title: 'Mục tiêu',
-      render: (val, record: any) => hideMeta(record) || val
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
     },
     {
       key: 'trongSo',
       dataIndex: 'trongSo',
       title: 'Trọng số',
-      render: (val, record: any) => hideMeta(record) || val
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
     },
     {
       key: 'loaiKpi',
       dataIndex: 'loaiKpi',
       title: 'Loại KPI',
-      render: (value: number, record: any) =>
-        record.rowType !== 'data' ? { props: { colSpan: 0 } } : KpiLoaiConst.getName(value),
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : KpiLoaiConst.getName(val))
     },
     {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
       title: 'Kết quả thực tế',
-      render: (val, record: any) => hideMeta(record) || val
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
     },
     {
       key: 'trangThai',
-      dataIndex: 'trangThai',
-      title: 'Trạng thái',
-      render: (value: number, record: any) => {
-        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
-        const status = KpiTrangThaiConst.get(value);
-        return status ? <Tag color={status.color}>{status.text}</Tag> : null;
-      },
+      dataIndex: 'trangThai', title: 'Trạng thái',
+      render: (val, record) =>
+        record.rowType !== 'data'
+          ? { props: { colSpan: 0 } }
+          : <Tag color={KpiTrangThaiConst.get(val)?.color}>{KpiTrangThaiConst.get(val)?.text}</Tag>,
     },
   ];
 
   const actions: IAction[] = [
-    { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: (record) => record.rowType !== 'data', },
-    { label: 'Sửa', icon: <EditOutlined />, command: onClickUpdate, hidden: (record) => record.rowType !== 'data', },
-    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete, hidden: (record) => record.rowType !== 'data', }
+    { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
+    { label: 'Sửa', icon: <EditOutlined />, command: onClickUpdate, hidden: r => r.rowType !== 'data' },
+    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete, hidden: r => r.rowType !== 'data' }
   ];
-
-  const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
-    onFilterChange({ Keyword: value });
-  }, 500);
-
-  const handleSelectAllPages = async () => {
-    try {
-      const allIds = await dispatch(getAllIdsKpiCaNhan({
-        ...query,
-        PageIndex: 1,
-        PageSize: totalItem || 9999,
-      })).unwrap();
-
-      setSelectedRowKeys(allIds);
-      toast.success(`Đã chọn tất cả ${allIds.length} KPI`);
-    } catch (error) {
-      toast.error('Không thể lấy danh sách ID');
-    }
-  };
 
   const rowSelection = {
     selectedRowKeys,
     preserveSelectedRowKeys: true,
-    getCheckboxProps: (record: any) => ({
-      disabled: record.rowType !== 'data',
-      style: record.rowType !== 'data' ? { display: 'none' } : {},
-    }),
-    onChange: (newSelectedRowKeys: React.Key[]) => {
-      const currentPageIds = list?.map(item => item.id) || [];
-      const isUnselectingAllOnPage = currentPageIds.every(id => !newSelectedRowKeys.includes(id));
-
-      if (isUnselectingAllOnPage && selectedRowKeys.length > list?.length) {
-        setSelectedRowKeys([]);
-      } else {
-        setSelectedRowKeys(newSelectedRowKeys);
-      }
-    },
-    selections: [
-      {
-        key: 'current-page',
-        text: 'Chọn trang hiện tại',
-        onSelect: (changableRowKeys: React.Key[]) => {
-          setSelectedRowKeys(changableRowKeys);
-        },
-      },
-      {
-        key: 'all-pages',
-        text: 'Chọn tất cả các trang',
-        onSelect: () => {
-          handleSelectAllPages();
-        },
-      },
-    ],
+    getCheckboxProps: (record: any) => ({ disabled: record.rowType !== 'data', style: record.rowType !== 'data' ? { display: 'none' } : {} }),
+    onChange: setSelectedRowKeys,
   };
-
   return (
     <Card
       title="Kê khai KPI cá nhân"
+      style={{ height: 'calc(100vh - 40px)', display: 'flex', flexDirection: 'column' }}
+      styles={{ body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' } }}
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -320,7 +220,7 @@ const Page = () => {
         </Button>
       }
     >
-      <Form form={form} layout="horizontal">
+      <Form form={form} layout="horizontal" className="flex-none">
         <div className="flex items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-2 flex-1">
             <Input
@@ -339,23 +239,10 @@ const Page = () => {
                 onChange={handlePhongBanChange}
               />
             </Form.Item>
-            <Form.Item name="idNhanSu" noStyle>
-              <Select
-                placeholder={watchIdPhongBan ? "Chọn nhân sự" : "Chọn nhân sự (Tất cả)"}
-                style={{ width: 220 }}
-                allowClear
-                showSearch
-                optionFilterProp="label"
-                options={listNhanSu?.map((x: any) => ({
-                  value: x.id,
-                  label: (x.hoTen || `${x.hoDem ?? ''} ${x.ten ?? ''}`).trim()
-                }))}
-                onChange={(val) => onFilterChange({ idNhanSu: val })}
-              />
-            </Form.Item>
           </div>
 
           <div className="flex items-center gap-2">
+            <Button icon={<SaveOutlined />}>Lưu kết quả</Button>
             <Dropdown
               menu={{ items: bulkActionItems }}
               trigger={['click']}
@@ -407,46 +294,25 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
-
-      <AppTable
-        loading={status === ReduxStatus.LOADING}
-        rowKey="id"
-        columns={columns}
-        dataSource={tableData}
-        listActions={actions}
-        pagination={false}
-        rowSelection={rowSelection}
-        onRow={(record: any) => {
-          const isMeta = record.rowType === 'group' || record.rowType === 'total';
-
-          return {
-            onClick: () => {
-              if (isMeta) return; // ❌ không làm gì
-            },
+      <div className="flex-1 overflow-auto mt-2 w-full">
+        <AppTable
+          loading={status === ReduxStatus.LOADING}
+          rowKey="id"
+          columns={columns}
+          dataSource={tableData}
+          listActions={actions}
+          pagination={false}
+          rowSelection={rowSelection}
+          onRow={(record) => ({
             style: {
-              cursor: isMeta ? 'default' : 'pointer',
-              backgroundColor:
-                record.rowType === 'group'
-                  ? '#f0f5ff'
-                  : record.rowType === 'total'
-                    ? '#fafafa'
-                    : '#fff',
-              fontWeight: isMeta ? 600 : 'normal',
-            },
-          };
-        }}
-      />
-
-      <PositionModal
-        isModalOpen={isModalOpen}
-        isUpdate={isUpdate}
-        isView={isView}
-        setIsModalOpen={setIsModalOpen}
-        onSuccess={() => {
-          dispatch(getKpiCaNhanKeKhai(query));
-          dispatch(getListTrangThaiKpiCaNhan());
-        }}
-      />
+              cursor: record.rowType !== 'data' ? 'default' : 'pointer',
+              backgroundColor: record.rowType === 'group' ? '#f0f5ff' : record.rowType === 'total' ? '#fafafa' : '#fff',
+              fontWeight: record.rowType !== 'data' ? 600 : 'normal',
+            }
+          })}
+        />
+      </div>
+      <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiCaNhanKeKhai(query)); dispatch(getListTrangThaiKpiCaNhan()); }} />
     </Card>
   );
 };
