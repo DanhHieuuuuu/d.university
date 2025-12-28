@@ -28,6 +28,7 @@ export type ICreateKpiDonVi = {
   trongSo: string,
   idDonVi: number,
   namHoc: string,
+  idKpiTruong?: number,
 };
 
 export type IUpdateTrangThaiKpiDonVi = {

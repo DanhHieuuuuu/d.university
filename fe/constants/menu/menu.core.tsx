@@ -84,13 +84,35 @@ export const listMenuCore: IMenu[] = [
             routerLink: '/kpi/list/units',
             icon: <PartitionOutlined />
           },
+          {
+            label: 'Kpi trường',
+            routerLink: '/kpi/list/school',
+            icon: <PartitionOutlined />
+          },
         ],
 
       },
       {
         label: 'Quản lý KPI',
         routerLink: '/kpi/manage',
-        icon: <PartitionOutlined />
+        icon: <PartitionOutlined />,
+        items: [
+          {
+            label: 'Kê khai Kpi cá nhân',
+            routerLink: '/kpi/manage/personals',
+            icon: <PartitionOutlined />
+          },
+          // {
+          //   label: 'Kê khai Kpi đơn vị',
+          //   routerLink: '/kpi/list/units',
+          //   icon: <PartitionOutlined />
+          // },
+          // {
+          //   label: 'Kê khai Kpi trường',
+          //   routerLink: '/kpi/list/school',
+          //   icon: <PartitionOutlined />
+          // },
+        ],
       }
     ]
   },

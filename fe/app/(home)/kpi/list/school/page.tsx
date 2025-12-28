@@ -14,31 +14,29 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { setSelectedKpiDonVi } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiDonVi, getAllKpiDonVi, getListNamHocKpiDonVi, getListTrangThaiKpiDonVi, updateTrangThaiKpiDonVi } from '@redux/feature/kpi/kpiThunk';
+import { setSelectedKpiTruong } from '@redux/feature/kpi/kpiSlice';
+import { deleteKpiTruong, getAllKpiTruong, getListNamHocKpiTruong, getListTrangThaiKpiTruong, updateTrangThaiKpiTruong } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
+import { IQueryKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import PositionModal from './(dialog)/create-or-update';
 import { KpiLoaiConst } from '../../const/kpiType.const';
 import { toast } from 'react-toastify';
 import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiDonVi.$list);
-  const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBan.$list);
-  const { data: trangThaiDonVi, status: trangThaiStatus } = useAppSelector(
-    (state) => state.kpiState.meta.trangThai.donVi
+  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
+  const { data: trangThaiTruong, status: trangThaiStatus } = useAppSelector(
+    (state) => state.kpiState.meta.trangThai.truong
   );
 
-  const { data: namHocDonVi, status: namHocStatus } = useAppSelector(
-    (state) => state.kpiState.meta.namHoc.donVi
+  const { data: namHocTruong, status: namHocStatus } = useAppSelector(
+    (state) => state.kpiState.meta.namHoc.truong
   );
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -48,12 +46,11 @@ const Page = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   useEffect(() => {
-    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
-    dispatch(getListTrangThaiKpiDonVi());
-    dispatch(getListNamHocKpiDonVi());
+    dispatch(getListTrangThaiKpiTruong());
+    dispatch(getListNamHocKpiTruong());
   }, [dispatch]);
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiDonVi>({
+  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiTruong>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -61,7 +58,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllKpiDonVi(newQuery));
+      dispatch(getAllKpiTruong(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -92,16 +89,16 @@ const Page = () => {
       onOk: async () => {
         try {
           await dispatch(
-            updateTrangThaiKpiDonVi({
+            updateTrangThaiKpiTruong({
               ids,
               trangThai: KpiTrangThaiConst.PHE_DUYET
             })
           ).unwrap();
           toast.success('Phê duyệt thành công!');
           setSelectedRowKeys([]);
-          dispatch(getAllKpiDonVi(query));
-          dispatch(getListTrangThaiKpiDonVi());
-          dispatch(getListNamHocKpiDonVi());
+          dispatch(getAllKpiTruong(query));
+          dispatch(getListTrangThaiKpiTruong());
+          dispatch(getListNamHocKpiTruong());
         } catch {
           toast.error('Phê duyệt thất bại!');
         }
@@ -156,7 +153,7 @@ const Page = () => {
           allowClear
           placeholder="Chọn năm học"
           loading={namHocStatus === ReduxStatus.LOADING}
-          options={namHocDonVi.map(x => ({
+          options={namHocTruong.map((x: any) => ({
             value: x.namHoc,
             label: x.namHoc
           }))}
@@ -168,7 +165,7 @@ const Page = () => {
           allowClear
           placeholder="Chọn trạng thái"
           loading={trangThaiStatus === ReduxStatus.LOADING}
-          options={trangThaiDonVi}
+          options={trangThaiTruong}
         />
       </Form.Item>
 
@@ -177,7 +174,7 @@ const Page = () => {
           size="small"
           onClick={() => {
             filterForm.resetFields();
-            onFilterChange({ namHoc: undefined, idDonVi: undefined });
+            onFilterChange({ namHoc: undefined });
             setOpenFilter(false);
           }}
         >
@@ -194,34 +191,34 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
-  const onClickUpdate = (record: IViewKpiDonVi) => {
-    dispatch(setSelectedKpiDonVi(record));
+  const onClickUpdate = (record: IViewKpiTruong) => {
+    dispatch(setSelectedKpiTruong(record));
     setIsModalView(false);
     setIsModalUpdate(true);
     setIsModalOpen(true);
   };
 
-  const onClickView = (record: IViewKpiDonVi) => {
-    dispatch(setSelectedKpiDonVi(record));
+  const onClickView = (record: IViewKpiTruong) => {
+    dispatch(setSelectedKpiTruong(record));
     setIsModalView(true);
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
 
-  const onClickDelete = (record: IViewKpiDonVi) => {
+  const onClickDelete = (record: IViewKpiTruong) => {
     console.log(record);
     Modal.confirm({
-      title: `Xóa Kpi ${record.kpi} của ${record.donVi}?`,
+      title: `Xóa Kpi ${record.kpi} ?`,
       okText: 'Xóa',
       okType: 'danger',
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await dispatch(deleteKpiDonVi(record.id)).unwrap();
+          await dispatch(deleteKpiTruong(record.id)).unwrap();
           toast.success('Xóa thành công!');
-          dispatch(getAllKpiDonVi(query));
-          dispatch(getListTrangThaiKpiDonVi());
-          dispatch(getListNamHocKpiDonVi());
+          dispatch(getAllKpiTruong(query));
+          dispatch(getListTrangThaiKpiTruong());
+          dispatch(getListNamHocKpiTruong());
         } catch (error: any) {
           toast.error(error?.response?.message || 'Xóa thất bại!');
         }
@@ -229,12 +226,16 @@ const Page = () => {
     });
   };
 
-  const columns: IColumn<IViewKpiDonVi>[] = [
+  const columns: IColumn<IViewKpiTruong>[] = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
+      key: 'linhVuc',
+      dataIndex: 'linhVuc',
+      title: 'Lĩnh Vực'
+    },
+    {
+      key: 'chienLuoc',
+      dataIndex: 'chienLuoc',
+      title: 'Mục tiêu chiến lược'
     },
     {
       key: 'kpi',
@@ -261,6 +262,11 @@ const Page = () => {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
       title: 'Kết quả thực tế'
+    },
+    {
+      key: 'namHoc',
+      dataIndex: 'namHoc',
+      title: 'Năm học'
     },
     {
       key: 'trangThai',
@@ -351,7 +357,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách KPI Đơn vị"
+      title="Danh sách KPI Trường"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -369,20 +375,6 @@ const Page = () => {
               onChange={(e) => handleDebouncedSearch(e.target.value)}
               className="max-w-[250px]"
             />
-            <Form.Item name="idDonVi" noStyle>
-              <Select
-                placeholder="Tất cả đơn vị"
-                style={{ width: 180 }}
-                allowClear
-                options={listPhongBan?.map(x => ({
-                  value: x.id,
-                  label: x.tenPhongBan
-                }))}
-                onChange={(value) => {
-                  onFilterChange({ idDonVi: value });
-                }}
-              />
-            </Form.Item>
           </div>
 
           <div className="flex items-center gap-2">
@@ -418,7 +410,7 @@ const Page = () => {
 
         <Form.Item>
           <div className="flex flex-row justify-center space-x-2">
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />} onClick={() => dispatch(getAllKpiDonVi(query))}>
+            <Button type="primary" htmlType="submit" icon={<SearchOutlined />} onClick={() => dispatch(getAllKpiTruong(query))}>
               Tìm kiếm
             </Button>
             <Button
@@ -428,7 +420,7 @@ const Page = () => {
               onClick={() => {
                 form.resetFields();
                 filterForm.resetFields();
-                onFilterChange({ Keyword: '', idDonVi: undefined, loaiKpi: undefined, trangThai: undefined });
+                onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined });
                 setSelectedRowKeys([]);
               }}
             >
@@ -454,9 +446,9 @@ const Page = () => {
         isView={isView}
         setIsModalOpen={setIsModalOpen}
         onSuccess={() => {
-          dispatch(getAllKpiDonVi(query));
-          dispatch(getListTrangThaiKpiDonVi());
-          dispatch(getListNamHocKpiDonVi());
+          dispatch(getAllKpiTruong(query));
+          dispatch(getListTrangThaiKpiTruong());
+          dispatch(getListNamHocKpiTruong());
         }}
       />
     </Card>

@@ -16,7 +16,7 @@ export type IViewKpiCaNhan = {
     kpi: string,
     mucTieu: string,
     trongSo: string,
-    loaiKPI: number,
+    loaiKpi: number,
     namHoc?: string,
     nhanSu: string,
     idNhanSu?: number,

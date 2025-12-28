@@ -88,7 +88,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
             {actions}
           </Space.Compact>
         );
-
+        if (actions.length === 0) return null;
         return (
           <Popover
             key={index}

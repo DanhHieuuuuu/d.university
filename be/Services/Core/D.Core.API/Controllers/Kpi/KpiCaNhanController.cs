@@ -55,6 +55,26 @@ namespace D.Core.API.Controllers.Kpi
             }
         }
 
+
+        /// <summary>
+        /// Danh sách  Kpi Cá Nhân kê khai
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("kpi-canhan/find-ke-khai")]
+        public async Task<ResponseAPI> GetAllKpiKeKhaiCaNhan([FromQuery] FilterKpiKeKhaiCaNhanDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
         /// <summary>
         /// Cập nhật Kpi Cá Nhân
         /// </summary>

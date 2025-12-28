@@ -176,11 +176,36 @@ const Page = () => {
     { key: 'kpi', dataIndex: 'kpi', title: 'Tên KPI' },
     { key: 'nhanSu', dataIndex: 'nhanSu', title: 'Nhân sự' },
     {
-      key: 'trangThai', dataIndex: 'trangThai', title: 'Trạng thái',
-      render: val => {
-        const s = KpiTrangThaiConst.get(val);
-        return s ? <Tag color={s.color}>{s.text}</Tag> : null;
-      }
+      key: 'mucTieu',
+      dataIndex: 'mucTieu',
+      title: 'Mục tiêu'
+    },
+    {
+      key: 'trongSo',
+      dataIndex: 'trongSo',
+      title: 'Trọng số'
+    },
+    {
+      key: 'loaiKpi',
+      dataIndex: 'loaiKpi',
+      title: 'Loại KPI',
+      render: (value: number) => KpiLoaiConst.getName(value),
+    },
+    {
+      key: 'ketQuaThucTe',
+      dataIndex: 'ketQuaThucTe',
+      title: 'Kết quả thực tế'
+    },
+    {
+      key: 'trangThai',
+      dataIndex: 'trangThai',
+      title: 'Trạng thái',
+      render: (value: number) => {
+        const status = KpiTrangThaiConst.get(value);
+        return status ? (
+          <Tag color={status.color}>{status.text}</Tag>
+        ) : null;
+      },
     },
   ];
 

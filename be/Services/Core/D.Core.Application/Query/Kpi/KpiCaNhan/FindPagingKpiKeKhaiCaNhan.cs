@@ -5,21 +5,21 @@ using D.DomainBase.Dto;
 
 namespace D.Core.Application.Query.Kpi.KpiCaNhan
 {
-    public class FindPagingKpiCaNhan : IQueryHandler<FilterKpiCaNhanDto, PageResultDto<KpiCaNhanDto>>
+    public class FindPagingKpiKeKhaiCaNhan : IQueryHandler<FilterKpiKeKhaiCaNhanDto, PageResultDto<KpiCaNhanDto>>
     {
         private readonly IKpiCaNhanService _service;
 
-        public FindPagingKpiCaNhan(IKpiCaNhanService kpiCaNhanService)
+        public FindPagingKpiKeKhaiCaNhan(IKpiCaNhanService kpiCaNhanService)
         {
             _service = kpiCaNhanService;
         }
 
         public Task<PageResultDto<KpiCaNhanDto>> Handle(
-            FilterKpiCaNhanDto request,
+            FilterKpiKeKhaiCaNhanDto request,
             CancellationToken cancellationToken
         )
         {
-            return _service.GetAllKpiCaNhan(request);
+            return _service.FindPagingKpiCaNhanKeKhai(request);
         }
     }
 }
