@@ -182,7 +182,7 @@ const HomePage: React.FC = () => {
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+          <Card variant="borderless" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
             <Statistic
               title={<span style={{ color: 'white' }}>Tổng Nhân Sự</span>}
               value={statsData.totalStaff}
@@ -200,7 +200,7 @@ const HomePage: React.FC = () => {
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+          <Card variant="borderless" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
             <Statistic
               title={<span style={{ color: 'white' }}>Tổng Sinh Viên</span>}
               value={statsData.totalStudents}
@@ -218,7 +218,7 @@ const HomePage: React.FC = () => {
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
+          <Card variant="borderless" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
             <Statistic
               title={<span style={{ color: 'white' }}>Tổng Môn Học</span>}
               value={statsData.totalCourses}
@@ -236,7 +236,7 @@ const HomePage: React.FC = () => {
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}>
+          <Card variant="borderless" style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }}>
             <Statistic
               title={<span style={{ color: 'white' }}>Tổng Khoa</span>}
               value={statsData.totalFaculties}
@@ -250,13 +250,13 @@ const HomePage: React.FC = () => {
       {/* Charts Row */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} lg={16}>
-          <Card title="Số lượng sinh viên theo khoa" bordered={false}>
+          <Card title="Số lượng sinh viên theo khoa" variant="borderless">
             <Column {...columnConfig} />
           </Card>
         </Col>
 
         <Col xs={24} lg={8}>
-          <Card title="Phân bố nhân sự theo chức vụ" bordered={false}>
+          <Card title="Phân bố nhân sự theo chức vụ" variant="borderless">
             <Pie {...pieConfig} />
           </Card>
         </Col>
@@ -265,7 +265,7 @@ const HomePage: React.FC = () => {
       {/* Recent Activities */}
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Card title="Hoạt động gần đây" bordered={false}>
+          <Card title="Hoạt động gần đây" variant="borderless">
             <Table columns={activityColumns} dataSource={recentActivities} pagination={false} />
           </Card>
         </Col>

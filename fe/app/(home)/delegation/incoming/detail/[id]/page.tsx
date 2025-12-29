@@ -114,7 +114,7 @@ export default function DetailDoanVaoPage() {
 
   return (
     <Card
-      bordered={false}
+      variant="borderless"
       className="h-full"
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
