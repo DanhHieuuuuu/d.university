@@ -1,6 +1,8 @@
 ﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Dtos.SinhVien.Auth;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace D.Core.API.Controllers.SinhVienController
@@ -43,6 +45,25 @@ namespace D.Core.API.Controllers.SinhVienController
         /// <returns></returns>
         [HttpGet("get-all")]
         public async Task<ResponseAPI> GetAll(SvSinhVienGetAllRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Chi tiết sinh viên bằng mssv
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("detail")]
+        public async Task<ResponseAPI> FindByMssv(FindByMssvDto dto)
         {
             try
             {
@@ -113,12 +134,11 @@ namespace D.Core.API.Controllers.SinhVienController
         }
 
         /// <summary>
-        /// Chi tiết sinh viên bằng mssv
+        /// Đăng nhập Sinh viên
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpGet("detail")]
-        public async Task<ResponseAPI> FindByMssv(FindByMssvDto dto)
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<ResponseAPI> Login([FromBody] SvLoginRequestDto dto)
         {
             try
             {
@@ -130,5 +150,41 @@ namespace D.Core.API.Controllers.SinhVienController
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Đăng xuất
+        /// </summary>
+        [HttpGet("logout")]
+        public async Task<ResponseAPI> Logout()
+        {
+            try
+            {
+                var dto = new SvLogoutRequestDto();
+                var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Refresh Token
+        /// </summary>
+        [HttpPost("refresh-token")]
+        public async Task<ResponseAPI> RefreshToken([FromBody] SvRefreshTokenRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }

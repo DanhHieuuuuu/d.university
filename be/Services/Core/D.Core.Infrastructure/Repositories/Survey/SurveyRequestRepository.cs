@@ -24,10 +24,10 @@ namespace D.Core.Infrastructure.Repositories.Survey
         public async Task<KsSurveyRequest> GetDetailWithNavigationsAsync(int id)
         {
             return await TableNoTracking
-                .Include(x => x.Targets)
-                .Include(x => x.Criterias)
-                .Include(x => x.Questions)
-                .ThenInclude(q => q.Answers)
+                .Include(x => x.Targets.Where(t => t.Deleted == false))
+                .Include(x => x.Criterias.Where(c => c.Deleted == false))
+                .Include(x => x.Questions.Where(q => q.Deleted == false).OrderBy(q => q.ThuTu))
+                .ThenInclude(q => q.Answers.Where(a => a.Deleted == false).OrderBy(a => a.ThuTu))
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 

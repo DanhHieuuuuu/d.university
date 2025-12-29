@@ -115,17 +115,64 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
             _mapper.Map(dto, entity);
 
-            entity.Targets.Clear();
+            var oldTargets = entity.Targets.ToList(); // .ToList() để copy ra mảng tạm, tránh lỗi
+            foreach (var item in oldTargets)
+            {
+                // Gọi Repo xóa item này đi
+                // Lưu ý: Ông cần đảm bảo UnitOfWork có repo này hoặc dùng Context delete trực tiếp
+                _unitOfWork.iKsSurveyTargetRepository.Delete(item);
+            }
+            entity.Targets.Clear(); // Xóa trong list memory
+
+            // Bước B: Thêm cái mới
             if (dto.Targets != null)
-                foreach (var t in dto.Targets) entity.Targets.Add(_mapper.Map<KsSurveyTarget>(t));
+            {
+                foreach (var t in dto.Targets)
+                {
+                    var newTarget = _mapper.Map<KsSurveyTarget>(t);
+                    // newTarget.Id = 0; // Đảm bảo ID = 0 để nó hiểu là thêm mới
+                    entity.Targets.Add(newTarget);
+                }
+            }
 
+            // =======================================================================
+            // 3. XỬ LÝ CRITERIA (Tiêu chí)
+            // =======================================================================
+            var oldCriterias = entity.Criterias.ToList();
+            foreach (var item in oldCriterias)
+            {
+                _unitOfWork.iKsSurveyCriteriaRepository.Delete(item);
+            }
             entity.Criterias.Clear();
-            if (dto.Criterias != null)
-                foreach (var c in dto.Criterias) entity.Criterias.Add(_mapper.Map<KsSurveyCriteria>(c));
 
+            if (dto.Criterias != null)
+            {
+                foreach (var c in dto.Criterias)
+                {
+                    entity.Criterias.Add(_mapper.Map<KsSurveyCriteria>(c));
+                }
+            }
+
+            // =======================================================================
+            // 4. XỬ LÝ QUESTION (Câu hỏi) & ANSWER (Đáp án)
+            // =======================================================================
+            var oldQuestions = entity.Questions.ToList();
+            foreach (var item in oldQuestions)
+            {
+                // Khi xóa Question, nhớ đảm bảo trong SQL đã set "ON DELETE CASCADE" cho bảng Answers
+                // Nếu không là phải loop xóa Answer trước đấy.
+                _unitOfWork.iKsSurveyQuestionRepository.Delete(item);
+            }
             entity.Questions.Clear();
+
             if (dto.Questions != null)
-                foreach (var q in dto.Questions) entity.Questions.Add(_mapper.Map<KsSurveyQuestion>(q));
+            {
+                foreach (var q in dto.Questions)
+                {
+                    // Map câu hỏi + câu trả lời con bên trong
+                    entity.Questions.Add(_mapper.Map<KsSurveyQuestion>(q));
+                }
+            }
 
             _unitOfWork.iKsSurveyRequestRepository.Update(entity);
 

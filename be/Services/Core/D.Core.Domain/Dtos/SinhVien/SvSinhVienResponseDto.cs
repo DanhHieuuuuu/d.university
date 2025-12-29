@@ -2,11 +2,11 @@
 {
     public class SvSinhVienResponseDto
     {
-        public int? IdSinhVien { get; set; }
+        public int IdSinhVien { get; set; }
         public string? Mssv { get; set; }
         public string? HoDem { get; set; }
         public string? Ten { get; set; }
-        public string HoTen => $"{HoDem} {Ten}".Trim();
+        public string HoTen { get; set; }
         public DateTime? NgaySinh { get; set; }
         public string? NoiSinh { get; set; }
         public int? GioiTinh { get; set; }
@@ -17,6 +17,7 @@
         public string? SoDienThoai { get; set; }
         public string? Email { get; set; }
 
+        public string? Email2 { get; set; }
         public int? KhoaHoc { get; set; }
         public int? Khoa { get; set; }
         public int? Nganh { get; set; }
