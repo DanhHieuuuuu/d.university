@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Breadcrumb, Button, Card, Form, Input, Modal, TableProps } from 'antd';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { Breadcrumb, Button, Card, Form, Input, Modal } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
 import { KeyIcon } from '@components/custom-icon';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -9,6 +10,8 @@ import { IAction, IColumn } from '@models/common/table.model';
 import AppTable from '@components/common/Table';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import { IQueryRole, IRole } from '@models/role';
 import {
@@ -20,7 +23,6 @@ import {
 } from '@redux/feature/roleConfigSlice';
 import CreateRoleModal from './(dialog)/create-or-update';
 import RolePermissionModal from './(dialog)/update-permission';
-import { toast } from 'react-toastify';
 
 const breadcrumbItems = [
   {
@@ -219,4 +221,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.UserMenuPermission);
