@@ -54,6 +54,11 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
           return renderStatusColumn(value, col, record);
         }
       };
+    } else {
+      return {
+        ...col,
+        minWidth: col.minWidth ?? 50
+      };
     }
 
     return col;
@@ -121,7 +126,14 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
 
   return (
     <>
-      <Table<T> size="small" columns={newColumns} scroll={{ x: 'max-content' }} rowSelection={rowSelection} {...rest} />
+      <Table<T>
+        size="small"
+        tableLayout="fixed"
+        columns={newColumns}
+        scroll={{ x: 'max-content' }}
+        rowSelection={rowSelection}
+        {...rest}
+      />
 
       <Modal width={250} title="Cấu hình hiển thị" open={openConfig} onCancel={closePopupConfig} footer={null}>
         <Checkbox.Group

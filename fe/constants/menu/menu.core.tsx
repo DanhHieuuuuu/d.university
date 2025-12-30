@@ -40,6 +40,7 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Danh mục',
     routerLink: '/list',
+    permissionKeys: [PermissionCoreConst.UserMenuAdmin],
     icon: <BarsOutlined />,
     items: [
       {
