@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useEffect, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Select } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -33,6 +33,7 @@ const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem } = useAppSelector((state) => state.nhanSuState);
+  const { phongBan } = useAppSelector((state) => state.danhmucState);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
@@ -172,9 +173,18 @@ const Page = () => {
       }
     >
       <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-2 gap-2">
           <Form.Item<IQueryNhanSu> label="Cccd:" name="cccd">
             <Input onChange={(e) => handleSearch(e)} />
+          </Form.Item>
+          <Form.Item<IQueryNhanSu> label="Phòng ban" name="idPhongBan">
+            <Select
+              allowClear
+              options={phongBan.$list.data?.map((item) => {
+                return { label: item.tenPhongBan, value: item.id };
+              })}
+              onChange={(val) => onFilterChange({ idPhongBan: val })}
+            />
           </Form.Item>
         </div>
         <Form.Item>

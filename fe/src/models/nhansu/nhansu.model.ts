@@ -3,6 +3,7 @@ import { ICreateNsQuanHe } from './quanHeGiaDinh.model';
 
 export type IQueryNhanSu = IQueryPaging & {
   cccd?: string;
+  idPhongBan?: number;
 };
 
 export type IViewNhanSu = {
