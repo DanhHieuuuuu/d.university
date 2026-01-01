@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
+import { Button, Card, Checkbox, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
   PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
   EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined
@@ -8,40 +8,53 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getKpiCaNhanKeKhai, getListTrangThaiKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getKpiCaNhanKeKhai, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, updateKetQuaThucTeKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
+
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KpiLoaiConst } from '../../const/kpiType.const';
+import { KPI_ORDER, KpiLoaiConst } from '../../const/kpiType.const';
 import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
 import { toast } from 'react-toastify';
 import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUser } from '@redux/feature/userSlice';
 import { buildKpiGroupedTable, KpiTableRow } from '@helpers/kpi/kpi.helper';
+import { LoaiCongThuc } from '../../const/loaiCongThuc.enum';
+import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
+import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
+import { KpiRoleConst } from '../../const/kpiRole.const';
 
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
-  const watchIdPhongBan = Form.useWatch('idPhongBan', form);
+  const { processUpdateStatus } = useKpiStatusAction();
 
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
-  const { list: listNhanSu } = useAppSelector((state) => state.userState);
-  const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBan.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.caNhan);
+  const { data: roleByUser, status: roleByUserStatus } = useAppSelector((state) => state.kpiState.meta.role.caNhan);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
   const [isView, setIsModalView] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [ketQuaMap, setKetQuaMap] = useState<Record<number, number | undefined>>({});
 
-  const tableData = useMemo(() => buildKpiGroupedTable<IViewKpiCaNhan>(list || []), [list]);
+  const tableData = useMemo(() => {
+    const sortedList = [...(list || [])].sort(
+      (a, b) =>
+        KPI_ORDER.indexOf(a.loaiKpi) -
+        KPI_ORDER.indexOf(b.loaiKpi)
+    );
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
+    return buildKpiGroupedTable<IViewKpiCaNhan>(sortedList);
+  }, [list]);
+
+  const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
     initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getKpiCaNhanKeKhai(newQuery)),
@@ -52,29 +65,73 @@ const Page = () => {
     dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
     dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
     dispatch(getListTrangThaiKpiCaNhan());
+    dispatch(getListKpiRoleByUser());
   }, [dispatch]);
 
-  const approveSelected = () => {
-    const ids = selectedRowKeys.map(Number);
-    const kpiToApprove = list.filter(
-      (item) => ids.includes(item.id) && item.trangThai === KpiTrangThaiConst.DE_XUAT
-    );
-    if (!kpiToApprove.length) return toast.error('Chỉ KPI "Đề xuất" mới được phê duyệt.');
-    Modal.confirm({
-      title: 'Phê duyệt hàng loạt',
-      content: `Xác nhận phê duyệt ${kpiToApprove.length} KPI đã chọn?`,
-      okText: 'Duyệt',
-      onOk: async () => {
-        try {
-          await dispatch(updateTrangThaiKpiCaNhan({ ids, trangThai: KpiTrangThaiConst.PHE_DUYET })).unwrap();
-          toast.success('Phê duyệt thành công!');
-          setSelectedRowKeys([]);
-          dispatch(getKpiCaNhanKeKhai(query));
-        } catch { toast.error('Phê duyệt thất bại!'); }
-      }
+
+  const approveSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DA_KE_KHAI],
+      invalidMsg: 'Chỉ KPI "Đã kê khai" mới được gửi duyệt',
+      confirmTitle: 'Gửi duyệt KPI',
+      confirmMessage: 'Xác nhận gửi duyệt các KPI đã chọn?',
+      successMsg: 'Gửi duyệt thành công',
+      nextStatus: KpiTrangThaiConst.DA_GUI_CHAM,
+      updateAction: updateTrangThaiKpiCaNhan,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getKpiCaNhanKeKhai(query));
+      },
     });
+
+
+  const updateKetQua = (id: number, value?: number) => {
+    setKetQuaMap(prev => ({
+      ...prev,
+      [id]: value
+    }));
   };
-  const scoreSelected = () => toast.info('Chức năng chấm KPI hàng loạt đang được cập nhật.');
+
+  const cancelApproveSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DA_GUI_CHAM],
+      invalidMsg: 'Chỉ KPI "Đã gửi chấm" mới được hủy duyệt',
+      confirmTitle: 'Hủy gửi duyệt KPI',
+      confirmMessage: 'Xác nhận hủy gửi duyệt các KPI đã chọn?',
+      successMsg: 'Hủy duyệt thành công',
+      nextStatus: KpiTrangThaiConst.DA_KE_KHAI,
+      updateAction: updateTrangThaiKpiCaNhan,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getKpiCaNhanKeKhai(query));
+      },
+    });
+
+  const handleSaveKetQua = async () => {
+    const selectedIds = new Set(selectedRowKeys.map(Number));
+    const items = Object.entries(ketQuaMap)
+      .filter(([id, v]) =>
+        v !== undefined && selectedIds.has(Number(id))
+      )
+      .map(([id, value]) => ({
+        id: Number(id),
+        ketQuaThucTe: value
+      }));
+
+    if (!items.length) {
+      toast.warning('Chọn KPI thay đổi cần lưu');
+      return;
+    }
+    try {
+      await dispatch(updateKetQuaThucTeKpiCaNhan({ items })).unwrap();
+      toast.success('Lưu kết quả thực tế thành công');
+      setKetQuaMap({});
+      setSelectedRowKeys([]);
+      dispatch(getKpiCaNhanKeKhai(query));
+    } catch {
+      toast.error('Lưu kết quả thất bại');
+    }
+  };
 
   const requiredSelect = (cb: () => void) => {
     if (!selectedRowKeys.length) return toast.warning('Vui lòng chọn ít nhất một KPI');
@@ -83,7 +140,7 @@ const Page = () => {
 
   const bulkActionItems: MenuProps['items'] = [
     { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
-    { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(scoreSelected) },
+    { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
   ];
 
   const filterContent = (
@@ -110,14 +167,8 @@ const Page = () => {
       }
     });
   };
-  const handlePhongBanChange = (value: number | undefined) => {
-    onFilterChange({ idPhongBan: value, idNhanSu: undefined });
-    form.setFieldValue('idNhanSu', undefined);
-    dispatch(getAllUser({ IdPhongBan: value, PageIndex: 1, PageSize: 2000 }));
-  };
-  const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => onFilterChange({ Keyword: value }), 500);
 
-  const hideMeta = (record: any) => record.rowType !== 'data' ? { props: { colSpan: 0 } } : undefined;
+  const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => onFilterChange({ Keyword: value }), 500);
 
   const columns: IColumn<KpiTableRow<IViewKpiCaNhan>>[] = [
     {
@@ -132,9 +183,9 @@ const Page = () => {
           return {
             children: (
               <div style={{
-                fontSize: 14, // Giảm từ 16 xuống 14
+                fontSize: 14,
                 fontWeight: 600,
-                textAlign: 'center', // Để left cho giống các hàng khác
+                textAlign: 'center',
                 color: '#0958d9',
               }}>
                 {KpiLoaiConst.getName(record.loaiKpi)}
@@ -184,8 +235,42 @@ const Page = () => {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
       title: 'Kết quả thực tế',
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
+      render: (val, record) => {
+        if (record.rowType !== 'data') {
+          return { props: { colSpan: 0 } };
+        }
+
+        const value = ketQuaMap[record.id] ?? val;
+
+        return (
+          <KetQuaInput
+
+            loaiCongThuc={record.loaiCongThuc}
+            value={value}
+            onChange={(v) => updateKetQua(record.id, v)}
+          />
+        );
+      },
     },
+    {
+      key: 'diemKpi',
+      dataIndex: 'diemKpi',
+      title: 'Điểm tự đánh giá',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'capTrenDanhGia',
+      dataIndex: 'capTrenDanhGia',
+      title: 'Cấp trên đánh giá',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'diemKpiCapTren',
+      dataIndex: 'diemKpiCapTren',
+      title: 'Điểm cấp trên',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+
     {
       key: 'trangThai',
       dataIndex: 'trangThai', title: 'Trạng thái',
@@ -198,8 +283,6 @@ const Page = () => {
 
   const actions: IAction[] = [
     { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
-    { label: 'Sửa', icon: <EditOutlined />, command: onClickUpdate, hidden: r => r.rowType !== 'data' },
-    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete, hidden: r => r.rowType !== 'data' }
   ];
 
   const rowSelection = {
@@ -230,19 +313,30 @@ const Page = () => {
               onChange={(e) => handleDebouncedSearch(e.target.value)}
               className="max-w-[250px]"
             />
-            <Form.Item name="idPhongBan" noStyle>
+            <Form.Item name="role" noStyle>
               <Select
-                placeholder="Tất cả đơn vị"
+                placeholder="Vị trí làm việc"
                 style={{ width: 180 }}
                 allowClear
-                options={listPhongBan?.map(x => ({ value: x.id, label: x.tenPhongBan }))}
-                onChange={handlePhongBanChange}
+                loading={roleByUserStatus === ReduxStatus.LOADING}
+                options={roleByUser?.map(r => ({
+                  value: r.role,
+                  label: KpiRoleConst.getName(r.role)
+                }))}
+                onChange={(value) => onFilterChange({ role: value })}
               />
             </Form.Item>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button icon={<SaveOutlined />}>Lưu kết quả</Button>
+            <Button
+              icon={<SaveOutlined />}
+              type="primary"
+              onClick={handleSaveKetQua}
+
+            >
+              Lưu kết quả
+            </Button>
             <Dropdown
               menu={{ items: bulkActionItems }}
               trigger={['click']}
@@ -286,6 +380,7 @@ const Page = () => {
                 form.resetFields();
                 filterForm.resetFields();
                 onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: undefined, trangThai: undefined });
+                setKetQuaMap({});
                 setSelectedRowKeys([]);
               }}
             >

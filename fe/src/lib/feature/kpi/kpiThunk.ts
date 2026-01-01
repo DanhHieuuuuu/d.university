@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { KpiService } from '@services/kpi.service';
-import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateTrangThaiKpiCaNhan, IUpdateKpiCaNhanThucTeList, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
+import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateTrangThaiKpiCaNhan, IUpdateKpiCaNhanThucTeList, IViewKpiCaNhan, IUpdateCapTrenDanhGiaList } from '@models/kpi/kpi-ca-nhan.model';
 import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import { ICreateKpiTruong, IQueryKpiTruong, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong } from '@models/kpi/kpi-truong.model';
@@ -112,6 +112,21 @@ export const updateKetQuaThucTeKpiCaNhan = createAsyncThunk(
     }
 );
 
+export const updateKetQuaCapTrenKpiCaNhan = createAsyncThunk(
+    'kpi/update-ketqua-captren-canhan',
+    async (payload: IUpdateCapTrenDanhGiaList, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.updateKetQuaCapTrenKpiCaNhan(payload);
+            return res;
+        } catch (error: any) {
+            return rejectWithValue(
+                error?.response?.data || {
+                    message: 'Cập nhật kết quả thực tế KPI thất bại'
+                }
+            );
+        }
+    }
+);
 
 //Kpi Don Vi
 export const getAllKpiDonVi = createAsyncThunk('kpi/list-donvi', async (payload?: IQueryKpiDonVi) => {
@@ -356,4 +371,11 @@ export const deleteKpiRole = createAsyncThunk('kpi-role/delete', async (ids: num
         });
     }
 }
+);
+
+export const getListKpiRoleByUser = createAsyncThunk(
+    'kpi-role/list-role-by-user',
+    async () => {
+        return await KpiService.getListKpiRoleByUser();
+    }
 );

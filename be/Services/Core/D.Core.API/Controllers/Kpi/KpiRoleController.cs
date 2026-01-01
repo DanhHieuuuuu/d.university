@@ -1,4 +1,5 @@
 ﻿using D.ControllerBase;
+using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +87,25 @@ namespace D.Core.API.Controllers.Kpi
             {
                 await _mediator.Send(dto);
                 return new("Đã xóa Role KPI thành công!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Danh sách Kpi Role của User
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("kpi-role/list-role-by-user")]
+        public async Task<ResponseAPI> GetListRoleByUser([FromQuery] GetKpiRoleByUserRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
             }
             catch (Exception ex)
             {

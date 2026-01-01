@@ -124,12 +124,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     PhongBan = nhanSus[kpi.IdNhanSu].TenPhongBan,
                     MucTieu = kpi.MucTieu,
                     TrongSo = kpi.TrongSo,
+                    Role = kpi.Role,
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.Status,
-                    TrangThaiText = kpi.Status.HasValue && KpiStatus.Names.ContainsKey(kpi.Status.Value)
-                        ? KpiStatus.Names[kpi.Status.Value]
-                        : "Không xác định",
-                    KetQuaThucTe = kpi.KetQuaThucTe
+                    LoaiCongThuc = kpi.LoaiCongThuc,
+                    KetQuaThucTe = kpi.KetQuaThucTe,
+                    CapTrenDanhGia = kpi.CapTrenDanhGia,
+                    DiemKpiCapTren = kpi.DiemKpiCapTren,
+                    DiemKpi = kpi.DiemKpi
                 };
 
             var totalCount = query.Count();
@@ -175,6 +177,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     && (dto.LoaiKpi == null || kpi.LoaiKPI == dto.LoaiKpi)
                     && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
                     && (dto.TrangThai == null || kpi.Status == dto.TrangThai)
+                    && (string.IsNullOrEmpty(dto.Role) || kpi.Role == dto.Role)
                 )
                 .Select(kpi => new KpiCaNhanDto
                 {
@@ -191,9 +194,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         : string.Empty,
                     MucTieu = kpi.MucTieu,
                     TrongSo = kpi.TrongSo,
+                    Role = kpi.Role,
                     NamHoc = kpi.NamHoc,
+                    LoaiCongThuc = kpi.LoaiCongThuc,
                     TrangThai = kpi.Status,
-                    KetQuaThucTe = kpi.KetQuaThucTe
+                    KetQuaThucTe = kpi.KetQuaThucTe,
+                    CapTrenDanhGia = kpi.CapTrenDanhGia,
+                    DiemKpiCapTren = kpi.DiemKpiCapTren,
+                    DiemKpi = kpi.DiemKpi
                 });
 
             var totalCount = await query.CountAsync();
@@ -248,6 +256,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     if (item.KetQuaThucTe.HasValue)
                     {
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
+                        kpi.DiemKpi = item.DiemKpi;
                         kpi.Status = KpiStatus.Declared;
 
                         _unitOfWork.iKpiCaNhanRepository.Update(kpi);
@@ -322,6 +331,40 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             }
 
             _unitOfWork.iKpiCaNhanRepository.SaveChange();
+        }
+
+
+        public void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiCaNhanListDto dto)
+        {
+            using var transaction = _unitOfWork.Database.BeginTransaction();
+            try
+            {
+                foreach (var item in dto.Items)
+                {
+                    var kpi = _unitOfWork.iKpiCaNhanRepository.Table
+                        .FirstOrDefault(x => x.Id == item.Id && !x.Deleted);
+
+                    if (kpi == null)
+                        throw new Exception("Không tìm thấy KPI cá nhân");
+
+                    if (item.KetQuaCapTren.HasValue)
+                    {
+                        kpi.CapTrenDanhGia = item.KetQuaCapTren;
+                        kpi.DiemKpiCapTren = item.DiemKpiCapTren;
+                        kpi.Status = KpiStatus.Evaluated;
+
+                        _unitOfWork.iKpiCaNhanRepository.Update(kpi);
+                    }
+                }
+
+                _unitOfWork.iKpiCaNhanRepository.SaveChange();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }

@@ -70,6 +70,14 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     dataIndex: '__config',
     width: 50,
     fixed: 'right',
+    onCell: (_record: T, index?: number) => {
+    const rowStyle =
+      typeof rest.onRow === 'function'
+        ? rest.onRow(_record)?.style
+        : undefined;
+
+    return rowStyle ? { style: rowStyle } : {};
+  },
     render: (_, record, index) => {
       if (!listActions?.length) return null;
 

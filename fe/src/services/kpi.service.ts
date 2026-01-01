@@ -1,7 +1,7 @@
 import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseList, IResponseItem } from '@models/common/response.model';
-import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateKpiCaNhanThucTeList, IUpdateTrangThaiKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
+import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateCapTrenDanhGiaList, IUpdateKpiCaNhan, IUpdateKpiCaNhanThucTeList, IUpdateTrangThaiKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import { ICreateKpiTruong, IQueryKpiTruong, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
@@ -127,6 +127,28 @@ const updateKetQuaThucTeKpiCaNhan = async (
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả thực tế');
+    return Promise.reject(err);
+  }
+};
+
+const updateKetQuaCapTrenKpiCaNhan = async (
+  body: IUpdateCapTrenDanhGiaList
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiCaNhanEndpoint}/update-ket-qua-cap-tren`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Cập nhật kết quả đánh giá thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả đánh giá');
     return Promise.reject(err);
   }
 };
@@ -418,6 +440,22 @@ const deleteKpiRole = async (ids: number[]) => {
   });
   return res.data;
 };
+
+export const getListKpiRoleByUser = async () => {
+  try {
+    const res = await axios.get(
+      `${apiKpiRoleEndpoint}/list-role-by-user`
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject(res.data?.message);
+    }
+
+    return res.data.data;
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
 export const KpiService = {
   getListKpiCaNhan,
   getListKpiCaNhanKeKhai,
@@ -427,6 +465,7 @@ export const KpiService = {
   getListTrangThaiKpiCaNhan,
   updateTrangThaiKpiCaNhan,
   updateKetQuaThucTeKpiCaNhan,
+  updateKetQuaCapTrenKpiCaNhan,
   getListKpiDonVi,
   createKpiDonVi,
   updateKpiDonVi,
@@ -447,4 +486,5 @@ export const KpiService = {
   createKpiRole,
   updateKpiRole,
   deleteKpiRole,
+  getListKpiRoleByUser
 };

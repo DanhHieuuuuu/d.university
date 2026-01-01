@@ -1,3 +1,4 @@
+import { LoaiCongThuc } from '@/app/(home)/kpi/const/loaiCongThuc.enum';
 import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryKpiCaNhan = IQueryPaging & {
@@ -23,8 +24,12 @@ export type IViewKpiCaNhan = {
     trangThai: number,
     phongBan?:string,
     ketQuaThucTe?: number,
+    loaiCongThuc?:LoaiCongThuc
     role?: string,
     linhVuc?: string,
+    diemKpi?: number,
+    capTrenDanhGia?: number,
+    diemKpiCapTren?: number,
 };
 
 export type ICreateKpiCaNhan = {
@@ -57,10 +62,21 @@ export type IViewListRole = {
 export type IUpdateKpiCaNhanThucTe = {
   id: number,
   ketQuaThucTe?: number,
+  diemKpi?:number
 };
 export interface IUpdateKpiCaNhanThucTeList {
   items: IUpdateKpiCaNhanThucTe[],
 };
+
+export type IUpdateCapTrenDanhGia = {
+  id: number,
+  ketQuaCapTren?: number,
+  diemKpiCapTren?:number
+};
+export interface IUpdateCapTrenDanhGiaList {
+  items: IUpdateCapTrenDanhGia[],
+};
+
 
 export interface IViewNhanSu {
   idNhanSu?: number,

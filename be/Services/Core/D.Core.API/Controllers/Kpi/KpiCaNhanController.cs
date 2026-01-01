@@ -152,6 +152,25 @@ namespace D.Core.API.Controllers.Kpi
         }
 
         /// <summary>
+        /// Cập nhật kết quả cấp trên Kpi Cá Nhân
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("kpi-canhan/update-ket-qua-cap-tren")]
+        public async Task<ResponseAPI> UpdateKetQuaCapTren([FromBody] UpdateKetQuaCapTrenKpiCaNhanListDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new("Đã thêm kết quả thực tế thành công!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Danh sách trạng thái Kpi Cá Nhân
         /// </summary>
         /// <param name="dto"></param>

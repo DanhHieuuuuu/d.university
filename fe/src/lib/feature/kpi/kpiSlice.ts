@@ -17,9 +17,12 @@ import {
     deleteKpiTruong,
     getListTrangThaiKpiTruong,
     getListNamHocKpiTruong,
-    getKpiCaNhanKeKhai
+    getKpiCaNhanKeKhai,
+    getListKpiRoleByUser,
+    updateKetQuaCapTrenKpiCaNhan
 } from './kpiThunk';
 import { IViewKpiTruong } from '@models/kpi/kpi-truong.model';
+
 
 interface MetaList<T> {
     status: ReduxStatus;
@@ -42,6 +45,9 @@ interface KpiState {
             donVi: MetaList<{ namHoc: string }>;
             truong: MetaList<{ value: number; label: string }>;
         };
+        role: {
+            caNhan: MetaList<{role: string}>
+        }
     }
 }
 
@@ -85,6 +91,9 @@ const initialState: KpiState = {
             donVi: { status: ReduxStatus.IDLE, data: [] },
             truong: { status: ReduxStatus.IDLE, data: [] },
         },
+        role: {
+            caNhan: { status: ReduxStatus.IDLE, data: [] },
+        }
     },
 
 };
@@ -220,6 +229,13 @@ const kpiSlice = createSlice({
                 state.meta.trangThai.caNhan.status = ReduxStatus.SUCCESS;
                 state.meta.trangThai.caNhan.data = action.payload;
             })
+            .addCase(getListKpiRoleByUser.pending, (state) => {
+                state.meta.role.caNhan.status = ReduxStatus.LOADING;
+            })
+            .addCase(getListKpiRoleByUser.fulfilled, (state, action) => {
+                state.meta.role.caNhan.status = ReduxStatus.SUCCESS;
+                state.meta.role.caNhan.data = action.payload;
+            })
             .addCase(updateTrangThaiKpiCaNhan.pending, (state) => {
                 state.kpiCaNhan.$update.status = ReduxStatus.LOADING;
             })
@@ -240,6 +256,15 @@ const kpiSlice = createSlice({
                 state.kpiCaNhan.$update.status = ReduxStatus.FAILURE;
             })
 
+            .addCase(updateKetQuaCapTrenKpiCaNhan.pending, (state) => {
+                state.kpiCaNhan.$update.status = ReduxStatus.LOADING;
+            })
+            .addCase(updateKetQuaCapTrenKpiCaNhan.fulfilled, (state) => {
+                state.kpiCaNhan.$update.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(updateKetQuaCapTrenKpiCaNhan.rejected, (state) => {
+                state.kpiCaNhan.$update.status = ReduxStatus.FAILURE;
+            })
             //Kpi Don Vi
             .addCase(getAllKpiDonVi.pending, (state) => {
                 state.kpiDonVi.$list.status = ReduxStatus.LOADING;

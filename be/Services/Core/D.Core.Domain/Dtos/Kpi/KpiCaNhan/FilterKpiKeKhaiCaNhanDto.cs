@@ -16,5 +16,7 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
         public int? IdPhongBan { get; set; }
         [FromQuery(Name = "trangthai")]
         public int? TrangThai { get; set; }
+        [FromQuery(Name = "role")]
+        public string? Role { get; set; }
     }
 }

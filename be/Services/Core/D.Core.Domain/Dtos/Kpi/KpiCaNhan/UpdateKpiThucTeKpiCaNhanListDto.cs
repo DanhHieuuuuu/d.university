@@ -6,6 +6,7 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
     {
         public int Id { get; set; }
         public decimal? KetQuaThucTe { get; set; }
+        public decimal? DiemKpi { get; set; }
     }
     public class UpdateKpiThucTeKpiCaNhanListDto : ICommand
     {

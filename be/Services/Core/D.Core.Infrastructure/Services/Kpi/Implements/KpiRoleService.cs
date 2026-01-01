@@ -1,28 +1,22 @@
 ﻿using AutoMapper;
-using D.ControllerBase.Exceptions;
-using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
+using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
-using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Domain.Entities.Kpi;
-using D.Core.Infrastructure.Services.Hrm.Abstracts;
-using D.Core.Infrastructure.Services.Hrm.Implements;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
+using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
 {
     public class KpiRoleService : ServiceBase, IKpiRoleService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _contextAccessor;
 
         public KpiRoleService(
             ILogger<KpiRoleService> logger,
@@ -33,6 +27,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
+            _contextAccessor = contextAccessor;
         }
 
         public void CreateKpiRole(CreateKpiRoleDto dto)
@@ -143,6 +138,24 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             };
         }
 
+        public List<GetKpiRoleByUserResponseDto> GetRoleByUserId()
+        {
+            _logger.LogInformation($"{nameof(GetRoleByUserId)} ");
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var roles = _unitOfWork.iKpiRoleRepository
+                        .TableNoTracking
+                        .Where(x => x.IdNhanSu == userId)
+                        .Select(x => x.Role)
+                        .Distinct()
+                        .OrderByDescending(x => x)
+                        .ToList();
+            var result = roles.Select(y => new GetKpiRoleByUserResponseDto
+            {
+                Role = y
+            }).ToList();
+
+            return result;
+        }
         public void UpdateKpiRole(UpdateKpiRoleDto dto)
         {
             _logger.LogInformation(
