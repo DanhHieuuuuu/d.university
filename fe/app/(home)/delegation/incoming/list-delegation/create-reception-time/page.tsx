@@ -21,8 +21,8 @@ const CreateReceptionTimePage: React.FC = () => {
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
-
-      const payload: ICreateReceptionTime = {
+      
+      const data: ICreateReceptionTime = {
         delegationIncomingId,
         date: values.date.format('YYYY-MM-DD'),
         startDate: values.startTime.format('HH:mm:ss'),
@@ -31,6 +31,9 @@ const CreateReceptionTimePage: React.FC = () => {
         totalPerson: values.totalPerson,
         address: values.address
       };
+      const payload: ICreateReceptionTimeList = {
+        items: [data],
+      };      
 
       await dispatch(createReceptionTime(payload)).unwrap();
       toast.success('Tạo thời gian tiếp đoàn thành công!');
