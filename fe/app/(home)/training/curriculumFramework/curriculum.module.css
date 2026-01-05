@@ -53,11 +53,11 @@
 
 .semesterCollapse :global(.ant-collapse-item) {
   margin-bottom: 12px;
-  border: 1px solid #d6e4ff;
+  border: 2px solid #91caff !important;
   border-radius: 8px !important;
   overflow: hidden;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   transition: all 0.3s ease;
 }
 
@@ -68,6 +68,10 @@
 
 .semesterCollapse :global(.ant-collapse-item-active) {
   border-color: #1890ff;
+}
+
+.semesterCollapse :global(.ant-collapse-item:last-child) {
+  border-bottom: 2px solid #91caff !important;
 }
 
 .semesterCollapse :global(.ant-collapse-header) {

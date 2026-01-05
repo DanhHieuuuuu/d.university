@@ -22,19 +22,19 @@ const CreateReceptionTimePage: React.FC = () => {
     console.log('FORM VALUES', values);
     try {
       setLoading(true);
-
-      //Create ReceptionTime
-      const payload = {
-        items: values.receptionTimes.map((item: any) => ({
-          date: item.date.format('YYYY-MM-DD'),
-          startDate: item.startTime.format('HH:mm:ss'),
-          endDate: item.endTime.format('HH:mm:ss'),
-          content: item.content,
-          totalPerson: item.totalPerson,
-          address: item.address,
-          delegationIncomingId
-        }))
+      
+      const data: ICreateReceptionTime = {
+        delegationIncomingId,
+        date: values.date.format('YYYY-MM-DD'),
+        startDate: values.startTime.format('HH:mm:ss'),
+        endDate: values.endTime.format('HH:mm:ss'),
+        content: values.content,
+        totalPerson: values.totalPerson,
+        address: values.address
       };
+      const payload: ICreateReceptionTimeList = {
+        items: [data],
+      };      
 
       const receptionResult = await dispatch(createReceptionTime(payload)).unwrap();
       console.log('receptionResult:', receptionResult);

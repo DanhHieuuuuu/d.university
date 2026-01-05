@@ -6,6 +6,7 @@ using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Entities.Survey;
+using D.Core.Domain.Entities.Sysvar;
 using D.Core.Domain.Shared.SeedData;
 using D.DomainBase.Entity;
 using D.InfrastructureBase.Database;
@@ -102,6 +103,11 @@ namespace D.Core.Domain
 
         #endregion
 
+        #region Sysvar
+        public DbSet<SysVar> SysVars { get; set; }
+
+        #endregion
+
         #region Survey
         public DbSet<KsSurvey> KsSurvey { get; set; }
         public DbSet<KsSurveyRequest> KsSurveyRequest { get; set; }
@@ -114,6 +120,7 @@ namespace D.Core.Domain
         public DbSet<KsSurveyReport> KsSurveyReport { get; set; }
         public DbSet<KsAIResponse> KsAIResponse { get; set; }
         public DbSet<KsSurveyLog> KsSurveyLog { get; set; }
+        public DbSet<KsSurveySubmissionLog> KsSurveySubmissionLog { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

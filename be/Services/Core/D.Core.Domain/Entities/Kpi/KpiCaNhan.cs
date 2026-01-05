@@ -12,6 +12,7 @@ namespace D.Core.Domain.Entities.Kpi
 
         [MaxLength(500)]
         public string? KPI { get; set; }
+        public string? LinhVuc { get; set; }
 
         [MaxLength(255)]
         public string? MucTieu { get; set; }
@@ -19,7 +20,7 @@ namespace D.Core.Domain.Entities.Kpi
         [MaxLength(255)]
         public string? TrongSo { get; set; }
 
-        public int LoaiKPI { get; set; }
+        public int? LoaiKPI { get; set; }
 
         public int IdNhanSu { get; set; }
 
@@ -30,11 +31,15 @@ namespace D.Core.Domain.Entities.Kpi
         public string? NamHoc { get; set; }
 
         public int? Status { get; set; }
+        public float? TyLeThamGia { get; set; }
 
         public decimal? KetQuaThucTe { get; set; }
         public string? CongThucTinh { get; set; }
         public LoaiCongThuc? LoaiCongThuc { get; set; }
         public string? ThamSoCongThuc { get; set; }
         public decimal? DiemKpi { get; set; }
+
+        public decimal? CapTrenDanhGia { get; set; }
+        public decimal? DiemKpiCapTren { get; set; }
     }
 }

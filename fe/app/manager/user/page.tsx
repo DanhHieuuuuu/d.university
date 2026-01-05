@@ -1,21 +1,26 @@
 'use client';
+
 import { ChangeEvent, useState } from 'react';
+import { toast } from 'react-toastify';
 import { Button, Card, Form, Input, Tag } from 'antd';
 import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, KeyOutlined } from '@ant-design/icons';
-import EditUserModal from './(dialog)/edit';
+import { useDebouncedCallback } from '@hooks/useDebounce';
+import { usePaginationWithFilter } from '@hooks/usePagination';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { formatDateView } from '@utils/index';
+
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { changeStatusUserThunk, getAllUser } from '@redux/feature/userSlice';
 
-import { IQueryUser, IUserView } from '@models/user/user.model';
 import AppTable from '@components/common/Table';
+import { IQueryUser, IUserView } from '@models/user/user.model';
 import { IAction, IColumn } from '@models/common/table.model';
-import { formatDateView } from '@utils/index';
-import { usePaginationWithFilter } from '@hooks/usePagination';
-import { useDebouncedCallback } from '@hooks/useDebounce';
+
 import CreateNhanSuModal from './(dialog)/create';
 import UserRoleModal from './(dialog)/user-role';
-import { toast } from 'react-toastify';
+import EditUserModal from './(dialog)/edit';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -229,4 +234,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.UserMenuAccountManager);

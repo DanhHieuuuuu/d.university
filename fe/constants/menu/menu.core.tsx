@@ -40,6 +40,7 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Danh mục',
     routerLink: '/list',
+    permissionKeys: [PermissionCoreConst.UserMenuAdmin],
     icon: <BarsOutlined />,
     items: [
       {
@@ -56,6 +57,63 @@ export const listMenuCore: IMenu[] = [
         label: 'Tổ bộ môn',
         routerLink: '/list/divisions',
         icon: <DeploymentUnitOutlined />
+      }
+    ]
+  },
+  {
+    label: 'KPI',
+    routerLink: '/kpi',
+    icon: <BarsOutlined />,
+    items: [
+      {
+        label: 'Danh sách KPI',
+        routerLink: '/kpi/list',
+        icon: <ApartmentOutlined />,
+        items: [
+          {
+            label: 'Kpi Role',
+            routerLink: '/kpi/list/roles',
+            icon: <PartitionOutlined />
+          },
+          {
+            label: 'Kpi cá nhân',
+            routerLink: '/kpi/list/personals',
+            icon: <PartitionOutlined />
+          },
+          {
+            label: 'Kpi đơn vị',
+            routerLink: '/kpi/list/units',
+            icon: <PartitionOutlined />
+          },
+          {
+            label: 'Kpi trường',
+            routerLink: '/kpi/list/school',
+            icon: <PartitionOutlined />
+          },
+        ],
+
+      },
+      {
+        label: 'Quản lý KPI',
+        routerLink: '/kpi/manage',
+        icon: <PartitionOutlined />,
+        items: [
+          {
+            label: 'Kê khai Kpi cá nhân',
+            routerLink: '/kpi/manage/personals',
+            icon: <PartitionOutlined />
+          },
+          // {
+          //   label: 'Kê khai Kpi đơn vị',
+          //   routerLink: '/kpi/list/units',
+          //   icon: <PartitionOutlined />
+          // },
+          // {
+          //   label: 'Kê khai Kpi trường',
+          //   routerLink: '/kpi/list/school',
+          //   icon: <PartitionOutlined />
+          // },
+        ],
       }
     ]
   },
@@ -117,7 +175,7 @@ export const listMenuCore: IMenu[] = [
         icon: <LinkOutlined />
       },
       {
-        label: 'Khung chương trình',
+        label: 'Chương trình khung',
         routerLink: '/training/curriculumFramework',
         icon: <ProfileOutlined />
       }

@@ -1,0 +1,62 @@
+import { IQueryPaging } from '@models/common/model.common';
+
+export type IQueryKpiTruong = IQueryPaging & {
+    loaiKpi?: number;
+    namHoc?: string;
+    trangThai?: number;
+};
+
+
+export interface IViewGetListKpiTruong {
+    id?: number;
+    kpi?: string;
+}
+
+export type IViewKpiTruong = {
+    id: number;
+    linhVuc: string;
+    chienLuoc: string;
+    kpi: string;
+    mucTieu: string;
+    trongSo: string;
+    loaiKpi: number;
+    namHoc: string;
+    trangThai: number;
+    ketQuaThucTe?: number;
+    isActive?: number;
+    loaiCongThuc?: string,
+};
+
+export type ICreateKpiTruong = {
+    kpi: string,
+    loaiKpi: number,
+    linhVuc: string,
+    chienLuoc: string,
+    mucTieu: string,
+    trongSo: string,
+    idDonVi: number,
+    namHoc: string,
+    loaiCongThuc: number,
+};
+
+export type IUpdateTrangThaiKpiTruong = {
+    ids: number[];
+    trangThai: number;
+    note?: string;
+};
+
+export type IUpdateKpiTruong = ICreateKpiTruong & {
+    id: number,
+};
+
+export type IViewGetTrangThai = {
+    trangThai?: number,
+}
+
+export type IUpdateKpiTruongThucTe = {
+    id: number,
+    ketQuaThucTe?: number,
+}
+export interface IUpdateKpiTruongThucTeList {
+    items: IUpdateKpiTruongThucTe[],
+}

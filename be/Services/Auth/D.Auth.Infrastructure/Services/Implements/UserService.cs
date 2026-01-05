@@ -259,14 +259,22 @@ namespace D.Auth.Infrastructure.Services.Implements
             var fileExtension = Path.GetExtension(request.File.FileName);
             var fileName = $"{Guid.NewGuid()}{fileExtension}";
 
-            object? imageExist = null;
+            FileResponseDto? existingImage = null;
             int imageId;
             if (!string.IsNullOrEmpty(ns.ImageLink) && int.TryParse(ns.ImageLink, out imageId))
             {
-                imageExist = _fileService.GetFileById(imageId);
+                try
+                {
+                    existingImage = _fileService.GetFileById(imageId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Avatar file with id {ImageId} no longer exists, a new file will be created", imageId);
+                    existingImage = null;
+                }
             }
-                
-            if (imageExist != null && int.TryParse(ns.ImageLink, out imageId))
+
+            if (existingImage != null && int.TryParse(ns.ImageLink, out imageId))
             {
                 var updateDto = new UpdateFileDto
                 {

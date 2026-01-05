@@ -17,10 +17,8 @@
     <ProjectReference Include="..\D.Core.Domain\D.Core.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Repositories\Survey\" />
     <Folder Include="Services\Kpi\Abstracts\" />
     <Folder Include="Services\Kpi\Implements\" />
-    <Folder Include="Services\Survey\" />
   </ItemGroup>
 
 </Project>

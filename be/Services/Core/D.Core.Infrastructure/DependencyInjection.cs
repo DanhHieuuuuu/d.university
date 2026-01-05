@@ -5,6 +5,7 @@ using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.Kpi;
 using D.Core.Infrastructure.Repositories.SinhVien;
+using D.Core.Infrastructure.Repositories.Survey;
 using D.Core.Infrastructure.Services.DaoTao.Abstracts;
 using D.Core.Infrastructure.Services.DaoTao.Implements;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
@@ -13,8 +14,16 @@ using D.Core.Infrastructure.Services.File.Abstracts;
 using D.Core.Infrastructure.Services.File.Implements;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.Core.Infrastructure.Services.Hrm.Implements;
+using D.Core.Infrastructure.Services.Kpi.Abstracts;
+using D.Core.Infrastructure.Services.Kpi.Implements;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.Core.Infrastructure.Services.SinhVien.Implements;
+using D.Core.Infrastructure.Services.Survey.Report.Abstracts;
+using D.Core.Infrastructure.Services.Survey.Report.Implement;
+using D.Core.Infrastructure.Services.Survey.Request.Abstracts;
+using D.Core.Infrastructure.Services.Survey.Request.Implement;
+using D.Core.Infrastructure.Services.Survey.Surveys.Abstracts;
+using D.Core.Infrastructure.Services.Survey.Surveys.Implement;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace D.Core.Infrastructure
@@ -41,7 +50,19 @@ namespace D.Core.Infrastructure
                 .AddScoped<IExcelService, ExcelService>()
                 .AddHostedService<AutoUpdateStatusService>()
             #endregion
-                .AddScoped<IFileService, FileService>();
+            #region Survey
+                .AddScoped<IRequestSurveyService, RequestSurveyService>()
+                .AddScoped<ISurveyService, SurveyService>()
+                .AddScoped<IReportSurveyService, ReportSurveyService>()
+            #endregion
+                .AddScoped<IFileService, FileService>()
+            #region Kpi
+                .AddScoped<IKpiRoleService, KpiRoleService>()
+                .AddScoped<IKpiCaNhanService, KpiCaNhanService>()
+                .AddScoped<IKpiDonViService, KpiDonViService>()
+                .AddScoped<IKpiTruongService, KpiTruongService>()
+                .AddScoped<IKpiTemplateService, KpiTemplateService>();
+            #endregion
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)
@@ -90,7 +111,16 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKpiLogStatusRepository, KpiLogStatusRepository>()
                 .AddScoped<IKpiRoleRepository, KpiRoleRepository>()
                 .AddScoped<IKpiTemplateRepository, KpiTemplateRepository>()
-                .AddScoped<IKpiTruongRepository, KpiTruongRepository>();
+                .AddScoped<IKpiTruongRepository, KpiTruongRepository>()
+            #endregion
+            #region Survey
+                .AddScoped<IKsSurveyRequestRepository, SurveyRequestRepository>()
+                .AddScoped<IKsSurveyRepository, SurveyRepository>()
+                .AddScoped<IKsSurveyReportRepository, SurveyReportRepository>()
+                .AddScoped<IKsSurveyLogRepository, SurveyLogRepository>()
+                .AddScoped<IKsSurveySubmissionRepository, SurveySubmissionRepository>()
+                .AddScoped<IKsSurveySubmissionAnswerRepository, SurveySubmissionAnswerRepository>()
+                .AddScoped<IKsSurveySubmissionLogRepository, SurveySubmissionLogRepository>();
             #endregion
         }
 

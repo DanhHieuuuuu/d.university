@@ -1,7 +1,7 @@
 import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryUser = IQueryPaging & {
-  Keyword?: string;
+  IdPhongBan?: number;
 };
 
 export type IUserView = {

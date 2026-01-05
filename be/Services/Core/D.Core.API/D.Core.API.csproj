@@ -28,8 +28,4 @@
     <ProjectReference Include="..\D.Core.Infrastructure\D.Core.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Kpi\" />
-  </ItemGroup>
-
 </Project>

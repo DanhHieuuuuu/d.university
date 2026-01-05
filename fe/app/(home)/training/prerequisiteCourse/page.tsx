@@ -1,18 +1,19 @@
 'use client';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal, message } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined
+  EyeOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getAllMonHoc } from '@redux/feature/dao-tao/monHocThunk';
-import { getAllMonTienQuyet } from '@redux/feature/dao-tao/monTienQuyetThunk';
+import { getAllMonTienQuyet, deleteMonTienQuyet } from '@redux/feature/dao-tao/monTienQuyetThunk';
 import { setSelectedIdMonTienQuyet } from '@redux/feature/dao-tao/daotaoSlice';
 
 import AppTable from '@components/common/Table';
@@ -80,6 +81,26 @@ const Page = () => {
     dispatch(getAllMonTienQuyet(query));
   };
 
+  const handleDelete = (id: number, monHocName: string, monTienQuyetName: string) => {
+    Modal.confirm({
+      title: 'Xác nhận xóa',
+      icon: <ExclamationCircleOutlined />,
+      content: `Bạn có chắc chắn muốn xóa môn tiên quyết "${monTienQuyetName}" cho môn học "${monHocName}"?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await dispatch(deleteMonTienQuyet(id)).unwrap();
+          message.success('Xóa môn tiên quyết thành công!');
+          refreshData();
+        } catch (error: any) {
+          message.error(error?.message || 'Xóa môn tiên quyết thất bại!');
+        }
+      }
+    });
+  };
+
   const columns: IColumn<IViewMonTienQuyet>[] = [
     {
       key: 'Id',
@@ -135,7 +156,9 @@ const Page = () => {
       color: 'red',
       icon: <DeleteOutlined />,
       command: (record: IViewMonTienQuyet) => {
-        dispatch(setSelectedIdMonTienQuyet(record.id));
+        const monHocName = getMonHocName(record.monHocId);
+        const monTienQuyetName = getMonHocName(record.monTienQuyetId);
+        handleDelete(record.id, monHocName.toString(), monTienQuyetName.toString());
       }
     }
   ];

@@ -105,7 +105,7 @@ const Page = () => {
   const actions: IAction[] = [
     {
       label: 'Chi tiết',
-      tooltip: 'Xem thông tin bộ môn',
+      tooltip: 'Xem thông tin tổ bộ môn',
       icon: <EyeOutlined />,
       command: (record: IViewToBoMon) => {
         dispatch(setSelectedIdToBoMon(record.id));
@@ -114,7 +114,7 @@ const Page = () => {
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin chức vụ',
+      tooltip: 'Sửa thông tin tổ bộ môn',
       icon: <EditOutlined />,
       command: (record: IViewToBoMon) => {
         dispatch(setSelectedIdToBoMon(record.id));
@@ -141,7 +141,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách bộ môn"
+      title="Danh sách tổ bộ môn"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>

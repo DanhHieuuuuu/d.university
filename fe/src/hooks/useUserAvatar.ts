@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FileService } from '@services/file.service';
 
-const DEFAULT_AVATAR_PATH = 'Anh_dai_dien/Anh_mac_dinh/203d0732-820a-4605-bfcc-79c4a4e69d80.jpg';
-
 export const useUserAvatar = (imageLink?: string | null) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,42 +34,52 @@ export const useUserAvatar = (imageLink?: string | null) => {
     let objectUrl: string | null = null;
 
     const fetchAvatar = async () => {
+      // Nếu không có imageLink, không cần fetch, sử dụng icon mặc định từ Ant Design
+      if (!imageLink) {
+        setAvatarUrl(null);
+        setIsDefaultAvatar(true);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
 
-        let fileName = DEFAULT_AVATAR_PATH;
-        let useDefault = true;
-
-        // Nếu có imageLink, thử lấy thông tin file từ API
-        if (imageLink) {
-          try {
-            const fileId = parseInt(imageLink);
-            if (!isNaN(fileId)) {
-              const fileInfo = await FileService.getFileById(fileId);
-              if (fileInfo && fileInfo.link) {
-                fileName = fileInfo.link;
-                useDefault = false;
-                setCurrentFileId(fileId);
-              }
-            }
-          } catch (err) {
-            console.warn('Could not fetch file info, using default avatar:', err);
-          }
+        // Parse imageLink thành fileId
+        const fileId = parseInt(imageLink);
+        if (isNaN(fileId)) {
+          console.warn('Invalid imageLink, using default icon');
+          setAvatarUrl(null);
+          setIsDefaultAvatar(true);
+          setLoading(false);
+          return;
         }
 
-        setIsDefaultAvatar(useDefault);
+        // Lấy thông tin file từ API
+        const fileInfo = await FileService.getFileById(fileId);
+        if (!fileInfo || !fileInfo.link) {
+          console.warn('File info not found, using default icon');
+          setAvatarUrl(null);
+          setIsDefaultAvatar(true);
+          setLoading(false);
+          return;
+        }
 
-        // Lấy ảnh từ S3
+        setCurrentFileId(fileId);
+
+        // Download ảnh từ S3
         const bustCache = refreshTrigger > 0;
-        const blob = await FileService.downloadFile(fileName, bustCache);
+        const blob = await FileService.downloadFile(fileInfo.link, bustCache);
         const url = URL.createObjectURL(blob);
         objectUrl = url;
         setAvatarUrl(url);
+        setIsDefaultAvatar(false);
       } catch (err) {
-        console.error('Error loading avatar:', err);
+        console.error('Error loading avatar, using default icon:', err);
         setError(err as Error);
         setAvatarUrl(null);
+        setIsDefaultAvatar(true);
       } finally {
         setLoading(false);
       }

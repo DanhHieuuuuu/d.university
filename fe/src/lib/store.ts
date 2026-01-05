@@ -9,6 +9,7 @@ import danhmucReducer from './feature/danh-muc/danhmucSlice';
 import studentReducer from './feature/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';
+import kpiReducer from './feature/kpi/kpiSlice';
 import delegationReducer from './feature/delegation/delegationSlice';
 import daotaoReducer from './feature/dao-tao/daotaoSlice';
 const persistConfig = {
@@ -31,6 +32,7 @@ export const makeStore = () => {
       studentState: studentReducer,
       roleConfigState: roleConfigReducer,
       noticeState: noticeReducer,
+      kpiState: kpiReducer,
       daotaoState: daotaoReducer
     },
     middleware: (getDefaultMiddleware) =>

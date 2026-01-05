@@ -119,7 +119,7 @@ const Page = () => {
       title: 'Trạng thái',
       align: 'center',
       type: ETableColumnType.STATUS,
-      getTagInfo: (status: number) => DelegationStatusConst.getInfo(status)
+      getTagInfo: (status: number) => DelegationStatusConst.getTag(status)
     }
   ];
 
@@ -258,7 +258,7 @@ const Page = () => {
               allowClear
               options={listStatus.map((st: any) => ({
                 value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, 'name') ?? ''
+                label: DelegationStatusConst.getInfo(st.status, "label" ) ?? ''
               }))}
               onChange={(value) => onFilterChange({ status: value })}
             />

@@ -47,6 +47,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 query = query.Where(x => dto.Cccd == x.SoCccd);
             }
 
+            if (dto.IdPhongBan != null)
+            {
+                query = query.Where(x => x.HienTaiPhongBan == dto.IdPhongBan);
+            }
+
             var totalCount = query.Count();
 
             var items = query
@@ -111,6 +116,10 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     || ((x.HoDem ?? "") + " " + (x.Ten ?? "")).Contains(kw)
                     || (x.SoCccd ?? "").Contains(kw)
                 );
+            }
+            if (dto.IdPhongBan.HasValue)
+            {
+                query = query.Where(x => x.HienTaiPhongBan == dto.IdPhongBan.Value);
             }
 
             var totalCount = query.Count();
