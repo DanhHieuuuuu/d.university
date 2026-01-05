@@ -14,6 +14,7 @@ export class KpiTrangThaiConst {
   static DA_CHAM = 11;
   static DA_KE_KHAI = 12;
   static DA_GUI_CHAM = 13;
+  static HIEU_TRUONG_PHE_DUYET = 14
 
   static list = [
     { value: this.TAO_MOI, text: 'Tạo mới', color: 'default' },
@@ -29,6 +30,11 @@ export class KpiTrangThaiConst {
     { value: this.DA_CHAM, text: 'Đã chấm', color: 'success' },
     { value: this.DA_KE_KHAI, text: 'Đã kê khai', color: 'purple' },
     { value: this.DA_GUI_CHAM, text: 'Đã gửi chấm', color: 'geekblue' },
+    {
+      value: this.HIEU_TRUONG_PHE_DUYET,
+      text: 'Hiệu trưởng phê duyệt',
+      color: 'blue',
+    },
   ] as { value: number; text: string; color: TagProps['color'] }[];
 
   static get(value?: number) {

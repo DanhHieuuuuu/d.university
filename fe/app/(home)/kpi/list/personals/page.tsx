@@ -33,6 +33,8 @@ import { ETableColumnType } from '@/constants/e-table.consts';
 import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
 import { buildKpiGroupedTable, KpiTableRow } from '@helpers/kpi/kpi.helper';
 import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
+import ConfirmScoredModal from '../../modal/ConfirmScoredModal';
+import { formatKetQua } from '@helpers/kpi/formatResult.helper';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -51,6 +53,7 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
   const [isView, setIsModalView] = useState(false);
+  const [openChamModal, setOpenChamModal] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ketQuaCapTrenMap, setKetQuaCapTrenMap] = useState<Record<number, number | undefined>>({});
@@ -84,20 +87,33 @@ const Page = () => {
     dispatch(getAllUser({ IdPhongBan: value, PageIndex: 1, PageSize: 2000 }));
   };
 
-  const scoreSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DA_GUI_CHAM],
-      invalidMsg: 'Chỉ có KPI đang ở trạng thái "Đã gửi chấm" mới được Chấm.',
-      confirmTitle: 'Chấm KPI',
-      confirmMessage: 'Xác nhận chấm các KPI đã chọn?',
-      successMsg: 'Chấm thành công',
-      nextStatus: KpiTrangThaiConst.DA_CHAM,
-      updateAction: updateTrangThaiKpiCaNhan,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiCaNhan(query));
-      },
-    });
+  const scoreSelected = () => {
+    if (!selectedRowKeys.length) {
+      toast.warning('Vui lòng chọn ít nhất một KPI');
+      return;
+    }
+    setOpenChamModal(true);
+  };
+
+  const handleSubmitScore = async (note?: string) => {
+    try {
+      await dispatch(
+        updateTrangThaiKpiCaNhan({
+          ids: selectedRowKeys.map(Number),
+          trangThai: KpiTrangThaiConst.DA_CHAM,
+          note,
+        })
+      ).unwrap();
+
+      toast.success('Chấm KPI thành công');
+
+      setOpenChamModal(false);
+      setSelectedRowKeys([]);
+      dispatch(getAllKpiCaNhan(query));
+    } catch {
+      toast.error('Chấm KPI thất bại');
+    }
+  };
 
   const cancelScoredSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
@@ -107,6 +123,36 @@ const Page = () => {
       confirmMessage: 'Xác nhận hủy chấm các KPI đã chọn?',
       successMsg: 'Hủy kết quả chấm thành công',
       nextStatus: KpiTrangThaiConst.DA_GUI_CHAM,
+      updateAction: updateTrangThaiKpiCaNhan,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiCaNhan(query));
+      },
+    });
+
+  const principalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DA_CHAM],
+      invalidMsg: 'Chỉ có KPI đang ở trạng thái "Đã chấm" mới được phê duyệt.',
+      confirmTitle: 'Phê duyệt KPI',
+      confirmMessage: 'Xác nhận phê duyệt các KPI đã chọn?',
+      successMsg: 'Phê duyệt thành công',
+      nextStatus: KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET,
+      updateAction: updateTrangThaiKpiCaNhan,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiCaNhan(query));
+      },
+    });
+
+  const cancelPrincipalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
+      invalidMsg: 'Chỉ KPI "Hiệu trưởng đã chấm" mới được hủy',
+      confirmTitle: 'Hủy phê duyệt KPI',
+      confirmMessage: 'Hủy phê duyệt các KPI đã chọn?',
+      successMsg: 'Hủy phê duyệt chấm thành công',
+      nextStatus: KpiTrangThaiConst.DA_CHAM,
       updateAction: updateTrangThaiKpiCaNhan,
       afterSuccess: () => {
         setSelectedRowKeys([]);
@@ -166,6 +212,18 @@ const Page = () => {
       label: 'Hủy kết quả chấm KPI',
       icon: <UndoOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(cancelScoredSelected),
+    },
+    {
+      key: 'principalApprove',
+      label: 'Hiệu trưởng phê duyệt',
+      icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(principalApprovedSelected),
+    },
+    {
+      key: 'cancelPrincipalApprove',
+      label: 'Hiệu trưởng hủy duyệt',
+      icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(cancelPrincipalApprovedSelected),
     },
   ];
 
@@ -262,7 +320,8 @@ const Page = () => {
     {
       key: 'nhanSu',
       dataIndex: 'nhanSu',
-      title: 'Nhân sự'
+      title: 'Nhân sự',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
     },
     {
       key: 'mucTieu',
@@ -286,12 +345,17 @@ const Page = () => {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
       title: 'Kết quả thực tế',
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      render: (val, record) =>
+        record.rowType !== 'data'
+          ? { props: { colSpan: 0 } }
+          : formatKetQua(val, record.loaiCongThuc),
     },
     {
       key: 'diemKpi',
       dataIndex: 'diemKpi',
-      title: 'Điểm tự đánh giá'
+      title: 'Điểm tự đánh giá',
+      align: 'center',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
     },
     {
       key: 'capTrenDanhGia',
@@ -304,7 +368,6 @@ const Page = () => {
         const value = ketQuaCapTrenMap[record.id] ?? val;
         return (
           <KetQuaInput
-
             loaiCongThuc={record.loaiCongThuc}
             value={value}
             onChange={(v) => updateKetQuaCapTren(record.id, v)}
@@ -316,6 +379,7 @@ const Page = () => {
       key: 'diemKpiCapTren',
       dataIndex: 'diemKpiCapTren',
       title: 'Điểm cấp trên',
+      align: 'center',
       render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
     },
     {
@@ -520,6 +584,13 @@ const Page = () => {
           dispatch(getAllKpiCaNhan(query));
           dispatch(getListTrangThaiKpiCaNhan());
         }}
+      />
+      <ConfirmScoredModal
+        open={openChamModal}
+        title="Chấm KPI Cá nhân"
+        trangThai={KpiTrangThaiConst.DA_CHAM}
+        onCancel={() => setOpenChamModal(false)}
+        onSubmit={handleSubmitScore}
       />
     </Card>
   );

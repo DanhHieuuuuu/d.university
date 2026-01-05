@@ -6,6 +6,7 @@ using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Entities.Survey;
+using D.Core.Domain.Entities.Sysvar;
 using D.Core.Domain.Shared.SeedData;
 using D.DomainBase.Entity;
 using D.InfrastructureBase.Database;
@@ -99,6 +100,11 @@ namespace D.Core.Domain
         public DbSet<KpiRole> KpiRoles { get; set; }
         public DbSet<KpiTemplate> KpiTemplates { get; set; }
         public DbSet<KpiTruong> KpiTruongs { get; set; }
+
+        #endregion
+
+        #region Sysvar
+        public DbSet<SysVar> SysVars { get; set; }
 
         #endregion
 

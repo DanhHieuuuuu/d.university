@@ -26,6 +26,7 @@ import { LoaiCongThuc } from '../../const/loaiCongThuc.enum';
 import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
 import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
 import { KpiRoleConst } from '../../const/kpiRole.const';
+import { formatKetQua } from '@helpers/kpi/formatResult.helper';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -256,18 +257,23 @@ const Page = () => {
       key: 'diemKpi',
       dataIndex: 'diemKpi',
       title: 'Điểm tự đánh giá',
+      align: 'center',
       render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
     },
     {
       key: 'capTrenDanhGia',
       dataIndex: 'capTrenDanhGia',
       title: 'Cấp trên đánh giá',
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      render: (val, record) =>
+        record.rowType !== 'data'
+          ? { props: { colSpan: 0 } }
+          : formatKetQua(val, record.loaiCongThuc),
     },
     {
       key: 'diemKpiCapTren',
       dataIndex: 'diemKpiCapTren',
       title: 'Điểm cấp trên',
+      align: 'center',
       render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
     },
 
