@@ -12,8 +12,9 @@ import { ReduxStatus } from '@redux/const';
 import { IColumn } from '@models/common/table.model';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
-import { getStatusName } from '@utils/status.helper';
 import { formatDateTimeView } from '@utils/index';
+import { DelegationStatusConst } from '../../consts/delegation-status.consts';
+import { ETableColumnType } from '@/constants/e-table.consts';
 
 const { TabPane } = Tabs;
 
@@ -29,8 +30,20 @@ const Page = () => {
     { key: 'stt', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
     { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center' },
     { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left' },
-    { key: 'oldStatus', dataIndex: 'oldStatus', title: 'Trạng thái cũ', render: getStatusName },
-    { key: 'newStatus', dataIndex: 'newStatus', title: 'Trạng thái mới', render: getStatusName },
+    {
+      key: 'oldStatus',
+      dataIndex: 'oldStatus',
+      title: 'Trạng thái cũ',
+      type: ETableColumnType.STATUS,
+      getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
+    },
+    {
+      key: 'newStatus',
+      dataIndex: 'newStatus',
+      title: 'Trạng thái mới',
+      type: ETableColumnType.STATUS,
+      getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
+    },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
     {
       key: 'createdDate',
