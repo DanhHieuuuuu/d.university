@@ -207,6 +207,15 @@ const Page = () => {
         </Form.Item>
       </Form>
 
+      <AppTable
+        loading={status === ReduxStatus.LOADING}
+        rowKey="maNhanSu"
+        columns={columns}
+        dataSource={list}
+        listActions={actions}
+        pagination={{ position: ['bottomRight'], ...pagination }}
+      />
+
       <CreateNhanSuModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
