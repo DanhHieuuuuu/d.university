@@ -103,6 +103,11 @@ html {
     background-color: #f3e5f5;
     color: #6a1b9a;
   }
+  .tag-approve {
+    @extend .tag-status;
+    background-color: #ffe0f0;
+    color: #d81b60;            
+  }
 }
 
 .dark {
@@ -134,11 +139,10 @@ html {
     background-color: rgba(255, 152, 0, 0.15);
     color: #ffb74d;
   }
-
-  .tag-propose {
+  .tag-approve {
     @extend .tag-status;
-    background-color: rgba(156, 39, 176, 0.15);
-    color: #ce93d8;
+    background-color: rgba(216, 27, 96, 0.15); 
+    color: #f48fb1;                            
   }
 }
 .hover-box:hover {

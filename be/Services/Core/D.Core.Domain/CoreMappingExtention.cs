@@ -185,6 +185,10 @@ namespace D.Core.Domain
             CreateMap<CreateDepartmentSupportResponseDto, DepartmentSupport>();
             CreateMap<CreateDepartmentSupportRequestDto, DepartmentSupport>();
             CreateMap<DepartmentSupport, CreateDepartmentSupportResponseDto>();
+            CreateMap<CreatePrepareRequestItemDto, Prepare>();
+            CreateMap<Prepare, CreatePrepareResponseDto>();
+            CreateMap<Prepare, UpdatePrepareResponseDto>();
+
 
             #endregion
 

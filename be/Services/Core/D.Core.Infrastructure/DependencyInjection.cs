@@ -48,6 +48,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IReceptionTimeService, ReceptionTimeService>()
                 .AddScoped<ISupporterService, SupporterService>()
                 .AddScoped<IExcelService, ExcelService>()
+                .AddHostedService<AutoUpdateStatusService>()
             #endregion
             #region Survey
                 .AddScoped<IRequestSurveyService, RequestSurveyService>()

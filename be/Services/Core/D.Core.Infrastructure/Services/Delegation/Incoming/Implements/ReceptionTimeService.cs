@@ -61,118 +61,166 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             return _mapper.Map<List<CreateReceptionTimeResponseDto>>(receptionTimes);
         }
 
-        public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int delegationIncomingId)
+        public async Task<List<ReceptionTimeResponseDto>> GetByIdReceptionTime(int delegationIncomingId)
         {
-            _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with DelegationIncomingId: {delegationIncomingId}");
+            _logger.LogInformation(
+                $"{nameof(GetByIdReceptionTime)} called with DelegationIncomingId: {delegationIncomingId}"
+            );
 
-            // Lấy receptionTime theo DelegationIncomingId
-            var receptionTime = _unitOfWork.iReceptionTimeRepository.TableNoTracking
-                .FirstOrDefault(r => r.DelegationIncomingId == delegationIncomingId);
+            var receptionTimes = _unitOfWork.iReceptionTimeRepository.TableNoTracking
+                .Where(r => r.DelegationIncomingId == delegationIncomingId)
+                .OrderBy(r => r.Date)
+                .ThenBy(r => r.StartDate)
+                .ToList();
 
-            if (receptionTime == null)
-                return null;
+            if (!receptionTimes.Any())
+                return new List<ReceptionTimeResponseDto>();
 
-            // Lấy thông tin đoàn
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
-                .FirstOrDefault(d => d.Id == receptionTime.DelegationIncomingId);
+                .FirstOrDefault(d => d.Id == delegationIncomingId);
+            //Load Prepare theo các ReceptionTimeId
+            var receptionTimeIds = receptionTimes.Select(x => x.Id).ToList();
 
-            var result = new ReceptionTimeResponseDto
+            var prepares = _unitOfWork.iPrepareRepository.TableNoTracking
+                .Where(p => receptionTimeIds.Contains(p.ReceptionTimeId) && !p.Deleted)
+                .ToList();
+
+            var result = receptionTimes.Select(rt => new ReceptionTimeResponseDto
             {
-                Id = receptionTime.Id,
-                StartDate = receptionTime.StartDate,
-                EndDate = receptionTime.EndDate,
-                Date = receptionTime.Date,
-                Content = receptionTime.Content,
-                TotalPerson = receptionTime.TotalPerson,
-                Address = receptionTime.Address,
-                DelegationIncomingId = receptionTime.DelegationIncomingId,
+                Id = rt.Id,
+                StartDate = rt.StartDate,
+                EndDate = rt.EndDate,
+                Date = rt.Date,
+                Content = rt.Content,
+                TotalPerson = rt.TotalPerson,
+                Address = rt.Address,
+                DelegationIncomingId = rt.DelegationIncomingId,
                 DelegationName = delegation?.Name,
-                DelegationCode = delegation?.Code
-            };
+                DelegationCode = delegation?.Code,
+                Prepares = prepares
+                     .Where(p => p.ReceptionTimeId == rt.Id)
+                     .Select(p => new PrepareResponseDto
+                     {
+                         Id = p.Id,
+                         Name = p.Name,
+                         Description = p.Description,
+                         Money = p.Money
+                     })
+                     .ToList()
+            }).ToList();
 
             return result;
         }
 
-        public async Task<UpdateReceptionTimeResponseDto> UpdateReceptionTime(UpdateReceptionTimeRequestDto dto)
+        public async Task<List<UpdateReceptionTimeResponseDto>> UpdateReceptionTimes(List<UpdateReceptionTimeRequestDto> dtos)
         {
-            _logger.LogInformation(
-                $"{nameof(UpdateReceptionTime)} called. Dto: {JsonSerializer.Serialize(dto)}"
-            );
+            if (dtos == null || !dtos.Any())throw new Exception("Danh sách thời gian tiếp đoàn trống.");
 
-            var exist = _unitOfWork.iReceptionTimeRepository.Table
-                .FirstOrDefault(x => x.DelegationIncomingId == dto.DelegationIncomingId);
+            var delegationId = dtos.First().DelegationIncomingId;
 
-            if (exist == null)
-                throw new Exception("Không tìm thấy thời gian tiếp đoàn.");
+            var dbItems = _unitOfWork.iReceptionTimeRepository.Table
+                .Where(x => x.DelegationIncomingId == delegationId && !x.Deleted)
+                .ToList();
 
-            #region Save old values
-            var oldStartDate = exist.StartDate;
-            var oldEndDate = exist.EndDate;
-            var oldDate = exist.Date;
-            var oldContent = exist.Content;
-            var oldTotalPerson = exist.TotalPerson;
-            var oldAddress = exist.Address;
-            #endregion
-
-            #region Update entity
-            exist.StartDate = dto.StartDate;
-            exist.EndDate = dto.EndDate;
-            exist.Date = dto.Date;
-            exist.Content = dto.Content;
-            exist.TotalPerson = dto.TotalPerson;
-            exist.Address = dto.Address;
-            #endregion
-
-            _unitOfWork.iReceptionTimeRepository.Update(exist);
-            await _unitOfWork.SaveChangesAsync();
-
-            #region Log
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
                 .FirstOrDefault(u => u.Id == userId);
             var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
 
-            var changes = new List<string>();
+            var logs = new List<LogReceptionTime>();
 
-            if (oldStartDate != dto.StartDate)
-                changes.Add($"Giờ bắt đầu: {oldStartDate} → {dto.StartDate}");
-
-            if (oldEndDate != dto.EndDate)
-                changes.Add($"Giờ kết thúc: {oldEndDate} → {dto.EndDate}");
-
-            if (oldDate != dto.Date)
-                changes.Add($"Ngày: {oldDate} → {dto.Date}");
-
-            if (oldContent != dto.Content)
-                changes.Add($"Nội dung: '{oldContent}' → '{dto.Content}'");
-
-            if (oldTotalPerson != dto.TotalPerson)
-                changes.Add($"Số người: {oldTotalPerson} → {dto.TotalPerson}");
-
-            if (oldAddress != dto.Address)
-                changes.Add($"Địa điểm: '{oldAddress}' → '{dto.Address}'");
-
-            var description = changes.Any()
-                ? $"Cập nhật thời gian tiếp đoàn: {string.Join("; ", changes)}."
-                : $"Cập nhật thời gian tiếp đoàn nhưng không thay đổi dữ liệu.";
-
-            var log = new LogReceptionTime
+            // UPDATE
+            foreach (var dto in dtos.Where(x => x.Id.HasValue))
             {
-                ReceptionTimeId = exist.Id,
-                Type = LogType.Update,
-                Description = description,
-                Reason = DelegationStatus.Names[DelegationStatus.Edited],
-                CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString(),
-                CreatedByName = userName
-            };
+                var exist = dbItems.FirstOrDefault(x => x.Id == dto.Id.Value);
+                if (exist == null) continue;
 
-            _unitOfWork.iLogReceptionTimeRepository.Add(log);
+                var changes = new List<string>();
+
+                if (exist.StartDate != dto.StartDate)
+                    changes.Add($"Giờ bắt đầu: {exist.StartDate} → {dto.StartDate}");
+
+                if (exist.EndDate != dto.EndDate)
+                    changes.Add($"Giờ kết thúc: {exist.EndDate} → {dto.EndDate}");
+
+                if (exist.Date != dto.Date)
+                    changes.Add($"Ngày: {exist.Date} → {dto.Date}");
+
+                if (exist.Content != dto.Content)
+                    changes.Add($"Nội dung: '{exist.Content}' → '{dto.Content}'");
+
+                if (exist.TotalPerson != dto.TotalPerson)
+                    changes.Add($"Số người: {exist.TotalPerson} → {dto.TotalPerson}");
+
+                if (exist.Address != dto.Address)
+                    changes.Add($"Địa điểm: '{exist.Address}' → '{dto.Address}'");
+
+                exist.StartDate = dto.StartDate;
+                exist.EndDate = dto.EndDate;
+                exist.Date = dto.Date;
+                exist.Content = dto.Content;
+                exist.TotalPerson = dto.TotalPerson;
+                exist.Address = dto.Address;
+
+                _unitOfWork.iReceptionTimeRepository.Update(exist);
+
+                logs.Add(new LogReceptionTime
+                {
+                    ReceptionTimeId = exist.Id,
+                    Type = LogType.Update,
+                    Description = changes.Any()
+                        ? $"Cập nhật thời gian tiếp đoàn: {string.Join("; ", changes)}."
+                        : "Cập nhật thời gian tiếp đoàn nhưng không thay đổi dữ liệu.",
+                    Reason = DelegationStatus.Names[DelegationStatus.Edited],
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = userId.ToString(),
+                    CreatedByName = userName
+                });
+            }
+
+            // SOFT DELETE
+            var clientIds = dtos
+                .Where(x => x.Id.HasValue)
+                .Select(x => x.Id.Value)
+                .ToList();
+
+            var softDeleteItems = dbItems
+                .Where(x => !clientIds.Contains(x.Id))
+                .ToList();
+
+            foreach (var item in softDeleteItems)
+            {
+                item.Deleted = true;
+                _unitOfWork.iReceptionTimeRepository.Update(item);
+
+                logs.Add(new LogReceptionTime
+                {
+                    ReceptionTimeId = item.Id,
+                    Type = LogType.Delete,
+                    Description = $"Xoá thời gian tiếp đoàn.",
+                    Reason = DelegationStatus.Names[DelegationStatus.Edited],
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = userId.ToString(),
+                    CreatedByName = userName
+                });
+            }
+
             await _unitOfWork.SaveChangesAsync();
-            #endregion
 
-            return _mapper.Map<UpdateReceptionTimeResponseDto>(exist);
+            if (logs.Any())
+            {
+                _unitOfWork.iLogReceptionTimeRepository.AddRange(logs);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            var result = _unitOfWork.iReceptionTimeRepository.Table
+                .Where(x => x.DelegationIncomingId == delegationId && !x.Deleted)
+                .ToList();
+
+            return _mapper.Map<List<UpdateReceptionTimeResponseDto>>(result);
         }
+
+
         public void DeleteReceptionTime(int id)
         {
             _logger.LogInformation($"{nameof(DeleteReceptionTime)} method called. Dto: {id}");
