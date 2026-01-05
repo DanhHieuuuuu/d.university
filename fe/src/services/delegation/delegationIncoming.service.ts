@@ -3,6 +3,7 @@ import axios from '@utils/axios';
 import {
   ICreateDepartment,
   ICreateDoanVao,
+  ICreatePrepare,
   ICreateReceptionTime,
   ICreateReceptionTimeList,
   ICreateSupporter,
@@ -12,7 +13,9 @@ import {
   IReceptionTime,
   IUpdateDepartmentSupport,
   IUpdateDoanVao,
+  IUpdatePrepare,
   IUpdateReceptionTime,
+  IUpdateReceptionTimes,
   IUpdateStatus,
   IViewGuestGroup
 } from '@models/delegation/delegation.model';
@@ -131,15 +134,12 @@ const getByIdDetailDelegation = async (delegationIncomingId: number) => {
 };
 const getByIdReceptionTime = async (delegationIncomingId: number) => {
   try {
-    const res = await axios.get(
-      `${apiDelegationEndpoint}/get-reception-time-by-id?DelegationIncomingId=${delegationIncomingId}`
-    );
-
-    const data: IResponseItem<IReceptionTime> = res.data;
+    const res = await axios.get(`${apiDelegationEndpoint}/get-reception-time-by-id?DelegationIncomingId=${delegationIncomingId}`);
+    const data: IResponseItem<IReceptionTime[]> = res.data;
     return Promise.resolve(data);
   } catch (err) {
     processApiMsgError(err, '');
-    return Promise.reject(err);
+    throw err
   }
 };
 const downloadTemplateExcel = async () => {
@@ -183,7 +183,7 @@ const getLogReceptionTime = async (query: any) => {
     return Promise.reject(err);
   }
 };
-const updateReceptionTime = async (body: IUpdateReceptionTime) => {
+const updateReceptionTimes = async (body: IUpdateReceptionTimes) => {
   try {
     const res = await axios.put(`${apiDelegationEndpoint}/update-reception-time`, body);
     return Promise.resolve(res.data);
@@ -293,7 +293,24 @@ const getByIdDepartmentSupport = async (departmentSupportId: number) => {
     return Promise.reject(err);
   }
 };
-
+const createPrepare = async (body: ICreatePrepare) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/create-prepare`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const updatePrepare = async (body: IUpdatePrepare) => {
+  try {
+    const res = await axios.put(`${apiDelegationEndpoint}/update-prepare`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
 export const DelegationIncomingService = {
   paging,
   getListPhongBan,
@@ -307,7 +324,7 @@ export const DelegationIncomingService = {
   downloadTemplateExcel,
   getLogStatus,
   getListNhanSu,
-  updateReceptionTime,
+  updateReceptionTimes,
   createReceptionTime,
   pagingSupporter,
   createSupporter,
@@ -317,5 +334,7 @@ export const DelegationIncomingService = {
   updateStatus,
   getLogReceptionTime,
   updateDepartmentSupport,
-  getByIdDepartmentSupport
+  getByIdDepartmentSupport,
+  createPrepare,
+  updatePrepare
 };

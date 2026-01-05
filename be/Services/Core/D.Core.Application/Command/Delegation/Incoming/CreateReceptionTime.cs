@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Application.Command.Delegation.Incoming
 {
-    public class CreateReceptionTimeList
-        : ICommandHandler<CreateReceptionTimeListRequestDto, List<CreateReceptionTimeResponseDto>>
+    public class CreateReceptionTimeList: ICommandHandler<CreateReceptionTimeListRequestDto, List<CreateReceptionTimeResponseDto>>
     {
         private readonly IReceptionTimeService _service;
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class ReceptionTimeRequestDto : IQuery<ReceptionTimeResponseDto>
+    public class ReceptionTimeRequestDto : IQuery<List<ReceptionTimeResponseDto>>
     {
         public int DelegationIncomingId {  get; set; }
     }

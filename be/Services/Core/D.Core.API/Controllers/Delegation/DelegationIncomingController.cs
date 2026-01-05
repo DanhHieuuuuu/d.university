@@ -251,12 +251,49 @@ namespace D.Core.API.Controllers.Delegation
 
         }
         /// <summary>
+        /// Tạo mới chuẩn bị đồ tiếp đoàn
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("create-prepare")]
+        public async Task<ResponseAPI> CreatePrepare([FromBody] CreatePrepareRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
+        /// <summary>
         /// Cập nhật thông tin thời gian tiếp đoàn
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("update-reception-time")]
-        public async Task<ResponseAPI> UpdateReceptionTime([FromBody] UpdateReceptionTimeRequestDto dto)
+        public async Task<ResponseAPI> UpdateReceptionTime([FromBody] UpdateReceptionTimesRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Cập nhật đồ chuẩn bị
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("update-prepare")]
+        public async Task<ResponseAPI> UpdatePrepare([FromBody] UpdatePrepareRequestDto dto)
         {
             try
             {

@@ -17,6 +17,7 @@ using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
             var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
-           
+            var receptionTime = _unitOfWork.iReceptionTimeRepository.TableNoTracking.Include(d => d.Id);
             var query = from d in _unitOfWork.iDelegationIncomingRepository.TableNoTracking
                         join pb in phongBanTable on d.IdPhongBan equals pb.Id into pbJoin
                         from pb in pbJoin.DefaultIfEmpty()
@@ -82,7 +83,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                             Location = d.Location,
                             RequestDate = d.RequestDate,
                             ReceptionDate = d.ReceptionDate,
-                            TotalMoney = d.TotalMoney
+                            TotalMoney = d.TotalMoney,
+                            ReceptionTimes = d.ReceptionTimes.Where(s => !s.Deleted).ToList(),
                         };
 
             var totalCount = query.Count();

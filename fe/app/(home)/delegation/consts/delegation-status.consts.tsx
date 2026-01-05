@@ -13,6 +13,7 @@ export class DelegationStatusConst {
   public static BI_HUY = 6;
   public static CAN_BO_SUNG = 7;
   public static DA_CHINH_SUA = 8;
+  public static DA_HET_HAN = 9;
 
   private static readonly map: Record<number, DelegationStatusTagInfo> = {
     [this.TAO_MOI]: {

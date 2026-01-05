@@ -20,7 +20,7 @@ export default function DetailDoanVaoPage() {
   const [activeKey, setActiveKey] = useState('delegation');
   const [delegation, setDelegation] = useState<IViewGuestGroup | null>(null);
   const [detailDelegation, setDetailDelegation] = useState<IDetailDelegationIncoming | null>(null);
-  const [receptionTime, setReceptionTime] = useState<IReceptionTime | null>(null);
+  const [receptionTime, setReceptionTime] = useState<IReceptionTime[]>([]);
   const [isEdit, setIsEdit] = useState(false);
   const delegationFormRef = useRef<FormInstance>(null);
   const staffFormRef = useRef<FormInstance>(null);
@@ -40,7 +40,7 @@ export default function DetailDoanVaoPage() {
       dispatch(getByIdDetailDelegation(Number(id)))
         .unwrap()
         .then((res) => setDetailDelegation(res));
-    } else if (key === 'receptionTime' && !receptionTime) {
+    } else if (key === 'receptionTime' && receptionTime.length === 0) {
       dispatch(getByIdReceptionTime(Number(id)))
         .unwrap()
         .then((res) => setReceptionTime(res));
@@ -99,16 +99,17 @@ export default function DetailDoanVaoPage() {
     {
       key: 'receptionTime',
       label: 'Thông tin thời gian tiếp đoàn',
-      children: receptionTime ? (
-        <ReceptionTimeTab
-          data={receptionTime}
-          isEdit={isEdit}
-          ref={receptionTimeFormRef}
-          onUpdated={reloadReceptionTime}
-        />
-      ) : (
-        <Empty description="Không có dữ liệu thời gian tiếp đoàn" />
-      )
+      children:
+        receptionTime.length > 0 ? (
+          <ReceptionTimeTab
+            ref={receptionTimeFormRef}
+            data={receptionTime}
+            isEdit={isEdit}
+            onUpdated={reloadReceptionTime}
+          />
+        ) : (
+          <Empty description="Không có dữ liệu thời gian tiếp đoàn" />
+        )
     }
   ];
 
@@ -151,6 +152,7 @@ export default function DetailDoanVaoPage() {
           </div>
         )
       }
+      bodyStyle={{ maxHeight: '90%', overflow: 'auto' }}
     >
       <Tabs type="card" items={tabItems} activeKey={activeKey} onChange={handleTabChange} />
     </Card>
