@@ -14,7 +14,7 @@ import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 
-type PositionModalProps = {
+type DepartmentModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
@@ -22,7 +22,7 @@ type PositionModalProps = {
   refreshData: () => void;
 };
 
-const PositionModal: React.FC<PositionModalProps> = (props) => {
+const DepartmentModal: React.FC<DepartmentModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm<ICreatePhongBan>();
   const [title, setTitle] = useState<string>('Thêm mới phòng ban');
@@ -211,4 +211,4 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   );
 };
 
-export default PositionModal;
+export default DepartmentModal;

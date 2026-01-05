@@ -14,11 +14,11 @@ import {
   ForkOutlined,
   BookOutlined,
   LinkOutlined,
-  ProfileOutlined
+  ProfileOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
-import { HistoryIcon } from 'lucide-react';
 
 export const listMenuCore: IMenu[] = [
   {
@@ -30,7 +30,19 @@ export const listMenuCore: IMenu[] = [
     label: 'Quản lý nhân sự',
     routerLink: '/hrm',
     // permissionKeys: [PermissionCoreConst.CoreMenuNhanSu],
-    icon: <TeamOutlined />
+    icon: <TeamOutlined />,
+    items: [
+      {
+        label: 'Danh sách nhân sự',
+        routerLink: '/hrm/employees',
+        icon: <UserOutlined />
+      },
+      {
+        label: 'Danh sách phòng ban',
+        routerLink: '/hrm/departments',
+        icon: <ApartmentOutlined />
+      }
+    ]
   },
   {
     label: 'Quản lý sinh viên',
@@ -39,23 +51,23 @@ export const listMenuCore: IMenu[] = [
   },
   {
     label: 'Danh mục',
-    routerLink: '/list',
+    routerLink: '/category',
     permissionKeys: [PermissionCoreConst.UserMenuAdmin],
     icon: <BarsOutlined />,
     items: [
       {
         label: 'Chức vụ',
-        routerLink: '/list/positions',
+        routerLink: '/category/positions',
         icon: <ApartmentOutlined />
       },
       {
         label: 'Phòng ban',
-        routerLink: '/list/departments',
+        routerLink: '/category/departments',
         icon: <PartitionOutlined />
       },
       {
         label: 'Tổ bộ môn',
-        routerLink: '/list/divisions',
+        routerLink: '/category/divisions',
         icon: <DeploymentUnitOutlined />
       }
     ]
@@ -89,9 +101,8 @@ export const listMenuCore: IMenu[] = [
             label: 'Kpi trường',
             routerLink: '/kpi/list/school',
             icon: <PartitionOutlined />
-          },
-        ],
-
+          }
+        ]
       },
       {
         label: 'Quản lý KPI',
@@ -102,7 +113,7 @@ export const listMenuCore: IMenu[] = [
             label: 'Kê khai Kpi cá nhân',
             routerLink: '/kpi/manage/personals',
             icon: <PartitionOutlined />
-          },
+          }
           // {
           //   label: 'Kê khai Kpi đơn vị',
           //   routerLink: '/kpi/list/units',
@@ -113,7 +124,7 @@ export const listMenuCore: IMenu[] = [
           //   routerLink: '/kpi/list/school',
           //   icon: <PartitionOutlined />
           // },
-        ],
+        ]
       }
     ]
   },

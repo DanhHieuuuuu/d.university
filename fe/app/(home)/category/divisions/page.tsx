@@ -1,4 +1,5 @@
 'use client';
+
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input } from 'antd';
 import {
@@ -13,14 +14,14 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedIdToBoMon } from '@redux/feature/danh-muc/danhmucSlice';
 import { getAllToBoMon } from '@redux/feature/danh-muc/danhmucThunk';
+import { formatDateView } from '@utils/index';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
-import PositionModal from './(dialog)/create-or-update';
-import { formatDateView } from '@utils/index';
+import DivisionModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -183,7 +184,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <PositionModal
+      <DivisionModal
         isModalOpen={isModalOpen}
         isUpdate={isUpdate}
         isView={isView}
