@@ -6,9 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import { useAppDispatch } from '@redux/hooks';
 import { ICreateReceptionTime, ICreateReceptionTimeList } from '@models/delegation/delegation.model';
-import { createReceptionTime } from '@redux/feature/delegation/delegationThunk';
+import { createPrepare, createReceptionTime } from '@redux/feature/delegation/delegationThunk';
 import { toast } from 'react-toastify';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
 const CreateReceptionTimePage: React.FC = () => {
   const [form] = Form.useForm();
@@ -19,8 +19,11 @@ const CreateReceptionTimePage: React.FC = () => {
   const delegationIncomingId = Number(searchParams.get('delegationIncomingId'));
 
   const onFinish = async (values: any) => {
+    console.log('FORM VALUES', values);
     try {
       setLoading(true);
+
+      //Create ReceptionTime
       const payload = {
         items: values.receptionTimes.map((item: any) => ({
           date: item.date.format('YYYY-MM-DD'),
@@ -32,13 +35,33 @@ const CreateReceptionTimePage: React.FC = () => {
           delegationIncomingId
         }))
       };
-      await dispatch(createReceptionTime(payload)).unwrap();
-      toast.success('Tạo thời gian tiếp đoàn thành công!');
+
+      const receptionResult = await dispatch(createReceptionTime(payload)).unwrap();
+      console.log('receptionResult:', receptionResult);
+      //Create Prepare theo từng ReceptionTime
+      const receptionTimes = receptionResult.data;
+      await Promise.all(
+        receptionTimes.map((rt: any, index: number) => {
+          const prepares = values.receptionTimes[index]?.prepares;
+          console.log('PREPARES:', prepares);
+          if (!prepares || prepares.length === 0) return Promise.resolve();
+
+          return dispatch(
+            createPrepare({
+              items: prepares.map((p: any) => ({
+                name: p.name,
+                description: p.description,
+                money: p.money,
+                receptionTimeId: rt.id
+              }))
+            })
+          ).unwrap();
+        })
+      );
+      toast.success('Tạo mới thành công!');
       router.back();
-    } catch (error: any) {
-      toast.error(error?.message || 'Tạo thất bại!');
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      toast.error(String(err));
     }
   };
 
@@ -157,6 +180,61 @@ const CreateReceptionTimePage: React.FC = () => {
                   <Form.Item {...restField} name={[name, 'content']} label="Nội dung">
                     <Input.TextArea rows={2} />
                   </Form.Item>
+                  {/* PREPARES */}
+                  <Form.List name={[name, 'prepares']}>
+                    {(prepareFields, { add: addPrepare, remove: removePrepare }) => (
+                      <>
+                        {prepareFields.map(({ key: pKey, name: pName }) => (
+                          <Card
+                            key={pKey}
+                            size="small"
+                            className="bg-gray-10 mb-2"
+                            title="Đồ chuẩn bị"
+                            extra={
+                              <Button
+                                type="text"
+                                danger
+                                icon={<DeleteOutlined />}
+                                onClick={() => removePrepare(pName)}
+                              />
+                            }
+                          >
+                            <Row gutter={12}>
+                              <Col span={8}>
+                                <Form.Item
+                                  name={[pName, 'name']}
+                                  label="Tên"
+                                  rules={[{ required: true, message: 'Nhập tên chuẩn bị' }]}
+                                >
+                                  <Input />
+                                </Form.Item>
+                              </Col>
+
+                              <Col span={10}>
+                                <Form.Item name={[pName, 'description']} label="Mô tả">
+                                  <Input />
+                                </Form.Item>
+                              </Col>
+
+                              <Col span={6}>
+                                <Form.Item
+                                  name={[pName, 'money']}
+                                  label="Chi phí"
+                                  rules={[{ required: true, message: 'Nhập chi phí' }]}
+                                >
+                                  <InputNumber min={0} style={{ width: '100%' }} />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          </Card>
+                        ))}
+
+                        <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => addPrepare()}>
+                          Thêm đồ chuẩn bị
+                        </Button>
+                      </>
+                    )}
+                  </Form.List>
                 </Card>
               ))}
               <div style={{ textAlign: 'center' }}>

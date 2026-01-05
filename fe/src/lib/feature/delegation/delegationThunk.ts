@@ -3,6 +3,7 @@ import { ICreateHopDongNs, IQueryNhanSu } from '@models/nhansu/nhansu.model';
 import {
   ICreateDepartment,
   ICreateDoanVao,
+  ICreatePrepare,
   ICreateReceptionTime,
   ICreateReceptionTimeList,
   ICreateSupporter,
@@ -12,6 +13,7 @@ import {
   IQueryLogStatus,
   IUpdateDepartmentSupport,
   IUpdateDoanVao,
+  IUpdatePrepare,
   IUpdateReceptionTime,
   IUpdateReceptionTimes,
   IUpdateStatus
@@ -305,5 +307,25 @@ export const getByIdDepartmentSupport = createAsyncThunk(
         response: error.response?.data
       });
     }
+  }
+);
+export const createPrepare = createAsyncThunk(
+  'delegation-incoming/createPrepare',
+  async (payload: ICreatePrepare, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.createPrepare(payload);
+    if (data?.code !== 200) {
+      return rejectWithValue(data.message);
+    }
+    return data;
+  }
+);
+export const updatePrepare = createAsyncThunk(
+  'delegation-incoming/updatePrepare',
+  async (payload: IUpdatePrepare, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.updatePrepare(payload);
+    if (data?.code !== 200) {
+      return rejectWithValue(data.message);
+    }
+    return data;
   }
 );

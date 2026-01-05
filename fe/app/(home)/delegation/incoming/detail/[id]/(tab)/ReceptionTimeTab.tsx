@@ -1,22 +1,23 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect,forwardRef, useImperativeHandle } from 'react';
 import dayjs from 'dayjs';
-import { Form, Input, InputNumber, DatePicker, TimePicker, Card, Button, Row, Col } from 'antd';
+import { Form, Input, InputNumber, DatePicker, TimePicker, Card, Button, Row, Col, FormInstance } from 'antd';
 import { IReceptionTime } from '@models/delegation/delegation.model';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@redux/hooks';
-import { updateReceptionTimes } from '@redux/feature/delegation/delegationThunk';
-
+import { updatePrepare, updateReceptionTimes } from '@redux/feature/delegation/delegationThunk';
+import { DeleteOutlined } from '@ant-design/icons';
 type ReceptionTimeTabProps = {
   data: IReceptionTime[] | null;
   isEdit?: boolean;
   onUpdated?: () => void;
 };
 
-const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = false, onUpdated }, ref) => {
+const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ data, isEdit = false, onUpdated }, ref) => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
+  useImperativeHandle(ref, () => form);
   useEffect(() => {
     if (!data) return;
     form.setFieldsValue({
@@ -24,14 +25,16 @@ const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = fals
         ...item,
         date: dayjs(item.date),
         startDate: dayjs(item.startDate, 'HH:mm:ss'),
-        endDate: dayjs(item.endDate, 'HH:mm:ss')
+        endDate: dayjs(item.endDate, 'HH:mm:ss'),
+        prepares: item.prepares || []
       }))
     });
   }, [data]);
 
   const onFinish = async (values: any) => {
     try {
-      const payload = {
+      // Update ReceptionTime
+      const receptionPayload = {
         items: values.items.map((x: any) => ({
           id: x.id,
           delegationIncomingId: x.delegationIncomingId,
@@ -44,11 +47,22 @@ const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = fals
         }))
       };
 
-      await dispatch(updateReceptionTimes(payload)).unwrap();
-      toast.success('Cập nhật thời gian tiếp đoàn thành công');
+      await dispatch(updateReceptionTimes(receptionPayload)).unwrap();
+      //Update Prepare theo ReceptionTime
+      for (const item of values.items) {
+        const preparePayload = {
+          receptionTimeId: item.id,
+          items: (item.prepares || []).map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            money: p.money
+          }))
+        };
+        await dispatch(updatePrepare(preparePayload)).unwrap();
+      }
       onUpdated?.();
-    } catch {
-      toast.error('Cập nhật thất bại');
+    } catch (err) {
     }
   };
 
@@ -56,7 +70,7 @@ const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = fals
     return <div className="text-center text-gray-400">Không có thời gian tiếp đoàn</div>;
   }
 
-  return (
+  return ( 
     <Form form={form} layout="vertical" onFinish={onFinish}>
       <Form.List name="items">
         {(fields, { remove }) => (
@@ -65,7 +79,7 @@ const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = fals
               <Card
                 key={key}
                 size="small"
-                className="mb-4"
+                className="mb-4 overflow-hidden"
                 title={`Lần tiếp đoàn ${index + 1}`}
                 extra={
                   isEdit && (
@@ -79,6 +93,7 @@ const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = fals
                     </Button>
                   )
                 }
+               
               >
                 <Form.Item name={[name, 'id']} hidden />
                 <Form.Item name={[name, 'delegationIncomingId']} hidden />
@@ -116,6 +131,60 @@ const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = fals
                     </Form.Item>
                   </Col>
                 </Row>
+                {/* PREPARES */}
+                <Form.List name={[name, 'prepares']}>
+                  {(prepareFields, { remove: removePrepare }) => (
+                    <>
+                      {prepareFields.map(({ key: pKey, name: pName }, pIndex) => (
+                        <Card
+                          key={pKey}
+                          size="small"
+                          className="bg-gray-10 mb-2"
+                          title={`${pIndex + 1}. Đồ chuẩn bị tiếp đoàn `}
+                          extra={
+                            isEdit && (
+                              <Button
+                                type="text"
+                                danger
+                                icon={<DeleteOutlined />}
+                                onClick={() => removePrepare(pName)}
+                              />
+                            )
+                          }
+                        >
+                          <Form.Item name={[pName, 'id']} hidden />
+                          <Row gutter={12}>
+                            <Col span={8}>
+                              <Form.Item
+                                label="Tên"
+                                name={[pName, 'name']}
+                                rules={[{ required: true, message: 'Nhập tên chuẩn bị' }]}
+                              >
+                                <Input disabled={!isEdit} />
+                              </Form.Item>
+                            </Col>
+
+                            <Col span={10}>
+                              <Form.Item label="Mô tả" name={[pName, 'description']}>
+                                <Input disabled={!isEdit} />
+                              </Form.Item>
+                            </Col>
+
+                            <Col span={6}>
+                              <Form.Item
+                                label="Chi phí"
+                                name={[pName, 'money']}
+                                rules={[{ required: true, message: 'Nhập chi phí' }]}
+                              >
+                                <InputNumber style={{ width: '100%' }} min={0} disabled={!isEdit} />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </Card>
+                      ))}
+                    </>
+                  )}
+                </Form.List>
               </Card>
             ))}
           </>
@@ -123,6 +192,6 @@ const ReceptionTimeTab: React.FC<ReceptionTimeTabProps> = ({ data, isEdit = fals
       </Form.List>
     </Form>
   );
-};
-
+}
+)
 export default ReceptionTimeTab;

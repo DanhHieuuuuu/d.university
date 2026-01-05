@@ -78,6 +78,12 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
                 .FirstOrDefault(d => d.Id == delegationIncomingId);
+            //Load Prepare theo các ReceptionTimeId
+            var receptionTimeIds = receptionTimes.Select(x => x.Id).ToList();
+
+            var prepares = _unitOfWork.iPrepareRepository.TableNoTracking
+                .Where(p => receptionTimeIds.Contains(p.ReceptionTimeId) && !p.Deleted)
+                .ToList();
 
             var result = receptionTimes.Select(rt => new ReceptionTimeResponseDto
             {
@@ -90,7 +96,17 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 Address = rt.Address,
                 DelegationIncomingId = rt.DelegationIncomingId,
                 DelegationName = delegation?.Name,
-                DelegationCode = delegation?.Code
+                DelegationCode = delegation?.Code,
+                Prepares = prepares
+                     .Where(p => p.ReceptionTimeId == rt.Id)
+                     .Select(p => new PrepareResponseDto
+                     {
+                         Id = p.Id,
+                         Name = p.Name,
+                         Description = p.Description,
+                         Money = p.Money
+                     })
+                     .ToList()
             }).ToList();
 
             return result;
@@ -113,9 +129,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             var logs = new List<LogReceptionTime>();
 
-            // =======================
-            // 1️⃣ UPDATE
-            // =======================
+            // UPDATE
             foreach (var dto in dtos.Where(x => x.Id.HasValue))
             {
                 var exist = dbItems.FirstOrDefault(x => x.Id == dto.Id.Value);
@@ -164,9 +178,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 });
             }
 
-            // =======================
-            // 2️⃣ SOFT DELETE
-            // =======================
+            // SOFT DELETE
             var clientIds = dtos
                 .Where(x => x.Id.HasValue)
                 .Select(x => x.Id.Value)

@@ -102,6 +102,7 @@ export default function DetailDoanVaoPage() {
       children:
         receptionTime.length > 0 ? (
           <ReceptionTimeTab
+            ref={receptionTimeFormRef}
             data={receptionTime}
             isEdit={isEdit}
             onUpdated={reloadReceptionTime}
@@ -151,6 +152,7 @@ export default function DetailDoanVaoPage() {
           </div>
         )
       }
+      bodyStyle={{ maxHeight: '90%', overflow: 'auto' }}
     >
       <Tabs type="card" items={tabItems} activeKey={activeKey} onChange={handleTabChange} />
     </Card>

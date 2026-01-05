@@ -113,6 +113,7 @@ const Page = () => {
             columns={receptionColumns}
             dataSource={listLogReceptionTime}
             pagination={{ position: ['bottomRight'], ...receptionPagination }}
+            scroll={{ y: 'calc(100vh - 370px)' }}
           />
         </TabPane>
       </Tabs>

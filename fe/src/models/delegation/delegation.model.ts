@@ -172,3 +172,15 @@ export interface IUpdateDepartmentSupport {
     supporterCode: string;
   }[];
 }
+export interface ICreatePrepareItem {
+  name: string,
+  description: string,
+  money:number,
+  receptionTimeId:number
+}
+export interface ICreatePrepare {
+  items: ICreatePrepareItem[];
+}
+export interface IUpdatePrepare {
+  items: IPrepare[];
+}

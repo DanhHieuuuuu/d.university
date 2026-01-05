@@ -84,7 +84,6 @@ const Page = () => {
       key: 'phongBan',
       dataIndex: 'phongBan',
       title: 'Phòng ban phụ trách',
-      align: 'center',
       width:200
     },
     {
@@ -325,7 +324,7 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        scroll={{ x:"max-content" }}
+       
       />
       <CreateDoanVaoModal
         isModalOpen={isModalOpen}

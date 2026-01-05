@@ -18,5 +18,13 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
         public int DelegationIncomingId { get; set; }
         public string? DelegationName { get; set; }
         public string? DelegationCode { get; set; }
+        public List<PrepareResponseDto> Prepares { get; set; } = new();
+    }
+    public class PrepareResponseDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public decimal Money { get; set; }
     }
 }

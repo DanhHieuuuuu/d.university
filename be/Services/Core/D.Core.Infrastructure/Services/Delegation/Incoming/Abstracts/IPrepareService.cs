@@ -1,4 +1,5 @@
-﻿using System;
+﻿using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
 {
     public interface IPrepareService
     {
+        Task<List<CreatePrepareResponseDto>> CreatePrepareList(CreatePrepareRequestDto dto);
+        Task<List<UpdatePrepareResponseDto>> UpdatePrepares(UpdatePrepareRequestDto dto);
     }
 }
