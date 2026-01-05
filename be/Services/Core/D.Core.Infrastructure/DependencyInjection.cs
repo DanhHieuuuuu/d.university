@@ -68,6 +68,9 @@ namespace D.Core.Infrastructure
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             return services
+                .AddScoped<IFileRepository, FileRepository>()
+                .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>()
+
                 .AddScoped<IDmChucVuRepository, DmChucVuRepository>()
                 .AddScoped<IDmDanTocRepository, DmDanTocRepository>()
                 .AddScoped<IDmGioiTinhRepository, DmGioiTinhRepository>()
@@ -82,9 +85,11 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsNhanSuRepository, NsNhanSuRepository>()
                 .AddScoped<INsQuanHeGiaDinhRepository, NsQuanHeGiaDinhRepository>()
                 .AddScoped<INsHopDongRepository, NsHopDongRepository>()
-                .AddScoped<INsHopDongChiTietRepository, NsHopDongChiTietRepository>()
                 .AddScoped<INsToBoMonRepository, NsToBoMonRepository>()
-                .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>()
+                .AddScoped<INsQuyetDinhRepository, NsQuyetDinhRepository>()
+                .AddScoped<INsQuyetDinhLogRepository, NsQuyetDinhLogRepository>()
+                .AddScoped<INsQuaTrinhCongTacRepository, NsQuaTrinhCongTacRepository>()
+                
             #region DaoTao
                 .AddScoped<IDtKhoaRepository, DtKhoaRepository>()
                 .AddScoped<IDtNganhRepository, DtNganhRepository>()
@@ -104,7 +109,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IReceptionTimeRepository, ReceptionTimeRepository>()
                 .AddScoped<ISupporterRepository, SupporterRepository>()
             #endregion
-                .AddScoped<IFileRepository, FileRepository>()
+                
             #region Kpi
                 .AddScoped<IKpiCaNhanRepository, KpiCaNhanRepository>()
                 .AddScoped<IKpiDonViRepository, KpiDonViRepository>()

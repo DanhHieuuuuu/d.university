@@ -1,4 +1,5 @@
 'use client';
+
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input } from 'antd';
 import {
@@ -19,7 +20,7 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryPhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
-import PositionModal from './(dialog)/create-or-update';
+import DepartmentModal from './(dialog)/create-or-update';
 import { formatDateView } from '@utils/index';
 
 const Page = () => {
@@ -208,7 +209,7 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
 
-      <PositionModal
+      <DepartmentModal
         isModalOpen={isModalOpen}
         isUpdate={isUpdate}
         isView={isView}

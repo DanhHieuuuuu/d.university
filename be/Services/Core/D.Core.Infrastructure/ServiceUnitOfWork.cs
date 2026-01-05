@@ -31,7 +31,9 @@ namespace D.Core.Infrastructure
         private NsNhanSuRepository _nsNhanSuRepository;
         private NsQuanHeGiaDinhRepository _nsQuanHeGiaDinhRepository;
         private NsHopDongRepository _nsHopDongRepository;
-        private NsHopDongChiTietRepository _nsHopDongChiTietRepository;
+        private NsQuyetDinhRepository _nsQuyetDinhRepository;
+        private NsQuyetDinhLogRepository _nsQuyetDinhLogRepository;
+        private NsQuaTrinhCongTacRepository _nsQuaTrinhCongTacRepository;
 
         #region Dao Tao
         private DtKhoaRepository _dtKhoaRepository;
@@ -124,18 +126,39 @@ namespace D.Core.Infrastructure
             }
         }
 
-        public INsHopDongChiTietRepository iNsHopDongChiTietRepository
+        public INsQuyetDinhLogRepository iNsQuyetDinhLogRepository
         {
             get
             {
-                if (_nsHopDongChiTietRepository == null)
+                if (_nsQuyetDinhLogRepository == null)
                 {
-                    _nsHopDongChiTietRepository = new NsHopDongChiTietRepository(
-                        _dbContext,
-                        _httpContext
-                    );
+                    _nsQuyetDinhLogRepository = new NsQuyetDinhLogRepository(_dbContext, _httpContext);
                 }
-                return _nsHopDongChiTietRepository;
+                return _nsQuyetDinhLogRepository;
+            }
+        }
+
+        public INsQuyetDinhRepository iNsQuyetDinhRepository
+        {
+            get
+            {
+                if (_nsQuyetDinhRepository == null)
+                {
+                    _nsQuyetDinhRepository = new NsQuyetDinhRepository(_dbContext, _httpContext);
+                }
+                return _nsQuyetDinhRepository;
+            }
+        }
+
+        public INsQuaTrinhCongTacRepository iNsQuaTrinhCongTacRepository
+        {
+            get
+            {
+                if (_nsQuaTrinhCongTacRepository == null)
+                {
+                    _nsQuaTrinhCongTacRepository = new NsQuaTrinhCongTacRepository(_dbContext, _httpContext);
+                }
+                return _nsQuaTrinhCongTacRepository;
             }
         }
 

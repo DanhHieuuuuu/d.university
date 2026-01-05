@@ -9,7 +9,7 @@ import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 
-type PositionModalProps = {
+type DivisionModalProps = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   isUpdate: boolean;
@@ -17,7 +17,7 @@ type PositionModalProps = {
   refreshData: () => void;
 };
 
-const PositionModal: React.FC<PositionModalProps> = (props) => {
+const DivisionModal: React.FC<DivisionModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm<ICreateToBoMon>();
   const [title] = useState<string>('');
@@ -162,4 +162,4 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   );
 };
 
-export default PositionModal;
+export default DivisionModal;
