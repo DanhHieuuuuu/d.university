@@ -54,9 +54,11 @@ namespace D.Core.Domain
         // Nhân sự
         DbSet<NsNhanSu> NsNhanSus { get; set; }
         DbSet<NsHopDong> NsHopDongs { get; set; }
-        DbSet<NsHopDongChiTiet> NsHopDongChiTiets { get; set; }
         DbSet<NsToBoMon> NsToBoMons { get; set; }
         DbSet<NsQuanHeGiaDinh> NsQuanHeGiaDinhs { get; set; }
+        DbSet<NsQuyetDinh> NsQuyetDinhs { get; set; }
+        DbSet<NsQuyetDinhLog> nsQuyetDinhLogs { get; set; }
+        DbSet<NsQuaTrinhCongTac> NsQuaTrinhCongTacs { get; set; }
 
         #endregion
 
