@@ -6,9 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import { useAppDispatch } from '@redux/hooks';
 import { ICreateReceptionTime, ICreateReceptionTimeList } from '@models/delegation/delegation.model';
-import { createReceptionTime } from '@redux/feature/delegation/delegationThunk';
+import { createPrepare, createReceptionTime } from '@redux/feature/delegation/delegationThunk';
 import { toast } from 'react-toastify';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
 const CreateReceptionTimePage: React.FC = () => {
   const [form] = Form.useForm();
@@ -19,10 +19,11 @@ const CreateReceptionTimePage: React.FC = () => {
   const delegationIncomingId = Number(searchParams.get('delegationIncomingId'));
 
   const onFinish = async (values: any) => {
+    console.log('FORM VALUES', values);
     try {
       setLoading(true);
-
-      const payload: ICreateReceptionTime = {
+      
+      const data: ICreateReceptionTime = {
         delegationIncomingId,
         date: values.date.format('YYYY-MM-DD'),
         startDate: values.startTime.format('HH:mm:ss'),
@@ -31,14 +32,36 @@ const CreateReceptionTimePage: React.FC = () => {
         totalPerson: values.totalPerson,
         address: values.address
       };
+      const payload: ICreateReceptionTimeList = {
+        items: [data],
+      };      
 
-      await dispatch(createReceptionTime(payload)).unwrap();
-      toast.success('Tạo thời gian tiếp đoàn thành công!');
+      const receptionResult = await dispatch(createReceptionTime(payload)).unwrap();
+      console.log('receptionResult:', receptionResult);
+      //Create Prepare theo từng ReceptionTime
+      const receptionTimes = receptionResult.data;
+      await Promise.all(
+        receptionTimes.map((rt: any, index: number) => {
+          const prepares = values.receptionTimes[index]?.prepares;
+          console.log('PREPARES:', prepares);
+          if (!prepares || prepares.length === 0) return Promise.resolve();
+
+          return dispatch(
+            createPrepare({
+              items: prepares.map((p: any) => ({
+                name: p.name,
+                description: p.description,
+                money: p.money,
+                receptionTimeId: rt.id
+              }))
+            })
+          ).unwrap();
+        })
+      );
+      toast.success('Tạo mới thành công!');
       router.back();
-    } catch (error: any) {
-      toast.error(error?.message || 'Tạo thất bại!');
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      toast.error(String(err));
     }
   };
 
@@ -66,74 +89,162 @@ const CreateReceptionTimePage: React.FC = () => {
           <span>Thêm thời gian tiếp đoàn</span>
         </div>
       }
+      extra={
+        <div className="flex justify-center gap-2">
+          <Button type="primary" onClick={() => form.submit()} loading={loading}>
+            Tạo mới
+          </Button>
+          <Button onClick={() => router.back()}>Hủy</Button>
+        </div>
+      }
+      bodyStyle={{ maxHeight: '90%', overflow: 'auto' }}
     >
       <Form
         form={form}
         layout="vertical"
         onFinish={onFinish}
         initialValues={{
-          totalPerson: 0
+          receptionTimes: [
+            {
+              totalPerson: 0
+            }
+          ]
         }}
       >
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              label="Ngày tiếp đoàn"
-              name="date"
-              rules={[{ required: true, message: 'Vui lòng chọn ngày tiếp đoàn' }]}
-            >
-              <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              label="Thời gian bắt đầu"
-              name="startTime"
-              rules={[{ required: true, message: 'Vui lòng chọn thời gian bắt đầu' }]}
-            >
-              <TimePicker format="HH:mm:ss" style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              label="Thời gian kết thúc"
-              name="endTime"
-              rules={[{ required: true, message: 'Vui lòng chọn thời gian kết thúc' }]}
-            >
-              <TimePicker format="HH:mm:ss" style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-        </Row>
+        <Form.List name="receptionTimes">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }, index) => (
+                <Card
+                  key={key}
+                  size="small"
+                  title={`Thời gian tiếp đoàn ${index + 1}`}
+                  className="mb-3"
+                  extra={
+                    fields.length > 1 && (
+                      <Button danger size="small" onClick={() => remove(name)}>
+                        Xóa
+                      </Button>
+                    )
+                  }
+                >
+                  <Row gutter={16}>
+                    <Col span={8}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'date']}
+                        label="Ngày tiếp đoàn"
+                        rules={[{ required: true, message: 'Chọn ngày' }]}
+                      >
+                        <DatePicker style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="Tổng số người"
-              name="totalPerson"
-              rules={[{ type: 'number', min: 0, message: 'Số người phải lớn hơn hoặc bằng 0' }]}
-            >
-              <InputNumber min={0} style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Địa điểm" name="address" rules={[{ message: 'Vui lòng nhập địa điểm' }]}>
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
+                    <Col span={8}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'startTime']}
+                        label="Bắt đầu"
+                        rules={[{ required: true, message: 'Chọn giờ bắt đầu' }]}
+                      >
+                        <TimePicker format="HH:mm:ss" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
 
-        <Form.Item label="Nội dung" name="content" rules={[{ message: 'Vui lòng nhập nội dung' }]}>
-          <Input.TextArea rows={3} />
-        </Form.Item>
+                    <Col span={8}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'endTime']}
+                        label="Kết thúc"
+                        rules={[{ required: true, message: 'Chọn giờ kết thúc' }]}
+                      >
+                        <TimePicker format="HH:mm:ss" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
-        <Form.Item>
-          <div className="flex justify-center gap-2">
-            <Button type="primary" htmlType="submit" loading={loading}>
-              Tạo mới
-            </Button>
-            <Button onClick={() => router.back()}>Hủy</Button>
-          </div>
-        </Form.Item>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item {...restField} name={[name, 'totalPerson']} label="Tổng số người">
+                        <InputNumber min={0} style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={12}>
+                      <Form.Item {...restField} name={[name, 'address']} label="Địa điểm">
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  <Form.Item {...restField} name={[name, 'content']} label="Nội dung">
+                    <Input.TextArea rows={2} />
+                  </Form.Item>
+                  {/* PREPARES */}
+                  <Form.List name={[name, 'prepares']}>
+                    {(prepareFields, { add: addPrepare, remove: removePrepare }) => (
+                      <>
+                        {prepareFields.map(({ key: pKey, name: pName }) => (
+                          <Card
+                            key={pKey}
+                            size="small"
+                            className="bg-gray-10 mb-2"
+                            title="Đồ chuẩn bị"
+                            extra={
+                              <Button
+                                type="text"
+                                danger
+                                icon={<DeleteOutlined />}
+                                onClick={() => removePrepare(pName)}
+                              />
+                            }
+                          >
+                            <Row gutter={12}>
+                              <Col span={8}>
+                                <Form.Item
+                                  name={[pName, 'name']}
+                                  label="Tên"
+                                  rules={[{ required: true, message: 'Nhập tên chuẩn bị' }]}
+                                >
+                                  <Input />
+                                </Form.Item>
+                              </Col>
+
+                              <Col span={10}>
+                                <Form.Item name={[pName, 'description']} label="Mô tả">
+                                  <Input />
+                                </Form.Item>
+                              </Col>
+
+                              <Col span={6}>
+                                <Form.Item
+                                  name={[pName, 'money']}
+                                  label="Chi phí"
+                                  rules={[{ required: true, message: 'Nhập chi phí' }]}
+                                >
+                                  <InputNumber min={0} style={{ width: '100%' }} />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          </Card>
+                        ))}
+
+                        <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => addPrepare()}>
+                          Thêm đồ chuẩn bị
+                        </Button>
+                      </>
+                    )}
+                  </Form.List>
+                </Card>
+              ))}
+              <div style={{ textAlign: 'center' }}>
+                <Button type="dashed" size="small" style={{ padding: '14px' }} onClick={() => add()}>
+                  + Thêm thời gian tiếp đoàn
+                </Button>
+              </div>
+            </>
+          )}
+        </Form.List>
       </Form>
     </Card>
   );

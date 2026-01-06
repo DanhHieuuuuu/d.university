@@ -47,6 +47,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 query = query.Where(x => dto.Cccd == x.SoCccd);
             }
 
+            if (dto.IdPhongBan != null)
+            {
+                query = query.Where(x => x.HienTaiPhongBan == dto.IdPhongBan);
+            }
+
             var totalCount = query.Count();
 
             var items = query
@@ -228,18 +233,18 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             // Lấy HsChucVu
             var hsChucVu = _unitOfWork.iDmChucVuRepository.FindById(dto.IdChucVu)?.HsChucVu;
 
-            var chiTietHopDong = new NsHopDongChiTiet
-            {
-                IdHopDong = newHd.Id,
-                IdNhanSu = newNhanSu.IdNhanSu,
-                MaNhanSu = newNhanSu.MaNhanSu,
-                IdChucVu = dto.IdChucVu,
-                IdPhongBan = dto.IdPhongBan,
-                IdToBoMon = dto.IdToBoMon,
-                LuongCoBan = dto.LuongCoBan,
-                HsChucVu = hsChucVu,
-                GhiChu = dto.GhiChu,
-            };
+            //var chiTietHopDong = new NsQuaTrinhCongTac
+            //{
+            //    IdHopDong = newHd.Id,
+            //    IdNhanSu = newNhanSu.IdNhanSu,
+            //    MaNhanSu = newNhanSu.MaNhanSu,
+            //    IdChucVu = dto.IdChucVu,
+            //    IdPhongBan = dto.IdPhongBan,
+            //    IdToBoMon = dto.IdToBoMon,
+            //    LuongCoBan = dto.LuongCoBan,
+            //    HsChucVu = hsChucVu,
+            //    GhiChu = dto.GhiChu,
+            //};
 
             newHd.IdNhanSu = newNhanSu.IdNhanSu;
 
@@ -255,8 +260,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 _unitOfWork.iNsNhanSuRepository.SaveChange();
             }
 
-            _unitOfWork.iNsHopDongChiTietRepository.Add(chiTietHopDong);
-            _unitOfWork.iNsHopDongChiTietRepository.SaveChange();
+            //_unitOfWork.iNsHopDongChiTietRepository.Add(chiTietHopDong);
+            //_unitOfWork.iNsHopDongChiTietRepository.SaveChange();
         }
 
         public NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto)
@@ -337,12 +342,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     ? cvName
                     : null;
 
-            var hopDongChiTiet =
-                _unitOfWork.iNsHopDongChiTietRepository.TableNoTracking.FirstOrDefault(d =>
-                    d.IdNhanSu == idNhanSu
-                );
-            result.IdToBoMon = hopDongChiTiet?.IdToBoMon;
-
             return result;
         }
 
@@ -379,11 +378,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     ? cvName
                     : null;
 
-            var hopDongChiTiet =
-                _unitOfWork.iNsHopDongChiTietRepository.TableNoTracking.FirstOrDefault(d =>
-                    d.IdNhanSu == idNhanSu
-                );
-            result.IdToBoMon = hopDongChiTiet?.IdToBoMon;
 
             result.ThongTinGiaDinh = GetThongTinGiaDinh(idNhanSu);
 

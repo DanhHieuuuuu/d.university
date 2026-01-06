@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import {clearSeletedKpiDonVi, resetStatusKpiDonVi} from '@redux/feature/kpi/kpiSlice';
-import {createKpiDonVi, updateKpiDonVi } from '@redux/feature/kpi/kpiThunk';
+import { clearSeletedKpiDonVi, resetStatusKpiDonVi } from '@redux/feature/kpi/kpiSlice';
+import { createKpiDonVi, updateKpiDonVi } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
@@ -82,7 +82,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const handleFinish: FormProps['onFinish'] = async (values: any) => {
     const payload = {
       ...values,
-      idDonVi: values.idDonVi?.value,
+      idDonVi: values.idDonVi,
       namHoc: values.namHoc.format('YYYY'),
     };
 
@@ -94,6 +94,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         ).unwrap();
         toast.success('Cập nhật KPI đơn vị thành công');
       } else {
+        console.log("Payload: ",payload);
         await dispatch(createKpiDonVi(payload)).unwrap();
         toast.success('Thêm mới KPI đơn vị thành công');
       }

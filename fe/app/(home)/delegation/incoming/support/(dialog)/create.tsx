@@ -29,10 +29,7 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
 
   useEffect(() => {
     if (isModalOpen) {
-      if (isUpdate && selected.data) {
-        setTitle('Chỉnh sửa phòng ban hỗ trợ');
-        initData();
-      } else if (isView && selected.data) {
+      if (isView && selected.data) {
         setTitle('Chi tiết phòng ban hỗ trợ');
         initData();
       } else {
@@ -40,7 +37,7 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
         form.resetFields();
       }
     }
-  }, [isModalOpen, selected, isUpdate, isView]);
+  }, [isModalOpen, selected, isView]);
 
   const initData = () => {
     if (!selected.data) return;
@@ -63,15 +60,8 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
         ...values,
         content: values.content?.trim() || ''
       };
-      if (isUpdate && selected.data) {
-        await dispatch(updateDepartmentSupport(payload)).unwrap();
-
-        toast.success('Cập nhật thành công');
-      } else {
-        await dispatch(createDepartmentSupport(payload)).unwrap();
-        toast.success('Thêm mới thành công');
-      }
-
+      await dispatch(createDepartmentSupport(payload)).unwrap();
+      toast.success('Thêm mới thành công');
       onCloseModal();
     } catch (error) {
       toast.error('Lỗi khi lưu dữ liệu');

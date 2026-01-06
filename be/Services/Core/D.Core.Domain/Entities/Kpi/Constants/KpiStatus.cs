@@ -14,6 +14,8 @@
         public static int Evaluating = 9;
         public static int Scored = 11;
         public static int Declared = 12;
+        public static int Evaluated = 13;
+        public static int PrincipalApprove = 14;
 
 
         public static Dictionary<int, string> Names = new Dictionary<int, string>()
@@ -29,7 +31,9 @@
             { Rejected, "Từ chối kết quả" },
             { Evaluating, "Đang đánh giá" },
             { Scored, "Đã chấm" },
-            { Declared, "Đã kê khai" }
+            { Declared, "Đã kê khai" },
+            {Evaluated, "Đã gửi chấm KPI" },
+            {PrincipalApprove, "Hiệu trưởng phê duyệt" }
         };
     }
 }

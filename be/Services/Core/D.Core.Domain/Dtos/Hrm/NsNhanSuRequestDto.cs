@@ -8,5 +8,7 @@ namespace D.Core.Domain.Dtos.Hrm
     {
         [FromQuery(Name = "cccd")]
         public string? Cccd { get; set; }
+        [FromQuery(Name = "idPhongBan")]
+        public int? IdPhongBan { get; set; }
     }
 }

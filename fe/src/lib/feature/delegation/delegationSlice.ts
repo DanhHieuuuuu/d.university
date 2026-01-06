@@ -4,6 +4,7 @@ import { ReduxStatus } from '@redux/const';
 import {
   createDepartmentSupport,
   createDoanVao,
+  createPrepare,
   createReceptionTime,
   createSupporter,
   deleteDoanVao,
@@ -21,7 +22,8 @@ import {
   getLogStatus,
   updateDepartmentSupport,
   updateDoanVao,
-  updateReceptionTime,
+  updatePrepare,
+  updateReceptionTimes,
   updateStatus
 } from './delegationThunk';
 import {
@@ -256,13 +258,13 @@ const delegationSlice = createSlice({
         state.status = ReduxStatus.FAILURE;
       })
       // update receptionTime
-      .addCase(updateReceptionTime.pending, (state) => {
+      .addCase(updateReceptionTimes.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
-      .addCase(updateReceptionTime.fulfilled, (state, action) => {
+      .addCase(updateReceptionTimes.fulfilled, (state, action) => {
         state.status = ReduxStatus.SUCCESS;
       })
-      .addCase(updateReceptionTime.rejected, (state) => {
+      .addCase(updateReceptionTimes.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
       // create ReceptionTime
@@ -349,7 +351,27 @@ const delegationSlice = createSlice({
       })
       .addCase(getByIdDepartmentSupport.rejected, (state) => {
         state.selected.status = ReduxStatus.FAILURE;
-      });
+      })
+      // update Prepare
+      .addCase(updatePrepare.pending, (state) => {
+        state.$update.status = ReduxStatus.LOADING;
+      })
+      .addCase(updatePrepare.fulfilled, (state, action) => {
+        state.$update.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updatePrepare.rejected, (state) => {
+        state.$update.status = ReduxStatus.FAILURE;
+      })
+      // create Prepare
+      .addCase(createPrepare.pending, (state) => {
+        state.$create.status = ReduxStatus.LOADING;
+      })
+      .addCase(createPrepare.fulfilled, (state) => {
+        state.$create.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(createPrepare.rejected, (state) => {
+        state.$create.status = ReduxStatus.FAILURE;
+      })
   }
 });
 

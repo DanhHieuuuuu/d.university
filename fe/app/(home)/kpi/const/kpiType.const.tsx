@@ -22,3 +22,9 @@ export class KpiLoaiConst {
     return this.list.find(x => x.value === value)?.name ?? '';
   }
 }
+
+export const KPI_ORDER = [
+  KpiLoaiConst.CHUC_NANG,
+  KpiLoaiConst.MUC_TIEU,
+  KpiLoaiConst.TUAN_THU,
+];

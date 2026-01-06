@@ -1,9 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { KpiService } from '@services/kpi.service';
-import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateTrangThaiKpiCaNhan, IUpdateKpiCaNhanThucTeList, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
+import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateTrangThaiKpiCaNhan, IUpdateKpiCaNhanThucTeList, IViewKpiCaNhan, IUpdateCapTrenDanhGiaList } from '@models/kpi/kpi-ca-nhan.model';
 import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
+import { ICreateKpiTruong, IQueryKpiTruong, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong } from '@models/kpi/kpi-truong.model';
 
 export const getAllKpiCaNhan = createAsyncThunk('kpi/list-canhan', async (payload?: IQueryKpiCaNhan) => {
     try {
@@ -14,6 +15,18 @@ export const getAllKpiCaNhan = createAsyncThunk('kpi/list-canhan', async (payloa
         console.error(error);
     }
 });
+
+export const getKpiCaNhanKeKhai = createAsyncThunk(
+    'kpi-canhan/ke-khai',
+    async (payload: IQueryKpiCaNhan | undefined, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.getListKpiCaNhanKeKhai(payload);
+            return res.data;
+        } catch (err: any) {
+            return rejectWithValue(err?.response?.data);
+        }
+    }
+);
 
 export const getAllIdsKpiCaNhan = createAsyncThunk(
     'kpi-canhan/getAllIds',
@@ -99,6 +112,21 @@ export const updateKetQuaThucTeKpiCaNhan = createAsyncThunk(
     }
 );
 
+export const updateKetQuaCapTrenKpiCaNhan = createAsyncThunk(
+    'kpi/update-ketqua-captren-canhan',
+    async (payload: IUpdateCapTrenDanhGiaList, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.updateKetQuaCapTrenKpiCaNhan(payload);
+            return res;
+        } catch (error: any) {
+            return rejectWithValue(
+                error?.response?.data || {
+                    message: 'Cập nhật kết quả thực tế KPI thất bại'
+                }
+            );
+        }
+    }
+);
 
 //Kpi Don Vi
 export const getAllKpiDonVi = createAsyncThunk('kpi/list-donvi', async (payload?: IQueryKpiDonVi) => {
@@ -111,15 +139,17 @@ export const getAllKpiDonVi = createAsyncThunk('kpi/list-donvi', async (payload?
     }
 });
 
-export const createKpiDonVi = createAsyncThunk('kpi/create-donvi', async (payload: ICreateKpiDonVi) => {
-    try {
-        const res = await KpiService.createKpiDonVi(payload);
+export const createKpiDonVi = createAsyncThunk(
+    'kpi/create-donvi',
+    async (payload: ICreateKpiDonVi, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.createKpiDonVi(payload);
+            return res;
+        } catch (err: any) {
+            return rejectWithValue(err?.response?.data);
+        }
+    });
 
-        return res.data;
-    } catch (error: any) {
-        console.error(error);
-    }
-});
 export const updateKpiDonVi = createAsyncThunk('kpi/update-donvi', async (payload: IUpdateKpiDonVi) => {
     try {
         const res = await KpiService.updateKpiDonVi(payload);
@@ -129,18 +159,19 @@ export const updateKpiDonVi = createAsyncThunk('kpi/update-donvi', async (payloa
         console.error(error);
     }
 });
-export const deleteKpiDonVi = createAsyncThunk('kpi/delete-donvi', async (payload: number, { rejectWithValue }) => {
-    try {
-        const res = await KpiService.deleteKpiDonVi(payload);
-        return res.data;
-    } catch (error: any) {
-        return rejectWithValue({
-            message: error.message,
-            code: error.code,
-            response: error.response?.data
-        });
+
+export const deleteKpiDonVi = createAsyncThunk(
+    'kpi/delete-donvi',
+    async (id: number, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.deleteKpiDonVi(id);
+            return res.data;
+        } catch (error: any) {
+            return rejectWithValue(error?.response?.data || 'Delete failed');
+        }
     }
-});
+);
+
 
 export const updateTrangThaiKpiDonVi = createAsyncThunk(
     'kpi/update-trang-thai-donvi',
@@ -185,6 +216,98 @@ export const getListTrangThaiKpiDonVi = createAsyncThunk(
     'kpiDonVi/getListTrangThai',
     async () => {
         return await KpiService.getListTrangThaiKpiDonVi();
+    }
+);
+
+// Kpi trường
+
+export const getAllKpiTruong = createAsyncThunk('kpi/list-truong', async (payload?: IQueryKpiTruong) => {
+    try {
+        const res = await KpiService.getListKpiTruong(payload);
+        console.log('res', res);
+        return res.data;
+    } catch (error: any) {
+        console.error(error);
+    }
+});
+
+export const createKpiTruong = createAsyncThunk(
+    'kpi/create-truong',
+    async (payload: ICreateKpiTruong, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.createKpiTruong(payload);
+            return res;
+        } catch (err: any) {
+            return rejectWithValue(err?.response?.data);
+        }
+    });
+
+export const updateKpiTruong = createAsyncThunk('kpi/update-truong', async (payload: IUpdateKpiTruong) => {
+    try {
+        const res = await KpiService.updateKpiTruong(payload);
+
+        return res.data;
+    } catch (error: any) {
+        console.error(error);
+    }
+});
+
+export const deleteKpiTruong = createAsyncThunk(
+    'kpi/delete-truong',
+    async (id: number, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.deleteKpiTruong(id);
+            return res.data;
+        } catch (error: any) {
+            return rejectWithValue(error?.response?.data || 'Delete failed');
+        }
+    }
+);
+
+
+export const updateTrangThaiKpiTruong = createAsyncThunk(
+    'kpi/update-trang-thai-truong',
+    async (payload: IUpdateTrangThaiKpiTruong, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.updateTrangThaiKpiTruong(payload);
+            return res;
+        } catch (error: any) {
+            return rejectWithValue(
+                error?.response?.data || {
+                    message: 'Cập nhật trạng thái KPI thất bại'
+                }
+            );
+        }
+    }
+);
+
+export const updateKetQuaThucTeKpiTruong = createAsyncThunk(
+    'kpi/update-ketqua-thucte-truong',
+    async (payload: IUpdateKpiTruongThucTeList, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.updateKetQuaThucTeKpiTruong(payload);
+            return res;
+        } catch (error: any) {
+            return rejectWithValue(
+                error?.response?.data || {
+                    message: 'Cập nhật kết quả thực tế KPI thất bại'
+                }
+            );
+        }
+    }
+);
+
+export const getListNamHocKpiTruong = createAsyncThunk(
+    'kpiTruong/getListNamHoc',
+    async () => {
+        return await KpiService.getListNamHocKpiTruong();
+    }
+);
+
+export const getListTrangThaiKpiTruong = createAsyncThunk(
+    'kpiTruong/getListTrangThai',
+    async () => {
+        return await KpiService.getListTrangThaiKpiTruong();
     }
 );
 //Kpi Role
@@ -248,4 +371,11 @@ export const deleteKpiRole = createAsyncThunk('kpi-role/delete', async (ids: num
         });
     }
 }
+);
+
+export const getListKpiRoleByUser = createAsyncThunk(
+    'kpi-role/list-role-by-user',
+    async () => {
+        return await KpiService.getListKpiRoleByUser();
+    }
 );

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using D.Core.Domain.Entities.Delegation.Incoming;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -32,6 +33,7 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging
         public int TotalPerson { get; set; }
 
         public string? PhoneNumber { get; set; }
+        public List<ReceptionTime>? ReceptionTimes { get; set; }
 
         public int Status { get; set; }
 

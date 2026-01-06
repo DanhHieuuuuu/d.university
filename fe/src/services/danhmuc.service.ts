@@ -13,6 +13,7 @@ import {
 } from '@models/danh-muc/common.model';
 import { ICreatePhongBan, IQueryPhongBan, IUpdatePhongBan, IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon, IViewToBoMon } from '@models/danh-muc/to-bo-mon.model';
+import { IQueryKhoaHoc, IViewKhoaHoc } from '@models/danh-muc/khoa-hoc.model';
 
 const apiDanhMucEndpoint = 'danhmuc';
 
@@ -26,6 +27,7 @@ const apiQuanHeEndpoint = `${apiDanhMucEndpoint}/quan-he`;
 const apiQuocTichEndpoint = `${apiDanhMucEndpoint}/quoc-tich`;
 const apiToBoMonEndpoint = `${apiDanhMucEndpoint}/to-bo-mon`;
 const apiTonGiaoEndpoint = `${apiDanhMucEndpoint}/ton-giao`;
+const apiKhoaHocEndpoint = `${apiDanhMucEndpoint}/khoa-hoc`;
 
 const getListChucVu = async (query?: IQueryChucVu) => {
   try {
@@ -285,6 +287,34 @@ const getListTonGiao = async () => {
   }
 };
 
+const getListKhoaHoc = async (query?: IQueryKhoaHoc) => {
+  try {
+    const res = await axios.get(`${apiKhoaHocEndpoint}/find`, {
+      params: {
+        ...query
+      }
+    });
+
+    const data: IResponseList<IViewKhoaHoc> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+const getKhoaHocById = async (idKhoaHoc: number) => {
+  try {
+    const res = await axios.get(`${apiKhoaHocEndpoint}/get-by-id?Id=${idKhoaHoc}`);
+
+    const data: IResponseItem<IViewKhoaHoc> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
 export const DanhMucService = {
   getListChucVu,
   getChucVuById,
@@ -307,5 +337,7 @@ export const DanhMucService = {
   updateToBoMon,
   deleteToBoMon,
   getToBoMonById,
-  getListTonGiao
+  getListTonGiao,
+  getListKhoaHoc,
+  getKhoaHocById
 };

@@ -107,14 +107,8 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             ? donvis[kpi.IdDonVi.Value]
                             : string.Empty,
                     LoaiKpi = kpi.LoaiKpi,
-                    //LoaiKpiText = kpi.LoaiKpi.HasValue && KpiTypes.Names.ContainsKey(kpi.LoaiKpi.Value)
-                    //    ? KpiTypes.Names[kpi.LoaiKpi.Value]
-                    //    : "Không xác định",
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.TrangThai,
-                    //TrangThaiText = kpi.TrangThai.HasValue && KpiStatus.Names.ContainsKey(kpi.TrangThai.Value)
-                    //        ? KpiStatus.Names[kpi.TrangThai.Value]
-                    //        : "Không xác định",
                     KetQuaThucTe = kpi.KetQuaThucTe,
                 };
 

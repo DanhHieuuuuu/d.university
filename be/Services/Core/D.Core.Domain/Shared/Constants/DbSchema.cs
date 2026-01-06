@@ -13,5 +13,6 @@
         public const string Dt = "dt";
         public const string Kpi = "kpi";
         public const string Ks = "ks";
+        public const string Sysvar = "sysvar";
     }
 }

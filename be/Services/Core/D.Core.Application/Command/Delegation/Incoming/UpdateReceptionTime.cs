@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace D.Core.Application.Command.Delegation.Incoming
 {
-    public class UpdateReceptionTime : ICommandHandler<UpdateReceptionTimeRequestDto, UpdateReceptionTimeResponseDto>
+    public class UpdateReceptionTime : ICommandHandler<UpdateReceptionTimesRequestDto, List<UpdateReceptionTimeResponseDto>>
     {
         private readonly IReceptionTimeService _service;
 
@@ -18,9 +18,9 @@ namespace D.Core.Application.Command.Delegation.Incoming
             _service = service;
         }
 
-        public async Task<UpdateReceptionTimeResponseDto> Handle(UpdateReceptionTimeRequestDto request, CancellationToken cancellationToken)
+        public async Task<List<UpdateReceptionTimeResponseDto>> Handle(UpdateReceptionTimesRequestDto request, CancellationToken cancellationToken)
         {
-            return await _service.UpdateReceptionTime(request);
+            return await _service.UpdateReceptionTimes(request.Items);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace D.Core.Application.Query.Kpi.KpiCaNhan
             CancellationToken cancellationToken
         )
         {
-            return _service.FindPagingKpiCaNhan(request);
+            return _service.GetAllKpiCaNhan(request);
         }
     }
 }

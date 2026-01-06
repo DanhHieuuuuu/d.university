@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
@@ -15,7 +16,6 @@ using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -138,24 +138,27 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
             var items = query.Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
 
-            var result = query.Select(x => new DmPhongBanResponseDto
-            {
-                Id = x.Id,
-                MaPhongBan = x.MaPhongBan,
-                TenPhongBan = x.TenPhongBan,
-                LoaiPhongBan = x.IdLoaiPhongBan.HasValue
-                    ? _unitOfWork
-                        .iDmLoaiPhongBanRepository.FindById(x.IdLoaiPhongBan.Value)
-                        .TenLoaiPhongBan
-                    : null,
-                DiaChi = x.DiaChi,
-                Hotline = x.Hotline,
-                Fax = x.Fax,
-                NgayThanhLap = x.NgayThanhLap,
-                STT = x.STT,
-                NguoiDaiDien = x.NguoiDaiDien,
-                ChucVuNguoiDaiDien = x.ChucVuNguoiDaiDien,
-            });
+            var result = query
+                .OrderBy(x => x.STT)
+                .ThenBy(x => x.Id)
+                .Select(x => new DmPhongBanResponseDto
+                {
+                    Id = x.Id,
+                    MaPhongBan = x.MaPhongBan,
+                    TenPhongBan = x.TenPhongBan,
+                    LoaiPhongBan = x.IdLoaiPhongBan.HasValue
+                        ? _unitOfWork
+                            .iDmLoaiPhongBanRepository.FindById(x.IdLoaiPhongBan.Value)
+                            .TenLoaiPhongBan
+                        : null,
+                    DiaChi = x.DiaChi,
+                    Hotline = x.Hotline,
+                    Fax = x.Fax,
+                    NgayThanhLap = x.NgayThanhLap,
+                    STT = x.STT,
+                    NguoiDaiDien = x.NguoiDaiDien,
+                    ChucVuNguoiDaiDien = x.ChucVuNguoiDaiDien,
+                });
 
             return new PageResultDto<DmPhongBanResponseDto>
             {
@@ -257,8 +260,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 var keyword = dto.Keyword.Trim();
 
                 query = query.Where(x =>
-                    x.MaKhoaHoc.Contains(keyword) ||
-                    x.TenKhoaHoc.Contains(keyword)
+                    x.MaKhoaHoc.Contains(keyword) || x.TenKhoaHoc.Contains(keyword)
                 );
             }
 
@@ -432,8 +434,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 throw new Exception($"Đã tồn tại tổ bộ môn có mã {dto.MaBoMon}");
             if (dto.IdPhongBan.HasValue)
             {
-                var existPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking
-                    .Any(x => x.Id == dto.IdPhongBan.Value);
+                var existPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking.Any(x =>
+                    x.Id == dto.IdPhongBan.Value
+                );
                 if (!existPhongBan)
                     throw new Exception($"Không tìm thấy phòng ban có Id = {dto.IdPhongBan}");
             }
@@ -445,25 +448,28 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         public void UpdateDmToBoMon(UpdateDmToBoMonDto dto)
         {
             _logger.LogInformation(
-        $"{nameof(UpdateDmToBoMon)} method called. Dto: {JsonSerializer.Serialize(dto)}"
-    );
+                $"{nameof(UpdateDmToBoMon)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
 
-            var exist = _unitOfWork.iDmToBoMonRepository.TableNoTracking
-                .FirstOrDefault(x => x.Id == dto.Id);
+            var exist = _unitOfWork.iDmToBoMonRepository.TableNoTracking.FirstOrDefault(x =>
+                x.Id == dto.Id
+            );
 
             if (exist == null)
                 throw new Exception($"Không tìm thấy tổ bộ môn có Id = {dto.Id}");
 
-            var existMaBoMon = _unitOfWork.iDmToBoMonRepository.TableNoTracking
-                .Any(x => x.MaBoMon == dto.MaBoMon! && x.Id != dto.Id);
+            var existMaBoMon = _unitOfWork.iDmToBoMonRepository.TableNoTracking.Any(x =>
+                x.MaBoMon == dto.MaBoMon! && x.Id != dto.Id
+            );
 
             if (existMaBoMon)
                 throw new Exception($"Đã tồn tại tổ bộ môn có mã \"{dto.MaBoMon}\" trong CSDL.");
 
             if (dto.IdPhongBan.HasValue)
             {
-                var existPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking
-                    .Any(x => x.Id == dto.IdPhongBan);
+                var existPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking.Any(x =>
+                    x.Id == dto.IdPhongBan
+                );
 
                 if (!existPhongBan)
                     throw new Exception($"Không tìm thấy phòng ban có Id = {dto.IdPhongBan}");
@@ -501,8 +507,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             if (entity == null)
                 return null;
             var phongban = entity.IdPhongBan.HasValue
-                        ? _unitOfWork.iDmPhongBanRepository.FindById(entity.IdPhongBan.Value)
-                        : null;
+                ? _unitOfWork.iDmPhongBanRepository.FindById(entity.IdPhongBan.Value)
+                : null;
             string? tenPhongBan = phongban?.TenPhongBan;
             var result = _mapper.Map<DmToBoMonResponseDto>(entity);
             result.PhongBan = tenPhongBan;

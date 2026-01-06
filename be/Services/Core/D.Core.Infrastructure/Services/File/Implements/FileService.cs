@@ -125,6 +125,10 @@ namespace D.Core.Infrastructure.Services.File.Implements
             if (file == null)
                 throw new Exception("File không tồn tại trong hệ thống.");
 
+            string? oldLinkToDelete = null;
+            bool shouldDeleteOldLink = false;
+            bool transactionCommitted = false;
+
             await using var transaction = await _unitOfWork.Database.BeginTransactionAsync();
 
             try
@@ -140,6 +144,7 @@ namespace D.Core.Infrastructure.Services.File.Implements
 
                 if (dto.File != null)
                 {
+                    var previousLink = file.Link;
                     var fileExtension = Path.GetExtension(dto.File.FileName);
                     var uuid = Guid.NewGuid().ToString();
                     var fileName = $"{uuid}{fileExtension}";
@@ -162,13 +167,20 @@ namespace D.Core.Infrastructure.Services.File.Implements
                         throw new Exception("Upload file lên MinIO thất bại.");
 
                     file.Link = folderPath;
+
+                    if (!string.IsNullOrWhiteSpace(previousLink) &&
+                        !previousLink.Equals(folderPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        oldLinkToDelete = previousLink;
+                        shouldDeleteOldLink = true;
+                    }
                 }
 
                 _unitOfWork.iFileRepository.Update(file);
                 await _unitOfWork.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-                return true;
+                transactionCommitted = true;
             }
             catch (Exception ex)
             {
@@ -176,6 +188,31 @@ namespace D.Core.Infrastructure.Services.File.Implements
                 _logger.LogError(ex, "Lỗi khi cập nhật file");
                 throw;
             }
+
+            if (transactionCommitted && shouldDeleteOldLink && !string.IsNullOrWhiteSpace(oldLinkToDelete))
+            {
+                try
+                {
+                    var deleted = await _s3ManagerFile.DeleteFileAsync(oldLinkToDelete);
+                    if (!deleted)
+                    {
+                        _logger.LogWarning(
+                            "Xóa file cũ {OldLink} trả về false khi cập nhật file Id={FileId}",
+                            oldLinkToDelete,
+                            file.Id);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "Không thể xóa file cũ {OldLink} sau khi cập nhật file Id={FileId}",
+                        oldLinkToDelete,
+                        file.Id);
+                }
+            }
+
+            return true;
         }
 
 

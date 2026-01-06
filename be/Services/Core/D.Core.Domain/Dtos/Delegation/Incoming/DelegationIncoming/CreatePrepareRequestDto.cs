@@ -1,0 +1,26 @@
+﻿using D.DomainBase.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
+{
+    public class CreatePrepareRequestDto : ICommand<List<CreatePrepareResponseDto>>
+
+    {
+        public List<CreatePrepareRequestItemDto> Items { get; set; } = new();
+    }
+    public class CreatePrepareRequestItemDto
+    {
+        public string? Name { get; set; }
+
+        public string? Description { get; set; }
+
+        public decimal Money { get; set; }
+
+        public int ReceptionTimeId { get; set; }
+
+    }
+}

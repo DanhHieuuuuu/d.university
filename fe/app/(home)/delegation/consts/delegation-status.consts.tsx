@@ -1,3 +1,9 @@
+import { ITagInfo } from '@models/common/table.model';
+
+export type DelegationStatusTagInfo = ITagInfo & {
+  value: number;
+};
+
 export class DelegationStatusConst {
   public static TAO_MOI = 1;
   public static DE_XUAT = 2;
@@ -7,57 +13,63 @@ export class DelegationStatusConst {
   public static BI_HUY = 6;
   public static CAN_BO_SUNG = 7;
   public static DA_CHINH_SUA = 8;
+  public static DA_HET_HAN = 9;
 
-  public static list = [
-    {
+  private static readonly map: Record<number, DelegationStatusTagInfo> = {
+    [this.TAO_MOI]: {
       value: this.TAO_MOI,
-      name: 'Tạo mới',
-      class: 'tag-init'
+      label: 'Tạo mới',
+      className: 'tag-init'
     },
-    {
-      value: this.BI_HUY,
-      name: 'Bị huỷ',
-      class: 'tag-cancel'
-    },
-    {
-      value: this.DA_CHINH_SUA,
-      name: 'Đã chỉnh sửa',
-      class: 'tag-edit'
-    },
-    {
+    [this.DE_XUAT]: {
       value: this.DE_XUAT,
-      name: 'Đề xuất',
-      class: 'tag-propose'
+      label: 'Đề xuất',
+      className: 'tag-propose'
     },
-    {
+    [this.PHE_DUYET]: {
       value: this.PHE_DUYET,
-      name: 'Phê duyệt',
-      class: 'tag-init'
+      label: 'Phê duyệt',
+      className: 'tag-init'
     },
-    {
+    [this.DANG_TIEP_DOAN]: {
       value: this.DANG_TIEP_DOAN,
-      name: 'Đang tiếp đoàn',
-      class: 'tag-reception'
+      label: 'Đang tiếp đoàn',
+      className: 'tag-reception'
     },
-    {
+    [this.DONE]: {
       value: this.DONE,
-      name: 'Hoàn thành',
-      class: 'tag-done'
+      label: 'Hoàn thành',
+      className: 'tag-done'
     },
-    {
+    [this.BI_HUY]: {
+      value: this.BI_HUY,
+      label: 'Bị huỷ',
+      className: 'tag-cancel'
+    },
+    [this.CAN_BO_SUNG]: {
       value: this.CAN_BO_SUNG,
-      name: 'Cần bổ sung',
-      class: 'tag-edit'
+      label: 'Cần bổ sung',
+      className: 'tag-edit'
+    },
+    [this.DA_CHINH_SUA]: {
+      value: this.DA_CHINH_SUA,
+      label: 'Đã chỉnh sửa',
+      className: 'tag-edit'
     }
-  ];
+  };
+
+  public static getTag(value?: number): DelegationStatusTagInfo | null {
+    if (value == null) return null;
+    return this.map[value] ?? null;
+  }
+
   public static getInfo(
     value: number,
-    field: keyof { value: number; name: string; class: string } | null = null
-  ): { value: number; name: string; class: string } | string | number | undefined {
-    const status = this.list.find((x) => x.value === value);
+    field: keyof DelegationStatusTagInfo | null = null
+  ): DelegationStatusTagInfo | string | number | undefined {
+    const info = this.map[value];
+    if (!info) return undefined;
 
-    if (!status) return undefined;
-
-    return field ? status[field] : status;
+    return field ? info[field] : info;
   }
 }

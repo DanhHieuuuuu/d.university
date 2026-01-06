@@ -55,6 +55,26 @@ namespace D.Core.API.Controllers.Kpi
             }
         }
 
+
+        /// <summary>
+        /// Danh sách  Kpi Cá Nhân kê khai
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("kpi-canhan/find-ke-khai")]
+        public async Task<ResponseAPI> GetAllKpiKeKhaiCaNhan([FromQuery] FilterKpiKeKhaiCaNhanDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
         /// <summary>
         /// Cập nhật Kpi Cá Nhân
         /// </summary>
@@ -119,6 +139,25 @@ namespace D.Core.API.Controllers.Kpi
         /// <returns></returns>
         [HttpPut("kpi-canhan/update-ket-qua-thuc-te")]
         public async Task<ResponseAPI> UpdateKetQuaThucTe([FromBody] UpdateKpiThucTeKpiCaNhanListDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new("Đã thêm kết quả thực tế thành công!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật kết quả cấp trên Kpi Cá Nhân
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("kpi-canhan/update-ket-qua-cap-tren")]
+        public async Task<ResponseAPI> UpdateKetQuaCapTren([FromBody] UpdateKetQuaCapTrenKpiCaNhanListDto dto)
         {
             try
             {

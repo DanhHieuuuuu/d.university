@@ -12,8 +12,9 @@ import { ReduxStatus } from '@redux/const';
 import { IColumn } from '@models/common/table.model';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
-import { getStatusName } from '@utils/status.helper';
 import { formatDateTimeView } from '@utils/index';
+import { DelegationStatusConst } from '../../consts/delegation-status.consts';
+import { ETableColumnType } from '@/constants/e-table.consts';
 
 const { TabPane } = Tabs;
 
@@ -29,8 +30,20 @@ const Page = () => {
     { key: 'stt', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
     { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center' },
     { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left' },
-    { key: 'oldStatus', dataIndex: 'oldStatus', title: 'Trạng thái cũ', render: getStatusName },
-    { key: 'newStatus', dataIndex: 'newStatus', title: 'Trạng thái mới', render: getStatusName },
+    {
+      key: 'oldStatus',
+      dataIndex: 'oldStatus',
+      title: 'Trạng thái cũ',
+      type: ETableColumnType.STATUS,
+      getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
+    },
+    {
+      key: 'newStatus',
+      dataIndex: 'newStatus',
+      title: 'Trạng thái mới',
+      type: ETableColumnType.STATUS,
+      getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
+    },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
     {
       key: 'createdDate',
@@ -43,7 +56,7 @@ const Page = () => {
 
   // Column cho logReceptionTime
   const receptionColumns: IColumn<ILogReceptionTime>[] = [
-    { key: 'stt', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
+    { key: 'stt', fixed: 'left', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
     { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center' },
     { key: 'type', dataIndex: 'type', title: 'Loại', align: 'center' },
     { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left' },
@@ -96,7 +109,7 @@ const Page = () => {
   return (
     <Card title="Nhật ký đoàn vào" className="h-full">
       <Tabs defaultActiveKey="1">
-        <TabPane tab="Log Status" key="1">
+        <TabPane tab="Nhật ký đoàn vào" key="1">
           <AppTable
             loading={status === ReduxStatus.LOADING}
             rowKey="id"
@@ -106,13 +119,14 @@ const Page = () => {
             scroll={{ y: 'calc(100vh - 370px)' }}
           />
         </TabPane>
-        <TabPane tab="Log Reception Time" key="2">
+        <TabPane tab="Nhật ký thời gian tiếp đoàn" key="2">
           <AppTable
             loading={status === ReduxStatus.LOADING}
             rowKey="id"
             columns={receptionColumns}
             dataSource={listLogReceptionTime}
             pagination={{ position: ['bottomRight'], ...receptionPagination }}
+            scroll={{ y: 'calc(100vh - 370px)' }}
           />
         </TabPane>
       </Tabs>

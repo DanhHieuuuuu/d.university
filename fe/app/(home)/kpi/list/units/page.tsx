@@ -220,6 +220,8 @@ const Page = () => {
           await dispatch(deleteKpiDonVi(record.id)).unwrap();
           toast.success('Xóa thành công!');
           dispatch(getAllKpiDonVi(query));
+          dispatch(getListTrangThaiKpiDonVi());
+          dispatch(getListNamHocKpiDonVi());
         } catch (error: any) {
           toast.error(error?.response?.message || 'Xóa thất bại!');
         }
@@ -454,6 +456,7 @@ const Page = () => {
         onSuccess={() => {
           dispatch(getAllKpiDonVi(query));
           dispatch(getListTrangThaiKpiDonVi());
+          dispatch(getListNamHocKpiDonVi());
         }}
       />
     </Card>

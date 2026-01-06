@@ -9,8 +9,6 @@ const getAll = async (query: IQueryUser) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/get-all`, { params: query });
 
-    console.log('Raw response:', res);
-    console.log('res.data:', res.data);
     const data: IResponseList<IUserView> = res.data;
 
     data.data.items = data.data.items.map((x: IUserView) => ({

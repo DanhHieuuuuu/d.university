@@ -1,17 +1,18 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal, message } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined
+  EyeOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';
+import { getAllChuyenNganh, deleteChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';
 import { setSelectedIdChuyenNganh } from '@redux/feature/dao-tao/daotaoSlice';
 
 import AppTable from '@components/common/Table';
@@ -66,6 +67,26 @@ const Page = () => {
 
   const refreshData = () => {
     dispatch(getAllChuyenNganh(query));
+  };
+
+  const handleDelete = (id: number, tenChuyenNganh: string) => {
+    Modal.confirm({
+      title: 'Xác nhận xóa',
+      icon: <ExclamationCircleOutlined />,
+      content: `Bạn có chắc chắn muốn xóa chuyên ngành "${tenChuyenNganh}"?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await dispatch(deleteChuyenNganh(id)).unwrap();
+          message.success('Xóa chuyên ngành thành công!');
+          refreshData();
+        } catch (error: any) {
+          message.error(error?.message || 'Xóa chuyên ngành thất bại!');
+        }
+      }
+    });
   };
 
   const columns: IColumn<IViewChuyenNganh>[] = [
@@ -129,7 +150,7 @@ const Page = () => {
       color: 'red',
       icon: <DeleteOutlined />,
       command: (record: IViewChuyenNganh) => {
-        dispatch(setSelectedIdChuyenNganh(record.id));
+        handleDelete(record.id, record.tenChuyenNganh);
       }
     }
   ];

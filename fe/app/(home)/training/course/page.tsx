@@ -1,17 +1,18 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal, message } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined
+  EyeOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllMonHoc } from '@redux/feature/dao-tao/monHocThunk';
+import { getAllMonHoc, deleteMonHoc } from '@redux/feature/dao-tao/monHocThunk';
 import { setSelectedIdMonHoc } from '@redux/feature/dao-tao/daotaoSlice';
 
 import AppTable from '@components/common/Table';
@@ -66,6 +67,26 @@ const Page = () => {
 
   const refreshData = () => {
     dispatch(getAllMonHoc(query));
+  };
+
+  const handleDelete = (id: number, tenMonHoc: string) => {
+    Modal.confirm({
+      title: 'Xác nhận xóa',
+      icon: <ExclamationCircleOutlined />,
+      content: `Bạn có chắc chắn muốn xóa môn học "${tenMonHoc}"?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await dispatch(deleteMonHoc(id)).unwrap();
+          message.success('Xóa môn học thành công!');
+          refreshData();
+        } catch (error: any) {
+          message.error(error?.message || 'Xóa môn học thất bại!');
+        }
+      }
+    });
   };
 
   const columns: IColumn<IViewMonHoc>[] = [
@@ -134,7 +155,7 @@ const Page = () => {
       color: 'red',
       icon: <DeleteOutlined />,
       command: (record: IViewMonHoc) => {
-        dispatch(setSelectedIdMonHoc(record.id));
+        handleDelete(record.id, record.tenMonHoc);
       }
     }
   ];

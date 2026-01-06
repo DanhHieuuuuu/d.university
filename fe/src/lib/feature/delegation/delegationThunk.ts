@@ -3,6 +3,7 @@ import { ICreateHopDongNs, IQueryNhanSu } from '@models/nhansu/nhansu.model';
 import {
   ICreateDepartment,
   ICreateDoanVao,
+  ICreatePrepare,
   ICreateReceptionTime,
   ICreateReceptionTimeList,
   ICreateSupporter,
@@ -12,7 +13,9 @@ import {
   IQueryLogStatus,
   IUpdateDepartmentSupport,
   IUpdateDoanVao,
+  IUpdatePrepare,
   IUpdateReceptionTime,
+  IUpdateReceptionTimes,
   IUpdateStatus
 } from '@models/delegation/delegation.model';
 import { DelegationIncomingService } from '@services/delegation/delegationIncoming.service';
@@ -187,10 +190,10 @@ export const getLogReceptionTime = createAsyncThunk(
     }
   }
 );
-export const updateReceptionTime = createAsyncThunk(
+export const updateReceptionTimes = createAsyncThunk(
   'delegation-incoming/updateReceptionTime',
-  async (payload: IUpdateReceptionTime, { rejectWithValue }) => {
-    const data = await DelegationIncomingService.updateReceptionTime(payload);
+  async (payload: IUpdateReceptionTimes, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.updateReceptionTimes(payload);
     if (data?.code !== 200) {
       return rejectWithValue(data.message);
     }
@@ -304,5 +307,25 @@ export const getByIdDepartmentSupport = createAsyncThunk(
         response: error.response?.data
       });
     }
+  }
+);
+export const createPrepare = createAsyncThunk(
+  'delegation-incoming/createPrepare',
+  async (payload: ICreatePrepare, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.createPrepare(payload);
+    if (data?.code !== 200) {
+      return rejectWithValue(data.message);
+    }
+    return data;
+  }
+);
+export const updatePrepare = createAsyncThunk(
+  'delegation-incoming/updatePrepare',
+  async (payload: IUpdatePrepare, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.updatePrepare(payload);
+    if (data?.code !== 200) {
+      return rejectWithValue(data.message);
+    }
+    return data;
   }
 );

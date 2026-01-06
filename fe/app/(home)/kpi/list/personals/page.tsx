@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
   PlusOutlined,
@@ -10,28 +10,37 @@ import {
   EyeOutlined,
   FilterOutlined,
   CheckCircleOutlined,
-  EllipsisOutlined
+  EllipsisOutlined,
+  UndoOutlined,
+  SaveOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getListTrangThaiKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getListTrangThaiKpiCaNhan, updateKetQuaCapTrenKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KpiLoaiConst } from '../../const/kpiType.const';
+import { KPI_ORDER, KpiLoaiConst } from '../../const/kpiType.const';
 import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
 import { toast } from 'react-toastify';
 import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUser } from '@redux/feature/userSlice';
+import { ETableColumnType } from '@/constants/e-table.consts';
+import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
+import { buildKpiGroupedTable, KpiTableRow } from '@helpers/kpi/kpi.helper';
+import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
+import ConfirmScoredModal from '../../modal/ConfirmScoredModal';
+import { formatKetQua } from '@helpers/kpi/formatResult.helper';
 
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
+  const { processUpdateStatus } = useKpiStatusAction();
   const watchIdPhongBan = Form.useWatch('idPhongBan', form);
 
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
@@ -44,8 +53,20 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
   const [isView, setIsModalView] = useState(false);
+  const [openChamModal, setOpenChamModal] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [ketQuaCapTrenMap, setKetQuaCapTrenMap] = useState<Record<number, number | undefined>>({});
+
+  const tableData = useMemo(() => {
+    const sortedList = [...(list || [])].sort(
+      (a, b) =>
+        KPI_ORDER.indexOf(a.loaiKpi) -
+        KPI_ORDER.indexOf(b.loaiKpi)
+    );
+
+    return buildKpiGroupedTable<IViewKpiCaNhan>(sortedList);
+  }, [list]);
 
   useEffect(() => {
     dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
@@ -66,45 +87,112 @@ const Page = () => {
     dispatch(getAllUser({ IdPhongBan: value, PageIndex: 1, PageSize: 2000 }));
   };
 
-  const approveSelected = () => {
-    const ids = selectedRowKeys.map(Number);
-    const kpiToApprove = list.filter(
-      (item) => ids.includes(item.id) && item.trangThai === KpiTrangThaiConst.DE_XUAT
-    );
-
-    if (kpiToApprove.length === 0) {
-      toast.error('Chỉ có KPI đang ở trạng thái "Đề xuất" mới được phê duyệt.');
+  const scoreSelected = () => {
+    if (!selectedRowKeys.length) {
+      toast.warning('Vui lòng chọn ít nhất một KPI');
       return;
     }
+    setOpenChamModal(true);
+  };
 
-    Modal.confirm({
-      title: 'Phê duyệt hàng loạt',
-      content: `Xác nhận phê duyệt ${kpiToApprove.length} KPI đã chọn?`,
-      okText: 'Duyệt',
-      onOk: async () => {
-        try {
-          await dispatch(
-            updateTrangThaiKpiCaNhan({
-              ids,
-              trangThai: KpiTrangThaiConst.PHE_DUYET
-            })
-          ).unwrap();
-          toast.success('Phê duyệt thành công!');
-          setSelectedRowKeys([]);
-          dispatch(getAllKpiCaNhan(query));
-          dispatch(getListTrangThaiKpiCaNhan());
-        } catch {
-          toast.error('Phê duyệt thất bại!');
-        }
-      }
+  const handleSubmitScore = async (note?: string) => {
+    try {
+      await dispatch(
+        updateTrangThaiKpiCaNhan({
+          ids: selectedRowKeys.map(Number),
+          trangThai: KpiTrangThaiConst.DA_CHAM,
+          note,
+        })
+      ).unwrap();
+
+      toast.success('Chấm KPI thành công');
+
+      setOpenChamModal(false);
+      setSelectedRowKeys([]);
+      dispatch(getAllKpiCaNhan(query));
+    } catch {
+      toast.error('Chấm KPI thất bại');
+    }
+  };
+
+  const cancelScoredSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DA_CHAM],
+      invalidMsg: 'Chỉ KPI "Đã chấm" mới được hủy',
+      confirmTitle: 'Hủy gửi chấm KPI',
+      confirmMessage: 'Xác nhận hủy chấm các KPI đã chọn?',
+      successMsg: 'Hủy kết quả chấm thành công',
+      nextStatus: KpiTrangThaiConst.DA_GUI_CHAM,
+      updateAction: updateTrangThaiKpiCaNhan,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiCaNhan(query));
+      },
     });
+
+  const principalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DA_CHAM],
+      invalidMsg: 'Chỉ có KPI đang ở trạng thái "Đã chấm" mới được phê duyệt.',
+      confirmTitle: 'Phê duyệt KPI',
+      confirmMessage: 'Xác nhận phê duyệt các KPI đã chọn?',
+      successMsg: 'Phê duyệt thành công',
+      nextStatus: KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET,
+      updateAction: updateTrangThaiKpiCaNhan,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiCaNhan(query));
+      },
+    });
+
+  const cancelPrincipalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
+      invalidMsg: 'Chỉ KPI "Hiệu trưởng đã chấm" mới được hủy',
+      confirmTitle: 'Hủy phê duyệt KPI',
+      confirmMessage: 'Hủy phê duyệt các KPI đã chọn?',
+      successMsg: 'Hủy phê duyệt chấm thành công',
+      nextStatus: KpiTrangThaiConst.DA_CHAM,
+      updateAction: updateTrangThaiKpiCaNhan,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiCaNhan(query));
+      },
+    });
+
+
+  const updateKetQuaCapTren = (id: number, value?: number) => {
+    setKetQuaCapTrenMap(prev => ({
+      ...prev,
+      [id]: value
+    }));
   };
 
+  const handleSaveKetQuaCapTren = async () => {
+    const selectedIds = new Set(selectedRowKeys.map(Number));
+    const items = Object.entries(ketQuaCapTrenMap)
+      .filter(([id, v]) =>
+        v !== undefined && selectedIds.has(Number(id))
+      )
+      .map(([id, value]) => ({
+        id: Number(id),
+        KetQuaCapTren: value
+      }));
 
-  const scoreSelected = () => {
-    toast.info('Chức năng chấm KPI hàng loạt đang được cập nhật.');
+    if (!items.length) {
+      toast.warning('Chọn KPI đánh giá đã thay đổi cần lưu');
+      return;
+    }
+    try {
+      await dispatch(updateKetQuaCapTrenKpiCaNhan({ items })).unwrap();
+      toast.success('Lưu kết quả đánh giá thành công');
+      setSelectedRowKeys([]);
+      setKetQuaCapTrenMap({})
+      dispatch(getAllKpiCaNhan(query));
+    } catch {
+      toast.error('Lưu kết quả thất bại');
+    }
   };
-
   const requiredSelect = (cb: () => void) => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
@@ -114,16 +202,28 @@ const Page = () => {
   };
   const bulkActionItems: MenuProps['items'] = [
     {
-      key: 'approve',
-      label: 'Phê duyệt',
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-      onClick: () => requiredSelect(approveSelected),
-    },
-    {
       key: 'score',
       label: 'Chấm KPI',
       icon: <EditOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(scoreSelected),
+    },
+    {
+      key: 'cancelScore',
+      label: 'Hủy kết quả chấm KPI',
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(cancelScoredSelected),
+    },
+    {
+      key: 'principalApprove',
+      label: 'Hiệu trưởng phê duyệt',
+      icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(principalApprovedSelected),
+    },
+    {
+      key: 'cancelPrincipalApprove',
+      label: 'Hiệu trưởng hủy duyệt',
+      icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(cancelPrincipalApprovedSelected),
     },
   ];
 
@@ -171,16 +271,126 @@ const Page = () => {
     });
   };
 
-  const columns: IColumn<IViewKpiCaNhan>[] = [
-    { key: 'linhVuc', dataIndex: 'linhVuc', title: 'Lĩnh Vực' },
-    { key: 'kpi', dataIndex: 'kpi', title: 'Tên KPI' },
-    { key: 'nhanSu', dataIndex: 'nhanSu', title: 'Nhân sự' },
+  const columns: IColumn<KpiTableRow<IViewKpiCaNhan>>[] = [
     {
-      key: 'trangThai', dataIndex: 'trangThai', title: 'Trạng thái',
-      render: val => {
-        const s = KpiTrangThaiConst.get(val);
-        return s ? <Tag color={s.color}>{s.text}</Tag> : null;
-      }
+      key: 'linhVuc',
+      dataIndex: 'linhVuc',
+      title: 'Lĩnh Vực',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'kpi',
+      dataIndex: 'kpi',
+      title: 'Tên KPI',
+      render: (value, record) => {
+        if (record.rowType === 'group') {
+          return {
+            children: (
+              <div style={{
+                fontSize: 14,
+                fontWeight: 600,
+                textAlign: 'center',
+                color: '#0958d9',
+              }}>
+                {KpiLoaiConst.getName(record.loaiKpi)}
+              </div>
+            ),
+            props: { colSpan: columns.length },
+          };
+        }
+
+        if (record.rowType === 'total') {
+          return {
+            children: (
+              <div style={{
+                fontSize: 15,
+                fontWeight: 600,
+                textAlign: 'left',
+              }}>
+                TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{record.trongSo}%</span>
+              </div>
+            ),
+            props: { colSpan: columns.length },
+          };
+        }
+
+        return value;
+      },
+    },
+    {
+      key: 'nhanSu',
+      dataIndex: 'nhanSu',
+      title: 'Nhân sự',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'mucTieu',
+      dataIndex: 'mucTieu',
+      title: 'Mục tiêu',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'trongSo',
+      dataIndex: 'trongSo',
+      title: 'Trọng số',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'loaiKpi',
+      dataIndex: 'loaiKpi',
+      title: 'Loại KPI',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : KpiLoaiConst.getName(val))
+    },
+    {
+      key: 'ketQuaThucTe',
+      dataIndex: 'ketQuaThucTe',
+      title: 'Kết quả thực tế',
+      render: (val, record) =>
+        record.rowType !== 'data'
+          ? { props: { colSpan: 0 } }
+          : formatKetQua(val, record.loaiCongThuc),
+    },
+    {
+      key: 'diemKpi',
+      dataIndex: 'diemKpi',
+      title: 'Điểm tự đánh giá',
+      align: 'center',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'capTrenDanhGia',
+      dataIndex: 'capTrenDanhGia',
+      title: 'Cấp trên đánh giá',
+      render: (val, record) => {
+        if (record.rowType !== 'data') {
+          return { props: { colSpan: 0 } };
+        }
+        const value = ketQuaCapTrenMap[record.id] ?? val;
+        return (
+          <KetQuaInput
+            loaiCongThuc={record.loaiCongThuc}
+            value={value}
+            onChange={(v) => updateKetQuaCapTren(record.id, v)}
+          />
+        );
+      },
+    },
+    {
+      key: 'diemKpiCapTren',
+      dataIndex: 'diemKpiCapTren',
+      title: 'Điểm cấp trên',
+      align: 'center',
+      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    },
+    {
+      key: 'trangThai',
+      dataIndex: 'trangThai',
+      title: 'Trạng thái',
+      type: ETableColumnType.STATUS,
+      render: (val, record) =>
+        record.rowType !== 'data'
+          ? { props: { colSpan: 0 } }
+          : <Tag color={KpiTrangThaiConst.get(val)?.color}>{KpiTrangThaiConst.get(val)?.text}</Tag>,
     },
   ];
 
@@ -212,6 +422,7 @@ const Page = () => {
   const rowSelection = {
     selectedRowKeys,
     preserveSelectedRowKeys: true,
+    getCheckboxProps: (record: any) => ({ disabled: record.rowType !== 'data', style: record.rowType !== 'data' ? { display: 'none' } : {} }),
     onChange: (newSelectedRowKeys: React.Key[]) => {
       const currentPageIds = list?.map(item => item.id) || [];
       const isUnselectingAllOnPage = currentPageIds.every(id => !newSelectedRowKeys.includes(id));
@@ -286,6 +497,14 @@ const Page = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              icon={<SaveOutlined />}
+              type="primary"
+              onClick={handleSaveKetQuaCapTren}
+
+            >
+              Lưu kết quả
+            </Button>
             <Dropdown
               menu={{ items: bulkActionItems }}
               trigger={['click']}
@@ -328,6 +547,7 @@ const Page = () => {
               onClick={() => {
                 form.resetFields();
                 filterForm.resetFields();
+                setKetQuaCapTrenMap({});
                 onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: undefined, trangThai: undefined });
                 setSelectedRowKeys([]);
               }}
@@ -342,10 +562,17 @@ const Page = () => {
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
         columns={columns}
-        dataSource={list}
+        dataSource={tableData}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
         rowSelection={rowSelection}
+        onRow={(record) => ({
+          style: {
+            cursor: record.rowType !== 'data' ? 'default' : 'pointer',
+            backgroundColor: record.rowType === 'group' ? '#f0f5ff' : record.rowType === 'total' ? '#fafafa' : '#fff',
+            fontWeight: record.rowType !== 'data' ? 600 : 'normal',
+          }
+        })}
       />
 
       <PositionModal
@@ -357,6 +584,13 @@ const Page = () => {
           dispatch(getAllKpiCaNhan(query));
           dispatch(getListTrangThaiKpiCaNhan());
         }}
+      />
+      <ConfirmScoredModal
+        open={openChamModal}
+        title="Chấm KPI Cá nhân"
+        trangThai={KpiTrangThaiConst.DA_CHAM}
+        onCancel={() => setOpenChamModal(false)}
+        onSubmit={handleSubmitScore}
       />
     </Card>
   );

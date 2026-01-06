@@ -39,12 +39,13 @@ import { DelegationStatusConst } from '../../consts/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
 import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
+import { useRouter } from 'next/navigation';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem, listPhongBan, listStatus } = useAppSelector((state) => state.delegationState);
-
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
@@ -55,6 +56,7 @@ const Page = () => {
       dataIndex: 'stt',
       title: 'STT',
       align: 'center',
+      fixed: 'left',
       render: (value, row, index) => index + 1
     },
     {
@@ -117,7 +119,7 @@ const Page = () => {
       title: 'Trạng thái',
       align: 'center',
       type: ETableColumnType.STATUS,
-      getTagInfo: (status: number) => DelegationStatusConst.getInfo(status)
+      getTagInfo: (status: number) => DelegationStatusConst.getTag(status)
     }
   ];
 
@@ -142,7 +144,7 @@ const Page = () => {
     {
       label: 'Tiếp đoàn',
       icon: <DeploymentUnitOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET,
+      hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET || !r.receptionTimes?.length,
       command: (record: IViewGuestGroup) => onClickTiepDoan(record)
     }
   ];
@@ -178,12 +180,8 @@ const Page = () => {
   };
 
   const onClickView = (data: IViewGuestGroup) => {
-    dispatch(select(data));
-    setIsModalView(true);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
+    router.push(`/delegation/incoming/detail/${data.id}`);
   };
-
   const onClickTiepDoan = (data: IViewGuestGroup) => {
     openConfirmStatusModal({
       title: 'Xác nhận tiếp đoàn',
@@ -242,8 +240,11 @@ const Page = () => {
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
             <Select
-              placeholder="Chọn phòng ban phụ trách"
+              showSearch
               allowClear
+              placeholder="Chọn phòng ban phụ trách"
+              optionFilterProp="label"
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
               options={listPhongBan.map((pb: any) => ({
                 value: pb.idPhongBan,
                 label: pb.tenPhongBan
@@ -257,7 +258,7 @@ const Page = () => {
               allowClear
               options={listStatus.map((st: any) => ({
                 value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, 'name') ?? ''
+                label: DelegationStatusConst.getInfo(st.status, "label" ) ?? ''
               }))}
               onChange={(value) => onFilterChange({ status: value })}
             />

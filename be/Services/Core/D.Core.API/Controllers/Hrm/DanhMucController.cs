@@ -1,4 +1,5 @@
 ﻿using d.Shared.Permission;
+using d.Shared.Permission.Permission;
 using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
@@ -70,7 +71,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpPost("chuc-vu/create")]
         public async Task<ResponseAPI> CreateDmChucVu([FromBody] CreateDmChucVuDto dto)
         {
@@ -90,7 +91,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpPut("chuc-vu/update")]
         public async Task<ResponseAPI> UpdateDmChucVu([FromBody] UpdateDmChucVuDto dto)
         {
@@ -108,9 +109,9 @@ namespace D.Core.API.Controllers.Hrm
         /// <summary>
         /// Xóa mềm chức vụ
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpDelete("chuc-vu/delete/{id}")]
         public async Task<ResponseAPI> DeleteDmChucVu([FromRoute] int id)
         {
@@ -248,7 +249,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpPost("phong-ban/create")]
         public async Task<ResponseAPI> CreateDmPhongBan([FromBody] CreateDmPhongBanDto dto)
         {
@@ -268,7 +269,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpPut("phong-ban/update")]
         public async Task<ResponseAPI> UpdateDmPhongBan([FromBody] UpdateDmPhongBanDto dto)
         {
@@ -288,7 +289,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpDelete("phong-ban/delete/{id}")]
         public async Task<ResponseAPI> DeleteDmPhongBan([FromRoute] int id)
         {
@@ -368,7 +369,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpPost("to-bo-mon/create")]
         public async Task<ResponseAPI> CreateDmToBoMon([FromBody] CreateDmToBoMonDto dto)
         {
@@ -445,7 +446,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionKeyConstant.Admin)]
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
         [HttpPost("khoa-hoc/create")]
         public async Task<ResponseAPI> CreateDmKhoaHoc([FromBody] CreateDmKhoaHocDto dto)
         {

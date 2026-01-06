@@ -38,5 +38,8 @@ namespace D.Core.Domain.Entities.Kpi
         public LoaiCongThuc? LoaiCongThuc { get; set; }
         public string? ThamSoCongThuc { get; set; }
         public decimal? DiemKpi { get; set; }
+
+        public decimal? CapTrenDanhGia { get; set; }
+        public decimal? DiemKpiCapTren { get; set; }
     }
 }

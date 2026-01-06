@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@redux/hooks';
 import { selectorPermissions, selectorUser } from '@redux/feature/auth/authSelectors';
+import NotPermissionAccessComponent from '@components/common/NotPermissionAccess';
 
 export function withAuthGuard(WrappedComponent: React.ComponentType, requiredPermission: string) {
   const GuardedComponent = (props: any) => {
@@ -21,7 +22,7 @@ export function withAuthGuard(WrappedComponent: React.ComponentType, requiredPer
       }
     }, [router, permissions]);
 
-    if (!hasAccess) return null;
+    if (!hasAccess) return <NotPermissionAccessComponent />;
 
     return <WrappedComponent {...props} />;
   };

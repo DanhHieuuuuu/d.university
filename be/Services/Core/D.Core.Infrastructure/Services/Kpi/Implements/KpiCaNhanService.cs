@@ -7,10 +7,13 @@ using D.Core.Domain.Entities.Kpi.Constants;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
+using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Extensions;
+using System.Net.Http;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -18,6 +21,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
     public class KpiCaNhanService : ServiceBase, IKpiCaNhanService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _contextAccessor;
 
         public KpiCaNhanService(
             ILogger<KpiRoleService> logger,
@@ -28,6 +32,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
+            _contextAccessor = contextAccessor;
         }
 
         public void CreateKpiCaNhan(CreateKpiCaNhanDto dto)
@@ -69,10 +74,10 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             _unitOfWork.iKpiCaNhanRepository.SaveChange();
         }
 
-        public async Task<PageResultDto<KpiCaNhanDto>> FindPagingKpiCaNhan(FilterKpiCaNhanDto dto)
+        public async Task<PageResultDto<KpiCaNhanDto>> GetAllKpiCaNhan(FilterKpiCaNhanDto dto)
         {
             _logger.LogInformation(
-                $"{nameof(FindPagingKpiCaNhan)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+                $"{nameof(GetAllKpiCaNhan)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
             var kpis = await _unitOfWork.iKpiCaNhanRepository
@@ -112,19 +117,21 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     Id = kpi.Id,
                     STT = kpi.STT,
                     KPI = kpi.KPI,
-                    LoaiKPI = kpi.LoaiKPI,
+                    LoaiKpi = kpi.LoaiKPI,
                     LinhVuc = kpi.LinhVuc,
                     NhanSu = nhanSus[kpi.IdNhanSu].HoTenDayDu,
                     IdNhanSu = kpi.IdNhanSu,
                     PhongBan = nhanSus[kpi.IdNhanSu].TenPhongBan,
                     MucTieu = kpi.MucTieu,
                     TrongSo = kpi.TrongSo,
+                    Role = kpi.Role,
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.Status,
-                    TrangThaiText = kpi.Status.HasValue && KpiStatus.Names.ContainsKey(kpi.Status.Value)
-                        ? KpiStatus.Names[kpi.Status.Value]
-                        : "Không xác định",
-                    KetQuaThucTe = kpi.KetQuaThucTe
+                    LoaiCongThuc = kpi.LoaiCongThuc,
+                    KetQuaThucTe = kpi.KetQuaThucTe,
+                    CapTrenDanhGia = kpi.CapTrenDanhGia,
+                    DiemKpiCapTren = kpi.DiemKpiCapTren,
+                    DiemKpi = kpi.DiemKpi
                 };
 
             var totalCount = query.Count();
@@ -141,9 +148,74 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         }
 
 
-        public PageResultDto<KpiCaNhanDto> GetAllKpiCaNhan(FilterKpiCaNhanDto dto)
+        public async Task<PageResultDto<KpiCaNhanDto>> FindPagingKpiCaNhanKeKhai(
+            FilterKpiKeKhaiCaNhanDto dto)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation(
+                $"{nameof(FindPagingKpiCaNhanKeKhai)} => dto = {JsonSerializer.Serialize(dto)}"
+            );
+
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var user = await _unitOfWork.iNsNhanSuRepository
+                .TableNoTracking
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            var phongBans = await _unitOfWork.iDmPhongBanRepository
+                .TableNoTracking
+                .ToDictionaryAsync(x => x.Id, x => x.TenPhongBan);
+
+
+            var query = _unitOfWork.iKpiCaNhanRepository
+                .TableNoTracking
+                .Where(kpi =>
+                    !kpi.Deleted
+                    && kpi.IdNhanSu == user.Id
+                    && (
+                        string.IsNullOrEmpty(dto.Keyword)
+                        || kpi.KPI!.ToLower().Contains(dto.Keyword.ToLower().Trim())
+                    )
+                    && (dto.LoaiKpi == null || kpi.LoaiKPI == dto.LoaiKpi)
+                    && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
+                    && (dto.TrangThai == null || kpi.Status == dto.TrangThai)
+                    && (string.IsNullOrEmpty(dto.Role) || kpi.Role == dto.Role)
+                )
+                .Select(kpi => new KpiCaNhanDto
+                {
+                    Id = kpi.Id,
+                    STT = kpi.STT,
+                    KPI = kpi.KPI,
+                    LoaiKpi = kpi.LoaiKPI,
+                    LinhVuc = kpi.LinhVuc,
+                    IdNhanSu = kpi.IdNhanSu,
+                    NhanSu = user.HoDem + " " + user.Ten,
+                    PhongBan = user.HienTaiPhongBan != null &&
+                               phongBans.ContainsKey(user.HienTaiPhongBan.Value)
+                        ? phongBans[user.HienTaiPhongBan.Value]
+                        : string.Empty,
+                    MucTieu = kpi.MucTieu,
+                    TrongSo = kpi.TrongSo,
+                    Role = kpi.Role,
+                    NamHoc = kpi.NamHoc,
+                    LoaiCongThuc = kpi.LoaiCongThuc,
+                    TrangThai = kpi.Status,
+                    KetQuaThucTe = kpi.KetQuaThucTe,
+                    CapTrenDanhGia = kpi.CapTrenDanhGia,
+                    DiemKpiCapTren = kpi.DiemKpiCapTren,
+                    DiemKpi = kpi.DiemKpi
+                });
+
+            var totalCount = await query.CountAsync();
+
+            var pagedItems = await query
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ToListAsync();
+
+            return new PageResultDto<KpiCaNhanDto>
+            {
+                Items = pagedItems,
+                TotalItem = totalCount
+            };
         }
 
         public List<TrangThaiResponseDto> GetListTrangThai()
@@ -184,6 +256,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     if (item.KetQuaThucTe.HasValue)
                     {
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
+                        kpi.DiemKpi = item.DiemKpi;
                         kpi.Status = KpiStatus.Declared;
 
                         _unitOfWork.iKpiCaNhanRepository.Update(kpi);
@@ -258,6 +331,40 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             }
 
             _unitOfWork.iKpiCaNhanRepository.SaveChange();
+        }
+
+
+        public void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiCaNhanListDto dto)
+        {
+            using var transaction = _unitOfWork.Database.BeginTransaction();
+            try
+            {
+                foreach (var item in dto.Items)
+                {
+                    var kpi = _unitOfWork.iKpiCaNhanRepository.Table
+                        .FirstOrDefault(x => x.Id == item.Id && !x.Deleted);
+
+                    if (kpi == null)
+                        throw new Exception("Không tìm thấy KPI cá nhân");
+
+                    if (item.KetQuaCapTren.HasValue)
+                    {
+                        kpi.CapTrenDanhGia = item.KetQuaCapTren;
+                        kpi.DiemKpiCapTren = item.DiemKpiCapTren;
+                        kpi.Status = KpiStatus.Evaluated;
+
+                        _unitOfWork.iKpiCaNhanRepository.Update(kpi);
+                    }
+                }
+
+                _unitOfWork.iKpiCaNhanRepository.SaveChange();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }

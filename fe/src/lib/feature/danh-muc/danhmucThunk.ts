@@ -3,6 +3,7 @@ import { DanhMucService } from '@services/danhmuc.service';
 import { ICreateChucVu, IQueryChucVu, IUpdateChucVu } from '@models/danh-muc/chuc-vu.model';
 import { ICreateToBoMon, IQueryToBoMon, IUpdateToBoMon } from '@models/danh-muc/to-bo-mon.model';
 import { ICreatePhongBan, IQueryPhongBan, IUpdatePhongBan } from '@models/danh-muc/phong-ban.model';
+import { IQueryKhoaHoc } from '@models/danh-muc/khoa-hoc.model';
 
 export const getAllChucVu = createAsyncThunk(
   'danhmuc/list-chucvu',
@@ -367,3 +368,21 @@ export const getAllTonGiao = createAsyncThunk('danhmuc/list-tongiao', async (_, 
     });
   }
 });
+
+export const getAllKhoaHoc = createAsyncThunk(
+  'danhmuc/list-khoahoc',
+  async (payload: IQueryKhoaHoc | undefined, { rejectWithValue }) => {
+    try {
+      const res = await DanhMucService.getListKhoaHoc(payload);
+
+      return res.data;
+    } catch (error: any) {
+      console.error(error);
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
