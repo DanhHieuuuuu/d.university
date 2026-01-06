@@ -189,9 +189,13 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
             if (report == null) throw new Exception("Báo cáo không tồn tại.");
 
             var respondentsQuery = from s in _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
-                                   join u in _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                                   on s.IdNguoiDung equals u.Id into uGroup
-                                   from u in uGroup.DefaultIfEmpty()
+                                   join nv in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                                   on s.IdNguoiDung equals nv.Id into uGroup
+                                   from nv in uGroup.DefaultIfEmpty()
+
+                                   join sv in _unitOfWork.iSvSinhVienRepository.TableNoTracking
+                                   on s.IdNguoiDung equals sv.Id into svGroup
+                                   from sv in svGroup.DefaultIfEmpty()
 
                                    where s.IdKhaoSat == report.IdKhaoSat
                                       && s.TrangThai == SubmissionStatus.Submitted
@@ -199,8 +203,12 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
                                    select new SurveyRespondentDto
                                    {
                                        SubmissionId = s.Id,
-                                       FullName = u != null ? $"{u.HoDem} {u.Ten}" : "Unknown",
-                                       UserCode = u != null ? u.MaNhanSu : "",
+                                       FullName = nv != null
+                                          ? $"{nv.HoDem} {nv.Ten}"
+                                          : (sv != null ? $"{sv.HoDem} {sv.Ten}" : "Unknown"),
+                                       UserCode = nv != null
+                                          ? nv.MaNhanSu
+                                          : (sv != null ? sv.Mssv : ""),
                                        SubmitTime = s.ThoiGianNop,
                                        TotalScore = s.DiemTong ?? 0
                                    };

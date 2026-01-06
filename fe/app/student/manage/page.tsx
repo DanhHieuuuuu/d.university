@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Modal, Tag } from 'antd';
 import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, StopOutlined, EyeOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -10,20 +10,35 @@ import { IColumn, IAction } from '@models/common/table.model';
 import { IQueryStudent, IViewStudent } from '@models/student/student.model';
 import { getListStudent, deleteStudent } from '@redux/feature/studentSlice';
 import { toast } from 'react-toastify';
-import dayjs from 'dayjs';
+import { formatDateView } from '@utils/index';
 import AppTable from '@components/common/Table';
 import StudentDialog from './(dialog)/create-or-update';
+import {
+  getAllDanToc,
+  getAllGioiTinh,
+  getAllQuocTich,
+  getAllTonGiao
+} from '@redux/feature/danh-muc/danhmucThunk';
 
 const StudentPage = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { list, status, total } = useAppSelector((state) => state.studentState);
+  const { listDanToc, listGioiTinh, listQuocTich, listTonGiao } = useAppSelector((s) => s.danhmucState);
+
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedStudent, setSelectedStudent] = useState<IViewStudent | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [isView, setIsView] = useState(false);
+
+  useEffect(() => {
+    dispatch(getAllGioiTinh());
+    dispatch(getAllQuocTich());
+    dispatch(getAllDanToc());
+    dispatch(getAllTonGiao());
+  }, []);
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryStudent>({
     total: total,
@@ -47,15 +62,19 @@ const StudentPage = () => {
   };
 
   const columns: IColumn<IViewStudent>[] = [
-    { key: 'idStudent', dataIndex: 'idStudent', title: 'ID', showOnConfig: false },
+    {
+      key: 'stt',
+      title: 'STT',
+      render: (value, record, index) => index + 1
+    },
     { key: 'mssv', dataIndex: 'mssv', title: 'MSSV' },
     { key: 'hoTen', dataIndex: 'hoTen', title: 'Họ tên' },
-    { key: 'soCccd', dataIndex: 'soCccs', title: 'CCCD' },
+    { key: 'soCccd', dataIndex: 'soCccd', title: 'CCCD' },
     {
       key: 'ngaySinh',
       dataIndex: 'ngaySinh',
       title: 'Ngày sinh',
-      render: (value) => (value ? dayjs(value).format('DD-MM-YYYY') : '')
+      render: (value) => formatDateView(value)
     },
     { key: 'noiSinh', dataIndex: 'noiSinh', title: 'Nơi sinh' },
     { key: 'email', dataIndex: 'email', title: 'Email' },
@@ -64,15 +83,31 @@ const StudentPage = () => {
       key: 'gioiTinh',
       dataIndex: 'gioiTinh',
       title: 'Giới tính',
-      render: (value) => (value ? 'Nam' : 'Nữ')
+      render: (value) => listGioiTinh.find((item) => item.id === value)?.tenGioiTinh
     },
-    { key: 'quocTich', dataIndex: 'quocTich', title: 'Quốc tịch' },
-    { key: 'danToc', dataIndex: 'danToc', title: 'Dân tộc' },
     {
-      key: 'trangThai',
-      dataIndex: 'trangThai',
+      key: 'quocTich',
+      dataIndex: 'quocTich',
+      title: 'Quốc tịch',
+      render: (value) => listQuocTich.find((item) => item.id === value)?.tenQuocGia
+    },
+    {
+      key: 'danToc',
+      dataIndex: 'danToc',
+      title: 'Dân tộc',
+      render: (value) => listDanToc.find((item) => item.id === value)?.tenDanToc
+    },
+    {
+      key: 'tonGiao',
+      dataIndex: 'tonGiao',
+      title: 'Tôn giáo',
+      render: (value) => listTonGiao.find((item) => item.id === value)?.tenTonGiao
+    },
+    {
+      key: 'trangThaiHoc',
+      dataIndex: 'trangThaiHoc',
       title: 'Trạng thái',
-      render: (val: boolean) => (val ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Khóa</Tag>)
+      render: (val: number) => (val === 1 ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Khóa</Tag>)
     }
   ];
 
@@ -109,8 +144,12 @@ const StudentPage = () => {
           okButtonProps: { danger: true },
           cancelText: 'Hủy',
           onOk: async () => {
+            if (!record.mssv) {
+              toast.error('Mã số sinh viên không tồn tại!');
+              return;
+            }
             try {
-              await dispatch(deleteStudent(record.idStudent)).unwrap();
+              await dispatch(deleteStudent(record.mssv)).unwrap();
               toast.success('Xóa sinh viên thành công');
               dispatch(getListStudent(query));
             } catch {

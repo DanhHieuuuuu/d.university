@@ -6,18 +6,28 @@ export type IQueryStudent = IQueryPaging & {
 
 export type IViewStudent = {
   idStudent: number;
-  mssv?: string;
+  mssv: string;
   hoDem?: string;
   ten?: string;
   hoTen?: string;
   ngaySinh?: Date;
   noiSinh?: string;
-  gioiTinh?: boolean;
+  gioiTinh?: number;
   quocTich?: number;
   danToc?: number;
+  tonGiao?: number;
+  nguyenQuan?: string;
+  noiOHienTai?: string;
   soCccd?: string;
   soDienThoai?: string;
   email?: string;
+
+  khoaHoc?: number;
+  khoa?: number;
+  nganh?: number;
+  chuyenNganh?: number;
+  trangThaiHoc?: number;
+
 };
 
 export type ICreateStudent = {
@@ -26,14 +36,22 @@ export type ICreateStudent = {
   ten?: string;
   ngaySinh?: Date;
   noiSinh?: string;
-  gioiTinh?: boolean;
+  gioiTinh?: number;
   quocTich?: number;
   danToc?: number;
+  tonGiao?: number;
+  nguyenQuan?: string;
+  noiOHienTai?: string;
   soCccd?: string;
   soDienThoai?: string;
   email?: string;
+  khoaHoc?: number;
+  khoa?: number;
+  nganh?: number;
+  chuyenNganh?: number;
 };
 
 export type IUpdateStudent = ICreateStudent & {
   idStudent: number;
+  trangThaiHoc?: number;
 };

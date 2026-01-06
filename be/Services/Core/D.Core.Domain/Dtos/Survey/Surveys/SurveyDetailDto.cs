@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 namespace D.Core.Domain.Dtos.Survey.Surveys
 {
     public class SurveyDetailDto : SurveyResponseDto
-    {
-        public string MoTa { get; set; }
+    {       
         public int IdPhongBan { get; set; }
-        public RequestSurveyDetailDto? RequestDetail { get; set; }
+        public RequestSurveyDetailDto? SurveyRequest { get; set; }
     }
 }

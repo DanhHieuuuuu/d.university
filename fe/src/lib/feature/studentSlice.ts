@@ -12,14 +12,14 @@ export const getListStudent = createAsyncThunk('student/list', async (args: IQue
   }
 });
 
-export const getDetailStudent = createAsyncThunk('student/find', async (keyword: string) => {
-  try {
-    const res = await StudentService.find(keyword);
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
+// export const getDetailStudent = createAsyncThunk('student/find', async (keyword: string) => {
+//   try {
+//     const res = await StudentService.find(keyword);
+//     return res.data;
+//   } catch (error: any) {
+//     console.error(error);
+//   }
+// });
 
 export const createStudent = createAsyncThunk('student/create', async (body: ICreateStudent) => {
   try {
@@ -39,9 +39,9 @@ export const updateStudent = createAsyncThunk('student/update', async (body: Par
   }
 });
 
-export const deleteStudent = createAsyncThunk('student/delete', async (idStudent: number) => {
+export const deleteStudent = createAsyncThunk('student/delete', async (mssv: string) => {
   try {
-    const res = await StudentService.remove(idStudent);
+    const res = await StudentService.remove(mssv);
     return res.data;
   } catch (error: any) {
     console.error(error);
@@ -117,16 +117,16 @@ const studentSlice = createSlice({
       .addCase(getListStudent.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
-      .addCase(getDetailStudent.pending, (state) => {
-        state.selected.status = ReduxStatus.LOADING;
-      })
-      .addCase(getDetailStudent.fulfilled, (state, action: PayloadAction<any>) => {
-        state.selected.status = ReduxStatus.SUCCESS;
-        state.selected.data = action.payload;
-      })
-      .addCase(getDetailStudent.rejected, (state) => {
-        state.selected.status = ReduxStatus.FAILURE;
-      })
+      // .addCase(getDetailStudent.pending, (state) => {
+      //   state.selected.status = ReduxStatus.LOADING;
+      // })
+      // .addCase(getDetailStudent.fulfilled, (state, action: PayloadAction<any>) => {
+      //   state.selected.status = ReduxStatus.SUCCESS;
+      //   state.selected.data = action.payload;
+      // })
+      // .addCase(getDetailStudent.rejected, (state) => {
+      //   state.selected.status = ReduxStatus.FAILURE;
+      // })
       .addCase(createStudent.pending, (state) => {
         state.$create.status = ReduxStatus.LOADING;
       })

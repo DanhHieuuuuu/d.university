@@ -1,0 +1,104 @@
+import { IQueryPaging } from '@models/common/model.common';
+import { ICriteria, IQuestion, ITarget, IViewRequest } from './request.model';
+
+export type IQuerySurvey = IQueryPaging & {
+  maKhaoSat?: string;
+  idPhongBan?: number;
+  status?: number;
+};
+
+export interface IViewSurvey {
+  id: number;
+  maKhaoSat: string;
+  tenKhaoSat: string;
+    moTa: string;
+  thoiGianBatDau: string | Date;
+  thoiGianKetThuc: string | Date;
+  status: number;
+  statusName: string; 
+  maYeuCauGoc?: string;
+}
+
+export type ISurveyDetail = IViewSurvey & {
+  idPhongBan: number;
+  surveyRequest?: ISurveyRequestSource; 
+}
+
+export interface ISurveyRequestSource {
+  id: number;
+  maYeuCau: string;
+  tenKhaoSatYeuCau: string;
+  questions?: IQuestion[]; 
+  targets?: ITarget[];
+  criterias?: ICriteria[];
+}
+
+export interface ICreateSurvey {
+  maKhaoSat: string;
+  tenKhaoSat: string;
+  moTa: string;
+  thoiGianBatDau: string | Date;
+  thoiGianKetThuc: string | Date;
+  idPhongBan: number;
+  maYeuCauGoc?: string;
+}
+
+export type IUpdateSurvey = ICreateSurvey & {
+  id: number;
+}
+
+export type IQueryMySurvey = IQueryPaging & {
+  status?: number;
+}
+
+export interface IMySurveyItem {
+  id: number;
+  maKhaoSat: string;
+  tenKhaoSat: string;
+  thoiGianBatDau: string | Date;
+  thoiGianKetThuc: string | Date;
+  status: number;
+  statusName: string;
+  maYeuCauGoc?: string;
+}
+
+export interface IAnswerExam {
+  id: number;
+  noiDung: string;
+  thuTu: number;
+}
+
+export interface ISurveyExam {
+  id: number;
+  noiDung: string;
+  loaiCauHoi: number;
+  answers: IAnswerExam[];
+}
+
+export interface ISavedAnswer {
+  questionId: number;
+  selectedAnswerId?: number; 
+  textResponse?: string;
+}
+
+export interface IStartSurveyResponse {
+  submissionId: number;
+  surveyId: number;
+  tenKhaoSat: string;
+  thoiGianBatDau: string | Date;
+  questions: ISurveyExam[];
+  savedAnswers: ISavedAnswer[];
+}
+
+export interface ISubmitSurvey {
+  submissionId: number;
+  answers: ISavedAnswer[];
+}
+
+export interface ISurveyResult {
+  submissionId: number;
+  totalScore: number;
+  totalCorrect: number;
+  totalQuestions: number;
+  submitTime: string | Date;
+}

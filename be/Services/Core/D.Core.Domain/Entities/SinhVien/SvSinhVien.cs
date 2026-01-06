@@ -30,6 +30,7 @@ namespace D.Core.Domain.Entities.SinhVien
         public int? KhoaHoc { get; set; }
         public int? Khoa { get; set; }
         public int? Nganh { get; set; }
+        public int? ChuyenNganh { get; set; }
         public int? LopQL { get; set; }
         public int? TrangThaiHoc { get; set; }
 

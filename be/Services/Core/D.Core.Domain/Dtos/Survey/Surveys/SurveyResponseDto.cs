@@ -12,6 +12,7 @@ namespace D.Core.Domain.Dtos.Survey.Surveys
         public int Id { get; set; }
         public string MaKhaoSat { get; set; }
         public string TenKhaoSat { get; set; }
+        public string MoTa { get; set; }
         public DateTime ThoiGianBatDau { get; set; }
         public DateTime ThoiGianKetThuc { get; set; }
         public int Status { get; set; }

@@ -43,19 +43,19 @@ namespace D.Core.API.Controllers.SinhVienController
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("get-all")]
-        public async Task<ResponseAPI> GetAll(SvSinhVienGetAllRequestDto dto)
-        {
-            try
-            {
-                var result = await _mediator.Send(dto);
-                return new ResponseAPI(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
+        //[HttpGet("get-all")]
+        //public async Task<ResponseAPI> GetAll(SvSinhVienGetAllRequestDto dto)
+        //{
+        //    try
+        //    {
+        //        var result = await _mediator.Send(dto);
+        //        return new ResponseAPI(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex);
+        //    }
+        //}
 
         /// <summary>
         /// Chi tiết sinh viên bằng mssv

@@ -14,7 +14,11 @@ import {
   ForkOutlined,
   BookOutlined,
   LinkOutlined,
-  ProfileOutlined
+  ProfileOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  FormOutlined,
+  InboxOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
@@ -155,6 +159,28 @@ export const listMenuCore: IMenu[] = [
         label: 'Khung chương trình',
         routerLink: '/training/curriculumFramework',
         icon: <ProfileOutlined />
+      }
+    ]
+  },
+  {
+    label: 'Khảo sát',
+    routerLink: '/survey',
+    icon: <FormOutlined />,
+    items: [
+      {
+        label: 'Danh sách yêu cầu',
+        routerLink: '/survey/manage/request',
+        icon: <InboxOutlined />,      
+      },
+      {
+        label: 'Danh sách khảo sát',
+        routerLink: '/survey/manage/surveys',
+        icon: <FileTextOutlined />
+      },
+      {
+        label: 'Báo cáo khảo sát',
+        routerLink: '/survey/manage/report',
+        icon: <BarChartOutlined />
       }
     ]
   },

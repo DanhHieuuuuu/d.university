@@ -21,20 +21,20 @@ const findPaging = async (query: IQueryStudent) => {
   }
 };
 
-const find = async (keyword: string) => {
-  try {
-    const res = await axios.get(`${apiStudentEndpoint}/get`, {
-      params: {
-        keyword: keyword
-      }
-    });
-    // Trả về data (object API)
-    return res.data;
-  } catch (err) {
-    processApiMsgError(err, 'Không thể tìm kiếm sinh viên.');
-    throw err;
-  }
-};
+// const find = async (keyword: string) => {
+//   try {
+//     const res = await axios.get(`${apiStudentEndpoint}/get-all`, {
+//       params: {
+//         keyword: keyword
+//       }
+//     });
+//     // Trả về data (object API)
+//     return res.data;
+//   } catch (err) {
+//     processApiMsgError(err, 'Không thể tìm kiếm sinh viên.');
+//     throw err;
+//   }
+// };
 
 const createSinhVien = async (body: ICreateStudent) => {
   try {
@@ -56,10 +56,10 @@ const update = async (body: Partial<IUpdateStudent>) => {
   }
 };
 
-const remove = async (idStudent: number) => {
+const remove = async (mssv: string) => {
   try {
     const res = await axios.delete(`${apiStudentEndpoint}/delete`, {
-      data: { idStudent }
+      data: { mssv }
     });
     return Promise.resolve(res.data);
   } catch (err) {
@@ -70,7 +70,7 @@ const remove = async (idStudent: number) => {
 
 export const StudentService = {
   findPaging,
-  find,
+  // find,
   createSinhVien,
   update,
   remove

@@ -56,6 +56,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                             Id = s.Id,
                             MaKhaoSat = s.MaKhaoSat,
                             TenKhaoSat = s.TenKhaoSat,
+                            MoTa = s.MoTa,
                             ThoiGianBatDau = s.ThoiGianBatDau,
                             ThoiGianKetThuc = s.ThoiGianKetThuc,
                             Status = s.Status,
