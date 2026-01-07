@@ -173,14 +173,14 @@ const HomePage: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: 24 }}>
       {/* Welcome Message */}
-      <h1 style={{ marginBottom: '24px', fontSize: '28px', fontWeight: '600' }}>
+      <p style={{ marginBottom: 24, fontSize: 28, fontWeight: 600 }}>
         Chào mừng trở lại, {user?.ten || 'Admin'}! 👋
-      </h1>
+      </p>
 
       {/* Statistics Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card variant="borderless" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
             <Statistic

@@ -28,12 +28,13 @@ const Page = () => {
   // Column cho logStatus
   const logStatusColumns: IColumn<ILogStatus>[] = [
     { key: 'stt', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
-    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center' },
-    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left' },
+    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center', width: 150 },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 200 },
     {
       key: 'oldStatus',
       dataIndex: 'oldStatus',
       title: 'Trạng thái cũ',
+      width: 160,
       type: ETableColumnType.STATUS,
       getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
     },
@@ -41,6 +42,7 @@ const Page = () => {
       key: 'newStatus',
       dataIndex: 'newStatus',
       title: 'Trạng thái mới',
+      width: 160,
       type: ETableColumnType.STATUS,
       getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
     },
@@ -57,9 +59,9 @@ const Page = () => {
   // Column cho logReceptionTime
   const receptionColumns: IColumn<ILogReceptionTime>[] = [
     { key: 'stt', fixed: 'left', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
-    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center' },
+    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center', width: 150 },
     { key: 'type', dataIndex: 'type', title: 'Loại', align: 'center' },
-    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left' },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 250 },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
     {
       key: 'createdDate',
@@ -116,7 +118,7 @@ const Page = () => {
             columns={logStatusColumns}
             dataSource={listLogStatus}
             pagination={{ position: ['bottomRight'], ...statusPagination }}
-            scroll={{ y: 'calc(100vh - 370px)' }}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 370px)' }}
           />
         </TabPane>
         <TabPane tab="Nhật ký thời gian tiếp đoàn" key="2">
@@ -126,7 +128,7 @@ const Page = () => {
             columns={receptionColumns}
             dataSource={listLogReceptionTime}
             pagination={{ position: ['bottomRight'], ...receptionPagination }}
-            scroll={{ y: 'calc(100vh - 370px)' }}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 370px)' }}
           />
         </TabPane>
       </Tabs>
