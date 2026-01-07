@@ -115,17 +115,51 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
             _mapper.Map(dto, entity);
 
+            var oldTargets = entity.Targets.ToList();
+            foreach (var item in oldTargets)
+            {
+                _unitOfWork.iKsSurveyTargetRepository.Delete(item);
+            }
             entity.Targets.Clear();
+
             if (dto.Targets != null)
-                foreach (var t in dto.Targets) entity.Targets.Add(_mapper.Map<KsSurveyTarget>(t));
+            {
+                foreach (var t in dto.Targets)
+                {
+                    var newTarget = _mapper.Map<KsSurveyTarget>(t);
+                    entity.Targets.Add(newTarget);
+                }
+            }
 
+            var oldCriterias = entity.Criterias.ToList();
+            foreach (var item in oldCriterias)
+            {
+                _unitOfWork.iKsSurveyCriteriaRepository.Delete(item);
+            }
             entity.Criterias.Clear();
-            if (dto.Criterias != null)
-                foreach (var c in dto.Criterias) entity.Criterias.Add(_mapper.Map<KsSurveyCriteria>(c));
 
+            if (dto.Criterias != null)
+            {
+                foreach (var c in dto.Criterias)
+                {
+                    entity.Criterias.Add(_mapper.Map<KsSurveyCriteria>(c));
+                }
+            }
+
+            var oldQuestions = entity.Questions.ToList();
+            foreach (var item in oldQuestions)
+            {
+                _unitOfWork.iKsSurveyQuestionRepository.Delete(item);
+            }
             entity.Questions.Clear();
+
             if (dto.Questions != null)
-                foreach (var q in dto.Questions) entity.Questions.Add(_mapper.Map<KsSurveyQuestion>(q));
+            {
+                foreach (var q in dto.Questions)
+                {
+                    entity.Questions.Add(_mapper.Map<KsSurveyQuestion>(q));
+                }
+            }
 
             _unitOfWork.iKsSurveyRequestRepository.Update(entity);
 

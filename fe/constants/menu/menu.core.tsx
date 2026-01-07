@@ -15,6 +15,10 @@ import {
   BookOutlined,
   LinkOutlined,
   ProfileOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  FormOutlined,
+  InboxOutlined,
   UserOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
@@ -189,6 +193,28 @@ export const listMenuCore: IMenu[] = [
         label: 'Chương trình khung',
         routerLink: '/training/curriculumFramework',
         icon: <ProfileOutlined />
+      }
+    ]
+  },
+  {
+    label: 'Khảo sát',
+    routerLink: '/survey',
+    icon: <FormOutlined />,
+    items: [
+      {
+        label: 'Danh sách yêu cầu',
+        routerLink: '/survey/manage/request',
+        icon: <InboxOutlined />,      
+      },
+      {
+        label: 'Danh sách khảo sát',
+        routerLink: '/survey/manage/surveys',
+        icon: <FileTextOutlined />
+      },
+      {
+        label: 'Báo cáo khảo sát',
+        routerLink: '/survey/manage/report',
+        icon: <BarChartOutlined />
       }
     ]
   },
