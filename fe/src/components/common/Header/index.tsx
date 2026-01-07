@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Layout, Typography, Dropdown, Modal, Form, Input, Button, Space, message } from 'antd';
-import { UserOutlined, LockOutlined, LogoutOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import { Layout, Dropdown, Modal, Form, Input, Button, Space, message } from 'antd';
+import { LockOutlined, LogoutOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { useNavigate } from '@hooks/navigate';
 import { RootState } from '@redux/store';
 import { clearUser } from '@redux/feature/auth/authSlice';
@@ -14,7 +14,6 @@ import UserAvatar from '@components/common/UserAvatar';
 import '@src/styles/globals.scss';
 
 const { Header } = Layout;
-const { Title } = Typography;
 
 const AppHeader = () => {
   const { navigateTo } = useNavigate();
@@ -112,13 +111,12 @@ const AppHeader = () => {
       >
         <div className="flex h-full w-full items-center justify-between" style={{ padding: '0 20px' }}>
           <div className="left-header">
-            <Title
-              level={2}
-              style={{ cursor: 'pointer', margin: 0, color: '#FFFFFF' }}
+            <p
+              style={{ fontSize: 30, fontWeight: 600, cursor: 'pointer', margin: 0, color: '#FFFFFF' }}
               onClick={() => navigateTo('/home')}
             >
               University
-            </Title>
+            </p>
           </div>
 
           <div className="right-header flex items-center gap-4">

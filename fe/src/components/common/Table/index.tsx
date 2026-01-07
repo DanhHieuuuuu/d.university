@@ -45,7 +45,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
       return {
         ...col,
         fixed: col.fixed ?? 'right',
-        width: col.width ?? 200,
+        width: col.width ?? 150,
         render: (value: any, record: T, index: number) => {
           if (col.render) {
             return col.render(value, record, index);
@@ -57,11 +57,9 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     } else {
       return {
         ...col,
-        minWidth: col.minWidth ?? 50
+        minWidth: col.minWidth ?? 60
       };
     }
-
-    return col;
   });
 
   const configColumn: IColumn<T> = {

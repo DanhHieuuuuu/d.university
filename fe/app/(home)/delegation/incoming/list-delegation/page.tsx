@@ -103,7 +103,8 @@ const Page = () => {
       key: 'totalPerson',
       dataIndex: 'totalPerson',
       title: 'Tổng số người',
-      align: 'center'
+      align: 'center',
+      width: 150
     },
     {
       key: 'phoneNumber',
@@ -129,7 +130,8 @@ const Page = () => {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
       title: 'Tổng chi phí',
-      align: 'right'
+      align: 'right',
+      width: 150
     },
     {
       key: 'status',
@@ -294,7 +296,7 @@ const Page = () => {
               allowClear
               options={listStatus.map((st: any) => ({
                 value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, "label") ?? ''
+                label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
               }))}
               onChange={(value) => onFilterChange({ status: value })}
             />
@@ -324,7 +326,7 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-       
+        scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
       />
       <CreateDoanVaoModal
         isModalOpen={isModalOpen}

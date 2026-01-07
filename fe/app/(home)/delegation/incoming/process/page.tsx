@@ -57,6 +57,7 @@ const Page = () => {
       title: 'STT',
       align: 'center',
       fixed: 'left',
+      width: 60,
       render: (value, row, index) => index + 1
     },
     {
@@ -100,7 +101,8 @@ const Page = () => {
       key: 'totalPerson',
       dataIndex: 'totalPerson',
       title: 'Tổng số người',
-      align: 'center'
+      align: 'center',
+      width: 100,
     },
     {
       key: 'phoneNumber',
@@ -288,6 +290,7 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+        scroll={{x: 'max-content', y: 'calc(100vh - 420px)'}}
       />
     </Card>
   );
