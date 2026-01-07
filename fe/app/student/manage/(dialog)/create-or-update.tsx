@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { Button, Form, Input, Modal, Space, DatePicker, Select } from 'antd';
 import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { createStudent, updateStudent } from '@redux/feature/studentSlice';
+import { createStudent, updateStudent } from '@redux/feature/student/studentSlice';
 import { ICreateStudent, IUpdateStudent, IViewStudent } from '@models/student/student.model';
 import { formatDateCallApi } from '@utils/index';
 import { ReduxStatus } from '@redux/const';

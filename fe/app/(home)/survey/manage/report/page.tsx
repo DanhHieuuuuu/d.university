@@ -1,7 +1,7 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag, Select } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
+import { SearchOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getPagingReport, generateReportAction, getReportDetail } from '@redux/feature/survey/surveyThunk';
@@ -104,29 +104,9 @@ const Page = () => {
     handleDebouncedSearch(event.target.value);
   };
 
-  const handleGenerateReport = (surveyId: number) => {
-    dispatch(generateReportAction(surveyId))
-      .unwrap()
-      .then(() => {
-        toast.success('Tạo báo cáo thành công');
-        dispatch(getPagingReport(query));
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error('Tạo báo cáo thất bại');
-      });
-  };
 
   return (
-    <Card
-      title="Danh sách báo cáo khảo sát"
-      className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => handleGenerateReport(1)}>
-          Tạo báo cáo mẫu
-        </Button>
-      }
-    >
+    <Card title="Danh sách báo cáo khảo sát" className="h-full">
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2 gap-4">
           <Form.Item<IQueryReport> label="Tìm kiếm:" name="Keyword">

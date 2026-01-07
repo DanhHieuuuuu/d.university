@@ -11,24 +11,24 @@ export interface IViewSurvey {
   id: number;
   maKhaoSat: string;
   tenKhaoSat: string;
-    moTa: string;
+  moTa: string;
   thoiGianBatDau: string | Date;
   thoiGianKetThuc: string | Date;
   status: number;
-  statusName: string; 
+  statusName: string;
   maYeuCauGoc?: string;
 }
 
 export type ISurveyDetail = IViewSurvey & {
   idPhongBan: number;
-  surveyRequest?: ISurveyRequestSource; 
-}
+  surveyRequest?: ISurveyRequestSource;
+};
 
 export interface ISurveyRequestSource {
   id: number;
   maYeuCau: string;
   tenKhaoSatYeuCau: string;
-  questions?: IQuestion[]; 
+  questions?: IQuestion[];
   targets?: ITarget[];
   criterias?: ICriteria[];
 }
@@ -45,11 +45,11 @@ export interface ICreateSurvey {
 
 export type IUpdateSurvey = ICreateSurvey & {
   id: number;
-}
+};
 
 export type IQueryMySurvey = IQueryPaging & {
   status?: number;
-}
+};
 
 export interface IMySurveyItem {
   id: number;
@@ -77,7 +77,7 @@ export interface ISurveyExam {
 
 export interface ISavedAnswer {
   questionId: number;
-  selectedAnswerId?: number; 
+  selectedAnswerId?: number;
   textResponse?: string;
 }
 

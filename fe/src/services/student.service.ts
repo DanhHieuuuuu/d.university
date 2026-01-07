@@ -1,7 +1,9 @@
 import { IQueryStudent, IViewStudent, ICreateStudent, IUpdateStudent } from '@models/student/student.model';
+import { ISinhVienLogin, ISinhVienConnectToken } from '@models/auth/sinhvien.model';
 import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
+import axiosBase from 'axios';
 
 const apiStudentEndpoint = 'sinhvien';
 
@@ -68,10 +70,50 @@ const remove = async (mssv: string) => {
   }
 };
 
+// Student Authentication APIs
+const sinhVienLoginApi = async (body: ISinhVienLogin) => {
+  try {
+    const params = {
+      mssv: body.mssv,
+      password: body.password
+    };
+
+    const res = await axiosBase.post(`sinhvien/login`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+const sinhVienRefreshTokenApi = async (params: { token: string; refreshToken: string }) => {
+  try {
+    const res = await axios.post(`sinhvien/refresh-token`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err);
+    return Promise.reject(err);
+  }
+};
+
+const sinhVienLogoutApi = async () => {
+  try {
+    const res = await axios.get(`sinhvien/logout`, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err);
+    return Promise.reject(err);
+  }
+};
+
 export const StudentService = {
   findPaging,
   // find,
   createSinhVien,
   update,
-  remove
+  remove,
+  sinhVienLoginApi,
+  sinhVienRefreshTokenApi,
+  sinhVienLogoutApi
 };

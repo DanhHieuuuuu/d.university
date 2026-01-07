@@ -1,15 +1,15 @@
-import { GlobalOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
+import { GlobalOutlined, HomeOutlined, TeamOutlined, LoginOutlined, FormOutlined } from '@ant-design/icons';
 import { IMenu } from '@models/common/menu.model';
 
 export const listMenuSurvey: IMenu[] = [
   {
-    label: 'Tổng quan',
-    routerLink: '/survey',
-    icon: <HomeOutlined />
+    label: 'Đăng nhập',
+    routerLink: '/survey/user/login',
+    icon: <LoginOutlined />
   },
   {
-    label: 'Danh sách khảo sát',
-    routerLink: '/survey/survey-list',
-    icon: <GlobalOutlined />
+    label: 'Khảo sát của tôi',
+    routerLink: '/survey/user/mysurvey',
+    icon: <FormOutlined />
   }
 ];

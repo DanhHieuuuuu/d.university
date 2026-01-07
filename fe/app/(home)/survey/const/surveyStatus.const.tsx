@@ -1,7 +1,7 @@
 export class surveyStatusConst {
-  static CLOSE = 0;
-  static OPEN = 1;
-  static COMPLETE = 2;
+  static CLOSE = 1;
+  static OPEN = 2;
+  static COMPLETE = 3;
 
   static list = [
     {

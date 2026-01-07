@@ -18,7 +18,7 @@ import {
   FileTextOutlined,
   BarChartOutlined,
   FormOutlined,
-  InboxOutlined
+  InboxOutlined,
   UserOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';

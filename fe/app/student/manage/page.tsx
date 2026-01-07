@@ -8,7 +8,7 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { IColumn, IAction } from '@models/common/table.model';
 import { IQueryStudent, IViewStudent } from '@models/student/student.model';
-import { getListStudent, deleteStudent } from '@redux/feature/studentSlice';
+import { getListStudent, deleteStudent } from '@redux/feature/student/studentSlice';
 import { toast } from 'react-toastify';
 import { formatDateView } from '@utils/index';
 import AppTable from '@components/common/Table';

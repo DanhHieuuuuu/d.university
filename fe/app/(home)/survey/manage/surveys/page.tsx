@@ -6,8 +6,6 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getPagingSurvey, openSurveyAction, closeSurveyAction, getSurveyById, generateReportAction } from '@redux/feature/survey/surveyThunk';
 import { setSelectedSurvey, clearSelectedSurvey } from '@redux/feature/survey/surveySlice';
-
-// 1. Thêm ISurveyDetail vào import
 import { IQuerySurvey, IViewSurvey, ISurveyDetail } from '@models/survey/survey.model';
 import { surveyStatusConst } from '../../const/surveyStatus.const';
 import AppTable from '@components/common/Table';

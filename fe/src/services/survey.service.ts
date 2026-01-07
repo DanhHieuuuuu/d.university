@@ -1,8 +1,21 @@
-import { IQuerySurvey, IViewSurvey, IQueryMySurvey, ISubmitSurvey, ICreateSurvey, IUpdateSurvey } from '@models/survey/survey.model';
+import {
+  IQuerySurvey,
+  IViewSurvey,
+  IQueryMySurvey,
+  ISubmitSurvey,
+  ICreateSurvey,
+  IUpdateSurvey
+} from '@models/survey/survey.model';
 import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
-import { IQueryRequest, IViewRequest, ICreateRequest, IUpdateRequest, IRejectRequest } from '@models/survey/request.model';
+import {
+  IQueryRequest,
+  IViewRequest,
+  ICreateRequest,
+  IUpdateRequest,
+  IRejectRequest
+} from '@models/survey/request.model';
 import { IQueryReport } from '@models/survey/report.model';
 
 const apiSurveyEndpoint = 'survey';
@@ -32,7 +45,6 @@ const getRequestById = async (id: number) => {
     throw err;
   }
 };
-
 
 const createRequest = async (body: ICreateRequest) => {
   try {
@@ -73,7 +85,6 @@ const submitRequest = async (id: number) => {
     throw err;
   }
 };
-
 
 const cancelSubmitRequest = async (id: number) => {
   try {
@@ -121,16 +132,6 @@ const getSurveyById = async (id: number) => {
     return res.data;
   } catch (err) {
     processApiMsgError(err, 'Không thể tải chi tiết khảo sát.');
-    throw err;
-  }
-};
-
-const createSurvey = async (body: ICreateSurvey) => {
-  try {
-    const res = await axios.post(`${apiSurveyEndpoint}/create-survey`, body);
-    return res.data;
-  } catch (err) {
-    processApiMsgError(err, 'Không thể tạo khảo sát mới.');
     throw err;
   }
 };
@@ -236,26 +237,25 @@ const getReportDetail = async (id: number) => {
 };
 
 export const SurveyService = {
-    pagingRequest,
-    getRequestById,
-    createRequest,
-    updateRequest,
-    removeRequest,
-    submitRequest,
-    cancelSubmitRequest,
-    approveRequest,
-    rejectRequest,
-    pagingSurvey,
-    getSurveyById,
-    createSurvey,
-    updateSurvey,
-    openSurvey,
-    closeSurvey,
-    getMySurveys,
-    startSurvey,
-    saveDraftSurvey,
-    submitSurvey,
-    generateReport,
-    pagingReport,
-    getReportDetail
+  pagingRequest,
+  getRequestById,
+  createRequest,
+  updateRequest,
+  removeRequest,
+  submitRequest,
+  cancelSubmitRequest,
+  approveRequest,
+  rejectRequest,
+  pagingSurvey,
+  getSurveyById,
+  updateSurvey,
+  openSurvey,
+  closeSurvey,
+  getMySurveys,
+  startSurvey,
+  saveDraftSurvey,
+  submitSurvey,
+  generateReport,
+  pagingReport,
+  getReportDetail
 };

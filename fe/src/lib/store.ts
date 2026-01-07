@@ -6,7 +6,7 @@ import loadingReducer from './feature/loadingSlice';
 import nhanSuReducer from './feature/nhansu/nhansuSlice';
 import userReducer from './feature/userSlice';
 import danhmucReducer from './feature/danh-muc/danhmucSlice';
-import studentReducer from './feature/studentSlice';
+import studentReducer from './feature/student/studentSlice';
 import roleConfigReducer from './feature/roleConfigSlice';
 import noticeReducer from './feature/noticeSlice';
 import kpiReducer from './feature/kpi/kpiSlice';
