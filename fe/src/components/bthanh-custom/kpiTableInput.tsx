@@ -2,58 +2,45 @@ import { Input, Select, Checkbox } from 'antd';
 import { LoaiCongThuc } from '@/app/(home)/kpi/const/loaiCongThuc.enum';
 
 type Props = {
-    loaiCongThuc?: LoaiCongThuc;
+    loaiKetQua?: LoaiCongThuc;
     value: any;
     onChange: (value: any) => void;
     editable?: boolean;
 };
 
 export default function KetQuaInput({
-    loaiCongThuc,
+    loaiKetQua,
     value,
     onChange,
     editable = true,
 }: Props) {
     const renderMap: Record<LoaiCongThuc, JSX.Element> = {
 
-        [LoaiCongThuc.TruMoiLan]: numberInput(),
-        [LoaiCongThuc.VuotMucTru]: numberInput(),
-        [LoaiCongThuc.KyLuatVuotMuc]: numberInput(),
-        [LoaiCongThuc.ChiaTheoMucTieu]: percentInput(),
-
-        [LoaiCongThuc.HoanThanh]: (
+        [LoaiCongThuc.NUMBER]: numberInput(),
+        [LoaiCongThuc.PERCENT]: percentInput(),
+        [LoaiCongThuc.YES_NO]: (
             <Select
-                size="small"
+                size="middle"
                 value={value}
-                style={{ width: '70%' }}
+                style={{ width: '95%' }}
                 options={[
-                    { value: 1, label: 'Hoàn thành' },
+                    { value: 1, label: 'Hoàn thành', },
                     { value: 0, label: 'Không hoàn thành' },
                 ]}
                 onChange={onChange}
                 disabled={!editable}
             />
         ),
-
-        [LoaiCongThuc.KyLuatBang]: (
-            <Checkbox
-                checked={value === 1}
-                style={{ width: '70%' }}
-                onChange={(e) => onChange(e.target.checked ? 1 : 0)}
-                disabled={!editable}
-                
-            />
-        ),
     };
-    if (loaiCongThuc == null) return null;
-    return renderMap[loaiCongThuc] ?? null;
+    if (loaiKetQua == null) return null;
+    return renderMap[loaiKetQua] ?? null;
 
     function numberInput() {
         return (
             <Input
-                size="small"
+                size="middle"
                 type="number"
-                style={{ width: '70%' }}
+                style={{ width: '95%' }}
                 value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
                 disabled={!editable}
@@ -64,9 +51,9 @@ export default function KetQuaInput({
     function percentInput() {
         return (
             <Input
-                size="small"
+                size="middle"
                 type="number"
-                style={{ width: '70%' }}
+                style={{ width: '95%' }}
                 min={0}
                 max={100}
                 suffix="%"

@@ -59,6 +59,25 @@ namespace D.Core.API.Controllers.Hrm
         }
 
         /// <summary>
+        /// Danh sách nhân sự by KpiRole
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("get-all-by-kpi-role")]
+        public async Task<ResponseAPI> GetAllByKpiRole(NsNhanSuByKpiRoleRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Thêm mới nhân sự
         /// </summary>
         /// <param name="dto"></param>

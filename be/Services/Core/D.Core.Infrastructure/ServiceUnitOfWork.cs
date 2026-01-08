@@ -5,6 +5,7 @@ using D.Core.Infrastructure.Repositories.Hrm;
 using D.Core.Infrastructure.Repositories.Kpi;
 using D.Core.Infrastructure.Repositories.SinhVien;
 using D.Core.Infrastructure.Repositories.Survey;
+using D.Core.Infrastructure.Repositories.Sysvar;
 using D.InfrastructureBase.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -69,6 +70,9 @@ namespace D.Core.Infrastructure
         private KpiLogStatusRepository _kpiLogStatusRepository;
         private KpiTemplateRepository _kpiTemplateRepository;
         private KpiTruongRepository _kpiTruongRepository;
+        #endregion
+        #region Sysvar
+        private SysvarRepository _sysVarRepository;
         #endregion
 
         #region Survey
@@ -581,6 +585,19 @@ namespace D.Core.Infrastructure
             }
         }
 
+        #endregion
+        #region Sysvar
+        public ISysVarRepository iSysVarRepository
+        {
+            get
+            {
+                if (_sysVarRepository == null)
+                {
+                    _sysVarRepository = new SysvarRepository(_dbContext, _httpContext);
+                }
+                return _sysVarRepository;
+            }
+        }
         #endregion
 
         #region Survey

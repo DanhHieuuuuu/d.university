@@ -20,6 +20,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public PageResultDto<DmLoaiHopDongResponseDto> GetAllDmLoaiHopDong(DmLoaiHopDongRequestDto dto);
         public PageResultDto<DmLoaiPhongBanResponseDto> GetAllDmLoaiPhongBan(DmLoaiPhongBanRequestDto dto);
         public PageResultDto<DmPhongBanResponseDto> GetAllDmPhongBan(DmPhongBanRequestDto dto);
+        public PageResultDto<DmPhongBanByKpiRoleResponseDto> GetAllDmPhongBanByKpiRole(DmPhongBanByKpiRoleRequestDto dto);
         public PageResultDto<DmKhoaHocResponseDto> GetAllDmKhoaHoc(DmKhoaHocRequestDto dto);
         public PageResultDto<DmQuanHeGiaDinhResponseDto> GetAllDmQuanHeGiaDinh(DmQuanHeGiaDinhRequestDto dto);
         public PageResultDto<DmQuocTichResponseDto> GetAllDmQuocTich(DmQuocTichRequestDto dto);

@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
@@ -14,8 +13,10 @@ using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
+using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -166,7 +167,73 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 TotalItem = totalCount,
             };
         }
+        public PageResultDto<DmPhongBanByKpiRoleResponseDto> GetAllDmPhongBanByKpiRole(DmPhongBanByKpiRoleRequestDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(GetAllDmPhongBanByKpiRole)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var userRoles = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                .Where(x => x.IdNhanSu == userId)
+                .ToList();
+            var isHieuTruong = userRoles.Any(x => x.Role == "HIEU_TRUONG");
+            var donViIds = userRoles
+                .Where(x => x.Role.StartsWith("TRUONG_DON_VI_CAP_2") && x.IdDonVi.HasValue)
+                .Select(x => x.IdDonVi!.Value)
+                .Distinct()
+                .ToList();
+            var query = _unitOfWork.iDmPhongBanRepository.TableNoTracking.AsQueryable();
+            if (!isHieuTruong)
+            {
+                if (!donViIds.Any())
+                {
+                    // User không phải hiệu trưởng và không phải trưởng đơn vị => không trả gì
+                    return new PageResultDto<DmPhongBanByKpiRoleResponseDto>
+                    {
+                        Items = new List<DmPhongBanByKpiRoleResponseDto>(),
+                        TotalItem = 0
+                    };
+                }
 
+                query = query.Where(x => donViIds.Contains(x.Id));
+            }
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                var kw = dto.Keyword.ToLower();
+                query = query.Where(x => x.TenPhongBan.ToLower().Contains(kw));
+            }
+            var totalCount = query.Count();
+
+            var items = query
+                .OrderBy(x => x.STT)
+                .ThenBy(x => x.Id)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ToList();
+
+            var result = items.Select(x => new DmPhongBanByKpiRoleResponseDto
+            {
+                Id = x.Id,
+                MaPhongBan = x.MaPhongBan,
+                TenPhongBan = x.TenPhongBan,
+                LoaiPhongBan = x.IdLoaiPhongBan.HasValue
+                    ? _unitOfWork.iDmLoaiPhongBanRepository.FindById(x.IdLoaiPhongBan.Value)?.TenLoaiPhongBan
+                    : null,
+                DiaChi = x.DiaChi,
+                Hotline = x.Hotline,
+                Fax = x.Fax,
+                NgayThanhLap = x.NgayThanhLap,
+                STT = x.STT,
+                NguoiDaiDien = x.NguoiDaiDien,
+                ChucVuNguoiDaiDien = x.ChucVuNguoiDaiDien,
+            }).ToList();
+
+            return new PageResultDto<DmPhongBanByKpiRoleResponseDto>
+            {
+                Items = result,
+                TotalItem = totalCount
+            };
+        }
         public PageResultDto<DmQuanHeGiaDinhResponseDto> GetAllDmQuanHeGiaDinh(
             DmQuanHeGiaDinhRequestDto dto
         )

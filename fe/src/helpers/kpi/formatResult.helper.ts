@@ -7,14 +7,11 @@ export const formatKetQua = (
   if (value == null) return '-';
 
   switch (loaiCongThuc) {
-    case LoaiCongThuc.HoanThanh:
+    case LoaiCongThuc.YES_NO:
       return value === 1 ? 'Hoàn thành' : 'Không hoàn thành';
 
-    case LoaiCongThuc.ChiaTheoMucTieu:
+    case LoaiCongThuc.PERCENT:
       return `${value}%`;
-
-    case LoaiCongThuc.KyLuatBang:
-      return value === 1 ? 'Có' : 'Không';
 
     default:
       return value;

@@ -225,5 +225,44 @@ namespace D.Core.API.Controllers.Kpi
                 return BadRequest(ex);
             }
         }
+
+
+        /// <summary>
+        /// Get Thời gian kê khai đơn vị
+        /// </summary>     
+        /// <returns></returns>
+        [HttpGet("kpi-donvi/ke-khai-time")]
+        public async Task<ResponseAPI> GetKeKhaiDonViTime([FromQuery] KpiKeKhaiTimeDonViRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
+
+        /// <summary>
+        /// Get Trạng thai kPI trường by KPi đơn vị
+        /// </summary>     
+        /// <returns></returns>
+        [HttpGet("kpi-donvi/trang-thai-kpi-truong")]
+        public async Task<ResponseAPI> GetTrangThaIKpiTruongByKpiDonVi([FromQuery] GetTrangThaiKpiTruongByKpiDonViRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
     }
 }

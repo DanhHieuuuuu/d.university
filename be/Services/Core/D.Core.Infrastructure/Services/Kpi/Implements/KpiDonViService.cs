@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using D.Auth.Domain;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Extensions;
+using System.Globalization;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -33,6 +35,15 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             _contextAccessor = contextAccessor;
 
         }
+        public int? GetKpiIsActive()
+        {
+            var sysVarValue = _unitOfWork.iSysVarRepository
+                .TableNoTracking.Where(x => x.GrName == "KPI_SETTING_ISACTIVE")
+                .Select(x => x.VarName)
+                .FirstOrDefault();
+
+            return int.TryParse(sysVarValue, out var parsedValue) ? parsedValue : (int?)null;
+        }
 
         public void CreateKpiDonVi(CreateKpiDonViDto dto)
         {
@@ -44,13 +55,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             if (donVi == null)
                 throw new Exception("Không tìm thấy đơn vị");
 
-            //var maxSTT = _unitOfWork.iKpiDonViRepository.TableNoTracking
-            //        .Where(k =>
-            //            k.IdDonVi == donVi.Id
-            //            && k.LoaiKpi == dto.LoaiKpi
-            //            && !k.Deleted
-            //        )
-            //        .Max(k => (int?)k.STT) ?? 0;
             var entity = _mapper.Map<KpiDonVi>(dto);
             //entity.STT = maxSTT + 1;
             _unitOfWork.iKpiDonViRepository.Add(entity);
@@ -78,6 +82,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             _logger.LogInformation(
                 $"{nameof(FindPagingKeKhai)} => dto = {JsonSerializer.Serialize(dto)}"
             );
+            var isActive = GetKpiIsActive();
             var kpis = _unitOfWork.iKpiDonViRepository.TableNoTracking.ToList();
             var donvis = _unitOfWork.iDmPhongBanRepository.TableNoTracking.ToDictionary(x => x.Id, x => x.TenPhongBan);
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
@@ -107,9 +112,23 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             ? donvis[kpi.IdDonVi.Value]
                             : string.Empty,
                     LoaiKpi = kpi.LoaiKpi,
+                    CongThuc = kpi.CongThucTinh,
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.TrangThai,
                     KetQuaThucTe = kpi.KetQuaThucTe,
+                    CapTrenDanhGia = kpi.CapTrenDanhGia,
+                    LoaiKetQua = kpi.LoaiKetQua,
+                    DiemKpiCapTren = kpi.DiemKpiCapTren,
+                    DiemKpi = kpi.DiemKpi,
+                    GhiChu = kpi.GhiChu,
+                    IsActive =
+                        (
+                            kpi.TrangThai == KpiStatus.Evaluating
+                            || kpi.TrangThai == KpiStatus.NeedEdit
+                            || kpi.TrangThai == KpiStatus.Declared
+                        )
+                            ? isActive
+                            : 0,
                 };
 
             var totalCount = query.Count();
@@ -157,12 +176,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             ? donvis[kpi.IdDonVi.Value]
                             : string.Empty,
                     LoaiKpi = kpi.LoaiKpi,
-                    //LoaiKpiText = kpi.LoaiKpi.HasValue && KpiTypes.Names.ContainsKey(kpi.LoaiKpi.Value)
-                    //    ? KpiTypes.Names[kpi.LoaiKpi.Value]
-                    //    : "Không xác định",
+                    CongThuc = kpi.CongThucTinh,
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.TrangThai,
-                    KetQuaThucTe = kpi.KetQuaThucTe
+                    KetQuaThucTe = kpi.KetQuaThucTe,
+                    DiemKpiCapTren = kpi.DiemKpiCapTren,
+                    CapTrenDanhGia = kpi.CapTrenDanhGia,
+                    DiemKpi = kpi.DiemKpi,
+                    LoaiKetQua = kpi.LoaiKetQua,
                 };
 
             var totalCount = query.Count();
@@ -356,14 +377,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 throw new Exception($"Không tìm thấy KPI cá nhân với Id={dto.Id}");
             }
-            //if (kpi.IdDonVi != dto.IdDonVi)
-            //{
-            //    var maxSTT = _unitOfWork.iKpiDonViRepository.TableNoTracking
-            //        .Where(k => k.IdDonVi == dto.IdDonVi && k.LoaiKpi == dto.LoaiKpi && !k.Deleted)
-            //        .Select(k => (int?)k.STT)
-            //        .Max() ?? 0;
-            //    kpi.STT = maxSTT + 1;
-            //}
 
             // Cập nhật thông tin
             kpi.Kpi = dto.Kpi;
@@ -399,6 +412,127 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             }
 
             _unitOfWork.iKpiDonViRepository.SaveChange();
+        }
+
+        public KpiKeKhaiTimeDonViDto GetKpiKeKhaiTime()
+        {
+            _logger.LogInformation($"{nameof(GetKpiKeKhaiTime)}");
+
+            // Lấy Start / End từ SysVar
+            var sysVars = _unitOfWork.iSysVarRepository
+                .Table
+                .Where(x =>
+                    x.GrName == "KPI_KeKhaiDonVi_Time" &&
+                    (x.VarName == "START_DATE" || x.VarName == "END_DATE"))
+                .Select(x => new
+                {
+                    x.VarName,
+                    x.VarValue
+                })
+                .ToList();
+
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+
+            foreach (var item in sysVars)
+            {
+                // Bỏ qua nếu giá trị cấu hình rỗng hoặc chưa được nhập
+                if (string.IsNullOrWhiteSpace(item.VarValue))
+                    continue;
+
+                if (!DateTime.TryParseExact(
+                    item.VarValue,
+                    "dd/MM/yyyy",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var parsedDate))
+                {
+                    _logger.LogWarning("SysVar KPI_KeKhaiDonVi_Time - {VarName} có giá trị không hợp lệ: {VarValue}", item.VarName, item.VarValue);
+                    continue;
+                }
+
+                if (item.VarName == "START_DATE")
+                    startDate = parsedDate;
+
+                if (item.VarName == "END_DATE")
+                    endDate = parsedDate;
+            }
+
+            var today = DateTime.Now.Date;
+
+            var isKeKhaiTime = startDate.HasValue
+                && endDate.HasValue
+                && today >= startDate.Value.Date
+                && today <= endDate.Value.Date;
+
+            return new KpiKeKhaiTimeDonViDto
+            {
+                IsKeKhaiTime = isKeKhaiTime,
+                StartDate = startDate ?? DateTime.MinValue,
+                EndDate = endDate ?? DateTime.MinValue
+            };
+        }
+
+        public void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiDonViListDto dto)
+        {
+            using var transaction = _unitOfWork.Database.BeginTransaction();
+            try
+            {
+                foreach (var item in dto.Items)
+                {
+                    var kpi = _unitOfWork.iKpiDonViRepository.Table
+                        .FirstOrDefault(x => x.Id == item.Id && !x.Deleted);
+
+                    if (kpi == null)
+                        throw new Exception("Không tìm thấy KPI cá nhân");
+
+                    if (item.KetQuaCapTren.HasValue)
+                    {
+                        kpi.CapTrenDanhGia = item.KetQuaCapTren;
+                        kpi.DiemKpiCapTren = item.DiemKpiCapTren;
+                        kpi.TrangThai = KpiStatus.Evaluated;
+
+                        _unitOfWork.iKpiDonViRepository.Update(kpi);
+                    }
+                }
+
+                _unitOfWork.iKpiDonViRepository.SaveChange();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public async Task<GetTrangThaiKpiTruongByKpiDonViResponseDto> GetTrangThaiKpiTruongByKpiDonViAsync(GetTrangThaiKpiTruongByKpiDonViRequestDto dto)
+        {
+            _logger.LogInformation(
+       $"{nameof(GetTrangThaiKpiTruongByKpiDonViAsync)} => idKpiDonVi = {dto.idKpiDonVi}"
+   );
+
+            var kpiDonVi = await _unitOfWork.iKpiDonViRepository.Table
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == dto.idKpiDonVi && !x.Deleted);
+
+            if (kpiDonVi == null)
+                throw new Exception("Khong tìm thấy KPi Đơn vị");
+
+            var kpiTruong = await _unitOfWork.iKpiTruongRepository.Table
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Id == kpiDonVi.IdKpiTruong && !x.Deleted
+                );
+
+            if (kpiTruong == null)
+                throw new Exception("Khong tìm thấy KPi Trường");
+
+            return new GetTrangThaiKpiTruongByKpiDonViResponseDto
+            {
+                IdKpiTruong = kpiTruong.Id,
+                TrangThai = kpiTruong.TrangThai
+            };
         }
     }
 }

@@ -22,9 +22,14 @@ namespace D.Core.Domain.Entities.Kpi
         public int? IdKpiTruong { get; set; }
         public decimal? KetQuaThucTe { get; set; }
         public string? CongThucTinh { get; set; }
-        public LoaiCongThuc? LoaiCongThuc { get; set; }
-        public string? ThamSoCongThuc { get; set; }
+        public string? LoaiKetQua { get; set; }
         public decimal? DiemKpi { get; set; }
+        public bool? IsKeKhai { get; set; }
+        [MaxLength(255)]
+
+        public int? IdCongThuc { get; set; }
+        [MaxLength(1000)]
+        public string? GhiChu { get; set; }
         public decimal? CapTrenDanhGia { get; set; }
         public decimal? DiemKpiCapTren { get; set; }
     }

@@ -1,6 +1,5 @@
-﻿using System.Linq;
-using System.Text.Json;
-using AutoMapper;
+﻿using AutoMapper;
+using d.Shared.Permission.Error;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
@@ -9,9 +8,11 @@ using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
-using d.Shared.Permission.Error;
+using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+using System.Text.Json;
 using NsNhanSuEntity = D.Core.Domain.Entities.Hrm.NhanSu.NsNhanSu;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
@@ -159,6 +160,107 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             {
                 Items = result,
                 TotalItem = totalCount,
+            };
+        }
+
+        public PageResultDto<NsNhanSuByKpiRoleResponseDto> GetAllNhanSuByKpiRole(NsNhanSuByKpiRoleRequestDto dto)
+        {
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+
+            var userRoles = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                .Where(x => x.IdNhanSu == userId)
+                .ToList();
+
+            var isHieuTruong = userRoles.Any(x => x.Role == "HIEU_TRUONG");
+            var donViIds = userRoles
+                .Where(x => (x.Role.StartsWith("TRUONG_DON_VI_CAP_2")|| x.Role.StartsWith("TRUONG_DON_VI_CAP_3")) && x.IdDonVi.HasValue)
+                .Select(x => x.IdDonVi!.Value)
+                .Distinct()
+                .ToList();
+
+            List<int> allowedNhanSuIds;
+
+            if (isHieuTruong)
+            {
+                allowedNhanSuIds = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                    .Select(x => x.IdNhanSu)
+                    .Distinct()
+                    .ToList();
+            }
+            else
+            {
+                allowedNhanSuIds = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                    .Where(x => x.IdDonVi.HasValue && donViIds.Contains(x.IdDonVi.Value))
+                    .Select(x => x.IdNhanSu)
+                    .Distinct()
+                    .ToList();
+            }
+            if (dto.IdPhongBan.HasValue)
+            {
+                allowedNhanSuIds = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                .Where(x =>
+                    x.IdDonVi == dto.IdPhongBan.Value
+                    && allowedNhanSuIds.Contains(x.IdNhanSu)
+                )
+                .Select(x => x.IdNhanSu)
+                .Distinct()
+                .ToList();
+            }
+
+            if (!allowedNhanSuIds.Any())
+            {
+                return new PageResultDto<NsNhanSuByKpiRoleResponseDto>
+                {
+                    Items = new List<NsNhanSuByKpiRoleResponseDto>(),
+                    TotalItem = 0
+                };
+            }
+
+            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                .Where(x => !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id));
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                var kw = dto.Keyword.ToLower();
+                query = query.Where(x =>
+                    (x.MaNhanSu ?? "").ToLower().Contains(kw) ||
+                    ((x.HoDem ?? "") + " " + (x.Ten ?? "")).ToLower().Contains(kw) ||
+                    (x.SoCccd ?? "").Contains(kw)
+                );
+            }
+
+        
+
+            var totalCount = query.Count();
+            var items = query
+                .OrderBy(x => x.Id)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ToList();
+
+            var (pbDict, cvDict) = GetPhongBanChucVuDict(items);
+
+            var result = items.Select(x => new NsNhanSuByKpiRoleResponseDto
+            {
+                Id = x.Id,
+                MaNhanSu = x.MaNhanSu,
+                HoDem = x.HoDem,
+                Ten = x.Ten,
+                NgaySinh = x.NgaySinh,
+                NoiSinh = x.NoiSinh,
+                SoDienThoai = x.SoDienThoai,
+                Email = x.Email,
+                Email2 = x.Email2,
+                SoCccd = x.SoCccd,
+                TenPhongBan = x.HienTaiPhongBan.HasValue && pbDict.TryGetValue(x.HienTaiPhongBan.Value, out var pbName) ? pbName : null,
+                TenChucVu = x.HienTaiChucVu.HasValue && cvDict.TryGetValue(x.HienTaiChucVu.Value, out var cvName) ? cvName : null,
+                TrangThai = GetTrangThaiText(x),
+            }).ToList();
+
+            return new PageResultDto<NsNhanSuByKpiRoleResponseDto>
+            {
+                Items = result,
+                TotalItem = totalCount
             };
         }
 

@@ -14,6 +14,10 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         void UpdateKetQuaThucTe(UpdateKpiThucTeKpiCaNhanListDto dto);
         void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiCaNhanListDto dto);
         List<TrangThaiResponseDto> GetListTrangThai();
-        //List<GetListRoleNhanSuResponseDto> GetListRoleNhanSu(GetListRoleNhanSuRequestDto dto);
+        int? GetKpiIsActive();
+        KpiKeKhaiTimeCaNhanDto GetKpiKeKhaiTime();
+        List<GetAllNhanSuKiemNhiemResponseDto> GetAllNhanSuKiemNhiem(GetAllNhanSuKiemNhiemRequestDto dto);
+        Task<List<int>> GetAllowedUserIds(int currentUserId);
+
     }
 }
