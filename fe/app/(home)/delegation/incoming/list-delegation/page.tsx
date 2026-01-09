@@ -40,6 +40,7 @@ import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
+import VoiceSearch from '../../../../../src/components/hieu-custom/voice-search';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -56,7 +57,7 @@ const Page = () => {
       dataIndex: 'stt',
       title: 'STT',
       align: 'center',
-      width:60,
+      width: 60,
       fixed: 'left',
       render: (value, row, index) => index + 1
     },
@@ -65,71 +66,72 @@ const Page = () => {
       dataIndex: 'code',
       title: 'Mã đoàn',
       align: 'center',
-      width:100
-      
+      width: 100
     },
     {
       key: 'name',
       dataIndex: 'name',
       title: 'Tên đoàn vào',
-      width:200
+      width: 200
     },
     {
       key: 'content',
       dataIndex: 'content',
       title: 'Nội dung',
-      width:200
+      width: 200
     },
     {
       key: 'phongBan',
       dataIndex: 'phongBan',
       title: 'Phòng ban phụ trách',
-      width:200
+      width: 200
     },
     {
       key: 'location',
       dataIndex: 'location',
       title: 'Địa điểm',
-      width:100
+      width: 100
     },
     {
       key: 'staffReceptionName',
       dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
       align: 'center',
-      width:200
+      width: 200
     },
     {
       key: 'totalPerson',
       dataIndex: 'totalPerson',
       title: 'Tổng số người',
-      align: 'center'
+      align: 'center',
+      width: 120
     },
     {
       key: 'phoneNumber',
       dataIndex: 'phoneNumber',
       title: 'SĐT liên hệ',
-      width:200
+      width: 200
     },
     {
       key: 'requestDate',
       dataIndex: 'requestDate',
       title: 'Ngày yêu cầu',
-      width:200,
+      width: 200,
       render: (value) => <p>{formatDateView(value)}</p>
     },
     {
       key: 'receptionDate',
       dataIndex: 'receptionDate',
       title: 'Ngày tiếp đón',
-      width:200,
+      width: 200,
       render: (value) => <p>{formatDateView(value)}</p>
     },
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
       title: 'Tổng chi phí',
-      align: 'right'
+      align: 'left',
+      width: 120
     },
     {
       key: 'status',
@@ -165,7 +167,7 @@ const Page = () => {
     {
       label: 'Thêm thời gian',
       icon: <PlusOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE ,
+      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
     },
     {
@@ -265,7 +267,7 @@ const Page = () => {
   return (
     <Card
       title="Danh sách Đoàn vào"
-      className="h-full"
+      className="min-h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
           Thêm mới
@@ -294,7 +296,7 @@ const Page = () => {
               allowClear
               options={listStatus.map((st: any) => ({
                 value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, "label") ?? ''
+                label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
               }))}
               onChange={(value) => onFilterChange({ status: value })}
             />
@@ -324,8 +326,8 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-       
       />
+     
       <CreateDoanVaoModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

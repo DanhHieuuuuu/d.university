@@ -28,6 +28,7 @@ namespace D.Notification.ApplicationService.Configs
             string? assemblyName
         )
         {
+            builder.Services.AddSignalR();
             builder.Services.AddDbContext<NotificationDbContext>(
                 options =>
                 {

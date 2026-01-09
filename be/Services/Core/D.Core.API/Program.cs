@@ -3,6 +3,7 @@ using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
 using D.Notification.ApplicationService.Configs;
+using D.Notification.Infrastructure.Hubs;
 using D.S3Bucket.Configs;
 using Serilog;
 using System.Reflection;
@@ -55,12 +56,13 @@ namespace D.Core.API
                     });
                 }
                 app.UseCors(ProgramBase.CorsPolicy);
-
+                app.MapHub<NotificationHub>("/notification-hub");
                 app.UseSerilogRequestLogging();
 
                 app.UseAuthentication();
                 app.UseAuthorization();
                 app.MapControllers();
+               
 
                 Log.Information("Core started successfully.");
                 app.Run();

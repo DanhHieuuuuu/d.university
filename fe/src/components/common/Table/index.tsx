@@ -138,7 +138,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         size="small"
         tableLayout="fixed"
         columns={newColumns}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 'max-content', y:370 }}
         rowSelection={rowSelection}
         {...rest}
       />

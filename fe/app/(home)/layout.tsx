@@ -19,6 +19,7 @@ import {
 
 import MenuComponent from '@components/menu/menu-home';
 import AppHeader from '@components/common/Header';
+import NotificationRealtime from './notification/real_time/NotificationRealtime';
 
 const { Content, Footer } = Layout;
 
@@ -40,6 +41,7 @@ const Index = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Layout hasSider style={{ height: '100vh' }}>
+      <NotificationRealtime/>
       <MenuComponent />
       <Layout style={{ background: '#F5F5F5' }}>
         <AppHeader />

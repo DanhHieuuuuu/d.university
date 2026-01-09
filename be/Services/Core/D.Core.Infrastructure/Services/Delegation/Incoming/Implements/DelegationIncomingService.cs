@@ -15,6 +15,10 @@ using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.ApplicationService.Implements;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -34,17 +38,20 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
     {
         private readonly ServiceUnitOfWork _unitOfWork;
         private readonly IExcelService _excelService;
+        private readonly INotificationService _notificationService;
         public DelegationIncomingService(
             ILogger<DelegationIncomingService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
-            IExcelService excelService
+            IExcelService excelService,
+            INotificationService notificationService
         )
             : base(logger, httpContext, mapper)
         {
             _unitOfWork = unitOfWork;
             _excelService = excelService;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -211,6 +218,18 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             await _unitOfWork.SaveChangesAsync();
             scope.Complete();
             #endregion
+            await _notificationService.SendAsync(new NotificationMessage
+            {
+                Receiver = new Receiver
+                {
+                    // người tiếp nhận đoàn
+                    UserId = newDoanVao.IdStaffReception
+                },
+                Title = "Đoàn vào mới",
+                Content = "Bạn có một đoàn vào mới cần xử lý",
+                AltContent = $"Đoàn {newDoanVao.Name} ({newDoanVao.Code}) vừa được tạo",
+                Channel = NotificationChannel.Realtime
+            });
             return _mapper.Map<CreateResponseDto>(newDoanVao);
 
         }
@@ -568,7 +587,17 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             _unitOfWork.iLogStatusRepository.Add(log);
             await _unitOfWork.SaveChangesAsync();
             #endregion
-
+            await _notificationService.SendAsync(new NotificationMessage
+            {
+                Receiver = new Receiver
+                {
+                    UserId = delegation.IdStaffReception
+                },
+                Title = "Cập nhật trạng thái đoàn vào",
+                Content = $"Đoàn {delegation.Code} đã được cập nhật trạng thái",
+                AltContent = $"Trạng thái mới: {DelegationStatus.Names[delegation.Status]}",
+                Channel = NotificationChannel.Realtime
+            });
         }
 
         private bool IsValidEmail(string email)

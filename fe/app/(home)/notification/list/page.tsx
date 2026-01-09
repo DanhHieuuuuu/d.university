@@ -15,7 +15,7 @@ const Page = () => {
   const [openPopup, setOpenPopup] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch($fetchNotification({ SkipCount: 0, MaxResultCount: 10 }));
+    dispatch($fetchNotification({ PageIndex: 0, PageSize: 10 }));
   }, []);
 
   const handleMarkAllAsRead = async () => {

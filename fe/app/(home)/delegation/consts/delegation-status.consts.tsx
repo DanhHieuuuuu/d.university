@@ -29,7 +29,7 @@ export class DelegationStatusConst {
     [this.PHE_DUYET]: {
       value: this.PHE_DUYET,
       label: 'Phê duyệt',
-      className: 'tag-init'
+      className: 'tag-approve'
     },
     [this.DANG_TIEP_DOAN]: {
       value: this.DANG_TIEP_DOAN,
@@ -55,6 +55,11 @@ export class DelegationStatusConst {
       value: this.DA_CHINH_SUA,
       label: 'Đã chỉnh sửa',
       className: 'tag-edit'
+    },
+    [this.DA_HET_HAN]: {
+      value: this.DA_HET_HAN,
+      label: 'Đã hết hạn',
+      className: 'tag-cancel'
     }
   };
 
