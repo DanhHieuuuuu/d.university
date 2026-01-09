@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateDoanVao, IUpdateDoanVao } from '@models/delegation/delegation.model';
 import { createDoanVao, updateDoanVao } from '@redux/feature/delegation/delegationThunk';
 import { clearSelected } from '@redux/feature/delegation/delegationSlice';
-import { DelegationStatusConst } from '../../../consts/delegation-status.consts';
+import { DelegationStatusConst } from '../../../../../../constants/core/delegation/delegation-status.consts';
 import type { UploadProps } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { downloadDelegationTemplateExcel } from '@utils/file-download.helper';

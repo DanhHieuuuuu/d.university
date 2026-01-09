@@ -13,7 +13,7 @@ import { IColumn } from '@models/common/table.model';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { formatDateTimeView } from '@utils/index';
-import { DelegationStatusConst } from '../../consts/delegation-status.consts';
+import { DelegationStatusConst } from '../../../../../constants/core/delegation/delegation-status.consts';
 import { ETableColumnType } from '@/constants/e-table.consts';
 
 const { TabPane } = Tabs;
