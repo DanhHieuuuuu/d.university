@@ -151,7 +151,7 @@ const Page = () => {
   const onClickView = (data: IViewNhanSu) => {
     dispatch(selectMaNhanSu(data.idNhanSu));
     dispatch(getHoSoNhanSu(data.idNhanSu));
-    navigateTo(`/hrm/employee/${data.idNhanSu}`);
+    navigateTo(`/hrm/employees/${data.idNhanSu}`);
   };
 
   const onClickUpdate = (data: IViewNhanSu) => {
