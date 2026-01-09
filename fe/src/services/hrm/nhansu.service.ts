@@ -1,4 +1,4 @@
-import { ICreateHopDongNs, ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
@@ -57,16 +57,6 @@ const createNhanSu = async (body: ICreateNhanSu) => {
   }
 };
 
-const createHopDong = async (body: ICreateHopDongNs) => {
-  try {
-    const res = await axios.post(`${apiNhanSuEndpoint}/create-hd`, body);
-    return Promise.resolve(res.data);
-  } catch (err) {
-    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
-    return Promise.reject(err);
-  }
-};
-
 const getHoSoNhanSu = async (id: number) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/ho-so/${id}`);
@@ -78,4 +68,4 @@ const getHoSoNhanSu = async (id: number) => {
   }
 };
 
-export const NhanSuService = { findPaging, find, findById, createNhanSu, createHopDong, getHoSoNhanSu };
+export const NhanSuService = { findPaging, find, findById, createNhanSu, getHoSoNhanSu };

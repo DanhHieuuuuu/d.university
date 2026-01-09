@@ -6,6 +6,7 @@
         public string? MaPhongBan { get; set; }
         public string? TenPhongBan { get; set; }
         public string? LoaiPhongBan { get; set; }
+        public int? IdLoaiPhongBan { get; set; }
         public string? DiaChi { get; set; }
         public string? Hotline { get; set; }
         public string? Fax { get; set; }

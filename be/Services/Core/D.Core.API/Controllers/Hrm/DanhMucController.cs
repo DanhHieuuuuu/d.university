@@ -223,6 +223,25 @@ namespace D.Core.API.Controllers.Hrm
         }
 
         /// <summary>
+        /// Danh sách phòng, ban by Kpi Role
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("phong-ban/get-by-kpi-role")]
+        public async Task<ResponseAPI> GetAllPhongBanByKpiRole([FromQuery] DmPhongBanByKpiRoleRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Lấy phòng ban theo Id
         /// </summary>
         /// <param name="dto"></param>

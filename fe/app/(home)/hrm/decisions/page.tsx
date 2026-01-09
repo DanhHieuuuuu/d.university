@@ -14,27 +14,29 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryPhongBan, IViewPhongBan, IViewPhongBanWithNhanSu } from '@models/danh-muc/phong-ban.model';
-import { formatDateView } from '@utils/index';
+import { getListQuyetDinh } from '@redux/feature/hrm/quyetdinh/quyetdinhThunk';
+import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
+import { IQueryQuyetDinh, IViewQuyetDinh } from '@models/nhansu/quyetdinh.model';
+import { ETableColumnType } from '@/constants/e-table.consts';
+import { NsQuyetDinhTypeConst } from '@/constants/core/hrm/quyet-dinh-type.const';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.phongBan.$list);
+  const { data, status, total: totalItem } = useAppSelector((state) => state.quyetdinhState.$list);
+  const { listLoaiHopDong } = useAppSelector((state) => state.danhmucState);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryPhongBan>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryQuyetDinh>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -42,7 +44,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllPhongBan(newQuery));
+      dispatch(getListQuyetDinh(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -68,10 +70,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllPhongBan(query));
+    dispatch(getListQuyetDinh(query));
   };
 
-  const columns: IColumn<IViewPhongBanWithNhanSu>[] = [
+  const columns: IColumn<IViewQuyetDinh>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -79,75 +81,38 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maPhongBan',
-      dataIndex: 'maPhongBan',
-      title: 'Mã phòng ban'
+      key: 'maNhanSu',
+      dataIndex: 'maNhanSu',
+      title: 'Mã nhân sự'
+    },{
+      key: 'hoTen',
+      dataIndex: 'hoTen',
+      title: 'Họ tên'
     },
     {
-      key: 'tenPhongBan',
-      dataIndex: 'tenPhongBan',
-      title: 'Tên phòng ban'
+      key: 'loaiQuyetDinh',
+      dataIndex: 'loaiQuyetDinh',
+      title: 'Loại quyết định',
+      type: ETableColumnType.STATUS,
+      align: 'center',
+      getTagInfo: (status: number) => NsQuyetDinhTypeConst.getTag(status)
+    },
+    
+    {
+      key: 'noiDungTomTat',
+      dataIndex: 'noiDungTomTat',
+      title: 'Nội dung'
     },
     {
-      key: 'diaChi',
-      dataIndex: 'diaChi',
-      title: 'Địa chỉ'
+      key: 'ngayHieuLuc',
+      dataIndex: 'ngayHieuLuc',
+      title: 'Bắt đầu hiệu lực từ',
+      align: 'center',
+      render: (val: string) => formatDateTimeView(val)
     },
-    {
-      key: 'hotline',
-      dataIndex: 'hotline',
-      title: 'Hotline'
-    },
-    {
-      key: 'fax',
-      dataIndex: 'fax',
-      title: 'Fax'
-    },
-    {
-      key: 'ngayThanhLap',
-      dataIndex: 'ngayThanhLap',
-      title: 'Ngày thành lập',
-      render: (value) => {
-        const date = formatDateView(value);
-        return <p>{date}</p>;
-      }
-    }
   ];
 
-  const actions: IAction[] = [
-    {
-      label: 'Chi tiết',
-      tooltip: 'Xem thông tin phòng ban',
-      icon: <EyeOutlined />,
-      command: (record: IViewPhongBan) => {
-        // dispatch(setSelectedIdPhongBan(record.id));
-        onClickView(record.id);
-      }
-    },
-    {
-      label: 'Kích hoạt',
-      tooltip: 'Kích hoạt',
-      icon: <UnlockOutlined />,
-      hidden: (record: IViewPhongBan) => {
-        return record.isActive === true;
-      },
-      command: (record: IViewPhongBan) => {
-        // dispatch(setSelectedIdPhongBan(record.id));
-        onClickUpdate(record.id);
-      }
-    },
-    {
-      label: 'Khóa',
-      tooltip: 'Khóa',
-      icon: <LockOutlined />,
-      hidden: (record: IViewPhongBan) => {
-        return record.isActive === false;
-      },
-      command: (record: IViewPhongBan) => {
-        // dispatch(setSelectedIdPhongBan(record.id));
-      }
-    }
-  ];
+  const actions: IAction[] = [];
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ Keyword: value });
@@ -159,7 +124,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách phòng ban"
+      title="Danh sách các quyết định"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -169,7 +134,7 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryPhongBan> label="Tên phòng ban:" name="Keyword">
+          <Form.Item<IQueryQuyetDinh> label="Nội dung:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
           </Form.Item>
         </div>
@@ -196,11 +161,10 @@ const Page = () => {
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
         columns={columns}
-        dataSource={list}
+        dataSource={data}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
-
     </Card>
   );
 };

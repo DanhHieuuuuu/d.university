@@ -34,7 +34,7 @@ import {
 } from '@redux/feature/delegation/delegationThunk';
 import { select } from '@redux/feature/delegation/delegationSlice';
 import { ETableColumnType } from '@/constants/e-table.consts';
-import { DelegationStatusConst } from '../../consts/delegation-status.consts';
+import { DelegationStatusConst } from '../../../../../constants/core/delegation/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
 import CreateDepartmentSupportModal from './(dialog)/create';

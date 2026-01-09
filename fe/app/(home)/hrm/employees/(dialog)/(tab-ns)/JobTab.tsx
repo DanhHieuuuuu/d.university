@@ -2,33 +2,33 @@
 
 import { useState } from 'react';
 import { Checkbox, DatePicker, Form, Input, Select } from 'antd';
-import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { ICreateHopDong } from '@models/nhansu/hopdong.model';
 import { useAppSelector } from '@redux/hooks';
 
 const { TextArea } = Input;
 
 export default function JobTab() {
-  const form = Form.useFormInstance<ICreateHopDongNs>();
+  const form = Form.useFormInstance<ICreateHopDong>();
   const [probation, setProbation] = useState<boolean>(false);
   const { phongBan, listLoaiHopDong, chucVu, listToBoMon } = useAppSelector((state) => state.danhmucState);
 
   return (
     <div className="grid grid-cols-3 gap-x-5">
-      <Form.Item<ICreateHopDongNs>
-        name={['thongTinNhanSu', 'maNhanSu']}
+      <Form.Item<ICreateHopDong>
+        name={['maNhanSu']}
         label="Mã nhân sự"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'maSoThue']} label="Mã số thuế">
+      <Form.Item<ICreateHopDong> name={['maSoThue']} label="Mã số thuế">
         <Input />
       </Form.Item>
       <div></div>
-      <Form.Item<ICreateHopDongNs> name="soHopDong" label="Số hợp đồng">
+      <Form.Item<ICreateHopDong> name="soHopDong" label="Số hợp đồng">
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name="idLoaiHopDong" label="Loại hợp đồng">
+      <Form.Item<ICreateHopDong> name="idLoaiHopDong" label="Loại hợp đồng">
         <Select
           allowClear
           options={listLoaiHopDong?.map((item) => {
@@ -36,14 +36,14 @@ export default function JobTab() {
           })}
         />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs>
+      <Form.Item<ICreateHopDong>
         name="ngayKyKet"
         label="Ngày ký kết"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <DatePicker showTime needConfirm format="HH:mm - DD/MM/YYYY" className="!w-full" />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name="idPhongBan" label="Phòng ban">
+      <Form.Item<ICreateHopDong> name="idPhongBan" label="Phòng ban">
         <Select
           allowClear
           options={phongBan.$list.data?.map((item) => {
@@ -51,7 +51,7 @@ export default function JobTab() {
           })}
         />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name="idChucVu" label="Chức vụ">
+      <Form.Item<ICreateHopDong> name="idChucVu" label="Chức vụ">
         <Select
           allowClear
           options={chucVu.$list.data?.map((item) => {
@@ -59,7 +59,7 @@ export default function JobTab() {
           })}
         />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name="idToBoMon" label="Tổ bộ môn">
+      <Form.Item<ICreateHopDong> name="idToBoMon" label="Tổ bộ môn">
         <Select
           allowClear
           options={listToBoMon?.map((item) => {
@@ -75,26 +75,26 @@ export default function JobTab() {
       </Form.Item>
       {probation && (
         <>
-          <Form.Item<ICreateHopDongNs> name="ngayBatDauThuViec" label="Ngày bắt đầu thử việc">
+          <Form.Item<ICreateHopDong> name="ngayBatDauThuViec" label="Ngày bắt đầu thử việc">
             <DatePicker needConfirm format="DD/MM/YYYY" className="!w-full" />
           </Form.Item>
-          <Form.Item<ICreateHopDongNs> name="ngayKetThucThuViec" label="Ngày kết thúc thử việc">
+          <Form.Item<ICreateHopDong> name="ngayKetThucThuViec" label="Ngày kết thúc thử việc">
             <DatePicker needConfirm format="DD/MM/YYYY" className="!w-full" />
           </Form.Item>
           <div></div>
         </>
       )}
-      <Form.Item<ICreateHopDongNs>
+      <Form.Item<ICreateHopDong>
         name="hopDongCoThoiHanTuNgay"
         label="Hợp đồng có thời hạn từ ngày"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <DatePicker needConfirm format="DD/MM/YYYY" className="!w-full" />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name="hopDongCoThoiHanDenNgay" label="Hợp đồng có thời hạn đến ngày">
+      <Form.Item<ICreateHopDong> name="hopDongCoThoiHanDenNgay" label="Hợp đồng có thời hạn đến ngày">
         <DatePicker needConfirm format="DD/MM/YYYY" className="!w-full" />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name="ghiChu" label="Ghi chú" className="col-span-full">
+      <Form.Item<ICreateHopDong> name="ghiChu" label="Ghi chú" className="col-span-full">
         <TextArea rows={4} />
       </Form.Item>
     </div>

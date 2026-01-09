@@ -27,8 +27,8 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiCaNhan);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
-  const { list: users = [], status } = useAppSelector(state => state.userState);
-
+  const { list: users = []} = useAppSelector(state => state.userState.byKpiRole);
+  const status = useAppSelector((state) => state.userState.status);
   useEffect(() => {
     if (isModalOpen) {
       if (isUpdate || isView) {
@@ -177,7 +177,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Form.Item
             label="Loại KPI"
-            name="loaiKPI"
+            name="loaiKpi"
             rules={[{ required: true, message: 'Vui lòng chọn loại KPI' }]}
           >
             <Select

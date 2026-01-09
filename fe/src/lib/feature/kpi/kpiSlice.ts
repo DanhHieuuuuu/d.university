@@ -19,7 +19,9 @@ import {
     getListNamHocKpiTruong,
     getKpiCaNhanKeKhai,
     getListKpiRoleByUser,
-    updateKetQuaCapTrenKpiCaNhan
+    updateKetQuaCapTrenKpiCaNhan,
+    updateKetQuaThucTeKpiDonVi,
+    updateKetQuaCapTrenKpiDonVi
 } from './kpiThunk';
 import { IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 
@@ -318,6 +320,25 @@ const kpiSlice = createSlice({
             .addCase(getListNamHocKpiDonVi.fulfilled, (state, action) => {
                 state.meta.namHoc.donVi.status = ReduxStatus.SUCCESS;
                 state.meta.namHoc.donVi.data = action.payload;
+            })
+            .addCase(updateKetQuaThucTeKpiDonVi.pending, (state) => {
+                state.kpiDonVi.$update.status = ReduxStatus.LOADING;
+            })
+            .addCase(updateKetQuaThucTeKpiDonVi.fulfilled, (state) => {
+                state.kpiDonVi.$update.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(updateKetQuaThucTeKpiDonVi.rejected, (state) => {
+                state.kpiDonVi.$update.status = ReduxStatus.FAILURE;
+            })
+
+            .addCase(updateKetQuaCapTrenKpiDonVi.pending, (state) => {
+                state.kpiDonVi.$update.status = ReduxStatus.LOADING;
+            })
+            .addCase(updateKetQuaCapTrenKpiDonVi.fulfilled, (state) => {
+                state.kpiDonVi.$update.status = ReduxStatus.SUCCESS;
+            })
+            .addCase(updateKetQuaCapTrenKpiDonVi.rejected, (state) => {
+                state.kpiDonVi.$update.status = ReduxStatus.FAILURE;
             })
             //KPI TRƯỜNG
             .addCase(getAllKpiTruong.pending, (state) => {

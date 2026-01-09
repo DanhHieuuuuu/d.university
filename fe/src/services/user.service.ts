@@ -23,6 +23,24 @@ const getAll = async (query: IQueryUser) => {
   }
 };
 
+const getAllByKpiRole = async (query: IQueryUser) => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/get-all-by-kpi-role`, { params: query });
+
+    const data: IResponseList<IUserView> = res.data;
+
+    data.data.items = data.data.items.map((x: IUserView) => ({
+      ...x,
+      hoTen: `${x.hoDem ?? ''} ${x.ten ?? ''}`.trim()
+    }));
+
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
 const createUser = async (body: IUserCreate) => {
   try {
     const res = await axios.post('user/create-user', body, {
@@ -109,6 +127,7 @@ const changeStatusUser = async (userId: number) => {
 
 export const UserService = {
   getAll,
+  getAllByKpiRole,
   createUser,
   updateUser,
   getNhanSuByMaNhanSu,

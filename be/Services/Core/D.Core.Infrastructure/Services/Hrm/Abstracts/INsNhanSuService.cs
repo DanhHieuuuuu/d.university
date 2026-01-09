@@ -9,11 +9,13 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
     {
         PageResultDto<NsNhanSuResponseDto> FindPagingNsNhanSu(NsNhanSuRequestDto dto);
         PageResultDto<NsNhanSuGetAllResponseDto> GetAllNhanSu(NsNhanSuGetAllRequestDto dto);
+        PageResultDto<NsNhanSuByKpiRoleResponseDto> GetAllNhanSuByKpiRole(NsNhanSuByKpiRoleRequestDto dto);
         void CreateGiaDinhNhanSu(int idNhanSu, CreateNsQuanHeGiaDinhDto dto);
         NsNhanSuResponseDto CreateNhanSu(CreateNhanSuDto dto);
-        void CreateHopDong(CreateHopDongDto dto);
+        void UpdateThongTinCongViec(UpdateNhanSuCongViecDto dto);
         NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto);
         NsNhanSuFindByIdResponseDto FindById(int idNhanSu);
         NsNhanSuHoSoChiTietResponseDto HoSoChiTietNhanSu(int idNhanSu);
+
     }
 }

@@ -188,5 +188,43 @@ namespace D.Core.API.Controllers.Kpi
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Danh sách trạng thái Kpi Cá Nhân
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("kpi-canhan/danh-sach-nhan-su-kiem-nhiem")]
+        public async Task<ResponseAPI> GetNhanSuKiemNhiem([FromQuery] GetAllNhanSuKiemNhiemRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Get Thời gian kê khai ca nhan
+        /// </summary>     
+        /// <returns></returns>
+        [HttpGet("kpi-canhan/ke-khai-time")]
+        public async Task<ResponseAPI> GetKeKhaiCaNhanTime([FromQuery] KpiKeKhaiTimeCaNhanRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
     }
 }

@@ -57,6 +57,8 @@ namespace D.Core.Domain.Entities.Kpi.Constants
             Name = "HIEU_TRUONG"
         };
 
+
+
         public static IReadOnlyList<TemplateTypeDto> All =>
             new List<TemplateTypeDto>
             {

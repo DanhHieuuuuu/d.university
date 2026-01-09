@@ -39,13 +39,15 @@ import {
   getToBoMonById,
   updateChucVu,
   updatePhongBan,
-  updateToBoMon
+  updateToBoMon,
+  getAllPhongBanByKpiRole
 } from './danhmucThunk';
 
 interface DanhMucState {
   chucVu: CRUD<IViewChucVu>;
   toBoMon: CRUD<IViewToBoMon>;
   phongBan: CRUD<IViewPhongBan>;
+  phongBanByKpiRole: CRUD<IViewPhongBan>;
   listDanToc: IViewDanToc[];
   listGioiTinh: IViewGioiTinh[];
   listKhoaHoc: IViewKhoaHoc[];
@@ -66,6 +68,13 @@ const initialState: DanhMucState = {
     $selected: { status: ReduxStatus.IDLE, id: null, data: null }
   },
   phongBan: {
+    $create: { status: ReduxStatus.IDLE },
+    $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
+    $update: { status: ReduxStatus.IDLE },
+    $delete: { status: ReduxStatus.IDLE },
+    $selected: { status: ReduxStatus.IDLE, id: null, data: null }
+  },
+  phongBanByKpiRole: {
     $create: { status: ReduxStatus.IDLE },
     $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
     $update: { status: ReduxStatus.IDLE },
@@ -116,6 +125,18 @@ const danhmucSlice = createSlice({
       state.phongBan.$create.status = ReduxStatus.IDLE;
       state.phongBan.$update.status = ReduxStatus.IDLE;
       state.phongBan.$delete.status = ReduxStatus.IDLE;
+    },
+
+    clearSelectedPhongBanByKpiRole: (state) => {
+      state.phongBanByKpiRole.$selected = { status: ReduxStatus.IDLE, id: null, data: null };
+    },
+    setSelectedIdPhongBanByKpiRole: (state, action: PayloadAction<number>) => {
+      state.phongBanByKpiRole.$selected.id = action.payload;
+    },
+    resetStatusPhongBanByKpiRole: (state) => {
+      state.phongBanByKpiRole.$create.status = ReduxStatus.IDLE;
+      state.phongBanByKpiRole.$update.status = ReduxStatus.IDLE;
+      state.phongBanByKpiRole.$delete.status = ReduxStatus.IDLE;
     },
 
     clearSeletedToBoMon: (state) => {
@@ -202,6 +223,17 @@ const danhmucSlice = createSlice({
       })
       .addCase(getAllPhongBan.rejected, (state) => {
         state.phongBan.$list.status = ReduxStatus.FAILURE;
+      })
+      .addCase(getAllPhongBanByKpiRole.pending, (state) => {
+        state.phongBanByKpiRole.$list.status = ReduxStatus.LOADING;
+      })
+      .addCase(getAllPhongBanByKpiRole.fulfilled, (state, action) => {
+        state.phongBanByKpiRole.$list.status = ReduxStatus.SUCCESS;
+        state.phongBanByKpiRole.$list.data = action.payload?.items || [];
+        state.phongBanByKpiRole.$list.total = action.payload?.totalItem || 0;
+      })
+      .addCase(getAllPhongBanByKpiRole.rejected, (state) => {
+        state.phongBanByKpiRole.$list.status = ReduxStatus.FAILURE;
       })
       .addCase(getPhongBanById.pending, (state) => {
         state.phongBan.$selected.status = ReduxStatus.LOADING;
@@ -317,6 +349,9 @@ export const {
   clearSelectedPhongBan,
   setSelectedIdPhongBan,
   resetStatusPhongBan,
+  clearSelectedPhongBanByKpiRole,
+  setSelectedIdPhongBanByKpiRole,
+  resetStatusPhongBanByKpiRole,
   clearSeletedToBoMon,
   setSelectedIdToBoMon,
   resetStatusToBoMon

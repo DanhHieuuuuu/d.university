@@ -13,6 +13,7 @@ namespace D.Core.Domain.Entities.Kpi
         [MaxLength(500)]
         public string? KPI { get; set; }
         public string? LinhVuc { get; set; }
+        public string? ChienLuoc { get; set; }
 
         [MaxLength(255)]
         public string? MucTieu { get; set; }
@@ -35,11 +36,13 @@ namespace D.Core.Domain.Entities.Kpi
 
         public decimal? KetQuaThucTe { get; set; }
         public string? CongThucTinh { get; set; }
-        public LoaiCongThuc? LoaiCongThuc { get; set; }
-        public string? ThamSoCongThuc { get; set; }
+        public string? LoaiKetQua { get; set; }
+        public int? IdCongThuc { get; set; }
         public decimal? DiemKpi { get; set; }
-
+        public bool? IsCaNhanKeKhai { get; set; }
         public decimal? CapTrenDanhGia { get; set; }
         public decimal? DiemKpiCapTren { get; set; }
+        [MaxLength(1000)]
+        public string? GhiChu { get; set; }
     }
 }

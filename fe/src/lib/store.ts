@@ -13,6 +13,9 @@ import kpiReducer from './feature/kpi/kpiSlice';
 import delegationReducer from './feature/delegation/delegationSlice';
 import daotaoReducer from './feature/dao-tao/daotaoSlice';
 import surveyReducer from './feature/survey/surveySlice';
+import hopdongReducer from './feature/hrm/hopdong/hopdongSlice';
+import quyetdinhReducer from './feature/hrm/quyetdinh/quyetdinhSlice';
+
 const persistConfig = {
   key: 'auth',
   storage,
@@ -35,7 +38,9 @@ export const makeStore = () => {
       noticeState: noticeReducer,
       kpiState: kpiReducer,
       daotaoState: daotaoReducer,
-      surveyState: surveyReducer
+      surveyState: surveyReducer,
+      hopdongState: hopdongReducer,
+      quyetdinhState: quyetdinhReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

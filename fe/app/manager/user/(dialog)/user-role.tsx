@@ -21,7 +21,7 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({ isModalOpen, setIsModalOp
   const dispatch = useAppDispatch();
 
   const roleList = useAppSelector((state) => state.roleConfigState.roleGroup.$list.data);
-  const userList = useAppSelector((state) => state.userState.list);
+  const userList = useAppSelector((state) => state.userState.all.list);
 
   const [treeData, setTreeData] = useState<{ title: string; value: number; key: number }[]>([]);
   const [userData, setUserData] = useState<IUserView | null>(null);

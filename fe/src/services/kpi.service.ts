@@ -2,9 +2,10 @@ import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseList, IResponseItem } from '@models/common/response.model';
 import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateCapTrenDanhGiaList, IUpdateKpiCaNhan, IUpdateKpiCaNhanThucTeList, IUpdateTrangThaiKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
-import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
+import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanhGiaList, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import { ICreateKpiTruong, IQueryKpiTruong, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
+import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 const apiDanhMucEndpoint = 'kpi';
 const apiKpiTruongEndpoint = `${apiDanhMucEndpoint}/kpi-truong`;
@@ -153,6 +154,19 @@ const updateKetQuaCapTrenKpiCaNhan = async (
   }
 };
 
+export const getAllNhanSuKiemNhiem = async (idPhongBan?: number) => {
+  try {
+    const res = await axios.get(`${apiKpiCaNhanEndpoint}/danh-sach-nhan-su-kiem-nhiem`, {
+      params: { idPhongBan }
+    });
+    return res.data as IResponseList<IViewNhanSu>;
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+
 //Kpi Don Vi
 const getListKpiDonVi = async (query?: IQueryKpiDonVi) => {
   try {
@@ -239,6 +253,28 @@ const updateKetQuaThucTeKpiDonVi = async (
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả thực tế');
+    return Promise.reject(err);
+  }
+};
+
+const updateKetQuaCapTrenKpiDonVi = async (
+  body: IUpdateCapTrenDonViDanhGiaList
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiDonViEndpoint}/update-ket-qua-cap-tren`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Cập nhật kết quả đánh giá thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả đánh giá');
     return Promise.reject(err);
   }
 };
@@ -474,6 +510,7 @@ export const KpiService = {
   getListNamHocKpiDonVi,
   updateTrangThaiKpiDonVi,
   updateKetQuaThucTeKpiDonVi,
+  updateKetQuaCapTrenKpiDonVi,
   getListKpiTruong,
   createKpiTruong,
   updateKpiTruong,

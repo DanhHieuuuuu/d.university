@@ -42,8 +42,13 @@ export const listMenuCore: IMenu[] = [
         icon: <UserOutlined />
       },
       {
-        label: 'Danh sách phòng ban',
-        routerLink: '/hrm/departments',
+        label: 'Danh sách hợp đồng',
+        routerLink: '/hrm/contracts',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Danh sách quyết định',
+        routerLink: '/hrm/decisions',
         icon: <ApartmentOutlined />
       }
     ]

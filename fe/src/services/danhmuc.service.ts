@@ -151,6 +151,22 @@ const getListPhongBan = async (query?: IQueryPhongBan) => {
   }
 };
 
+const getListPhongBanByKpiRole = async (query?: IQueryPhongBan) => {
+  try {
+    const res = await axios.get(`${apiPhongBanEndpoint}/get-by-kpi-role`, {
+      params: {
+        ...query
+      }
+    });
+
+    const data: IResponseList<IViewPhongBan> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
 const getPhongBanById = async (idPhongBan: number) => {
   try {
     const res = await axios.get(`${apiPhongBanEndpoint}/get-by-id?Id=${idPhongBan}`);
@@ -326,6 +342,7 @@ export const DanhMucService = {
   getListLoaiHopDong,
   getListLoaiPhongBan,
   getListPhongBan,
+  getListPhongBanByKpiRole,
   getPhongBanById,
   createPhongBan,
   updatePhongBan,

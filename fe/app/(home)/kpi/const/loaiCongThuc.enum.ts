@@ -1,8 +1,5 @@
 export enum LoaiCongThuc {
-  TruMoiLan = 1,
-  ChiaTheoMucTieu = 2,
-  VuotMucTru = 3,
-  HoanThanh = 4,
-  KyLuatBang = 5,
-  KyLuatVuotMuc = 6,
+  NUMBER = 'NUMBER',
+  PERCENT = 'PERCENT',
+  YES_NO = 'YES_NO',
 }
