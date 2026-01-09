@@ -124,15 +124,19 @@ namespace D.Core.Domain
 
             #region sv
 
-            CreateMap<SvSinhVien, SvSinhVienResponseDto>();
-            CreateMap<CreateSinhVienDto, SvSinhVien>();
+            CreateMap<SvSinhVien, SvSinhVienResponseDto>()
+                .ForMember(dest => dest.IdSinhVien, opt => opt.MapFrom(src => src.Id));
+            CreateMap<CreateSinhVienDto, SvSinhVien>()
+                .ForMember(dest => dest.HoDem, opt => opt.MapFrom(src => src.HoDem != null ? src.HoDem.Trim() : null))
+                .ForMember(dest => dest.Ten, opt => opt.MapFrom(src => src.Ten != null ? src.Ten.Trim() : null));
             CreateMap<UpdateSinhVienDto, SvSinhVien>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Mssv, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedDate, opt => opt.Ignore());
             CreateMap<SvSinhVien, SvSinhVienGetAllResponseDto>()
-                .ForMember(
-                    dest => dest.HoTen,
-                    opt => opt.MapFrom(src => src.HoDem + " " + src.Ten)
-                );
+                .ForMember(dest => dest.IdSinhVien, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.HoTen, opt => opt.MapFrom(src => $"{src.HoDem} {src.Ten}".Trim()));
 
             #endregion
 
@@ -229,6 +233,7 @@ namespace D.Core.Domain
                 .ForMember(dest => dest.SelectedAnswerId, opt => opt.MapFrom(src => src.IdDapAnChon))
                 .ForMember(dest => dest.TextResponse, opt => opt.MapFrom(src => src.CauTraLoiText));
             #endregion
+
             #region Kpi
             CreateMap<KpiRole, KpiRoleResponseDto>();
             CreateMap<CreateKpiRoleDto, KpiRole>();

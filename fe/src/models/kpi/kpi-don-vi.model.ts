@@ -1,3 +1,4 @@
+import { LoaiCongThuc } from '@/app/(home)/kpi/const/loaiCongThuc.enum';
 import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryKpiDonVi = IQueryPaging & {
@@ -11,13 +12,20 @@ export type IViewKpiDonVi = {
   id: number,
   kpi: string,
   mucTieu: string,
-  trongSo: number, 
+  trongSo: number,
   donVi: string,
   idDonVi?: number,
   loaiKpi: number,
   namHoc: string,
   trangThai: number,
   ketQuaThucTe: number,
+  capTrenDanhGia: number,
+  diemKpi?: number;
+  diemKpiCapTren?: number;
+  isActive?: number;
+  loaiKetQua?: LoaiCongThuc;
+  ghiChu?: string;
+  congThuc?:string;
 };
 
 export type ICreateKpiDonVi = {
@@ -56,6 +64,15 @@ export type IUpdateKpiDonViThucTe = {
 export interface IUpdateKpiDonViThucTeList {
   items: IUpdateKpiDonViThucTe[],
 }
+
+export type IUpdateCapTrenDonViDanhGia = {
+  id: number,
+  ketQuaCapTren?: number,
+  diemKpiCapTren?: number
+};
+export interface IUpdateCapTrenDonViDanhGiaList {
+  items: IUpdateCapTrenDonViDanhGia[],
+};
 
 export interface IViewNhanSu {
   idNhanSu?: number,

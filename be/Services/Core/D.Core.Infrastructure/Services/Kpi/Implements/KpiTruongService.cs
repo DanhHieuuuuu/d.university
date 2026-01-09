@@ -18,16 +18,19 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
     public class KpiTruongService : ServiceBase, IKpiTruongService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
+        private readonly IKpiCaNhanService _kpiCaNhanService;
 
         public KpiTruongService(
             ILogger<KpiRoleService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            IKpiCaNhanService kpiCaNhanService
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
+            _kpiCaNhanService = kpiCaNhanService;
         }
 
         public async Task CreateKpiTruong(CreateKpiTruongDto dto)
@@ -66,6 +69,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 $"{nameof(GetAllKpiTruong)} => dto = {JsonSerializer.Serialize(dto)}"
             );
             var kpis = _unitOfWork.iKpiTruongRepository.TableNoTracking.ToList();
+            var isActive = _kpiCaNhanService.GetKpiIsActive();
 
             var query =
                 from kpi in kpis
@@ -90,7 +94,18 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.TrangThai,
                     KetQuaThucTe = kpi.KetQuaThucTe,
-                    LoaiCongThuc = kpi.LoaiCongThuc,
+                    LoaiKetQua = kpi.LoaiKetQua,
+                    DiemKpiCapTren = kpi.DiemKpiCapTren,
+                    CapTrenDanhGia = kpi.CapTrenDanhGia,
+                    DiemKpi = kpi.DiemKpi,
+                    IsActive =
+                        (
+                            kpi.TrangThai == KpiStatus.Evaluating
+                            || kpi.TrangThai == KpiStatus.NeedEdit
+                            || kpi.TrangThai == KpiStatus.Declared
+                        )
+                            ? isActive
+                            : 0,
                 };
 
             var totalCount = query.Count();
@@ -270,7 +285,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             kpiTruong.LoaiKpi = dto.LoaiKpi;
             kpiTruong.NamHoc = dto.NamHoc;
             kpiTruong.KetQuaThucTe = dto.KetQuaThucTe;
-            kpiTruong.LoaiCongThuc = dto.LoaiCongThuc;
 
             _unitOfWork.iKpiTruongRepository.Update(kpiTruong);
             await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAppDispatch } from '@redux/hooks';
 import { myPermission, refreshToken } from '@redux/feature/auth/authThunk';
 import { processApiMsgError } from '@utils/index';
@@ -10,13 +10,19 @@ import { $fetchNotification } from '@redux/feature/noticeSlice';
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     checkAuth();
-  }, [router]);
+  }, [router, pathname]);
 
   const checkAuth = async () => {
+    // Skip auth check for public survey routes
+    if (pathname?.startsWith('/survey/user')) {
+      return;
+    }
+
     const valid = getValidToken();
 
     if (!valid) {

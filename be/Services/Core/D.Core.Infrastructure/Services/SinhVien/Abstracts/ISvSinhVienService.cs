@@ -1,4 +1,5 @@
 ﻿using D.Core.Domain.Dtos.SinhVien;
+using D.Core.Domain.Dtos.SinhVien.Auth;
 using D.DomainBase.Dto;
 
 namespace D.Core.Infrastructure.Services.SinhVien.Abstracts
@@ -11,5 +12,9 @@ namespace D.Core.Infrastructure.Services.SinhVien.Abstracts
         Task<bool> UpdateSinhVien(UpdateSinhVienDto dto);
         Task<bool> DeleteSinhVien(DeleteSinhVienDto dto);
         Task<SvSinhVienResponseDto> FindByMssv(FindByMssvDto dto);
+
+        Task<SvLoginResponseDto> Login(SvLoginRequestDto loginRequest);
+        Task<bool> Logout(SvLogoutRequestDto logoutRequestDto);
+        Task<SvRefreshTokenResponseDto> RefreshToken(SvRefreshTokenRequestDto refreshToken);
     }
 }
