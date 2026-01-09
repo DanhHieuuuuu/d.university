@@ -1,4 +1,5 @@
-import { ICreateHopDongNs, ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateHopDongNs } from '@models/nhansu/hopdong.model';
 import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';

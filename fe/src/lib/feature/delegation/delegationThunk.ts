@@ -1,5 +1,4 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { ICreateHopDongNs, IQueryNhanSu } from '@models/nhansu/nhansu.model';
 import {
   ICreateDepartment,
   ICreateDoanVao,
