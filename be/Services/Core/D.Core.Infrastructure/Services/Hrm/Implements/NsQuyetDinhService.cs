@@ -101,6 +101,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
                 quyetdinh.Status = NsQuyetDinhStatus.PheDuyet;
                 _unitOfWork.iNsQuyetDinhRepository.Update(quyetdinh);
+                _unitOfWork.iNsQuyetDinhRepository.SaveChange();
             }
         }
 
@@ -146,6 +147,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
                 quyetdinh.Status = NsQuyetDinhStatus.TuChoi;
                 _unitOfWork.iNsQuyetDinhRepository.Update(quyetdinh);
+                _unitOfWork.iNsQuyetDinhRepository.SaveChange();
             }
         }
 
