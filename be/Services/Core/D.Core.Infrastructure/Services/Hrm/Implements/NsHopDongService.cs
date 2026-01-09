@@ -20,18 +20,18 @@ using Microsoft.Extensions.Logging;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
-    public class NsContractService : ServiceBase, INsContractService
+    public class NsHopDongService : ServiceBase, INsHopDongService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
-        private readonly INsDecisionService _decisionService;
+        private readonly INsQuyetDinhService _decisionService;
         private readonly INsNhanSuService _nhansuService;
 
-        public NsContractService(
-            ILogger<NsContractService> logger,
+        public NsHopDongService(
+            ILogger<NsHopDongService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
-            INsDecisionService decisionService,
+            INsQuyetDinhService decisionService,
             INsNhanSuService nhansuService
         )
             : base(logger, contextAccessor, mapper)
@@ -120,20 +120,23 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"{nameof(GetAllContract)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var query = _unitOfWork.iNsHopDongRepository.TableNoTracking.AsQueryable();
+            var query =
+                from hd in _unitOfWork.iNsHopDongRepository.TableNoTracking
+                join ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                    on hd.IdNhanSu equals ns.Id
+                select new { HopDong = hd, NhanSu = ns };
 
             // Filter
-            if (dto.IdLoaiHopDong != null)
+            if (dto.IdLoaiHopDong.HasValue)
             {
-                query = query.Where(x => dto.IdLoaiHopDong == x.IdLoaiHopDong);
+                query = query.Where(x => dto.IdLoaiHopDong == x.HopDong.IdLoaiHopDong);
             }
-
-            
 
             var totalCount = query.Count();
 
             var items = query
-                .OrderBy(x => x.CreatedDate).ThenBy(x => x.Id)
+                .OrderBy(x => x.HopDong.CreatedDate)
+                .ThenBy(x => x.HopDong.Id)
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ToList();
@@ -141,17 +144,18 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var result = items
                 .Select(x => new NsHopDongResponseDto
                 {
-                    Id = x.Id,
-                    SoHopDong = x.SoHopDong,
-                    IdLoaiHopDong = x.IdLoaiHopDong,
-                    IdNhanSu = x.IdNhanSu,
-                    NgayKyKet = x.NgayKyKet,
-                    HopDongCoThoiHanTuNgay = x.HopDongCoThoiHanTuNgay,
-                    HopDongCoThoiHanDenNgay = x.HopDongCoThoiHanDenNgay,
-                    NgayBatDauThuViec = x.NgayBatDauThuViec,
-                    NgayKetThucThuViec = x.NgayKetThucThuViec,
-                    LuongCoBan = x.LuongCoBan,
-                    GhiChu = x.GhiChu,
+                    Id = x.HopDong.Id,
+                    SoHopDong = x.HopDong.SoHopDong,
+                    IdLoaiHopDong = x.HopDong.IdLoaiHopDong,
+                    IdNhanSu = x.HopDong.IdNhanSu,
+                    HoTen = x.NhanSu.HoDem + " " + x.NhanSu.Ten,
+                    NgayKyKet = x.HopDong.NgayKyKet,
+                    HopDongCoThoiHanTuNgay = x.HopDong.HopDongCoThoiHanTuNgay,
+                    HopDongCoThoiHanDenNgay = x.HopDong.HopDongCoThoiHanDenNgay,
+                    NgayBatDauThuViec = x.HopDong.NgayBatDauThuViec,
+                    NgayKetThucThuViec = x.HopDong.NgayKetThucThuViec,
+                    LuongCoBan = x.HopDong.LuongCoBan,
+                    GhiChu = x.HopDong.GhiChu,
                 })
                 .ToList();
 

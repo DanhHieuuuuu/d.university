@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-import { getListNhanSu, createHopDongNhanSu, getHoSoNhanSu, createNhanSu } from './nhansuThunk';
+import { getListNhanSu, getHoSoNhanSu, createNhanSu } from './nhansuThunk';
 
 interface NhanSuState {
   status: ReduxStatus;
@@ -81,22 +81,13 @@ const nhanSuSlice = createSlice({
         state.selected.data = null;
       })
       .addCase(createNhanSu.pending, (state) => {
-        state.$createHopDong.status = ReduxStatus.LOADING;
+        state.$create.status = ReduxStatus.LOADING;
       })
       .addCase(createNhanSu.fulfilled, (state) => {
-        state.$createHopDong.status = ReduxStatus.SUCCESS;
+        state.$create.status = ReduxStatus.SUCCESS;
       })
       .addCase(createNhanSu.rejected, (state) => {
-        state.$createHopDong.status = ReduxStatus.FAILURE;
-      })
-      .addCase(createHopDongNhanSu.pending, (state) => {
-        state.$createHopDong.status = ReduxStatus.LOADING;
-      })
-      .addCase(createHopDongNhanSu.fulfilled, (state) => {
-        state.$createHopDong.status = ReduxStatus.SUCCESS;
-      })
-      .addCase(createHopDongNhanSu.rejected, (state) => {
-        state.$createHopDong.status = ReduxStatus.FAILURE;
+        state.$create.status = ReduxStatus.FAILURE;
       });
   }
 });

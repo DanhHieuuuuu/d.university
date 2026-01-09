@@ -1,11 +1,11 @@
 'use client';
 
 import { Form, Input, InputNumber } from 'antd';
-import { ICreateHopDongNs } from '@models/nhansu/hopdong.model';
+import { ICreateHopDong } from '@models/nhansu/hopdong.model';
 import { useEffect } from 'react';
 
 export default function SalaryTab() {
-  const form = Form.useFormInstance<ICreateHopDongNs>();
+  const form = Form.useFormInstance<ICreateHopDong>();
 
   useEffect(() => {
     form.setFieldValue('currency', 'VNĐ');
@@ -14,7 +14,7 @@ export default function SalaryTab() {
 
   return (
     <div className="grid grid-cols-2 gap-x-5">
-      <Form.Item<ICreateHopDongNs>
+      <Form.Item<ICreateHopDong>
         name="luongCoBan"
         label="Lương cơ bản"
         rules={[{ required: true, message: 'Không được để trống!' }]}
@@ -27,24 +27,24 @@ export default function SalaryTab() {
       <Form.Item name="payFrequency" label="Trả lương" className="col-span-full">
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs>
+      <Form.Item<ICreateHopDong>
         name={['tenNganHang1']}
         label="Tên ngân hàng"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs>
+      <Form.Item<ICreateHopDong>
         name={['atm1']}
         label="Số tài khoản"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name={['tenNganHang2']} label="Tên ngân hàng 2">
+      <Form.Item<ICreateHopDong> name={['tenNganHang2']} label="Tên ngân hàng 2">
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name={['atm2']} label="Số tài khoản 2">
+      <Form.Item<ICreateHopDong> name={['atm2']} label="Số tài khoản 2">
         <Input />
       </Form.Item>
     </div>

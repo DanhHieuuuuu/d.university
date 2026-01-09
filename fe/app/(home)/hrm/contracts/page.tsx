@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Select } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -14,27 +14,27 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
-import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import { IQueryPhongBan, IViewPhongBan, IViewPhongBanWithNhanSu } from '@models/danh-muc/phong-ban.model';
-import { formatDateView } from '@utils/index';
+import { IQueryHopDong, IViewHopDong } from '@models/nhansu/hopdong.model';
+import { getListHopDong } from '@redux/feature/hrm/hopdong/hopdongThunk';
+import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.phongBan.$list);
+  const { data, status, total: totalItem } = useAppSelector((state) => state.hopdongState.$list);
+  const { listLoaiHopDong } = useAppSelector((state) => state.danhmucState);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<number>(0);
 
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryPhongBan>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryHopDong>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -42,7 +42,7 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getAllPhongBan(newQuery));
+      dispatch(getListHopDong(newQuery));
     },
     triggerFirstLoad: true
   });
@@ -68,10 +68,10 @@ const Page = () => {
   };
 
   const refreshData = () => {
-    dispatch(getAllPhongBan(query));
+    dispatch(getListHopDong(query));
   };
 
-  const columns: IColumn<IViewPhongBanWithNhanSu>[] = [
+  const columns: IColumn<IViewHopDong>[] = [
     {
       key: 'Id',
       dataIndex: 'id',
@@ -79,75 +79,60 @@ const Page = () => {
       showOnConfig: false
     },
     {
-      key: 'maPhongBan',
-      dataIndex: 'maPhongBan',
-      title: 'Mã phòng ban'
+      key: 'soHopDong',
+      dataIndex: 'soHopDong',
+      title: 'Số hợp đồng'
     },
     {
-      key: 'tenPhongBan',
-      dataIndex: 'tenPhongBan',
-      title: 'Tên phòng ban'
-    },
-    {
-      key: 'diaChi',
-      dataIndex: 'diaChi',
-      title: 'Địa chỉ'
-    },
-    {
-      key: 'hotline',
-      dataIndex: 'hotline',
-      title: 'Hotline'
-    },
-    {
-      key: 'fax',
-      dataIndex: 'fax',
-      title: 'Fax'
-    },
-    {
-      key: 'ngayThanhLap',
-      dataIndex: 'ngayThanhLap',
-      title: 'Ngày thành lập',
-      render: (value) => {
-        const date = formatDateView(value);
-        return <p>{date}</p>;
+      key: 'idLoaiHopDong',
+      dataIndex: 'idLoaiHopDong',
+      title: 'Loại hợp đồng',
+      render: (val) => {
+        const item = listLoaiHopDong.find((x) => x.id === val);
+        return <span>{item?.tenLoaiHopDong}</span>;
       }
+    },
+    {
+      key: 'hoTen',
+      dataIndex: 'hoTen',
+      title: 'Họ tên'
+    },
+    {
+      key: 'ngayKyKet',
+      dataIndex: 'ngayKyKet',
+      title: 'Ngày ký kết',
+      align: 'center',
+      render: (val: string) => formatDateTimeView(val)
+    },
+    {
+      key: 'hopDongCoThoiHanTuNgay',
+      dataIndex: 'hopDongCoThoiHanTuNgay',
+      title: 'Có hiệu lực từ',
+      align: 'center',
+      render: (val: string) => formatDateTimeView(val)
+    },
+    {
+      key: 'hopDongCoThoiHanDenNgay',
+      dataIndex: 'hopDongCoThoiHanDenNgay',
+      title: 'Có hiệu lực đến',
+      align: 'center',
+      render: (val: string) => (val != null ? formatDateTimeView(val) : '')
+    },
+    {
+      key: 'luongCoBan',
+      dataIndex: 'luongCoBan',
+      title: 'Lương cơ bản',
+      align: 'center',
+      render: (val: number) => formatCurrency(val)
+    },
+    {
+      key: 'ghiChu',
+      dataIndex: 'ghiChu',
+      title: 'Ghi chú'
     }
   ];
 
-  const actions: IAction[] = [
-    {
-      label: 'Chi tiết',
-      tooltip: 'Xem thông tin phòng ban',
-      icon: <EyeOutlined />,
-      command: (record: IViewPhongBan) => {
-        // dispatch(setSelectedIdPhongBan(record.id));
-        onClickView(record.id);
-      }
-    },
-    {
-      label: 'Kích hoạt',
-      tooltip: 'Kích hoạt',
-      icon: <UnlockOutlined />,
-      hidden: (record: IViewPhongBan) => {
-        return record.isActive === true;
-      },
-      command: (record: IViewPhongBan) => {
-        // dispatch(setSelectedIdPhongBan(record.id));
-        onClickUpdate(record.id);
-      }
-    },
-    {
-      label: 'Khóa',
-      tooltip: 'Khóa',
-      icon: <LockOutlined />,
-      hidden: (record: IViewPhongBan) => {
-        return record.isActive === false;
-      },
-      command: (record: IViewPhongBan) => {
-        // dispatch(setSelectedIdPhongBan(record.id));
-      }
-    }
-  ];
+  const actions: IAction[] = [];
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ Keyword: value });
@@ -159,7 +144,7 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách phòng ban"
+      title="Danh sách hợp đồng"
       className="h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
@@ -169,8 +154,15 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          <Form.Item<IQueryPhongBan> label="Tên phòng ban:" name="Keyword">
-            <Input onChange={(e) => handleSearch(e)} />
+          
+          <Form.Item<IQueryHopDong> label="Loại hợp đồng:" name="loaiHopDong">
+            <Select
+              allowClear
+              options={listLoaiHopDong.map((item) => {
+                return { value: item.id, label: item.tenLoaiHopDong };
+              })}
+              onChange={(val) => onFilterChange({ loaiHopDong: val })}
+            />
           </Form.Item>
         </div>
         <Form.Item>
@@ -196,11 +188,10 @@ const Page = () => {
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
         columns={columns}
-        dataSource={list}
+        dataSource={data}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
-
     </Card>
   );
 };
