@@ -15,12 +15,12 @@ using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
-    public class NsDecisionService : ServiceBase, INsDecisionService
+    public class NsQuyetDinhService : ServiceBase, INsQuyetDinhService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
 
-        public NsDecisionService(
-            ILogger<NsDecisionService> logger,
+        public NsQuyetDinhService(
+            ILogger<NsQuyetDinhService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork
@@ -154,22 +154,25 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             _logger.LogInformation($"Method {nameof(FindPagingNsQuyetDinh)} called. Dto: {JsonSerializer.Serialize(dto)}");
 
 
-            var query = _unitOfWork.iNsQuyetDinhRepository.TableNoTracking.AsQueryable();
+            var query = from qd in _unitOfWork.iNsQuyetDinhRepository.TableNoTracking
+                        join ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                        on qd.IdNhanSu equals ns.Id
+                        select new { QuyetDinh = qd, NhanSu = ns };
 
             // Filter
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
-                query = query.Where(x => x.NoiDungTomTat!.ToLower().Contains(dto.Keyword.ToLower()));
+                query = query.Where(x => x.QuyetDinh.NoiDungTomTat!.ToLower().Contains(dto.Keyword.ToLower()));
             }
             if (dto.TrangThai != null)
             {
-                query = query.Where(x => x.Status == dto.TrangThai);
+                query = query.Where(x => x.QuyetDinh.Status == dto.TrangThai);
             }
 
             var totalCount = query.Count();
 
             var items = query
-                .OrderByDescending(x => x.CreatedDate) // cố định thứ tự
+                .OrderByDescending(x => x.QuyetDinh.CreatedDate) // cố định thứ tự
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ToList();
@@ -177,13 +180,14 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var result = items
                 .Select(x => new NsQuyetDinhResponseDto
                 {
-                    Id = x.Id,
-                    IdNhanSu = x.IdNhanSu,
-                    MaNhanSu = x.MaNhanSu,
-                    Status = x.Status,
-                    LoaiQuyetDinh = x.LoaiQuyetDinh,
-                    NgayHieuLuc = x.NgayHieuLuc,
-                    NoiDungTomTat = x.NoiDungTomTat
+                    Id = x.QuyetDinh.Id,
+                    IdNhanSu = x.QuyetDinh.IdNhanSu,
+                    MaNhanSu = x.QuyetDinh.MaNhanSu,
+                    HoTen = x.NhanSu.HoDem + " " + x.NhanSu.Ten,
+                    Status = x.QuyetDinh.Status,
+                    LoaiQuyetDinh = x.QuyetDinh.LoaiQuyetDinh,
+                    NgayHieuLuc = x.QuyetDinh.NgayHieuLuc,
+                    NoiDungTomTat = x.QuyetDinh.NoiDungTomTat
                 })
                 .ToList();
 

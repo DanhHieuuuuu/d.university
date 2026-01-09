@@ -14,7 +14,7 @@ import delegationReducer from './feature/delegation/delegationSlice';
 import daotaoReducer from './feature/dao-tao/daotaoSlice';
 import surveyReducer from './feature/survey/surveySlice';
 import hopdongReducer from './feature/hrm/hopdong/hopdongSlice';
-// import quyetdinhReducer from './feature/hrm/quyetdinh/quyetdinhSlice';
+import quyetdinhReducer from './feature/hrm/quyetdinh/quyetdinhSlice';
 
 const persistConfig = {
   key: 'auth',
@@ -40,7 +40,7 @@ export const makeStore = () => {
       daotaoState: daotaoReducer,
       surveyState: surveyReducer,
       hopdongState: hopdongReducer,
-      // quyetdinhState: quyetdinhReducer
+      quyetdinhState: quyetdinhReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

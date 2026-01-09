@@ -19,14 +19,14 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
     public class NsNhanSuService : ServiceBase, INsNhanSuService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
-        private readonly INsDecisionService _decisionService;
+        private readonly INsQuyetDinhService _decisionService;
 
         public NsNhanSuService(
             ILogger<NsNhanSuService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
-            INsDecisionService decisionService
+            INsQuyetDinhService decisionService
         )
             : base(logger, httpContext, mapper)
         {

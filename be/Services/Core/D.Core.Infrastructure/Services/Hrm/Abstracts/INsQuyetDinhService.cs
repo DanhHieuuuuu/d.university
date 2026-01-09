@@ -4,7 +4,7 @@ using D.DomainBase.Dto;
 
 namespace D.Core.Infrastructure.Services.Hrm.Abstracts
 {
-    public interface INsDecisionService
+    public interface INsQuyetDinhService
     {
         /// <summary>
         /// Tạo quyết định mới

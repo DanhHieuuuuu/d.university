@@ -35,7 +35,7 @@ namespace D.Core.Infrastructure
             return services
                 .AddScoped<ServiceUnitOfWork>()
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
-                .AddScoped<INsDecisionService, NsDecisionService>()
+                .AddScoped<INsQuyetDinhService, NsQuyetDinhService>()
                 .AddScoped<INsHopDongService, NsHopDongService>()
                 .AddScoped<IDmDanhMucService, DmDanhMucService>()
                 .AddScoped<ISvSinhVienService, SvSinhVienService>()
