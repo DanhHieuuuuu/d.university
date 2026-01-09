@@ -4,6 +4,7 @@ using D.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D.Core.Domain.Migrations
 {
     [DbContext(typeof(CoreDBContext))]
-    partial class CoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260109181114_updatesurvey3")]
+    partial class updatesurvey3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3782,9 +3785,6 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("CapTrenDanhGia")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("ChienLuoc")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CongThucTinh")
                         .HasColumnType("nvarchar(max)");
 
@@ -3814,21 +3814,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("DiemKpiCapTren")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("GhiChu")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int?>("IdCongThuc")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdKpiDonVi")
                         .HasColumnType("int");
 
                     b.Property<int>("IdNhanSu")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("IsCaNhanKeKhai")
-                        .HasColumnType("bit");
 
                     b.Property<string>("KPI")
                         .HasMaxLength(500)
@@ -3840,11 +3830,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("LinhVuc")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LoaiKPI")
+                    b.Property<int?>("LoaiCongThuc")
                         .HasColumnType("int");
 
-                    b.Property<string>("LoaiKetQua")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("LoaiKPI")
+                        .HasColumnType("int");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
@@ -3868,6 +3858,9 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("ThamSoCongThuc")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TrongSo")
                         .HasMaxLength(255)
@@ -3921,22 +3914,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("DiemKpiCapTren")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("GhiChu")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int?>("IdCongThuc")
-                        .HasMaxLength(255)
-                        .HasColumnType("int");
-
                     b.Property<int?>("IdDonVi")
                         .HasColumnType("int");
 
                     b.Property<int?>("IdKpiTruong")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("IsKeKhai")
-                        .HasColumnType("bit");
 
                     b.Property<decimal?>("KetQuaThucTe")
                         .HasColumnType("decimal(18,2)");
@@ -3945,8 +3927,8 @@ namespace D.Core.Domain.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("LoaiKetQua")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("LoaiCongThuc")
+                        .HasColumnType("int");
 
                     b.Property<int?>("LoaiKpi")
                         .HasColumnType("int");
@@ -3965,6 +3947,9 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("NamHoc")
                         .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("ThamSoCongThuc")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("TrangThai")
                         .HasColumnType("int");
@@ -4160,9 +4145,6 @@ namespace D.Core.Domain.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal?>("CapTrenDanhGia")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("ChienLuoc")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -4193,15 +4175,6 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("DiemKpi")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("DiemKpiCapTren")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("IdCongThuc")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("IsKeKhai")
-                        .HasColumnType("bit");
-
                     b.Property<decimal?>("KetQuaThucTe")
                         .HasColumnType("decimal(18,2)");
 
@@ -4213,9 +4186,8 @@ namespace D.Core.Domain.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("LoaiKetQua")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<int?>("LoaiCongThuc")
+                        .HasColumnType("int");
 
                     b.Property<int?>("LoaiKpi")
                         .HasColumnType("int");
@@ -4471,6 +4443,12 @@ namespace D.Core.Domain.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("bit")
                         .HasColumnName("IsCorrect");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Description");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)

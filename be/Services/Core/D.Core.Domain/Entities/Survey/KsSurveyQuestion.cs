@@ -40,11 +40,6 @@ namespace D.Core.Domain.Entities.Survey
         [Description("Thứ tự hiển thị (A, B, C...)")]
         public int ThuTu { get; set; }
 
-        [Column("Description")]
-        [Description("Mô tả")]
-        [MaxLength(2000)]
-        public string MoTa { get; set; }
-
         [ForeignKey(nameof(IdYeuCau))]
         public virtual KsSurveyRequest SurveyRequest { get; set; }
         public virtual ICollection<KsQuestionAnswer> Answers { get; set; }

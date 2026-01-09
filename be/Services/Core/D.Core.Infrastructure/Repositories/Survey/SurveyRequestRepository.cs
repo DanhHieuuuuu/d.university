@@ -35,7 +35,7 @@ namespace D.Core.Infrastructure.Repositories.Survey
         {
             return await _dbContext.Set<KsSurveyQuestion>()
                 .Include(q => q.Answers)
-                .Where(q => q.IdYeuCau == requestId) // Lưu ý: Check tên cột FK trong DB (IdRequest hay SurveyRequestId?)
+                .Where(q => q.IdYeuCau == requestId)
                 .OrderBy(q => q.Id)
                 .AsNoTracking()
                 .ToListAsync();
@@ -50,7 +50,8 @@ namespace D.Core.Infrastructure.Repositories.Survey
                         select new CorrectAnswerDto
                         {
                             QuestionId = q.Id,
-                            AnswerId = a.Id
+                            AnswerId = a.Id,
+                            Value = a.Value
                         };
             return await query.ToListAsync();
         }

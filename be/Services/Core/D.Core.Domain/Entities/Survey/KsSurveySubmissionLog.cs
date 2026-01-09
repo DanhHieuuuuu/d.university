@@ -22,7 +22,7 @@ namespace D.Core.Domain.Entities.Survey
 
         [Column("Description")]
         [MaxLength(500)]
-        public string MoTa { get; set; } // "Nộp bài được 8 điểm", "Bắt đầu làm bài"...
+        public string MoTa { get; set; }
 
     }
 }

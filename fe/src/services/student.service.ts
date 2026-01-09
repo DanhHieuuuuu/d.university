@@ -78,7 +78,7 @@ const sinhVienLoginApi = async (body: ISinhVienLogin) => {
       password: body.password
     };
 
-    const res = await axiosBase.post(`sinhvien/login`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    const res = await axios.post(`${apiStudentEndpoint}/login`, params);
 
     return Promise.resolve(res.data);
   } catch (err) {
@@ -89,7 +89,7 @@ const sinhVienLoginApi = async (body: ISinhVienLogin) => {
 
 const sinhVienRefreshTokenApi = async (params: { token: string; refreshToken: string }) => {
   try {
-    const res = await axios.post(`sinhvien/refresh-token`, params, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    const res = await axios.post(`${apiStudentEndpoint}/refresh-token`, params);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err);
@@ -99,7 +99,7 @@ const sinhVienRefreshTokenApi = async (params: { token: string; refreshToken: st
 
 const sinhVienLogoutApi = async () => {
   try {
-    const res = await axios.get(`sinhvien/logout`, { baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL });
+    const res = await axios.get(`${apiStudentEndpoint}/logout`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err);

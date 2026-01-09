@@ -1,11 +1,11 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag, Select } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
+import { SearchOutlined, SyncOutlined, CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getPagingRequest, approveRequestAction, rejectRequestAction, submitRequestAction, cancelSubmitRequestAction, removeRequest, getRequestById } from '@redux/feature/survey/surveyThunk';
-import { resetRequestStatus, setSelectedRequest, clearSelectedRequest } from '@redux/feature/survey/surveySlice';
+import { getPagingRequest, approveRequestAction, rejectRequestAction, getRequestById } from '@redux/feature/survey/surveyThunk';
+import { setSelectedRequest, clearSelectedRequest } from '@redux/feature/survey/surveySlice';
 
 import { IQueryRequest, IViewRequest } from '@models/survey/request.model';
 
@@ -14,7 +14,7 @@ import { IAction, IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
-import CreateOrUpdateRequestModal from './(dialog)/create-or-update';
+import CreateOrUpdateRequestModal from '../request/(dialog)/create-or-update';
 import { toast } from 'react-toastify';
 import { requestStatusConst } from '../../const/requestStatus.const';
 
@@ -30,12 +30,6 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequestState] = useState<IViewRequest | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
-
-  const onClickAdd = () => {
-    setSelectedRequestState(null);
-    setIsViewMode(false);
-    setIsModalOpen(true);
-  };
 
   const columns: IColumn<IViewRequest>[] = [
     {
@@ -97,6 +91,7 @@ const Page = () => {
     }
   ];
 
+  // Actions for admin - only view, approve, reject
   const actions: IAction[] = [
     {
       label: 'Xem chi tiết',
@@ -115,70 +110,28 @@ const Page = () => {
       }
     },
     {
-      label: 'Sửa',
-      icon: <EditOutlined />,
-      command: (record: IViewRequest) => {
-        setSelectedRequestState(record);
-        dispatch(setSelectedRequest(record));
-        setIsViewMode(false);
-        setIsModalOpen(true);
-      },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT // Chỉ cho phép sửa khi bản nháp
-    },
-    {
-      label: 'Gửi duyệt',
-      icon: <CheckOutlined />,
-      command: (record: IViewRequest) => {
-        dispatch(submitRequestAction(record.id))
-          .unwrap()
-          .then(() => {
-            toast.success('Gửi duyệt thành công');
-            dispatch(getPagingRequest(query));
-          })
-          .catch((err) => {
-            console.error(err);
-            toast.error('Gửi duyệt thất bại');
-          });
-      },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT // Chỉ cho phép khi bản nháp
-    },
-    {
-      label: 'Hủy gửi duyệt',
-      icon: <CloseOutlined />,
-      command: (record: IViewRequest) => {
-        dispatch(cancelSubmitRequestAction(record.id))
-          .unwrap()
-          .then(() => {
-            toast.success('Hủy gửi duyệt thành công');
-            dispatch(getPagingRequest(query));
-          })
-          .catch((err) => {
-            console.error(err);
-            toast.error('Hủy gửi duyệt thất bại');
-          });
-      },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING // Chỉ cho phép khi chờ duyệt
-    },
-    {
       label: 'Duyệt',
       icon: <CheckOutlined />,
       command: (record: IViewRequest) => {
-        dispatch(approveRequestAction(record.id))
-          .unwrap()
-          .then(() => {
-            toast.success('Duyệt yêu cầu thành công');
-            dispatch(getPagingRequest(query));
-          })
-          .catch((err) => {
-            console.error(err);
-            toast.error('Duyệt yêu cầu thất bại');
-          });
+        if (confirm('Bạn có chắc muốn duyệt yêu cầu này?')) {
+          dispatch(approveRequestAction(record.id))
+            .unwrap()
+            .then(() => {
+              toast.success('Duyệt yêu cầu thành công');
+              dispatch(getPagingRequest(query));
+            })
+            .catch((err) => {
+              console.error(err);
+              toast.error('Duyệt yêu cầu thất bại');
+            });
+        }
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING // Chỉ cho phép khi chờ duyệt
+      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING
     },
     {
       label: 'Từ chối',
       icon: <CloseOutlined />,
+      color: 'danger',
       command: (record: IViewRequest) => {
         const reason = prompt('Lý do từ chối:');
         if (reason) {
@@ -194,27 +147,7 @@ const Page = () => {
             });
         }
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING // Chỉ cho phép khi chờ duyệt
-    },
-    {
-      label: 'Xóa',
-      icon: <CloseOutlined />,
-      color: 'danger',
-      command: (record: IViewRequest) => {
-        if (confirm('Bạn có chắc muốn xóa yêu cầu này?')) {
-          dispatch(removeRequest(record.id))
-            .unwrap()
-            .then(() => {
-              toast.success('Xóa yêu cầu thành công');
-              dispatch(getPagingRequest(query));
-            })
-            .catch((err) => {
-              console.error(err);
-              toast.error('Xóa yêu cầu thất bại');
-            });
-        }
-      },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT // Chỉ cho phép xóa khi bản nháp
+      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING
     }
   ];
 
@@ -224,7 +157,7 @@ const Page = () => {
       PageIndex: 1,
       PageSize: 10,
       Keyword: '',
-      trangThai: requestStatusConst.DRAFT
+      // No default status filter - show all requests
     },
     onQueryChange: (newQuery) => {
       dispatch(getPagingRequest(newQuery));
@@ -246,21 +179,16 @@ const Page = () => {
 
   return (
     <Card
-      title="Danh sách yêu cầu khảo sát"
+      title="Quản lý yêu cầu khảo sát"
       className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
-      }
     >
-      <Form form={form} layout="horizontal" initialValues={{ trangThai: requestStatusConst.DRAFT }}>
+      <Form form={form} layout="horizontal">
         <div className="grid grid-cols-3 gap-4">
           <Form.Item<IQueryRequest> label="Tìm kiếm:" name="Keyword">
             <Input placeholder="Mã yêu cầu/tên khảo sát" onChange={(e) => handleSearch(e)} />
           </Form.Item>
           <Form.Item label="Trạng thái:" name="trangThai">
-            <Select placeholder="Chọn trạng thái" allowClear onChange={handleStatusFilter}>
+            <Select placeholder="Tất cả trạng thái" allowClear onChange={handleStatusFilter}>
               {requestStatusConst.list.map((status) => (
                 <Option key={status.value} value={status.value}>
                   {status.name}
