@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { NhanSuService } from '@services/nhansu.service';
-import { ICreateHopDongNs, ICreateNhanSu, IQueryNhanSu } from '@models/nhansu/nhansu.model';
+import { NhanSuService } from '@services/hrm/nhansu.service';
+import { ICreateNhanSu, IQueryNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateHopDongNs } from '@models/nhansu/hopdong.model';
 
 export const getListNhanSu = createAsyncThunk('nhansu/list', async (args: IQueryNhanSu, { rejectWithValue }) => {
   try {

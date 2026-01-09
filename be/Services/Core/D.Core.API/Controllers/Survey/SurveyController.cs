@@ -386,7 +386,6 @@ namespace D.Core.API.Controllers.Survey
         {
             try
             {
-                var query = new GetReportDetailDto(id);
                 var result = await _mediator.Send(new GetReportDetailDto(id));
                 return Ok(new ResponseAPI(result));
             }

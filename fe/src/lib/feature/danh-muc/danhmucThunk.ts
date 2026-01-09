@@ -167,6 +167,24 @@ export const getAllPhongBan = createAsyncThunk(
   }
 );
 
+export const getAllPhongBanByKpiRole = createAsyncThunk(
+  'danhmuc/list-phongban-by-kpi-role',
+  async (payload: IQueryPhongBan | undefined, { rejectWithValue }) => {
+    try {
+      const res = await DanhMucService.getListPhongBanByKpiRole(payload);
+
+      return res.data;
+    } catch (error: any) {
+      console.error(error);
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
+
 export const createPhongBan = createAsyncThunk(
   'danhmuc/create-phongban',
   async (payload: ICreatePhongBan, { rejectWithValue }) => {

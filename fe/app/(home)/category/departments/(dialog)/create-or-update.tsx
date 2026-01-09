@@ -148,18 +148,11 @@ const DepartmentModal: React.FC<DepartmentModalProps> = (props) => {
           >
             <Select
               placeholder="Chọn loại phòng ban"
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.children as unknown as string).toLowerCase().includes(input.toLowerCase())
-              }
-            >
-              {listLoaiPhongBan.map((loai) => (
-                <Select.Option key={loai.id} value={loai.id}>
-                  {loai.tenLoaiPhongBan}
-                </Select.Option>
-              ))}
-            </Select>
+              allowClear
+              options={listLoaiPhongBan.map((item) => {
+                return { label: item.tenLoaiPhongBan, value: item.id };
+              })}
+            />
           </Form.Item>
 
           <Form.Item<ICreatePhongBan>
@@ -190,21 +183,21 @@ const DepartmentModal: React.FC<DepartmentModalProps> = (props) => {
             <DatePicker format="DD/MM/YYYY" className="!w-full" />
           </Form.Item>
 
-          <Form.Item<ICreatePhongBan>
-            label="Người đại diện"
-            name="nguoiDaiDien"
-            rules={[{ required: true, message: 'Vui lòng nhập tên người đại diện' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item<ICreatePhongBan> label="Chức vụ người đại diện" name="chucVuNguoiDaiDien">
-            <Input />
-          </Form.Item>
-
           <Form.Item<ICreatePhongBan> label="STT" name="stt">
             <InputNumber className="!w-full" min={0} />
           </Form.Item>
+
+          {isView && (
+            <>
+              <Form.Item<ICreatePhongBan> name="nguoiDaiDien" label="Người đại diện">
+                <Input />
+              </Form.Item>
+
+              <Form.Item<ICreatePhongBan> name="chucVuNguoiDaiDien" label="Chức vụ người đại diện">
+                <Input />
+              </Form.Item>
+            </>
+          )}
         </div>
       </Form>
     </Modal>

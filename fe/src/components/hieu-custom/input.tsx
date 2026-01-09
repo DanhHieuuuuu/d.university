@@ -1,4 +1,4 @@
-import { Input, Form, Typography } from 'antd';
+import { Input, Form } from 'antd';
 import type { Rule } from 'antd/es/form';
 
 // Định nghĩa kiểu dữ liệu props

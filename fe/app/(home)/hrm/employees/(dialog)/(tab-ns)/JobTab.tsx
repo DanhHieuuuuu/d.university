@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Checkbox, DatePicker, Form, Input, Select } from 'antd';
-import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { ICreateHopDongNs } from '@models/nhansu/hopdong.model';
 import { useAppSelector } from '@redux/hooks';
 
 const { TextArea } = Input;
@@ -15,13 +15,13 @@ export default function JobTab() {
   return (
     <div className="grid grid-cols-3 gap-x-5">
       <Form.Item<ICreateHopDongNs>
-        name={['thongTinNhanSu', 'maNhanSu']}
+        name={['maNhanSu']}
         label="Mã nhân sự"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'maSoThue']} label="Mã số thuế">
+      <Form.Item<ICreateHopDongNs> name={['maSoThue']} label="Mã số thuế">
         <Input />
       </Form.Item>
       <div></div>

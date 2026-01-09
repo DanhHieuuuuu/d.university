@@ -1,7 +1,7 @@
 'use client';
 
 import { Form, Input, InputNumber } from 'antd';
-import { ICreateHopDongNs } from '@models/nhansu/nhansu.model';
+import { ICreateHopDongNs } from '@models/nhansu/hopdong.model';
 import { useEffect } from 'react';
 
 export default function SalaryTab() {
@@ -28,23 +28,23 @@ export default function SalaryTab() {
         <Input />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
-        name={['thongTinNhanSu', 'tenNganHang1']}
+        name={['tenNganHang1']}
         label="Tên ngân hàng"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <Input />
       </Form.Item>
       <Form.Item<ICreateHopDongNs>
-        name={['thongTinNhanSu', 'atm1']}
+        name={['atm1']}
         label="Số tài khoản"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'tenNganHang2']} label="Tên ngân hàng 2">
+      <Form.Item<ICreateHopDongNs> name={['tenNganHang2']} label="Tên ngân hàng 2">
         <Input />
       </Form.Item>
-      <Form.Item<ICreateHopDongNs> name={['thongTinNhanSu', 'atm2']} label="Số tài khoản 2">
+      <Form.Item<ICreateHopDongNs> name={['atm2']} label="Số tài khoản 2">
         <Input />
       </Form.Item>
     </div>

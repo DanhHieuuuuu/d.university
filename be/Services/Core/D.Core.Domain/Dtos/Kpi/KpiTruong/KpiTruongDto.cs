@@ -14,8 +14,11 @@ namespace D.Core.Domain.Dtos.Kpi.KpiTruong
         public int? LoaiKpi { get; set; }
         public string? NamHoc { get; set; }
         public int? TrangThai { get; set; }
-        public LoaiCongThuc? LoaiCongThuc { get; set; }
+        public string? LoaiKetQua { get; set; }
         public decimal? KetQuaThucTe { get; set; }
+        public decimal? DiemKpiCapTren { get; set; }
+        public decimal? CapTrenDanhGia { get; set; }
+        public decimal? DiemKpi { get; set; }
         public int? IsActive { get; set; }
     }
 }

@@ -21,7 +21,7 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({ isModalOpen, setIsModalOp
   const dispatch = useAppDispatch();
 
   const roleList = useAppSelector((state) => state.roleConfigState.roleGroup.$list.data);
-  const userList = useAppSelector((state) => state.userState.list);
+  const userList = useAppSelector((state) => state.userState.all.list);
 
   const [treeData, setTreeData] = useState<{ title: string; value: number; key: number }[]>([]);
   const [userData, setUserData] = useState<IUserView | null>(null);
@@ -43,7 +43,7 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({ isModalOpen, setIsModalOp
       setUserData(user);
 
       // Lấy danh sách role
-      dispatch(getListRole({ SkipCount: 0, MaxResultCount: 1000, Keyword: '' }));
+      dispatch(getListRole({ PageIndex: 0, PageSize: 1000, Keyword: '' }));
 
       // Lấy role hiện tại của user
       dispatch(getUserRolesByIdThunk(userId))

@@ -12,8 +12,9 @@ import { ReduxStatus } from '@redux/const';
 import { IColumn } from '@models/common/table.model';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
-import { getStatusName } from '@utils/status.helper';
 import { formatDateTimeView } from '@utils/index';
+import { DelegationStatusConst } from '../../consts/delegation-status.consts';
+import { ETableColumnType } from '@/constants/e-table.consts';
 
 const { TabPane } = Tabs;
 
@@ -25,11 +26,25 @@ const Page = () => {
 
   // Column cho logStatus
   const logStatusColumns: IColumn<ILogStatus>[] = [
-    { key: 'stt',fixed: 'left', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
-    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center',width:130 },
-    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left' },
-    { key: 'oldStatus', dataIndex: 'oldStatus', title: 'Trạng thái cũ', render: getStatusName ,width:120},
-    { key: 'newStatus', dataIndex: 'newStatus', title: 'Trạng thái mới', render: getStatusName,width:120 },
+    { key: 'stt', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
+    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center', width: 150 },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 200 },
+    {
+      key: 'oldStatus',
+      dataIndex: 'oldStatus',
+      title: 'Trạng thái cũ',
+      width: 160,
+      type: ETableColumnType.STATUS,
+      getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
+    },
+    {
+      key: 'newStatus',
+      dataIndex: 'newStatus',
+      title: 'Trạng thái mới',
+      width: 160,
+      type: ETableColumnType.STATUS,
+      getTagInfo: (val: number) => DelegationStatusConst.getTag(val)
+    },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
     {
       key: 'createdDate',
@@ -45,7 +60,7 @@ const Page = () => {
     { key: 'stt', fixed: 'left', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
     { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center',width:130 },
     { key: 'type', dataIndex: 'type', title: 'Loại', align: 'center' },
-    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left' },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 250 },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
     {
       key: 'createdDate',

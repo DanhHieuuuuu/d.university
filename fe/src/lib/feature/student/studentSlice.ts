@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IQueryStudent, IViewStudent, ICreateStudent, IUpdateStudent } from '@models/student/student.model';
+import { ISinhVien } from '@models/auth/sinhvien.model';
 import { StudentService } from '@services/student.service';
+import { sinhVienLogin, sinhVienRefreshToken, sinhVienLogout } from './studentThunk';
+import { setItem as setToken, clearToken } from '@utils/token-storage';
 import { ReduxStatus } from '@redux/const';
 
 export const getListStudent = createAsyncThunk('student/list', async (args: IQueryStudent) => {
@@ -12,14 +15,14 @@ export const getListStudent = createAsyncThunk('student/list', async (args: IQue
   }
 });
 
-export const getDetailStudent = createAsyncThunk('student/find', async (keyword: string) => {
-  try {
-    const res = await StudentService.find(keyword);
-    return res.data;
-  } catch (error: any) {
-    console.error(error);
-  }
-});
+// export const getDetailStudent = createAsyncThunk('student/find', async (keyword: string) => {
+//   try {
+//     const res = await StudentService.find(keyword);
+//     return res.data;
+//   } catch (error: any) {
+//     console.error(error);
+//   }
+// });
 
 export const createStudent = createAsyncThunk('student/create', async (body: ICreateStudent) => {
   try {
@@ -39,9 +42,9 @@ export const updateStudent = createAsyncThunk('student/update', async (body: Par
   }
 });
 
-export const deleteStudent = createAsyncThunk('student/delete', async (idStudent: number) => {
+export const deleteStudent = createAsyncThunk('student/delete', async (mssv: string) => {
   try {
-    const res = await StudentService.remove(idStudent);
+    const res = await StudentService.remove(mssv);
     return res.data;
   } catch (error: any) {
     console.error(error);
@@ -50,6 +53,14 @@ export const deleteStudent = createAsyncThunk('student/delete', async (idStudent
 
 interface StudentState {
   status: ReduxStatus;
+  // Authentication state
+  user: ISinhVien | null;
+  isAuthenticated: boolean;
+  $login: {
+    loading?: boolean;
+    data?: null;
+  };
+  // Student management state
   selected: {
     status: ReduxStatus;
     studentId: string | null;
@@ -69,6 +80,14 @@ interface StudentState {
 }
 const initialState: StudentState = {
   status: ReduxStatus.IDLE,
+  // Authentication state
+  user: null,
+  isAuthenticated: false,
+  $login: {
+    loading: false,
+    data: null
+  },
+  // Student management state
   selected: {
     status: ReduxStatus.IDLE,
     studentId: null,
@@ -94,6 +113,25 @@ const studentSlice = createSlice({
     studentSelected: (state: StudentState) => state.selected
   },
   reducers: {
+    // Authentication reducers
+    setSinhVien: (state, action: PayloadAction<Omit<StudentState, 'isAuthenticated'>>) => {
+      return {
+        ...state,
+        ...action.payload,
+        isAuthenticated: true
+      };
+    },
+    clearSinhVien: (state) => {
+      clearToken();
+      return {
+        ...initialState,
+        // Keep student management state
+        list: state.list,
+        total: state.total,
+        selected: state.selected
+      };
+    },
+    // Student management reducers
     selectStudentId: (state, action: PayloadAction<string>) => {
       state.selected.studentId = action.payload;
     },
@@ -106,6 +144,56 @@ const studentSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Authentication thunks
+      .addCase(sinhVienLogin.pending, (state) => {
+        state.$login.loading = true;
+      })
+      .addCase(sinhVienLogin.fulfilled, (state, action) => {
+        const { remember } = action.meta.arg;
+        const { data: result, code } = action.payload;
+
+        // save token
+        setToken({
+          accessToken: result.token,
+          refreshToken: result.refreshToken,
+          expiredAccessToken: result.expiredToken,
+          expiredRefreshToken: result.expiredRefreshToken,
+          remember
+        });
+
+        // update state
+        state.$login.loading = false;
+        state.user = result.user;
+        state.isAuthenticated = true;
+      })
+      .addCase(sinhVienLogin.rejected, (state) => {
+        state.$login.loading = false;
+      })
+      .addCase(sinhVienRefreshToken.pending, (state) => {
+        state.$login.loading = true;
+      })
+      .addCase(sinhVienRefreshToken.fulfilled, (state, action) => {
+        state.$login.loading = false;
+        const result = action.payload.data;
+
+        // always save as "remember" to ensure user doesn't get kicked out
+        setToken({
+          accessToken: result.token,
+          refreshToken: result.refreshToken,
+          expiredAccessToken: result.expiredToken,
+          expiredRefreshToken: result.expiredRefreshToken,
+          remember: true
+        });
+      })
+      .addCase(sinhVienRefreshToken.rejected, (state) => {
+        state.$login.loading = false;
+      })
+      .addCase(sinhVienLogout.fulfilled, (state) => {
+        clearToken();
+        state.user = null;
+        state.isAuthenticated = false;
+      })
+      // Student management thunks
       .addCase(getListStudent.pending, (state) => {
         state.status = ReduxStatus.LOADING;
       })
@@ -117,16 +205,16 @@ const studentSlice = createSlice({
       .addCase(getListStudent.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
-      .addCase(getDetailStudent.pending, (state) => {
-        state.selected.status = ReduxStatus.LOADING;
-      })
-      .addCase(getDetailStudent.fulfilled, (state, action: PayloadAction<any>) => {
-        state.selected.status = ReduxStatus.SUCCESS;
-        state.selected.data = action.payload;
-      })
-      .addCase(getDetailStudent.rejected, (state) => {
-        state.selected.status = ReduxStatus.FAILURE;
-      })
+      // .addCase(getDetailStudent.pending, (state) => {
+      //   state.selected.status = ReduxStatus.LOADING;
+      // })
+      // .addCase(getDetailStudent.fulfilled, (state, action: PayloadAction<any>) => {
+      //   state.selected.status = ReduxStatus.SUCCESS;
+      //   state.selected.data = action.payload;
+      // })
+      // .addCase(getDetailStudent.rejected, (state) => {
+      //   state.selected.status = ReduxStatus.FAILURE;
+      // })
       .addCase(createStudent.pending, (state) => {
         state.$create.status = ReduxStatus.LOADING;
       })
@@ -159,6 +247,6 @@ const studentSlice = createSlice({
 
 const studentReducer = studentSlice.reducer;
 
-export const { selectStudentId, clearSelected, resetStatusCreate } = studentSlice.actions;
+export const { setSinhVien, clearSinhVien, selectStudentId, clearSelected, resetStatusCreate } = studentSlice.actions;
 
 export default studentReducer;

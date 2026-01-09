@@ -12,6 +12,15 @@ export const getAllUser = createAsyncThunk('user/getAll', async (args: IQueryUse
   }
 });
 
+export const getAllUserByKpiRole = createAsyncThunk('user/getAllByKpiRole', async (args: IQueryUser) => {
+  try {
+    const res = await UserService.getAllByKpiRole(args);
+    return res.data;
+  } catch (error: any) {
+    console.error(error);
+  }
+});
+
 export const createUser = createAsyncThunk('user/create', async (body: IUserCreate) => {
   try {
     return await UserService.createUser(body);
@@ -60,8 +69,17 @@ export const changeStatusUserThunk = createAsyncThunk('user/changeStatus', async
 interface UserState {
   status: ReduxStatus;
   selected: IUserView | null;
-  list: IUserView[];
-  total: number;
+
+  all: {
+    list: IUserView[];
+    total: number;
+  };
+
+  byKpiRole: {
+    list: IUserView[];
+    total: number;
+  };
+
   $addRoles: {
     status: ReduxStatus;
   };
@@ -70,9 +88,20 @@ interface UserState {
 const initialState: UserState = {
   status: ReduxStatus.IDLE,
   selected: null,
-  list: [],
-  total: 0,
-  $addRoles: { status: ReduxStatus.IDLE }
+
+  all: {
+    list: [],
+    total: 0
+  },
+
+  byKpiRole: {
+    list: [],
+    total: 0
+  },
+
+  $addRoles: {
+    status: ReduxStatus.IDLE
+  }
 };
 
 const userSlice = createSlice({
@@ -90,15 +119,26 @@ const userSlice = createSlice({
       })
       .addCase(getAllUser.fulfilled, (state, action: PayloadAction<any>) => {
         state.status = ReduxStatus.SUCCESS;
-        state.list = action.payload?.items;
-        state.total = action.payload?.totalItem;
+        state.all.list = action.payload?.items;
+        state.all.total = action.payload?.totalItem;
       })
       .addCase(getAllUser.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
+      .addCase(getAllUserByKpiRole.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(getAllUserByKpiRole.fulfilled, (state, action: PayloadAction<any>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.byKpiRole.list = action.payload?.items;
+        state.byKpiRole.total = action.payload?.totalItem;
+      })
+      .addCase(getAllUserByKpiRole.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
       .addCase(createUser.fulfilled, (state, action: PayloadAction<any>) => {
         if (action.payload?.id) {
-          state.list.push(action.payload);
+          state.all.list.push(action.payload);
         }
       })
       .addCase(updateUser.pending, (state) => {
@@ -108,9 +148,9 @@ const userSlice = createSlice({
         state.status = ReduxStatus.SUCCESS;
         if (state.selected) {
           // Cập nhật list local
-          const index = state.list.findIndex((u) => u.id === state.selected?.id);
+          const index = state.all.list.findIndex((u) => u.id === state.selected?.id);
           if (index !== -1) {
-            state.list[index] = { ...state.list[index], email: action.meta.arg.Email ?? state.list[index].email };
+            state.all.list[index] = { ...state.all.list[index], email: action.meta.arg.Email ?? state.all.list[index].email };
           }
         }
       })
@@ -126,9 +166,9 @@ const userSlice = createSlice({
         state.$addRoles.status = ReduxStatus.SUCCESS;
         const { userId, roleIds, res } = action.payload;
         if (res.status === 1) {
-          const index = state.list.findIndex((u) => u.id === userId);
+          const index = state.all.list.findIndex((u) => u.id === userId);
           if (index !== -1) {
-            state.list[index] = { ...state.list[index], roleIds };
+            state.all.list[index] = { ...state.all.list[index], roleIds };
           }
           if (state.selected?.id === userId) {
             state.selected.roleIds = roleIds;
@@ -145,9 +185,9 @@ const userSlice = createSlice({
       .addCase(getUserRolesByIdThunk.fulfilled, (state, action) => {
         state.status = ReduxStatus.SUCCESS;
         const { userId, roleIds } = action.payload?.data ?? {};
-        const index = state.list.findIndex((u) => u.id === userId);
+        const index = state.all.list.findIndex((u) => u.id === userId);
         if (index !== -1) {
-          state.list[index] = { ...state.list[index], roleIds };
+          state.all.list[index] = { ...state.all.list[index], roleIds };
         }
         if (state.selected && state.selected.id === userId) {
           state.selected = { ...state.selected, roleIds };
@@ -164,9 +204,9 @@ const userSlice = createSlice({
         const { userId, newStatus } = action.payload;
         const newTrangThai = newStatus ? 'Đang hoạt động' : 'Vô hiệu hóa';
 
-        const index = state.list.findIndex((u) => u.id === userId);
+        const index = state.all.list.findIndex((u) => u.id === userId);
         if (index !== -1) {
-          state.list[index] = { ...state.list[index], trangThai: newTrangThai };
+          state.all.list[index] = { ...state.all.list[index], trangThai: newTrangThai };
         }
         if (state.selected?.id === userId) {
           state.selected.trangThai = newTrangThai;

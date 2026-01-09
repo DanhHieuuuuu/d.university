@@ -25,8 +25,8 @@ import EditUserModal from './(dialog)/edit';
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { list, status, total: totalItem } = useAppSelector((state) => state.userState);
-
+  const { list, total } = useAppSelector((state) => state.userState.all);
+  const status = useAppSelector((state) => state.userState.status);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [openUserRoleModal, setOpenUserRoleModal] = useState(false);
@@ -149,7 +149,7 @@ const Page = () => {
   ];
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryUser>({
-    total: totalItem,
+    total: total,
     initialQuery: {
       PageIndex: 1,
       PageSize: 10,

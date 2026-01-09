@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Core;
+using d.Shared.Permission.Auth;
 using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
 using D.Core.Domain.Entities.Survey;
@@ -55,6 +56,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                             Id = s.Id,
                             MaKhaoSat = s.MaKhaoSat,
                             TenKhaoSat = s.TenKhaoSat,
+                            MoTa = s.MoTa,
                             ThoiGianBatDau = s.ThoiGianBatDau,
                             ThoiGianKetThuc = s.ThoiGianKetThuc,
                             Status = s.Status,
@@ -90,38 +92,6 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             return _mapper.Map<SurveyDetailDto>(entity);
         }
 
-        //public async Task CreateSurveyFromRequestAsync(int requestId)
-        //{
-        //    _logger.LogInformation($"{nameof(CreateSurveyFromRequestAsync)} method called, dto: {JsonSerializer.Serialize(requestId)}.");
-
-        //    using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-        //    var request = _unitOfWork.iKsSurveyRequestRepository.FindById(requestId);
-        //    if (request == null) throw new Exception("Không tìm thấy yêu cầu gốc.");
-
-        //    var exists = await _unitOfWork.iKsSurveyRepository.TableNoTracking
-        //        .AnyAsync(x => x.IdYeuCau == requestId);
-        //    if (exists) return;
-
-        //    var survey = new KsSurvey
-        //    {
-        //        IdYeuCau = request.Id,
-        //        MaKhaoSat = request.MaYeuCau,
-        //        TenKhaoSat = request.TenKhaoSatYeuCau,
-        //        MoTa = request.MoTa,
-        //        ThoiGianBatDau = request.ThoiGianBatDau,
-        //        ThoiGianKetThuc = request.ThoiGianKetThuc,
-        //        IdPhongBan = request.IdPhongBan,
-        //        Status = SurveyStatus.Close,
-        //        CreatedDate = DateTime.Now,
-        //        CreatedBy = CommonUntil.GetCurrentUserId(_httpContextAccessor).ToString()
-        //    };
-
-        //    await _unitOfWork.iKsSurveyRepository.AddAsync(survey);
-        //    await _unitOfWork.SaveChangesAsync();
-
-        //    await LogActionAsync(survey.MaKhaoSat, "Create", "Khởi tạo khảo sát", null, "Close");
-        //}
         public async Task CreateSurveyFromRequestAsync(int requestId)
         {
             _logger.LogInformation($"{nameof(CreateSurveyFromRequestAsync)} method called, dto: {JsonSerializer.Serialize(requestId)}.");
@@ -229,18 +199,86 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             await _unitOfWork.iKsSurveyLogRepository.AddAsync(log);
         }
 
+        //public async Task<PageResultDto<SurveyResponseDto>> GetMySurveysAsync(FilterMySurveyDto dto)
+        //{
+        //    _logger.LogInformation($"{nameof(GetMySurveysAsync)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+
+        //    var userId = CommonUntil.GetCurrentUserId(_httpContextAccessor);
+
+        //    var user = await _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefaultAsync(u => u.Id == userId);
+        //    if (user == null) throw new Exception("Không tìm thấy thông tin người dùng.");
+
+        //    var query = _unitOfWork.iKsSurveyRepository.TableNoTracking
+        //        .Include(s => s.SurveyRequest)
+        //            .ThenInclude(r => r.Targets)
+        //        .Where(s => s.Status == SurveyStatus.Open);
+
+        //    if (!string.IsNullOrEmpty(dto.Keyword))
+        //    {
+        //        query = query.Where(s => s.TenKhaoSat.Contains(dto.Keyword) || s.MaKhaoSat.Contains(dto.Keyword));
+        //    }
+
+        //    var allOpenSurveys = await query.ToListAsync();
+
+        //    var validSurveys = allOpenSurveys.Where(s =>
+        //    {
+        //        var targets = s.SurveyRequest.Targets;
+        //        if (targets == null || !targets.Any()) return true; // Không target = All
+
+        //        foreach (var t in targets)
+        //        {
+        //            if (t.LoaiDoiTuong == SurveyTarget.All) return true;
+        //            if (t.LoaiDoiTuong == SurveyTarget.Lecturer)
+        //            {
+        //                bool matchPhongBan = (t.IdPhongBan == null) || (t.IdPhongBan == user.HienTaiPhongBan);
+        //                if (matchPhongBan) return true;
+        //            }
+        //            // TODO: Check Student
+        //        }
+        //        return false;
+        //    }).ToList();
+
+        //    var total = validSurveys.Count();
+        //    var items = validSurveys.Skip((dto.PageIndex - 1) * dto.PageSize).Take(dto.PageSize).ToList();
+
+        //    return new PageResultDto<SurveyResponseDto>
+        //    {
+        //        Items = _mapper.Map<List<SurveyResponseDto>>(items),
+        //        TotalItem = total,
+        //    };
+        //}
+
         public async Task<PageResultDto<SurveyResponseDto>> GetMySurveysAsync(FilterMySurveyDto dto)
         {
-            _logger.LogInformation($"{nameof(GetMySurveysAsync)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+            _logger.LogInformation($"{nameof(GetMySurveysAsync)} method called.");
 
             var userId = CommonUntil.GetCurrentUserId(_httpContextAccessor);
+            var userType = CommonUntil.GetCurrentUserType(_httpContextAccessor);
 
-            var user = await _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) throw new Exception("Không tìm thấy thông tin người dùng.");
+            int? uPhongBan = null;
+            int? uKhoa = null;
+            int? uKhoaHoc = null;
+
+            if (userType == UserTypeConstant.STUDENT)
+            {
+                var sv = await _unitOfWork.iSvSinhVienRepository.TableNoTracking
+                    .FirstOrDefaultAsync(x => x.Id == userId);
+                if (sv == null) throw new Exception("Không tìm thấy thông tin sinh viên.");
+
+                uKhoa = sv.Khoa;
+                uKhoaHoc = sv.KhoaHoc;
+            }
+            else
+            {
+                var ns = await _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                    .FirstOrDefaultAsync(x => x.Id == userId);
+                if (ns == null) throw new Exception("Không tìm thấy thông tin nhân sự.");
+
+                uPhongBan = ns.HienTaiPhongBan;
+            }
 
             var query = _unitOfWork.iKsSurveyRepository.TableNoTracking
                 .Include(s => s.SurveyRequest)
-                    .ThenInclude(r => r.Targets)
                 .Where(s => s.Status == SurveyStatus.Open);
 
             if (!string.IsNullOrEmpty(dto.Keyword))
@@ -248,28 +286,31 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                 query = query.Where(s => s.TenKhaoSat.Contains(dto.Keyword) || s.MaKhaoSat.Contains(dto.Keyword));
             }
 
-            var allOpenSurveys = await query.ToListAsync();
+            query = query.Where(s =>
+                !s.SurveyRequest.Targets.Any() ||
+                s.SurveyRequest.Targets.Any(t =>
+                    t.LoaiDoiTuong == SurveyTarget.All ||
+                    (
+                        userType != UserTypeConstant.STUDENT &&
+                        t.LoaiDoiTuong == SurveyTarget.Lecturer &&
+                        (t.IdPhongBan == null || t.IdPhongBan == uPhongBan)
+                    ) ||
+                    (
+                        userType == UserTypeConstant.STUDENT &&
+                        t.LoaiDoiTuong == SurveyTarget.Student &&
+                        (t.IdKhoa == null || t.IdKhoa == uKhoa) &&
+                        (t.IdKhoaHoc == null || t.IdKhoaHoc == uKhoaHoc)
+                    )
+                )
+            );
 
-            var validSurveys = allOpenSurveys.Where(s =>
-            {
-                var targets = s.SurveyRequest.Targets;
-                if (targets == null || !targets.Any()) return true; // Không target = All
+            var total = await query.CountAsync();
 
-                foreach (var t in targets)
-                {
-                    if (t.LoaiDoiTuong == SurveyTarget.All) return true;
-                    if (t.LoaiDoiTuong == SurveyTarget.Lecturer)
-                    {
-                        bool matchPhongBan = (t.IdPhongBan == null) || (t.IdPhongBan == user.HienTaiPhongBan);
-                        if (matchPhongBan) return true;
-                    }
-                    // TODO: Check Student
-                }
-                return false;
-            }).ToList();
-
-            var total = validSurveys.Count();
-            var items = validSurveys.Skip((dto.PageIndex - 1) * dto.PageSize).Take(dto.PageSize).ToList();
+            var items = await query
+                .OrderByDescending(s => s.Id)
+                .Skip((dto.PageIndex - 1) * dto.PageSize)
+                .Take(dto.PageSize)
+                .ToListAsync();
 
             return new PageResultDto<SurveyResponseDto>
             {
@@ -283,6 +324,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             _logger.LogInformation($"{nameof(StartSurveyAsync)} method called. Dto: {surveyId}");
 
             var userId = CommonUntil.GetCurrentUserId(_httpContextAccessor);
+            var userType = CommonUntil.GetCurrentUserType(_httpContextAccessor);
 
             var submission = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
                 .FirstOrDefaultAsync(x => x.IdKhaoSat == surveyId && x.IdNguoiDung == userId);
@@ -292,11 +334,60 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                 throw new Exception("Bạn đã hoàn thành khảo sát này.");
             }
 
-            var surveyEntity = _unitOfWork.iKsSurveyRepository.FindById(surveyId);
+            int? uPhongBan = null;
+            int? uKhoa = null;
+            int? uKhoaHoc = null;
+            int? uNganh = null;
+
+            if (userType == UserTypeConstant.STUDENT)
+            {
+                var sv = await _unitOfWork.iSvSinhVienRepository.TableNoTracking.FirstOrDefaultAsync(x => x.Id == userId);
+                if (sv == null) throw new Exception("Không tìm thấy thông tin sinh viên.");
+                uKhoa = sv.Khoa;
+                uKhoaHoc = sv.KhoaHoc;
+                uNganh = sv.Nganh;
+            }
+            else
+            {
+                var ns = await _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefaultAsync(x => x.Id == userId);
+                if (ns == null) throw new Exception("Không tìm thấy thông tin nhân sự.");
+                uPhongBan = ns.HienTaiPhongBan;
+            }
+
+            var surveyEntity = await _unitOfWork.iKsSurveyRepository.TableNoTracking
+                .Include(x => x.SurveyRequest).ThenInclude(r => r.Targets) 
+                .FirstOrDefaultAsync(x => x.Id == surveyId);
             if (surveyEntity == null) throw new Exception("Khảo sát không tồn tại.");
+
             if (surveyEntity.ThoiGianKetThuc < DateTime.Now)            
                 throw new Exception("Đợt khảo sát đã kết thúc, bạn không thể thực hiện hành động này.");
-            
+
+            var targets = surveyEntity.SurveyRequest.Targets;
+            if (targets != null && targets.Any())
+            {
+                bool isAllowed = targets.Any(t =>
+                    t.LoaiDoiTuong == SurveyTarget.All
+                    ||
+                    (
+                        userType != UserTypeConstant.STUDENT &&
+                        t.LoaiDoiTuong == SurveyTarget.Lecturer &&
+                        (t.IdPhongBan == null || t.IdPhongBan == uPhongBan)
+                    )
+                    ||
+                    (
+                        userType == UserTypeConstant.STUDENT &&
+                        t.LoaiDoiTuong == SurveyTarget.Student &&
+                        (t.IdKhoa == null || t.IdKhoa == uKhoa) &&
+                        (t.IdKhoaHoc == null || t.IdKhoaHoc == uKhoaHoc)
+                    )
+                );
+
+                if (!isAllowed)
+                {
+                    throw new Exception("Bạn không thuộc đối tượng tham gia khảo sát này.");
+                }
+            }
+
             var questionsEntities = await _unitOfWork.iKsSurveyRequestRepository
                 .GetQuestionsByRequestIdAsync(surveyEntity.IdYeuCau);
 

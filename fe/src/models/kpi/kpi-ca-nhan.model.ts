@@ -5,31 +5,36 @@ export type IQueryKpiCaNhan = IQueryPaging & {
   idNhanSu?: number,
   loaiKpi?: number,
   namHoc?: string,
-  phongBan?: string ,
-  trangThai?:string,
-  idPhongBan?:number,
-  chucVu?:string,
-  role?:string,
+  phongBan?: string,
+  trangThai?: string,
+  idPhongBan?: number,
+  chucVu?: string,
+  role?: string,
 };
 
 export type IViewKpiCaNhan = {
-    id: number,
-    kpi: string,
-    mucTieu: string,
-    trongSo: string,
-    loaiKpi: number,
-    namHoc?: string,
-    nhanSu: string,
-    idNhanSu?: number,
-    trangThai: number,
-    phongBan?:string,
-    ketQuaThucTe?: number,
-    loaiCongThuc?:LoaiCongThuc
-    role?: string,
-    linhVuc?: string,
-    diemKpi?: number,
-    capTrenDanhGia?: number,
-    diemKpiCapTren?: number,
+  id: number,
+  kpi: string,
+  mucTieu: string,
+  trongSo: string,
+  loaiKpi: number,
+  namHoc?: string,
+  nhanSu: string,
+  idNhanSu?: number,
+  trangThai: number,
+  phongBan?: string,
+  ketQuaThucTe?: number,
+  diemKpi?: number; 
+  capTrenDanhGia?: number,
+  diemKpiCapTren?: number,
+  loaiKetQua?: LoaiCongThuc;
+  isActive?: number,
+  role?: string,
+  ghiChu?: string,
+  congThuc?:string;
+  linhVuc?: string,
+  chienLuoc?: string,
+  isCaNhanKeKhai?: boolean,
 };
 
 export type ICreateKpiCaNhan = {
@@ -62,7 +67,7 @@ export type IViewListRole = {
 export type IUpdateKpiCaNhanThucTe = {
   id: number,
   ketQuaThucTe?: number,
-  diemKpi?:number
+  diemKpi?: number
 };
 export interface IUpdateKpiCaNhanThucTeList {
   items: IUpdateKpiCaNhanThucTe[],
@@ -71,7 +76,7 @@ export interface IUpdateKpiCaNhanThucTeList {
 export type IUpdateCapTrenDanhGia = {
   id: number,
   ketQuaCapTren?: number,
-  diemKpiCapTren?:number
+  diemKpiCapTren?: number
 };
 export interface IUpdateCapTrenDanhGiaList {
   items: IUpdateCapTrenDanhGia[],
@@ -84,7 +89,7 @@ export interface IViewNhanSu {
   hoTenDayDu?: string,
   idnhanSu?: number,
   tenPhongBan?: string,
-  hienTaiPhongBan?:number,
-  maNhanSu?:string,
-  tenHienThi?:string,
+  hienTaiPhongBan?: number,
+  maNhanSu?: string,
+  tenHienThi?: string,
 };

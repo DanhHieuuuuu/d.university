@@ -33,7 +33,6 @@ export type IViewNhanSu = {
 };
 
 export type ICreateNhanSu = {
-  maNhanSu?: string;
   hoDem?: string;
   ten?: string;
   ngaySinh?: Date;
@@ -51,35 +50,8 @@ export type ICreateNhanSu = {
   email?: string;
   khanCapSoDienThoai?: string;
   khanCapNguoiLienHe?: string;
-  maSoThue?: string;
-  tenNganHang1?: string;
-  atm1?: string;
-  tenNganHang2?: string;
-  atm2?: string;
   thongTinGiaDinh?: ICreateNsQuanHe[];
   chieuCao?: number;
   canNang?: number;
   nhomMau?: string;
-};
-
-export type ICreateHopDongNs = {
-  soHopDong?: string;
-  idLoaiHopDong?: number;
-  ngayKyKet?: Date;
-  kyLan1?: Date;
-  kyLan2?: Date;
-  kyLan3?: Date;
-  ngayBatDauThuViec?: Date;
-  ngayKetThucThuViec?: Date;
-  hopDongCoThoiHanTuNgay?: Date;
-  hopDongCoThoiHanDenNgay?: Date;
-  luongCoBan?: number;
-  idToBoMon?: number;
-  idPhongBan?: number;
-  idChucVu?: number;
-  ghiChu?: string;
-  idNhanSu?: number;
-  thongTinNhanSu?: ICreateNhanSu;
-  currency: string | null;
-  payFrequency: string | null;
 };

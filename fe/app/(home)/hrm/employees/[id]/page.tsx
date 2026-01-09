@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Breadcrumb, Card, Empty, Typography } from 'antd';
+import { Breadcrumb, Card, Empty } from 'antd';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { formatDateView } from '@utils/index';
 
@@ -32,11 +32,17 @@ const Page = ({ params }: { params: { id: string } }) => {
   const nhansu = useAppSelector(selectedNhanSu);
   const status = useAppSelector(selectedNhanSuStatus);
 
+  useEffect(() => {
+    if (!Number.isNaN(idNhanSu)) {
+      dispatch(getHoSoNhanSu(Number.parseInt(idNhanSu)));
+    }
+  }, [dispatch, idNhanSu]);
+
   if (status === ReduxStatus.LOADING) {
     return <HoSoNhanSuLoading />;
   }
 
-  if (!nhansu) {
+  if (status === ReduxStatus.FAILURE || !nhansu) {
     return <Empty description="Không tìm thấy nhân sự" />;
   }
 
@@ -44,9 +50,9 @@ const Page = ({ params }: { params: { id: string } }) => {
     <div className="ho-so-ns-page">
       <Breadcrumb separator=">" items={breadcrumbItems} />
       <div className="content">
-        <Typography.Title level={3} className="header">
+        <p className="header">
           Mẫu - Hồ sơ nhân sự
-        </Typography.Title>
+        </p>
         <div className="container">
           <Card title="Thông tin cá nhân">
             <div className="grid grid-cols-4 gap-4">

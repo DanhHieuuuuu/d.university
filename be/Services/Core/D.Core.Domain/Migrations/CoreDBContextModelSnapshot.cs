@@ -3782,6 +3782,9 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("CapTrenDanhGia")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ChienLuoc")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CongThucTinh")
                         .HasColumnType("nvarchar(max)");
 
@@ -3811,11 +3814,21 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("DiemKpiCapTren")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("GhiChu")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int?>("IdCongThuc")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdKpiDonVi")
                         .HasColumnType("int");
 
                     b.Property<int>("IdNhanSu")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("IsCaNhanKeKhai")
+                        .HasColumnType("bit");
 
                     b.Property<string>("KPI")
                         .HasMaxLength(500)
@@ -3827,11 +3840,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("LinhVuc")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LoaiCongThuc")
-                        .HasColumnType("int");
-
                     b.Property<int?>("LoaiKPI")
                         .HasColumnType("int");
+
+                    b.Property<string>("LoaiKetQua")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
@@ -3855,9 +3868,6 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
-
-                    b.Property<string>("ThamSoCongThuc")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TrongSo")
                         .HasMaxLength(255)
@@ -3911,11 +3921,22 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("DiemKpiCapTren")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("GhiChu")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int?>("IdCongThuc")
+                        .HasMaxLength(255)
+                        .HasColumnType("int");
+
                     b.Property<int?>("IdDonVi")
                         .HasColumnType("int");
 
                     b.Property<int?>("IdKpiTruong")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("IsKeKhai")
+                        .HasColumnType("bit");
 
                     b.Property<decimal?>("KetQuaThucTe")
                         .HasColumnType("decimal(18,2)");
@@ -3924,8 +3945,8 @@ namespace D.Core.Domain.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("LoaiCongThuc")
-                        .HasColumnType("int");
+                    b.Property<string>("LoaiKetQua")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("LoaiKpi")
                         .HasColumnType("int");
@@ -3944,9 +3965,6 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("NamHoc")
                         .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
-
-                    b.Property<string>("ThamSoCongThuc")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("TrangThai")
                         .HasColumnType("int");
@@ -4142,6 +4160,9 @@ namespace D.Core.Domain.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("CapTrenDanhGia")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("ChienLuoc")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -4172,6 +4193,15 @@ namespace D.Core.Domain.Migrations
                     b.Property<decimal?>("DiemKpi")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal?>("DiemKpiCapTren")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("IdCongThuc")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsKeKhai")
+                        .HasColumnType("bit");
+
                     b.Property<decimal?>("KetQuaThucTe")
                         .HasColumnType("decimal(18,2)");
 
@@ -4183,8 +4213,9 @@ namespace D.Core.Domain.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int?>("LoaiCongThuc")
-                        .HasColumnType("int");
+                    b.Property<string>("LoaiKetQua")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int?>("LoaiKpi")
                         .HasColumnType("int");
@@ -4226,6 +4257,9 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ChuyenNganh")
+                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
