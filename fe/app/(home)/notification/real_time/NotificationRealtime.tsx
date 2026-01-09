@@ -5,6 +5,7 @@ import { message } from 'antd';
 import { useAppDispatch } from '@redux/hooks';
 import { $fetchNotification } from '@redux/feature/noticeSlice';
 import connection from '@services/delegation/notificationHub.service';
+import * as signalR from '@microsoft/signalr';
 
 export default function NotificationRealtime() {
      console.log('🔥 NotificationRealtime mounted');
@@ -13,6 +14,7 @@ export default function NotificationRealtime() {
 useEffect(() => {
   async function start() {
     try {
+      debugger
       console.log('Current connection state:', connection.state);
 
       // Luôn đăng ký event, để chắc chắn nhận thông báo
@@ -23,7 +25,7 @@ useEffect(() => {
         dispatch($fetchNotification({ PageIndex: 0, PageSize: 10 }));
       });
 
-      if (connection.state !== 'Connected') {
+      if (connection.state !== signalR.HubConnectionState.Connected) {
         await connection.start();
         console.log('SignalR connected');
       }
@@ -37,7 +39,7 @@ useEffect(() => {
   return () => {
     connection.off('ReceiveNotification');
   };
-}, []);
+}, [dispatch]);
 
   return null;
 }
