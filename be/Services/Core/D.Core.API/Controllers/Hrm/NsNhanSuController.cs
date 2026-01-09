@@ -5,6 +5,7 @@ using d.Shared.Permission;
 using d.Shared.Permission.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using D.Core.Domain.Dtos.Hrm.HopDong;
 
 namespace D.Core.API.Controllers.Hrm
 {
@@ -79,26 +80,6 @@ namespace D.Core.API.Controllers.Hrm
         }
 
         /// <summary>
-        /// Tạo hợp đồng
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateNhanSu)]
-        [HttpPost("create-hd")]
-        public async Task<ResponseAPI> CreateHopDong(CreateHopDongDto dto)
-        {
-            try
-            {
-                await _mediator.Send(dto);
-                return new();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
-
-        /// <summary>
         /// Lấy thông tin nhân sự bằng số điện thoại, mã nhân sự
         /// </summary>
         /// <param name="dto"></param>
@@ -159,5 +140,40 @@ namespace D.Core.API.Controllers.Hrm
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Tạo hợp đồng
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateNhanSu)]
+        [HttpPost("contract/create")]
+        public async Task<ResponseAPI> CreateHopDong(CreateHopDongDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpGet("contract/find")]
+        public async Task<ResponseAPI> GetAllContract(NsHopDongRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 using AutoMapper;
+using D.Auth.Domain.Entities;
+using D.Constants.Core.Hrm;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
+using D.Core.Domain.Dtos.Hrm.QuyetDinh;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.DomainBase.Dto;
@@ -19,16 +21,19 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
     public class NsNhanSuService : ServiceBase, INsNhanSuService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
+        private readonly INsDecisionService _decisionService;
 
         public NsNhanSuService(
             ILogger<NsNhanSuService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            INsDecisionService decisionService
         )
             : base(logger, httpContext, mapper)
         {
             _unitOfWork = unitOfWork;
+            _decisionService = decisionService;
         }
 
         #region Public API
@@ -198,8 +203,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"{nameof(CreateNhanSu)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            ValidateMaNhanSu(dto.MaNhanSu!);
-
             // Tạo entity nhân sự
             var newNhanSu = CreateNewNhanSu(dto);
 
@@ -212,56 +215,37 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             return _mapper.Map<NsNhanSuResponseDto>(newNhanSu);
         }
 
-        public void CreateHopDong(CreateHopDongDto dto)
+        public void UpdateThongTinCongViec(UpdateNhanSuCongViecDto dto)
         {
             _logger.LogInformation(
-                $"Method {nameof(CreateHopDong)} called. Dto: {JsonSerializer.Serialize(dto)}"
+                $"{nameof(UpdateNhanSuCongViecDto)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            // Tạo hợp đồng
-            var newHd = _mapper.Map<NsHopDong>(dto);
-            _unitOfWork.iNsHopDongRepository.Add(newHd);
-            _unitOfWork.iNsHopDongRepository.SaveChange();
-
-            if (dto.ThongTinNhanSu == null)
-                return;
-
-            // Tạo nhân sự kèm theo
-            var newNhanSuDto = dto.ThongTinNhanSu;
-            var newNhanSu = CreateNhanSu(newNhanSuDto);
-
-            // Lấy HsChucVu
-            var hsChucVu = _unitOfWork.iDmChucVuRepository.FindById(dto.IdChucVu)?.HsChucVu;
-
-            //var chiTietHopDong = new NsQuaTrinhCongTac
-            //{
-            //    IdHopDong = newHd.Id,
-            //    IdNhanSu = newNhanSu.IdNhanSu,
-            //    MaNhanSu = newNhanSu.MaNhanSu,
-            //    IdChucVu = dto.IdChucVu,
-            //    IdPhongBan = dto.IdPhongBan,
-            //    IdToBoMon = dto.IdToBoMon,
-            //    LuongCoBan = dto.LuongCoBan,
-            //    HsChucVu = hsChucVu,
-            //    GhiChu = dto.GhiChu,
-            //};
-
-            newHd.IdNhanSu = newNhanSu.IdNhanSu;
-
-            // Update nhân sự: chỉ update 2 field nếu cần
             var nhansu = _unitOfWork.iNsNhanSuRepository.Table.FirstOrDefault(x =>
-                x.Id == newNhanSu.IdNhanSu
+                dto.IdNhanSu == x.Id
             );
-            if (nhansu != null)
+
+            if (nhansu == null)
             {
-                nhansu.HienTaiChucVu = dto.IdChucVu;
-                nhansu.HienTaiPhongBan = dto.IdPhongBan;
+                throw new UserFriendlyException(
+                    ErrorCodeConstant.CodeNotFound,
+                    $"Không tìm thấy nhân sự với Id: {dto.IdNhanSu}"
+                );
+            }
+            else
+            {
+                nhansu.MaNhanSu = dto.MaNhanSu;
+                nhansu.MaSoThue = dto.MaSoThue;
+                nhansu.TenNganHang1 = dto.TenNganHang1;
+                nhansu.TenNganHang2 = dto.TenNganHang2;
+                nhansu.Atm1 = dto.Atm1;
+                nhansu.Atm2 = dto.Atm2;
+                nhansu.HienTaiChucVu = dto.HienTaiChucVu;
+                nhansu.HienTaiPhongBan = dto.HienTaiPhongBan;
+
                 _unitOfWork.iNsNhanSuRepository.Update(nhansu);
                 _unitOfWork.iNsNhanSuRepository.SaveChange();
             }
-
-            //_unitOfWork.iNsHopDongChiTietRepository.Add(chiTietHopDong);
-            //_unitOfWork.iNsHopDongChiTietRepository.SaveChange();
         }
 
         public NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto)
@@ -378,7 +362,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     ? cvName
                     : null;
 
-
             result.ThongTinGiaDinh = GetThongTinGiaDinh(idNhanSu);
 
             return result;
@@ -388,16 +371,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         #region Private helpers
 
-        private void ValidateMaNhanSu(string maNhanSu)
-        {
-            if (_unitOfWork.iNsNhanSuRepository.IsMaNhanSuExist(maNhanSu))
-            {
-                throw new UserFriendlyException(
-                    ErrorCodeConstant.UserExists,
-                    "Đã tồn tại mã nhân sự này trong CSDL. Vui lòng nhập mã khác."
-                );
-            }
-        }
 
         // chỉ thêm mới thông tin nhân sự
         private NsNhanSuEntity CreateNewNhanSu(CreateNhanSuDto dto)

@@ -11,7 +11,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         PageResultDto<NsNhanSuGetAllResponseDto> GetAllNhanSu(NsNhanSuGetAllRequestDto dto);
         void CreateGiaDinhNhanSu(int idNhanSu, CreateNsQuanHeGiaDinhDto dto);
         NsNhanSuResponseDto CreateNhanSu(CreateNhanSuDto dto);
-        void CreateHopDong(CreateHopDongDto dto);
+        void UpdateThongTinCongViec(UpdateNhanSuCongViecDto dto);
         NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto);
         NsNhanSuFindByIdResponseDto FindById(int idNhanSu);
         NsNhanSuHoSoChiTietResponseDto HoSoChiTietNhanSu(int idNhanSu);

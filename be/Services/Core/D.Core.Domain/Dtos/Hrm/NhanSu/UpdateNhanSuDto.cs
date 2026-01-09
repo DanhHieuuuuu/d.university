@@ -1,10 +1,16 @@
-﻿using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using D.DomainBase.Common;
 
 namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {
-    public class CreateNhanSuDto : ICommand<NsNhanSuResponseDto>
+    public class UpdateNhanSuDto : ICommand<NsNhanSuResponseDto>
     {
+        public int? IdNhanSu { get; set; }
+
         // Thông tin cá nhân
         public string? HoDem { get; set; }
         public string? Ten { get; set; }
@@ -23,7 +29,8 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? Email { get; set; }
         public string? KhanCapSoDienThoai { get; set; }
         public string? KhanCapNguoiLienHe { get; set; }
-        public List<CreateNsQuanHeGiaDinhDto>? ThongTinGiaDinh { get; set; }        
+
+        //public List<CreateNsQuanHeGiaDinhDto>? ThongTinGiaDinh { get; set; }
 
         // Thông tin sức khỏe
         public decimal? ChieuCao { get; set; }

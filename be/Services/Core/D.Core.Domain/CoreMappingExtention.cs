@@ -42,6 +42,8 @@ using D.Core.Domain.Entities.SinhVien;
 using D.Core.Domain.Entities.Survey;
 using D.Core.Domain.Entities.Survey.Constants;
 using System.Reflection;
+using D.Core.Domain.Dtos.Hrm.HopDong;
+using D.Core.Domain.Dtos.Hrm.QuyetDinh;
 
 namespace D.Core.Domain
 {
@@ -69,8 +71,7 @@ namespace D.Core.Domain
             CreateMap<CreateDmToBoMonDto, DmToBoMon>();
             CreateMap<CreateDmKhoaHocDto, DmKhoaHoc>();
             CreateMap<DmKhoaHoc, DmKhoaHocResponseDto>();
-
-            CreateMap<CreateHopDongDto, NsHopDong>();
+                        
             CreateMap<NsNhanSu, NsNhanSuResponseDto>()
                 .ForMember(dest => dest.IdNhanSu, options => options.MapFrom(src => src.Id))
                 .ForMember(
@@ -113,6 +114,11 @@ namespace D.Core.Domain
                             )
                         )
                 );
+
+            CreateMap<CreateHopDongDto, NsHopDong>();
+            CreateMap<NsHopDong, NsHopDongResponseDto>();
+
+            CreateMap<NsQuyetDinh, NsQuyetDinhResponseDto>();
 
             #endregion
 
