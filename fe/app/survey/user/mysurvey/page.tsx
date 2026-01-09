@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Button, Card, Empty, Tag, Spin, Row, Col, Input } from 'antd';
+import { Button, Card, Empty, Tag, Spin, Row, Col, Input, Select } from 'antd';
 import { SearchOutlined, PlayCircleOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { SurveyService } from '@services/survey.service';
@@ -83,13 +83,27 @@ const Page = () => {
         title={
           <div className="flex items-center justify-between">
             <span className="text-xl font-semibold">Khảo sát của tôi</span>
-            <Search
-              placeholder="Tìm kiếm khảo sát..."
-              allowClear
-              style={{ width: 300 }}
-              onSearch={(value) => setQuery({ ...query, Keyword: value, PageIndex: 1 })}
-              prefix={<SearchOutlined />}
-            />
+            <div className="flex gap-3">
+              <Select
+                placeholder="Lọc theo trạng thái"
+                allowClear
+                style={{ width: 200 }}
+                onChange={(value) => setQuery({ ...query, status: value, PageIndex: 1 })}
+                options={[
+                  { label: 'Tất cả', value: undefined },
+                  { label: 'Đang mở', value: surveyStatusConst.OPEN },
+                  { label: 'Đã đóng', value: surveyStatusConst.CLOSE },
+                  { label: 'Hoàn thành', value: surveyStatusConst.COMPLETE }
+                ]}
+              />
+              <Search
+                placeholder="Tìm kiếm khảo sát..."
+                allowClear
+                style={{ width: 300 }}
+                onSearch={(value) => setQuery({ ...query, Keyword: value, PageIndex: 1 })}
+                prefix={<SearchOutlined />}
+              />
+            </div>
           </div>
         }
       >

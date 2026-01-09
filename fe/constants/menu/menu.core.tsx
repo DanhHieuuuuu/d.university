@@ -207,6 +207,11 @@ export const listMenuCore: IMenu[] = [
         icon: <InboxOutlined />,      
       },
       {
+        label: 'Quản lý yêu cầu',
+        routerLink: '/survey/manage/request-manage',
+        icon: <InboxOutlined />,      
+      },
+      {
         label: 'Danh sách khảo sát',
         routerLink: '/survey/manage/surveys',
         icon: <FileTextOutlined />

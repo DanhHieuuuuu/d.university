@@ -38,6 +38,29 @@ namespace d.Shared.Permission.Permission
             #endregion
 
             #region Survey - Khảo sát
+            { PermissionCoreKeys.CoreMenuKhaoSat, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreMenuKhaoSat, PermissionName = "Quản lý khảo sát", ParentKey = null } },
+
+            // Request 
+            { PermissionCoreKeys.SurveyMenuRequest, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyMenuRequest, PermissionName = "Danh sách yêu cầu", ParentKey = PermissionCoreKeys.CoreMenuKhaoSat } },
+            { PermissionCoreKeys.SurveyButtonRequestCreate, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonRequestCreate, PermissionName = "Tạo yêu cầu", ParentKey = PermissionCoreKeys.SurveyMenuRequest } },
+            { PermissionCoreKeys.SurveyButtonRequestUpdate, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonRequestUpdate, PermissionName = "Sửa yêu cầu", ParentKey = PermissionCoreKeys.SurveyMenuRequest } },
+            { PermissionCoreKeys.SurveyButtonRequestDelete, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonRequestDelete, PermissionName = "Xóa yêu cầu", ParentKey = PermissionCoreKeys.SurveyMenuRequest } },
+            { PermissionCoreKeys.SurveyButtonRequestSubmit, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonRequestSubmit, PermissionName = "Gửi duyệt", ParentKey = PermissionCoreKeys.SurveyMenuRequest } },
+            { PermissionCoreKeys.SurveyButtonRequestCancelSubmit, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonRequestCancelSubmit, PermissionName = "Hủy gửi duyệt", ParentKey = PermissionCoreKeys.SurveyMenuRequest } },
+
+            // Request management
+            { PermissionCoreKeys.SurveyMenuRequestApproval, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyMenuRequestApproval, PermissionName = "Quản lý yêu cầu", ParentKey = PermissionCoreKeys.CoreMenuKhaoSat } },
+            { PermissionCoreKeys.SurveyButtonRequestApprove, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonRequestApprove, PermissionName = "Duyệt yêu cầu", ParentKey = PermissionCoreKeys.SurveyMenuRequestApproval } },
+            { PermissionCoreKeys.SurveyButtonRequestReject, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonRequestReject, PermissionName = "Từ chối yêu cầu", ParentKey = PermissionCoreKeys.SurveyMenuRequestApproval } },
+
+            // Survey Management
+            { PermissionCoreKeys.SurveyMenuManagement, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyMenuManagement, PermissionName = "Danh sách khảo sát", ParentKey = PermissionCoreKeys.CoreMenuKhaoSat } },
+            { PermissionCoreKeys.SurveyButtonSurveyOpen, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonSurveyOpen, PermissionName = "Mở khảo sát", ParentKey = PermissionCoreKeys.SurveyMenuManagement } },
+            { PermissionCoreKeys.SurveyButtonSurveyClose, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonSurveyClose, PermissionName = "Đóng khảo sát", ParentKey = PermissionCoreKeys.SurveyMenuManagement } },
+
+            // Report Management
+            { PermissionCoreKeys.SurveyMenuReport, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyMenuReport, PermissionName = "Báo cáo khảo sát", ParentKey = PermissionCoreKeys.CoreMenuKhaoSat } },
+            { PermissionCoreKeys.SurveyButtonReportGenerate, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonReportGenerate, PermissionName = "Tạo báo cáo", ParentKey = PermissionCoreKeys.SurveyMenuReport } },
 
             #endregion
         };
