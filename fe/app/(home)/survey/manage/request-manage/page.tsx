@@ -1,7 +1,7 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input, Tag, Select } from 'antd';
-import { SearchOutlined, SyncOutlined, CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Tag, Select, Modal } from 'antd';
+import { SearchOutlined, SyncOutlined, CheckOutlined, CloseOutlined, EyeOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getPagingRequest, approveRequestAction, rejectRequestAction, getRequestById } from '@redux/feature/survey/surveyThunk';
@@ -113,18 +113,28 @@ const Page = () => {
       label: 'Duyệt',
       icon: <CheckOutlined />,
       command: (record: IViewRequest) => {
-        if (confirm('Bạn có chắc muốn duyệt yêu cầu này?')) {
-          dispatch(approveRequestAction(record.id))
-            .unwrap()
-            .then(() => {
+        Modal.confirm({
+          title: 'Xác nhận duyệt',
+          icon: <ExclamationCircleOutlined />,
+          centered: true,
+          content: (
+            <div>
+              <p>Bạn có chắc chắn muốn duyệt yêu cầu "{record.tenKhaoSatYeuCau}"?</p>
+            </div>
+          ),
+          okText: 'Duyệt',
+          okType: 'primary',
+          cancelText: 'Hủy',
+          onOk: async () => {
+            try {
+              await dispatch(approveRequestAction(record.id)).unwrap();
               toast.success('Duyệt yêu cầu thành công');
               dispatch(getPagingRequest(query));
-            })
-            .catch((err) => {
-              console.error(err);
-              toast.error('Duyệt yêu cầu thất bại');
-            });
-        }
+            } catch (error: any) {
+              toast.error(error?.message || 'Duyệt yêu cầu thất bại');
+            }
+          }
+        });
       },
       hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING
     },
@@ -133,19 +143,39 @@ const Page = () => {
       icon: <CloseOutlined />,
       color: 'danger',
       command: (record: IViewRequest) => {
-        const reason = prompt('Lý do từ chối:');
-        if (reason) {
-          dispatch(rejectRequestAction({ id: record.id, reason }))
-            .unwrap()
-            .then(() => {
+        let rejectReason = '';
+        Modal.confirm({
+          title: 'Từ chối yêu cầu khảo sát "' + record.tenKhaoSatYeuCau + '"',
+          icon: <ExclamationCircleOutlined />,
+          centered: true,
+          content: (
+            <div>
+              <Input.TextArea
+                rows={4}
+                placeholder="Nhập lý do từ chối..."
+                onChange={(e) => (rejectReason = e.target.value)}
+                style={{ marginTop: 12 }}
+              />
+            </div>
+          ),
+          okText: 'Từ chối',
+          okType: 'danger',
+          cancelText: 'Hủy',
+          onOk: async () => {
+            if (!rejectReason || !rejectReason.trim()) {
+              toast.error('Vui lòng nhập lý do từ chối');
+              return Promise.reject();
+            }
+            try {
+              await dispatch(rejectRequestAction({ id: record.id, reason: rejectReason })).unwrap();
               toast.success('Từ chối yêu cầu thành công');
               dispatch(getPagingRequest(query));
-            })
-            .catch((err) => {
-              console.error(err);
-              toast.error('Từ chối yêu cầu thất bại');
-            });
-        }
+            } catch (error: any) {
+              toast.error(error?.message || 'Từ chối yêu cầu thất bại');
+              return Promise.reject();
+            }
+          }
+        });
       },
       hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING
     }

@@ -279,7 +279,15 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             var query = _unitOfWork.iKsSurveyRepository.TableNoTracking
                 .Include(s => s.SurveyRequest)
-                .Where(s => s.Status == SurveyStatus.Open);
+                .AsQueryable();
+
+            if (dto.Status.HasValue)
+            {
+                query = query.Where(s => s.Status == dto.Status.Value);
+            }
+            else             {
+                query = query.Where(s => s.Status == SurveyStatus.Open);
+            }
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
@@ -536,13 +544,29 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             foreach (var item in newAnswers)
             {
-                var existing = existingAnswers.FirstOrDefault(x => x.IdCauHoi == item.QuestionId);
-                if (existing != null)
+                // Delete existing answers for this question first
+                var existingForQuestion = existingAnswers.Where(x => x.IdCauHoi == item.QuestionId).ToList();
+                foreach (var existing in existingForQuestion)
                 {
-                    existing.IdDapAnChon = item.SelectedAnswerId;
-                    existing.CauTraLoiText = item.TextResponse;
-                    _unitOfWork.iKsSurveySubmissionAnswerRepository.Update(existing);
+                    _unitOfWork.iKsSurveySubmissionAnswerRepository.Delete(existing);
                 }
+
+                // Handle multiple choice (type 2) - create multiple records
+                if (item.SelectedAnswerIds != null && item.SelectedAnswerIds.Any())
+                {
+                    foreach (var answerId in item.SelectedAnswerIds)
+                    {
+                        var newAns = new KsSurveySubmissionAnswer
+                        {
+                            IdPhienLamBai = submissionId,
+                            IdCauHoi = item.QuestionId,
+                            IdDapAnChon = answerId,
+                            CauTraLoiText = null
+                        };
+                        await _unitOfWork.iKsSurveySubmissionAnswerRepository.AddAsync(newAns);
+                    }
+                }
+                // Handle single choice (type 1) or essay (type 3) - single record
                 else
                 {
                     var newAns = new KsSurveySubmissionAnswer

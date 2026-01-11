@@ -122,8 +122,8 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
     try {
       const payload: ICreateRequest = {
         ...values,
-        thoiGianBatDau: dayjs(values.thoiGianBatDau).toISOString(),
-        thoiGianKetThuc: dayjs(values.thoiGianKetThuc).toISOString()
+        thoiGianBatDau: dayjs(values.thoiGianBatDau).format('YYYY-MM-DDTHH:mm:ss'),
+        thoiGianKetThuc: dayjs(values.thoiGianKetThuc).format('YYYY-MM-DDTHH:mm:ss')
       };
 
       if (isEdit && request) {
@@ -199,6 +199,20 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
       >
         <TextArea rows={3} placeholder="Nhập mô tả khảo sát" disabled={isViewMode} />
       </Form.Item>
+
+      {isViewMode && request?.lyDoTuChoi && (
+        <Form.Item label="Lý do từ chối" name="lyDoTuChoi">
+          <TextArea 
+            rows={3} 
+            disabled 
+            style={{ 
+              backgroundColor: '#fff1f0', 
+              borderColor: '#ffa39e',
+              color: '#cf1322'
+            }} 
+          />
+        </Form.Item>
+      )}
 
       <Row gutter={16}>
         <Col span={12}>

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Modal, Button, Radio, Input, Form, Spin, Progress, message, Space } from 'antd';
-import { SaveOutlined, SendOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Modal, Button, Radio, Checkbox, Input, Form, Spin, Progress, message, Space } from 'antd';
+import { SendOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { SurveyService } from '@services/survey.service';
 import { IStartSurveyResponse, ISavedAnswer, ISurveyExam } from '@models/survey/survey.model';
@@ -38,6 +38,24 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
       }
     };
   }, [isOpen, surveyId]);
+
+  const handleClose = async () => {
+    // Save draft before closing if there are answers
+    if (surveyData && answers.size > 0) {
+      try {
+        const answersArray = Array.from(answers.values());
+        await SurveyService.saveDraftSurvey({
+          submissionId: surveyData.submissionId,
+          answers: answersArray
+        });
+        messageApi.success('Đã lưu bản nháp', 1);
+      } catch (error) {
+        console.error('Save on close error:', error);
+        // Don't block closing even if save fails
+      }
+    }
+    onClose();
+  };
 
   // Set up auto-save
   useEffect(() => {
@@ -80,8 +98,13 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
           const formValues: any = {};
           data.savedAnswers.forEach((answer) => {
             if (answer.selectedAnswerId) {
+              // For single choice (type 1)
               formValues[`question_${answer.questionId}`] = answer.selectedAnswerId;
+            } else if (answer.selectedAnswerIds && answer.selectedAnswerIds.length > 0) {
+              // For multiple choice (type 2)
+              formValues[`question_${answer.questionId}`] = answer.selectedAnswerIds;
             } else if (answer.textResponse) {
+              // For essay (type 3)
               formValues[`question_${answer.questionId}`] = answer.textResponse;
             }
           });
@@ -103,8 +126,9 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
   const handleAnswerChange = (questionId: number, value: any, loaiCauHoi: number) => {
     const newAnswer: ISavedAnswer = {
       questionId,
-      selectedAnswerId: loaiCauHoi === 1 ? value : undefined,
-      textResponse: loaiCauHoi === 2 ? value : undefined
+      selectedAnswerId: loaiCauHoi === 1 ? value : undefined, // Single choice
+      selectedAnswerIds: loaiCauHoi === 2 ? value : undefined, // Multiple choice
+      textResponse: loaiCauHoi === 3 ? value : undefined // Essay
     };
 
     setAnswers((prev) => {
@@ -131,22 +155,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
     }
   };
 
-  const handleManualSave = async () => {
-    if (!surveyData) return;
 
-    try {
-      const answersArray = Array.from(answers.values());
-      await SurveyService.saveDraftSurvey({
-        submissionId: surveyData.submissionId,
-        answers: answersArray
-      });
-      setLastSaveTime(new Date());
-      toast.success('Đã lưu bản nháp thành công');
-    } catch (error) {
-      console.error('Save error:', error);
-      toast.error('Lưu bản nháp thất bại');
-    }
-  };
 
   const handleSubmit = async () => {
     if (!surveyData) return;
@@ -193,8 +202,9 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
   };
 
   const renderQuestion = (question: ISurveyExam, index: number) => {
-    const isMultipleChoice = question.loaiCauHoi === 1;
-    const isText = question.loaiCauHoi === 2;
+    const isSingleChoice = question.loaiCauHoi === 1; // Radio
+    const isMultipleChoice = question.loaiCauHoi === 2; // Checkbox
+    const isEssay = question.loaiCauHoi === 3; // TextArea
 
     return (
       <div key={question.id} className="mb-6 p-4 border rounded-lg bg-white">
@@ -203,9 +213,13 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
             Câu {index + 1}: {question.noiDung}
           </span>
           <span className="text-red-500 ml-1">*</span>
+          <span className="text-xs text-gray-500 ml-2">
+            ({isSingleChoice ? 'Chọn 1 đáp án' : isMultipleChoice ? 'Chọn nhiều đáp án' : 'Tự luận'})
+          </span>
         </div>
 
-        {isMultipleChoice && (
+        {/* Single Choice - Radio */}
+        {isSingleChoice && (
           <Form.Item
             name={`question_${question.id}`}
             rules={[{ required: true, message: 'Vui lòng chọn câu trả lời' }]}
@@ -225,7 +239,29 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
           </Form.Item>
         )}
 
-        {isText && (
+        {/* Multiple Choice - Checkbox */}
+        {isMultipleChoice && (
+          <Form.Item
+            name={`question_${question.id}`}
+            rules={[{ required: true, message: 'Vui lòng chọn ít nhất 1 đáp án' }]}
+          >
+            <Checkbox.Group
+              onChange={(values) => handleAnswerChange(question.id, values, question.loaiCauHoi)}
+              className="w-full"
+            >
+              <Space direction="vertical" className="w-full">
+                {question.answers.map((answer) => (
+                  <Checkbox key={answer.id} value={answer.id} className="w-full p-2 hover:bg-gray-50 rounded">
+                    {answer.noiDung}
+                  </Checkbox>
+                ))}
+              </Space>
+            </Checkbox.Group>
+          </Form.Item>
+        )}
+
+        {/* Essay - TextArea */}
+        {isEssay && (
           <Form.Item
             name={`question_${question.id}`}
             rules={[{ required: true, message: 'Vui lòng nhập câu trả lời' }]}
@@ -256,7 +292,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
           </div>
         }
         open={isOpen}
-        onCancel={onClose}
+        onCancel={handleClose}
         width={800}
         footer={null}
         maskClosable={false}
@@ -292,12 +328,9 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
             </Form>
 
             {/* Actions */}
-            <div className="flex justify-between items-center mt-6 pt-4 border-t">
-              <Button icon={<SaveOutlined />} onClick={handleManualSave}>
-                Lưu bản nháp
-              </Button>
+            <div className="flex justify-end items-center mt-6 pt-4 border-t">
               <Space>
-                <Button onClick={onClose}>Hủy</Button>
+                <Button onClick={handleClose}>Đóng</Button>
                 <Button
                   type="primary"
                   icon={<SendOutlined />}

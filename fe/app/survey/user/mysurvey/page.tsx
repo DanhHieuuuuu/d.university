@@ -88,9 +88,16 @@ const Page = () => {
                 placeholder="Lọc theo trạng thái"
                 allowClear
                 style={{ width: 200 }}
-                onChange={(value) => setQuery({ ...query, status: value, PageIndex: 1 })}
+                onChange={(value) => {
+                  const newQuery = { ...query, PageIndex: 1 };
+                  if (value === undefined) {
+                    delete newQuery.status;
+                  } else {
+                    newQuery.status = value;
+                  }
+                  setQuery(newQuery);
+                }}
                 options={[
-                  { label: 'Tất cả', value: undefined },
                   { label: 'Đang mở', value: surveyStatusConst.OPEN },
                   { label: 'Đã đóng', value: surveyStatusConst.CLOSE },
                   { label: 'Hoàn thành', value: surveyStatusConst.COMPLETE }
