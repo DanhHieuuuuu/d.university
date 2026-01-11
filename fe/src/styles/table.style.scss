@@ -81,4 +81,15 @@
 .ant-table-thead .ant-btn {
   padding: 0 !important;
   height: 24px;
+  border: none !important;
+  background: transparent !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
 }
+
+.ant-table-thead .ant-btn:focus,
+.ant-table-thead .ant-btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
