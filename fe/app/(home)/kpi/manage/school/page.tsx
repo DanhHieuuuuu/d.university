@@ -267,7 +267,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQua(record.id, v)}
-            editable={record.isActive !== 0}
+            editable={record.isActive == 0}
           />
         );
       },

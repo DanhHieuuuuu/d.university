@@ -3,8 +3,10 @@ using D.Auth.Domain;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
+using D.Core.Domain.Dtos.Kpi.KpiLogStatus;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
+using D.Core.Domain.Migrations;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.Core.Infrastructure.Services.Kpi.Common;
 using D.DomainBase.Common;
@@ -26,17 +28,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
     {
         private readonly ServiceUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IKpiLogStatusService _logKpiService;
 
         public KpiDonViService(
             ILogger<KpiRoleService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            IKpiLogStatusService logKpiService
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _logKpiService = logKpiService;
 
         }
         public int? GetKpiIsActive()
@@ -60,9 +65,16 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 throw new Exception("Không tìm thấy đơn vị");
 
             var entity = _mapper.Map<KpiDonVi>(dto);
-            //entity.STT = maxSTT + 1;
             _unitOfWork.iKpiDonViRepository.Add(entity);
             _unitOfWork.iKpiDonViRepository.SaveChange();
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = entity.Id,
+                OldStatus = 0,
+                NewStatus = entity.TrangThai,
+                Description = "Tạo KPI đơn vị mới",
+                CapKpi = 2
+            });
         }
 
         public void DeleteKpiDonVi(DeleteKpiDonViDto dto)
@@ -74,11 +86,19 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 throw new Exception($"KPI đơn vị với Id = {dto.Id} không tồn tại hoặc đã bị xóa.");
             }
-
+            var oldStatus = kpi.TrangThai;
             kpi.Deleted = true;
 
             _unitOfWork.iKpiDonViRepository.Update(kpi);
             _unitOfWork.iKpiDonViRepository.SaveChange();
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = kpi.Id,
+                OldStatus = oldStatus,
+                NewStatus = null,
+                Description = "Xóa KPI đơn vị",
+                CapKpi = 2
+            });
         }
 
         public PageResultDto<KpiDonViDto> FindPagingKeKhai(FilterKpiDonViKeKhaiDto dto)
@@ -257,12 +277,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     })
                     .ToList();
 
-            //var totalCount = query.Count();
-            //var pagedItems = query
-            //    .Skip(dto.SkipCount())
-            //    .Take(dto.PageSize)
-            //    .ToList();
-
             return new PageResultDto<KpiDonViDto>
             {
                 Items = pagedItems,
@@ -357,6 +371,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 item.Deleted = true;
                 item.ModifiedDate = DateTime.UtcNow;
+                _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                {
+                    KpiId = item.Id,
+                    OldStatus = item.Status,
+                    NewStatus = 0,
+                    Description = "Hủy giao KPI",
+                    CapKpi = item.LoaiKPI
+                });
             }
 
             foreach (var nsDto in dto.NhanSus)
@@ -375,6 +397,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     {
                         existed.TrongSo = nsDto.TrongSo;
                         existed.ModifiedDate = DateTime.UtcNow;
+                        _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                        {
+                            KpiId = existed.Id,
+                            OldStatus = existed.Status,
+                            NewStatus = existed.Status,
+                            Description = $"Cập nhật trọng số KPI ({existed.TrongSo})",
+                            CapKpi = 1
+                        });
                     }
                     continue;
                 }
@@ -387,7 +417,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 if (kpiRole == null)
                     throw new Exception("Nhân sự không thuộc đơn vị của KPI");
 
-                _unitOfWork.iKpiCaNhanRepository.Add(new KpiCaNhan
+                var newKpi = new KpiCaNhan
                 {
                     KPI = kpiDonVi.Kpi,
                     MucTieu = kpiDonVi.MucTieu ?? "0",
@@ -401,6 +431,23 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     LoaiKetQua = kpiDonVi.LoaiKetQua,
                     IdCongThuc = kpiDonVi.IdCongThuc ?? 0,
                     Status = KpiStatus.Assigned
+                };
+                _unitOfWork.iKpiCaNhanRepository.Add(newKpi);
+                _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                {
+                    KpiId = newKpi.Id,
+                    OldStatus = 0,
+                    NewStatus = newKpi.Status,
+                    Description = "Đã được giao KPI",
+                    CapKpi = 1
+                });
+                _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                {
+                    KpiId = kpiDonVi.Id,
+                    OldStatus = 0,
+                    NewStatus = 0,
+                    Description = "Giao KPI đơn vị cho nhân sự",
+                    CapKpi = 2
                 });
             }
 
@@ -422,10 +469,10 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
                     if (item.KetQuaThucTe.HasValue)
                     {
+                        var oldStatus = kpi.TrangThai;
+                        var oldScore = kpi.DiemKpi;
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
                         kpi.DiemKpi = item.DiemKpi;
-                        kpi.TrangThai = KpiStatus.Declared;
-
                         kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
                             kpi.KetQuaThucTe,
                             kpi.MucTieu,
@@ -433,8 +480,17 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                          );
+                        kpi.TrangThai = KpiStatus.Declared;
 
                         _unitOfWork.iKpiDonViRepository.Update(kpi);
+                        _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                        {
+                            KpiId = kpi.Id,
+                            OldStatus = oldStatus,
+                            NewStatus = kpi.TrangThai,
+                            Description = $"Cập nhật kết quả thực tế, điểm cũ: {oldScore}, điểm mới: {kpi.DiemKpi}",
+                            CapKpi = 2
+                        });
                     }
                 }
 
@@ -458,7 +514,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 throw new Exception($"Không tìm thấy KPI cá nhân với Id={dto.Id}");
             }
-
+            var oldStatus = kpi.TrangThai;
             // Cập nhật thông tin
             kpi.Kpi = dto.Kpi;
             kpi.MucTieu = dto.MucTieu;
@@ -467,9 +523,21 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             kpi.LoaiKpi = dto.LoaiKpi;
             kpi.NamHoc = dto.NamHoc;
             kpi.IdKpiTruong = dto.IdKpiTruong;
+            kpi.LoaiKetQua = dto.LoaiKetQua;
+            kpi.IdCongThuc = dto.IdCongThuc;
+            kpi.CongThucTinh = dto.CongThucTinh;
+            kpi.TrangThai = KpiStatus.Edited;
 
             _unitOfWork.iKpiDonViRepository.Update(kpi);
             _unitOfWork.iKpiDonViRepository.SaveChange();
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = kpi.Id,
+                OldStatus = oldStatus,
+                NewStatus = kpi.TrangThai,
+                Description = "Cập nhật KPI đơn vị",
+                CapKpi = 2
+            });
         }
 
         public void UpdateTrangThaiKpiDonVi(UpdateTrangThaiKpiDonViDto dto)
@@ -488,8 +556,18 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             foreach (var kpi in kpiList)
             {
+                var oldStatus = kpi.TrangThai;
                 kpi.TrangThai = dto.TrangThai;
                 _unitOfWork.iKpiDonViRepository.Update(kpi);
+                _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                {
+                    KpiId = kpi.Id,
+                    OldStatus = oldStatus,
+                    NewStatus = kpi.TrangThai,
+                    Description = "Cập nhật trạng thái KPI đơn vị",
+                    CapKpi = 2,
+                    Reason = dto.Note
+                });
             }
 
             _unitOfWork.iKpiDonViRepository.SaveChange();
@@ -569,9 +647,10 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
                     if (item.KetQuaCapTren.HasValue)
                     {
+                        var oldStatus = kpi.TrangThai;
+                        var oldScore = kpi.DiemKpi;
                         kpi.CapTrenDanhGia = item.KetQuaCapTren;
                         kpi.DiemKpiCapTren = item.DiemKpiCapTren;
-                        kpi.TrangThai = KpiStatus.Evaluated;
                         kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
                             kpi.CapTrenDanhGia,
                             kpi.MucTieu,
@@ -579,8 +658,17 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                         );
+                        kpi.TrangThai = KpiStatus.Evaluated;
 
                         _unitOfWork.iKpiDonViRepository.Update(kpi);
+                        _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                        {
+                            KpiId = kpi.Id,
+                            OldStatus = oldStatus,
+                            NewStatus = kpi.TrangThai,
+                            Description = $"Cập nhật kết quả cấp trên, điểm cũ: {oldScore}, điểm mới: {kpi.DiemKpi}",
+                            CapKpi = 2
+                        });
                     }
                 }
 

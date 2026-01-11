@@ -26,9 +26,11 @@ import {
     updateKetQuaCapTrenKpiTruong,
     updateKetQuaThucTeKpiTruong,
     getNhanSuDaGiaoByKpiDonVi,
-    giaoKpiDonVi
+    giaoKpiDonVi,
+    getKpiLogStatus,
 } from './kpiThunk';
 import { IViewKpiTruong } from '@models/kpi/kpi-truong.model';
+import { KpiLogStatusDto } from '@models/kpi/kpi-log.model';
 
 
 interface MetaList<T> {
@@ -49,6 +51,13 @@ interface KpiState {
         data: NhanSuDaGiaoDto[];
         status: ReduxStatus;
     };
+    kpiLog: {
+        $list: {
+            status: ReduxStatus;
+            data: KpiLogStatusDto[];
+            total?: number;
+        };
+    }
     meta: {
         trangThai: {
             caNhan: MetaList<{ value: number; label: string }>;
@@ -99,6 +108,9 @@ const initialState: KpiState = {
     nhanSuDaGiao: {
         data: [],
         status: ReduxStatus.IDLE
+    },
+    kpiLog: {
+        $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
     },
     meta: {
         trangThai: {
@@ -504,6 +516,20 @@ const kpiSlice = createSlice({
             })
             .addCase(deleteKpiRole.rejected, (state) => {
                 state.kpiRole.$delete.status = ReduxStatus.FAILURE;
+            })
+            // KPI Log 
+            .addCase(getKpiLogStatus.pending, (state) => {
+                state.kpiLog.$list.status = ReduxStatus.LOADING;
+            })
+            .addCase(getKpiLogStatus.fulfilled, (state, action) => {
+                console.log('API LOG RESPONSE', action.payload);
+                console.log('ITEMS LENGTH', action.payload?.items?.length);
+                state.kpiLog.$list.status = ReduxStatus.SUCCESS;
+                state.kpiLog.$list.data = action.payload?.items ?? [];
+                state.kpiLog.$list.total = action.payload?.totalItem ?? 0;
+            })
+            .addCase(getKpiLogStatus.rejected, (state) => {
+                state.kpiLog.$list.status = ReduxStatus.FAILURE;
             })
     }
 });

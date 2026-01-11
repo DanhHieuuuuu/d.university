@@ -62,7 +62,7 @@ const Page = () => {
 
   const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiDonVi>({
     total: totalItem || 0,
-    initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
+    initialQuery: { PageIndex: 1, PageSize: 2000, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getKpiDonViKeKhai(newQuery)),
     triggerFirstLoad: true
   });

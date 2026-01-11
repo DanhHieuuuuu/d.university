@@ -365,17 +365,17 @@ const Page = () => {
             </span>
           </div>
         }
-        extra={
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />} 
-            onClick={onClickAdd}
-            size="large"
-            className="shadow-md hover:shadow-lg transition-shadow"
-          >
-            Thêm mới
-          </Button>
-        }
+      // extra={
+      //   <Button 
+      //     type="primary" 
+      //     icon={<PlusOutlined />} 
+      //     onClick={onClickAdd}
+      //     size="large"
+      //     className="shadow-md hover:shadow-lg transition-shadow"
+      //   >
+      //     Thêm mới
+      //   </Button>
+      // }
       >
         <Form form={form} layout="horizontal">
           <div className="flex items-center justify-between mb-6 gap-4">
@@ -395,13 +395,13 @@ const Page = () => {
                   allowClear
                   size="large"
                   loading={roleByUserStatus === ReduxStatus.LOADING}
-                  options={roleByUser?.map(r => ({
-                    value: r.role,
-                    label: KpiRoleConst.getName(r.role)
+                  options={Array.from(new Set(roleByUser?.map(r => r.role) || [])).map(role => ({
+                    value: role,
+                    label: KpiRoleConst.getName(role)
                   }))}
                   onChange={(value) => onFilterChange({ role: value })}
                 />
-              </Form.Item> 
+              </Form.Item>
               <Button
                 size="large"
                 icon={<SyncOutlined />}
@@ -452,9 +452,9 @@ const Page = () => {
                 placement="bottomRight"
                 styles={{ body: { padding: 16, minWidth: 280 } }}
               >
-                <Button 
+                <Button
                   size="large"
-                  icon={<FilterOutlined />} 
+                  icon={<FilterOutlined />}
                   type={openFilter ? "primary" : "default"}
                 >
                   Bộ lọc
@@ -483,11 +483,19 @@ const Page = () => {
                   <div className="flex flex-col">
                     <span className="text-sm text-gray-600 mb-2 font-medium">Chức vụ:</span>
                     <div className="flex flex-wrap gap-2">
-                      {roleByUser?.map(r => (
-                        <Tag key={r.role} color="blue" className="text-sm px-3 py-1">
-                          {KpiRoleConst.getName(r.role)} ({r.tiLe}%)
-                        </Tag>
-                      ))}
+                      {(() => {
+                        const mergedRoles = (roleByUser || []).reduce<Record<string, number>>((acc, r) => {
+                          if (!r.role) return acc;
+                          acc[r.role] = (acc[r.role] || 0) + (r.tiLe ?? 0);
+                          return acc;
+                        }, {});
+
+                        return Object.entries(mergedRoles).map(([role, tiLe]) => (
+                          <Tag key={role} color="blue" className="text-sm px-3 py-1">
+                            {KpiRoleConst.getName(role)} ({tiLe}%)
+                          </Tag>
+                        ));
+                      })()}
                     </div>
                   </div>
 

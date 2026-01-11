@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -7,9 +7,11 @@ import { createKpiDonVi, updateKpiDonVi } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
+import { getAllPhongBan, getAllPhongBanByKpiRole } from '@redux/feature/danh-muc/danhmucThunk';
 import { ICreateKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
+import { LIST_CONG_THUC } from '@/constants/kpi/kpiFormula.const';
+import { LOAI_KET_QUA_OPTIONS } from '@/constants/kpi/loaiCongThuc.enum';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -27,7 +29,16 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
   const { phongBanByKpiRole } = useAppSelector((state) => state.danhmucState);
-
+  const selectedLoaiKpi = Form.useWatch('loaiKpi', form);
+  const congThucOptions = useMemo(() => {
+    if (!selectedLoaiKpi) return [];
+    return LIST_CONG_THUC
+      .filter(ct => ct.loaiKpiApDung.includes(selectedLoaiKpi))
+      .map(ct => ({
+        value: ct.id,
+        label: ct.congThuc,
+      }));
+  }, [selectedLoaiKpi]);
   useEffect(() => {
     if (isModalOpen) {
       if (isUpdate || isView) {
@@ -40,18 +51,21 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   useEffect(() => {
     if (!$selected.data || phongBanByKpiRole.$list.data.length === 0) return;
-
     const selectedData = $selected.data;
-
     const donVi = phongBanByKpiRole.$list.data.find(
       pb => pb.id === selectedData.idDonVi
     );
-
+    const congThucMatched = LIST_CONG_THUC.find(
+      x => x.congThuc === selectedData.congThuc
+    );
     form.setFieldsValue({
       ...selectedData,
       idDonVi: donVi
         ? { value: donVi.id, label: donVi.tenPhongBan }
         : undefined,
+      loaiKPI: selectedData.loaiKpi,
+      congThucTinh: congThucMatched?.congThuc,
+      idCongThuc: congThucMatched?.id,
       namHoc: selectedData.namHoc
         ? dayjs(selectedData.namHoc, 'YYYY')
         : undefined,
@@ -69,7 +83,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   }, [$create.status, $update.status, dispatch, form, setIsModalOpen]);
 
   useEffect(() => {
-    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 2000 }));
+    dispatch(getAllPhongBanByKpiRole({ PageIndex: 1, PageSize: 2000 }));
   }, [dispatch]);
 
 
@@ -82,8 +96,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const handleFinish: FormProps['onFinish'] = async (values: any) => {
     const payload = {
       ...values,
-      idDonVi: values.idDonVi,
+      idDonVi: values.idDonVi?.value ?? values.idDonVi,
       namHoc: values.namHoc.format('YYYY'),
+      trongSo: values.trongSo != null ? values.trongSo.toString() : '0',
+      idCongThuc: values.idCongThuc,
+      congThucTinh: values.congThucTinh,
+      loaiKetQua: values.loaiKetQua,
     };
 
 
@@ -94,7 +112,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         ).unwrap();
         toast.success('Cập nhật KPI đơn vị thành công');
       } else {
-        console.log("Payload: ",payload);
         await dispatch(createKpiDonVi(payload)).unwrap();
         toast.success('Thêm mới KPI đơn vị thành công');
       }
@@ -166,9 +183,22 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           <Form.Item<ICreateKpiDonVi>
             label="Trọng số"
             name="trongSo"
-            rules={[{ required: true, message: 'Vui lòng nhập trọng số' }]}
+            rules={[
+              { required: true, message: 'Vui lòng nhập trọng số' },
+              {
+                type: 'number',
+                min: 0,
+                max: 100,
+                message: 'Trọng số phải là số ≥ 0',
+              },
+            ]}
           >
-            <Input />
+            <InputNumber
+              className="!w-full"
+              placeholder="Nhập trọng số"
+              min={0}
+              precision={2}
+            />
           </Form.Item>
 
           <Form.Item
@@ -181,10 +211,55 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
                 value: x.value,
                 label: x.name,
               }))}
-              placeholder="Chọn loại KPI"
+              onChange={() => {
+                form.setFieldsValue({
+                  idCongThuc: undefined,
+                  congThucTinh: undefined,
+                });
+              }}
             />
           </Form.Item>
 
+          <Form.Item
+            label="Công thức tính KPI"
+            name="idCongThuc"
+            rules={[{ required: true, message: 'Vui lòng chọn công thức' }]}
+          >
+            <Select
+              key={selectedLoaiKpi}
+              placeholder={
+                selectedLoaiKpi
+                  ? 'Chọn công thức'
+                  : 'Vui lòng chọn Loại KPI trước'
+              }
+              options={congThucOptions}
+              disabled={isView || !selectedLoaiKpi}
+              onChange={(value) => {
+                const selected = LIST_CONG_THUC.find(x => x.id === value);
+                form.setFieldsValue({
+                  congThucTinh: selected?.congThuc,
+                });
+              }}
+            />
+          </Form.Item>
+
+
+          <Form.Item
+            label="Loại kết quả"
+            name="loaiKetQua"
+            rules={[{ required: true, message: 'Vui lòng chọn loại kết quả' }]}
+          >
+            <Select
+              placeholder="Chọn loại kết quả"
+              options={LOAI_KET_QUA_OPTIONS}
+            />
+          </Form.Item>
+          <Form.Item
+            name="congThucTinh"
+            hidden
+          >
+            <Input />
+          </Form.Item>
 
           <Form.Item<ICreateKpiDonVi>
             label="Đơn vị"

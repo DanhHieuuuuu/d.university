@@ -6,12 +6,14 @@ import { ICreateKpiDonVi, IGiaoKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanh
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
+import {  IQueryKpiLogStatus } from '@models/kpi/kpi-log.model';
 
 const apiDanhMucEndpoint = 'kpi';
 const apiKpiTruongEndpoint = `${apiDanhMucEndpoint}/kpi-truong`;
 const apiKpiDonViEndpoint = `${apiDanhMucEndpoint}/kpi-donvi`;
 const apiKpiCaNhanEndpoint = `${apiDanhMucEndpoint}/kpi-canhan`;
 const apiKpiRoleEndpoint = `${apiDanhMucEndpoint}/kpi-role`;
+const apiKpiLogEndpoint = `${apiDanhMucEndpoint}/kpi-log`;
 
 //Kpi Cá nhân
 const getListKpiCaNhan = async (query?: IQueryKpiCaNhan) => {
@@ -571,6 +573,21 @@ export const getListKpiRoleByUser = async () => {
     return Promise.reject(err);
   }
 };
+//KPi log
+
+const getKpiLogs = async (query?: IQueryKpiLogStatus) => {
+  try {
+    const res = await axios.get(`${apiKpiLogEndpoint}/get-log-status`, {
+      params: query
+    });
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Lỗi khi lấy log KPI');
+    return Promise.reject(err);
+  }
+};
+
+
 export const KpiService = {
   getListKpiCaNhan,
   getListKpiCaNhanKeKhai,
@@ -606,5 +623,6 @@ export const KpiService = {
   createKpiRole,
   updateKpiRole,
   deleteKpiRole,
-  getListKpiRoleByUser
+  getListKpiRoleByUser,
+  getKpiLogs,
 };

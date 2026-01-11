@@ -13,6 +13,7 @@ import { getAllUser } from '@redux/feature/userSlice';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { LIST_CONG_THUC } from '@/constants/kpi/kpiFormula.const';
 import { LOAI_KET_QUA_OPTIONS } from '@/constants/kpi/loaiCongThuc.enum';
+import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -34,7 +35,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const selectedLoaiKpi = Form.useWatch('loaiKPI', form);
   const congThucOptions = useMemo(() => {
     if (!selectedLoaiKpi) return [];
-
     return LIST_CONG_THUC
       .filter(ct => ct.loaiKpiApDung.includes(selectedLoaiKpi))
       .map(ct => ({
@@ -62,9 +62,16 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       ? userOptions.find(u => u.value === selectedData.idNhanSu)
       : undefined;
 
+    const congThucMatched = LIST_CONG_THUC.find(
+      x => x.congThuc === selectedData.congThuc
+    );
+
     form.setFieldsValue({
       ...selectedData,
       idNhanSu: nhanSuOption,
+      loaiKPI: selectedData.loaiKpi,
+      idCongThuc: congThucMatched?.id,
+      congThucTinh: congThucMatched?.congThuc,
       role: selectedData?.role ?? '',
       namHoc: selectedData.namHoc
         ? dayjs(selectedData.namHoc, 'YYYY')
@@ -103,11 +110,10 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       ...values,
       idNhanSu: values.idNhanSu?.value,
       namHoc: values.namHoc.format('YYYY'),
+      trongSo: values.trongSo != null ? values.trongSo.toString() : '0',
       idCongThuc: values.idCongThuc,
       congThucTinh: values.congThucTinh,
     };
-
-    console.log('PAYLOAD GỬI BE', payload);
 
     try {
       if (isUpdate && $selected.data) {
@@ -167,13 +173,13 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Input />
           </Form.Item>
 
-          <Form.Item<ICreateKpiCaNhan>
+          {/* <Form.Item<ICreateKpiCaNhan>
             label="Lĩnh Vực"
             name="linhVuc"
             rules={[{ required: true, message: 'Vui lòng nhập lĩnh vực' }]}
           >
             <Input />
-          </Form.Item>
+          </Form.Item> */}
 
 
           <Form.Item<ICreateKpiCaNhan>
@@ -184,13 +190,27 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Input />
           </Form.Item>
 
-          <Form.Item<ICreateKpiCaNhan>
+          <Form.Item
             label="Trọng số"
             name="trongSo"
-            rules={[{ required: true, message: 'Vui lòng nhập trọng số' }]}
+            rules={[
+              { required: true, message: 'Vui lòng nhập trọng số' },
+              {
+                type: 'number',
+                min: 0,
+                max: 100,
+                message: 'Trọng số phải là số ≥ 0',
+              },
+            ]}
           >
-            <Input />
+            <InputNumber
+              className="!w-full"
+              placeholder="Nhập trọng số"
+              min={0}
+              precision={2}
+            />
           </Form.Item>
+
 
           <Form.Item
             label="Loại KPI"
@@ -218,13 +238,14 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             rules={[{ required: true, message: 'Vui lòng chọn công thức' }]}
           >
             <Select
+              key={selectedLoaiKpi}
               placeholder={
                 selectedLoaiKpi
                   ? 'Chọn công thức'
                   : 'Vui lòng chọn Loại KPI trước'
               }
               options={congThucOptions}
-              disabled={!selectedLoaiKpi}
+              disabled={isView || !selectedLoaiKpi}
               onChange={(value) => {
                 const selected = LIST_CONG_THUC.find(x => x.id === value);
                 form.setFieldsValue({
@@ -261,8 +282,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
               loading={status === ReduxStatus.LOADING}
               onChange={(value) => {
                 const selectedUser = users.find(u => u.id === value?.value);
-                const roleCode = selectedUser?.tenChucVu ?? '';
-                form.setFieldsValue({ role: roleCode });
+                const roleEnum = KpiRoleConst.list.find(
+                  x => x.name === selectedUser?.tenChucVu
+                )?.value;
+                form.setFieldsValue({
+                  role: roleEnum ?? '',
+                });
               }}
             />
           </Form.Item>

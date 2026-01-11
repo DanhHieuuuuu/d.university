@@ -27,6 +27,7 @@ export type IViewKpiDonVi = {
   loaiKetQua?: LoaiCongThuc;
   ghiChu?: string;
   congThuc?:string;
+  
 };
 
 export type ICreateKpiDonVi = {
@@ -40,6 +41,7 @@ export type ICreateKpiDonVi = {
   idKpiTruong?: number,
   idCongThuc: number,
   congThucTinh?: string,
+  loaiKetQua?: LoaiCongThuc;
 };
 
 export type IUpdateTrangThaiKpiDonVi = {

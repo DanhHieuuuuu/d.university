@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using d.Shared.Permission.Error;
-using D.Auth.Domain;
 using D.ControllerBase.Exceptions;
-using D.Core.Domain;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
-using D.Core.Domain.Entities.Hrm.DanhMuc;
+using D.Core.Domain.Dtos.Kpi.KpiLogStatus;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
@@ -15,10 +13,7 @@ using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Extensions;
 using System.Globalization;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -27,17 +22,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
     {
         private readonly ServiceUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IKpiLogStatusService _logKpiService;
 
         public KpiCaNhanService(
             ILogger<KpiRoleService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            IKpiLogStatusService logKpiService
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _logKpiService = logKpiService;
         }
 
         public void CreateKpiCaNhan(CreateKpiCaNhanDto dto)
@@ -60,6 +58,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             entity.STT = maxSTT + 1;
             _unitOfWork.iKpiCaNhanRepository.Add(entity);
             _unitOfWork.iKpiCaNhanRepository.SaveChange();
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = entity.Id,
+                OldStatus = 0,
+                NewStatus = entity.Status,
+                Description = "Tạo KPI cá nhân mới",
+                CapKpi = 1
+            });
         }
 
         public void DeleteKpiCaNhan(DeleteKpiCaNhanDto dto)
@@ -71,11 +77,19 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 throw new Exception($"KPI cá nhân với Id = {dto.Id} không tồn tại hoặc đã bị xóa.");
             }
-
+            var oldStatus = kpi.Status;
             kpi.Deleted = true;
 
             _unitOfWork.iKpiCaNhanRepository.Update(kpi);
             _unitOfWork.iKpiCaNhanRepository.SaveChange();
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = kpi.Id,
+                OldStatus = oldStatus,
+                NewStatus = null,
+                Description = "Xóa KPI cá nhân",
+                CapKpi = 1
+            });
         }
 
         public async Task<PageResultDto<KpiCaNhanDto>> GetAllKpiCaNhan(FilterKpiCaNhanDto dto)
@@ -211,8 +225,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
 
 
-        public async Task<PageResultDto<KpiCaNhanDto>> FindPagingKpiCaNhanKeKhai(
-            FilterKpiKeKhaiCaNhanDto dto)
+        public async Task<PageResultDto<KpiCaNhanDto>> FindPagingKpiCaNhanKeKhai(FilterKpiKeKhaiCaNhanDto dto)
         {
             _logger.LogInformation(
                 $"{nameof(FindPagingKpiCaNhanKeKhai)} => dto = {JsonSerializer.Serialize(dto)}"
@@ -332,9 +345,11 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
                     if (item.KetQuaThucTe.HasValue)
                     {
+                        var oldStatus = kpi.Status;
+                        var oldScore = kpi.DiemKpi;
+
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
                         kpi.DiemKpi = item.DiemKpi;
-                        kpi.Status = KpiStatus.Declared;
 
                         kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
                             kpi.KetQuaThucTe,
@@ -343,8 +358,17 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                          );
+                        kpi.Status = KpiStatus.Declared;
 
                         _unitOfWork.iKpiCaNhanRepository.Update(kpi);
+                        _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                        {
+                            KpiId = kpi.Id,
+                            OldStatus = oldStatus,
+                            NewStatus = kpi.Status,
+                            Description = $"Cập nhật kết quả thực tế, điểm cũ: {oldScore}, điểm mới: {kpi.DiemKpi}",
+                            CapKpi = 1
+                        });
                     }
                 }
 
@@ -365,13 +389,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         public void UpdateKpiCaNhan(UpdateKpiCaNhanDto dto)
         {
             _logger.LogInformation($"{nameof(UpdateKpiCaNhan)} dto={JsonSerializer.Serialize(dto)}");
-            // Tìm KPI cập nhật
             var kpi = _unitOfWork.iKpiCaNhanRepository.Table.FirstOrDefault(x => x.Id == dto.Id && !x.Deleted);
 
             if (kpi == null)
             {
                 throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, $"Không tìm thấy KPI cá nhân với Id={dto.Id}");
             }
+
+            var oldStatus = kpi.Status;
 
             if (kpi.IdNhanSu != dto.IdNhanSu)
             {
@@ -389,10 +414,23 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             kpi.IdNhanSu = dto.IdNhanSu;
             kpi.LoaiKPI = dto.LoaiKPI;
             kpi.NamHoc = dto.NamHoc;
+            kpi.CongThucTinh = dto.CongThucTinh;
+            kpi.IdCongThuc = dto.IdCongThuc;
+            kpi.LoaiKetQua = dto.LoaiKetQua;
+            kpi.Role = dto.Role;
             kpi.Status = KpiStatus.Edited;
 
             _unitOfWork.iKpiCaNhanRepository.Update(kpi);
             _unitOfWork.iKpiCaNhanRepository.SaveChange();
+
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = kpi.Id,
+                OldStatus = oldStatus,
+                NewStatus = kpi.Status,
+                Description = "Cập nhật KPI cá nhân",
+                CapKpi = 1
+            });
         }
 
         public void UpdateTrangThaiKpiCaNhan(UpdateTrangThaiKpiDto dto)
@@ -411,8 +449,19 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             foreach (var kpi in kpiList)
             {
+                var oldStatus = kpi.Status;
+
                 kpi.Status = dto.TrangThai;
                 _unitOfWork.iKpiCaNhanRepository.Update(kpi);
+                _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                {
+                    KpiId = kpi.Id,
+                    OldStatus = oldStatus,
+                    NewStatus = kpi.Status,
+                    Description = dto.Note ?? "Thay đổi trạng thái KPI",
+                    CapKpi = 1,
+                    Reason = dto.Note
+                });
             }
 
             _unitOfWork.iKpiCaNhanRepository.SaveChange();
@@ -434,6 +483,8 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
                     if (item.KetQuaCapTren.HasValue)
                     {
+                        var oldStatus = kpi.Status;
+                        var oldScore = kpi.DiemKpiCapTren;
                         kpi.CapTrenDanhGia = item.KetQuaCapTren;
                         kpi.DiemKpiCapTren = item.DiemKpiCapTren;
                         kpi.Status = KpiStatus.Evaluated;
@@ -446,6 +497,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         );
 
                         _unitOfWork.iKpiCaNhanRepository.Update(kpi);
+                        _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                        {
+                            KpiId = kpi.Id,
+                            OldStatus = oldStatus,
+                            NewStatus = kpi.Status,
+                            Description = $"Cập nhật kết quả cấp trên, điểm cũ: {oldScore}, điểm mới: {kpi.DiemKpiCapTren}",
+                            CapKpi = 1
+                        });
                     }
                 }
 

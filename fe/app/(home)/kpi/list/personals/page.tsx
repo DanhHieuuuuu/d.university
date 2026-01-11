@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Tabs, Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
+import { Tabs, Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag, Table } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -16,7 +16,7 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getListTrangThaiKpiCaNhan, updateKetQuaCapTrenKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getKpiLogStatus, getListTrangThaiKpiCaNhan, updateKetQuaCapTrenKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -33,6 +33,7 @@ import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
 import ConfirmScoredModal from '../../modal/ConfirmScoredModal';
 import { formatKetQua } from '@helpers/kpi/formatResult.helper';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
+import KpiLogModal from '../../modal/KpiLogModal';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -54,7 +55,13 @@ const Page = () => {
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ketQuaCapTrenMap, setKetQuaCapTrenMap] = useState<Record<number, number | undefined>>({});
+  const [openLogModal, setOpenLogModal] = useState(false);
+  const [selectedKpiLogId, setSelectedKpiLogId] = useState<number | null>(null);
   const [activeLoaiKpi, setActiveLoaiKpi] = useState<number>(KpiLoaiConst.CHUC_NANG);
+  const { data, total, status: logStatus } = useAppSelector(
+    state => state.kpiState.kpiLog.$list
+  );
+
   const KPI_TABS = KpiLoaiConst.list.map(x => ({
     key: String(x.value),
     label: `KPI ${x.name}`,
@@ -65,6 +72,8 @@ const Page = () => {
     dispatch(getAllUserByKpiRole({ PageIndex: 1, PageSize: 2000 }));
     dispatch(getListTrangThaiKpiCaNhan());
   }, [dispatch]);
+
+
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
@@ -288,6 +297,19 @@ const Page = () => {
   const onClickView = (record: IViewKpiCaNhan) => {
     dispatch(setSelectedKpiCaNhan(record)); setModalMode('view');
   };
+  const onClickViewLog = (record: IViewKpiCaNhan) => {
+    setSelectedKpiLogId(record.id);
+    setOpenLogModal(true);
+
+    dispatch(
+      getKpiLogStatus({
+        kpiId: record.id,
+        PageIndex: 1,
+        PageSize: 50,
+        capKpi: 1
+      })
+    );
+  };
   const onClickDelete = (record: IViewKpiCaNhan) => {
     Modal.confirm({
       title: `Xóa Kpi ${record.kpi} của ${record.nhanSu}?`,
@@ -398,7 +420,8 @@ const Page = () => {
   const actions: IAction[] = [
     { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView },
     { label: 'Sửa', icon: <EditOutlined />, command: onClickUpdate },
-    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete }
+    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete },
+    { label: 'Nhật ký trạng thái', icon: <EyeOutlined />, command: onClickViewLog }
   ];
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
@@ -610,6 +633,13 @@ const Page = () => {
         onCancel={() => setOpenChamModal(false)}
         onSubmit={handleSubmitScore}
       />
+      <KpiLogModal
+        open={openLogModal}
+        onCancel={() => setOpenLogModal(false)}
+        data={data}
+        loading={logStatus === ReduxStatus.LOADING}
+      />
+
     </Card>
   );
 };

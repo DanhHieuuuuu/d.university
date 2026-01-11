@@ -2,6 +2,7 @@
 using D.ControllerBase.Exceptions;
 using D.Core.Domain;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
+using D.Core.Domain.Dtos.Kpi.KpiLogStatus;
 using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
@@ -20,18 +21,21 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
     {
         private readonly ServiceUnitOfWork _unitOfWork;
         private readonly IKpiCaNhanService _kpiCaNhanService;
+        private readonly IKpiLogStatusService _logKpiService;
 
         public KpiTruongService(
             ILogger<KpiRoleService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
-            IKpiCaNhanService kpiCaNhanService
+            IKpiCaNhanService kpiCaNhanService,
+            IKpiLogStatusService kpiLogStatusService
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _kpiCaNhanService = kpiCaNhanService;
+            _logKpiService = kpiLogStatusService;
         }
 
         public async Task CreateKpiTruong(CreateKpiTruongDto dto)
@@ -44,6 +48,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             var entity = _mapper.Map<KpiTruong>(dto);
             await _unitOfWork.iKpiTruongRepository.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = entity.Id,
+                OldStatus = 0,
+                NewStatus = entity.TrangThai,
+                Description = "Tạo KPI trường mới",
+                CapKpi = 3
+            });
 
         }
 
@@ -57,11 +69,19 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             if (kpi == null)
                 throw new Exception($"KPI trường với Id = {dto.Id} không tồn tại hoặc đã bị xóa.");
-
+            var oldStatus = kpi.TrangThai;
             kpi.Deleted = true;
 
             _unitOfWork.iKpiTruongRepository.Update(kpi);
             await _unitOfWork.SaveChangesAsync();
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = kpi.Id,
+                OldStatus = oldStatus,
+                NewStatus = null,
+                Description = "Xóa KPI đơn vị",
+                CapKpi = 3
+            });
         }
 
         public PageResultDto<KpiTruongDto> GetAllKpiTruong(FilterKpiTruongDto dto)
@@ -249,6 +269,8 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
                     if (item.KetQuaThucTe.HasValue)
                     {
+                        var oldStatus = kpi.TrangThai;
+                        var oldScore = kpi.DiemKpi;
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
                         kpi.DiemKpi = item.DiemKpi;
                         kpi.TrangThai = KpiStatus.Declared;
@@ -262,6 +284,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                          );
 
                         _unitOfWork.iKpiTruongRepository.Update(kpi);
+                        _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                        {
+                            KpiId = kpi.Id,
+                            OldStatus = oldStatus,
+                            NewStatus = kpi.TrangThai,
+                            Description = $"Cập nhật kết quả thực tế, điểm cũ: {oldScore}, điểm mới: {kpi.DiemKpi}",
+                            CapKpi = 3
+                        });
                     }
                 }
 
@@ -286,7 +316,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 throw new Exception($"Không tìm thấy KPI cá nhân với Id={dto.Id}");
             }
 
-
+            var oldStatus = kpiTruong.TrangThai;
             // Cập nhật thông tin
             kpiTruong.LinhVuc = dto.LinhVuc;
             kpiTruong.ChienLuoc = dto.ChienLuoc;
@@ -296,9 +326,22 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             kpiTruong.LoaiKpi = dto.LoaiKpi;
             kpiTruong.NamHoc = dto.NamHoc;
             kpiTruong.KetQuaThucTe = dto.KetQuaThucTe;
+            kpiTruong.IdCongThuc = dto.IdCongThuc;
+            kpiTruong.CongThucTinh = dto.CongThucTinh;
+            kpiTruong.LoaiKetQua = dto.LoaiKetQua;
+            kpiTruong.TrangThai = KpiStatus.Edited;
 
             _unitOfWork.iKpiTruongRepository.Update(kpiTruong);
             await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
+
+            _logKpiService.InsertLog(new InsertKpiLogStatusDto
+            {
+                KpiId = kpiTruong.Id,
+                OldStatus = oldStatus,
+                NewStatus = kpiTruong.TrangThai,
+                Description = $"Cập nhật Kpi trường",
+                CapKpi = 3
+            });
         }
 
         public async Task UpdateTrangThaiKpiTruong(UpdateTrangThaiKpiTruongDto dto)
@@ -317,8 +360,18 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             foreach (var kpi in kpiList)
             {
+                var oldStatus = kpi.TrangThai;
                 kpi.TrangThai = dto.TrangThai;
                 _unitOfWork.iKpiTruongRepository.Update(kpi);
+                _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                {
+                    KpiId = kpi.Id,
+                    OldStatus = oldStatus,
+                    NewStatus = kpi.TrangThai,
+                    Description = "Cập nhật trạng thái KPI trường",
+                    CapKpi = 3,
+                    Reason = dto.Note
+                });
             }
 
             await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
@@ -339,6 +392,8 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
                     if (item.KetQuaCapTren.HasValue)
                     {
+                        var oldStatus = kpi.TrangThai;
+                        var oldScore = kpi.DiemKpi;
                         kpi.CapTrenDanhGia = item.KetQuaCapTren;
                         kpi.DiemKpiCapTren = item.DiemKpiCapTren;
                         kpi.TrangThai = KpiStatus.Evaluated;
@@ -351,6 +406,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         );
 
                         _unitOfWork.iKpiTruongRepository.Update(kpi);
+                        _logKpiService.InsertLog(new InsertKpiLogStatusDto
+                        {
+                            KpiId = kpi.Id,
+                            OldStatus = oldStatus,
+                            NewStatus = kpi.TrangThai,
+                            Description = $"Cập nhật kết quả cấp trên, điểm cũ: {oldScore}, điểm mới: {kpi.DiemKpi}",
+                            CapKpi = 3
+                        });
                     }
                 }
 

@@ -44,6 +44,7 @@ using D.Core.Domain.Entities.Survey.Constants;
 using System.Reflection;
 using D.Core.Domain.Dtos.Hrm.HopDong;
 using D.Core.Domain.Dtos.Hrm.QuyetDinh;
+using D.Core.Domain.Dtos.Kpi.KpiLogStatus;
 
 namespace D.Core.Domain
 {
@@ -252,6 +253,7 @@ namespace D.Core.Domain
 
             CreateMap<KpiTemplate, KpiTemplateDto>();
             CreateMap<CreateKpiTemplateDto, KpiTemplate>();
+            CreateMap<KpiLogStatus, KpiLogStatusDto>();
             #endregion
         }
 

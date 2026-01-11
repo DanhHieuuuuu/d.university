@@ -42,9 +42,9 @@ const PositionModal: React.FC<PositionModalProps> = ({
     $update.status === ReduxStatus.LOADING;
 
   const title = useMemo(() => {
-    if (isView) return 'Xem thông tin KPI Cá nhân';
-    if (isUpdate) return 'Cập nhật KPI Cá nhân';
-    return 'Thêm mới KPI Cá nhân';
+    if (isView) return 'Xem thông tin KPI Role';
+    if (isUpdate) return 'Cập nhật KPI Role';
+    return 'Thêm mới KPI Role';
   }, [isView, isUpdate]);
 
   useEffect(() => {

@@ -41,7 +41,7 @@ export type IViewKpiCaNhan = {
 export type ICreateKpiCaNhan = {
   kpi: string,
   loaiKPI: number,
-  linhVuc: string,
+  // linhVuc: string,
   mucTieu: string,
   trongSo: string,
   idNhanSu: number,
@@ -49,6 +49,7 @@ export type ICreateKpiCaNhan = {
   role:string,
   idCongThuc: number,
   congThucTinh?: string,
+  loaiKetQua?: LoaiCongThuc;
 };
 
 export type IUpdateKpiCaNhan = ICreateKpiCaNhan & {
@@ -82,12 +83,12 @@ export type IUpdateCapTrenDanhGia = {
   ketQuaCapTren?: number,
   diemKpiCapTren?: number
 };
-export interface IUpdateCapTrenDanhGiaList {
+export type IUpdateCapTrenDanhGiaList ={
   items: IUpdateCapTrenDanhGia[],
 };
 
 
-export interface IViewNhanSu {
+export type IViewNhanSu = {
   idNhanSu?: number,
   tenNhanSu?: string,
   hoTenDayDu?: string,
@@ -98,13 +99,13 @@ export interface IViewNhanSu {
   tenHienThi?: string,
 };
 
-export interface IKpiCaNhanLoaiSummary {
+export type IKpiCaNhanLoaiSummary = {
   loaiKpi: number;
   tuDanhGia: number;
   capTren: number;
 }
 
-export interface IKpiCaNhanSummary {
+export type IKpiCaNhanSummary = {
   tongTuDanhGia: number;
   tongCapTren: number;
   byLoaiKpi: IKpiCaNhanLoaiSummary[];
