@@ -4,7 +4,7 @@ import { Button, Card, Checkbox, Divider, Dropdown, Form, Input, MenuProps, Moda
 import {
   PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
   EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined,
-  RobotFilled
+  RobotFilled, FileTextOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -388,123 +388,159 @@ const Page = () => {
   };
 
   return (
-    <Card
-      title="Kê khai KPI Đơn vị"
-      className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
-      }
-    >
-      <Form form={form} layout="horizontal">
-        <div className="flex items-center justify-between mb-6 gap-4">
-          <div className="flex items-center gap-2 flex-1">
-            <Input
-              placeholder="Tìm KPI..."
-              prefix={<SearchOutlined />}
-              allowClear
-              onChange={(e) => handleDebouncedSearch(e.target.value)}
-              className="max-w-[250px]"
-            />
-            <Button
-              color="default"
-              variant="filled"
-              icon={<SyncOutlined />}
-              onClick={() => {
-                form.resetFields();
-                filterForm.resetFields();
-                onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined });
-                setKetQuaMap({});
-                setSelectedRowKeys([]);
-              }}
-            >
-              Tải lại
-            </Button>
+    <div className="space-y-4">
+      {/* Statistics Card - Only Total KPIs */}
+      <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-500 text-sm mb-1">Tổng số KPI</p>
+            <p className="text-2xl font-bold text-blue-600">{(list || []).length}</p>
           </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              icon={<SaveOutlined />}
-              type="primary"
-              onClick={handleSaveKetQua}
-
-            >
-              Lưu kết quả
-            </Button>
-            <Dropdown
-              menu={{ items: bulkActionItems }}
-              trigger={['click']}
-              disabled={selectedRowKeys.length === 0}
-            >
-              <Button
-                type={selectedRowKeys.length > 0 ? 'primary' : 'default'}
-                icon={<EllipsisOutlined />}
-              >
-                Thao tác
-                {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
-              </Button>
-            </Dropdown>
-
-            <Popover
-              content={filterContent}
-              title="Bộ lọc"
-              trigger="click"
-              open={openFilter}
-              onOpenChange={setOpenFilter}
-              placement="bottomRight"
-              styles={{ body: { padding: 16, minWidth: 280 } }}
-            >
-              <Button icon={<FilterOutlined />} type={openFilter ? "primary" : "default"}>
-                Bộ lọc
-              </Button>
-            </Popover>
+          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <FileTextOutlined className="text-2xl text-blue-600" />
           </div>
         </div>
-      </Form>
+      </Card>
 
-      <div className="kpi-table-wrapper">
-        <AppTable
-          loading={status === ReduxStatus.LOADING}
-          rowKey="id"
-          columns={columns}
-          dataSource={tableData}
-          listActions={actions}
-          pagination={false}
-          rowSelection={{
-            ...rowSelection,
-            fixed: 'left',
-          }}
-          scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
-          footer={() => (
-            <div className="kpi-table-footer">
-              <div className="footer-row">
-                <strong>Tổng điểm kê khai:</strong>
-                <span className="score-warning">
-                  {totalDeclaredScore.toFixed(2)}
-                </span>
-              </div>
-
-              <div className="footer-row">
-                <strong>Điểm tổng nhận được:</strong>
-                <span className="score-success">
-                  {finalScore.toFixed(2)}
-                </span>
-              </div>
+      {/* Main Card */}
+      <Card
+        className="h-full"
+        title={
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
+            <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Kê khai KPI Đơn vị
+            </span>
+          </div>
+        }
+        extra={
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={onClickAdd}
+            size="large"
+            className="shadow-md hover:shadow-lg transition-shadow"
+          >
+            Thêm mới
+          </Button>
+        }
+      >
+        <Form form={form} layout="horizontal">
+          <div className="flex items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                placeholder="Tìm KPI..."
+                prefix={<SearchOutlined />}
+                allowClear
+                onChange={(e) => handleDebouncedSearch(e.target.value)}
+                className="max-w-[250px]"
+                size="large"
+              />
+              <Button
+                size="large"
+                icon={<SyncOutlined />}
+                onClick={() => {
+                  form.resetFields();
+                  filterForm.resetFields();
+                  onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined });
+                  setKetQuaMap({});
+                  setSelectedRowKeys([]);
+                }}
+              >
+                Tải lại
+              </Button>
             </div>
-          )}
+
+            <div className="flex items-center gap-2">
+              <Button
+                icon={<SaveOutlined />}
+                type="primary"
+                size="large"
+                onClick={handleSaveKetQua}
+                className="shadow-md hover:shadow-lg transition-shadow"
+              >
+                Lưu kết quả
+              </Button>
+              <Dropdown
+                menu={{ items: bulkActionItems }}
+                trigger={['click']}
+                disabled={selectedRowKeys.length === 0}
+              >
+                <Button
+                  size="large"
+                  type={selectedRowKeys.length > 0 ? 'primary' : 'default'}
+                  icon={<EllipsisOutlined />}
+                  className={selectedRowKeys.length > 0 ? "shadow-md hover:shadow-lg transition-shadow" : ""}
+                >
+                  Thao tác
+                  {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
+                </Button>
+              </Dropdown>
+
+              <Popover
+                content={filterContent}
+                title="Bộ lọc"
+                trigger="click"
+                open={openFilter}
+                onOpenChange={setOpenFilter}
+                placement="bottomRight"
+                styles={{ body: { padding: 16, minWidth: 280 } }}
+              >
+                <Button 
+                  size="large"
+                  icon={<FilterOutlined />} 
+                  type={openFilter ? "primary" : "default"}
+                >
+                  Bộ lọc
+                </Button>
+              </Popover>
+            </div>
+          </div>
+        </Form>
+
+        <div className="kpi-table-wrapper">
+          <AppTable
+            loading={status === ReduxStatus.LOADING}
+            rowKey="id"
+            columns={columns}
+            dataSource={tableData}
+            listActions={actions}
+            pagination={false}
+            rowSelection={{
+              ...rowSelection,
+              fixed: 'left',
+            }}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 520px)' }}
+            footer={() => (
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col items-center justify-center">
+                    <span className="text-sm text-gray-600 mb-1">Tổng điểm kê khai</span>
+                    <span className="text-2xl font-bold text-orange-600">
+                      {totalDeclaredScore.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center border-l border-gray-300 pl-4">
+                    <span className="text-sm text-gray-600 mb-1">Điểm tổng nhận được</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      {finalScore.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          />
+        </div>
+        <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiDonViKeKhai(query)); dispatch(getListTrangThaiKpiDonVi()); }} />
+        <AssignKpiModal
+          open={openAssignModal}
+          onClose={() => setOpenAssignModal(false)}
+          kpiId={selectedKpiDonVi?.id ?? undefined}
+          donViId={selectedKpiDonVi?.data?.idDonVi ?? undefined}
         />
-      </div>
-      <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiDonViKeKhai(query)); dispatch(getListTrangThaiKpiDonVi()); }} />
-      <AssignKpiModal
-        open={openAssignModal}
-        onClose={() => setOpenAssignModal(false)}
-        kpiId={selectedKpiDonVi?.id ?? undefined}
-        donViId={selectedKpiDonVi?.data?.idDonVi ?? undefined}
-      />
-
-
-    </Card>
+      </Card>
+    </div>
   );
 };
 export default Page;

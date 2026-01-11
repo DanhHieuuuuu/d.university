@@ -105,27 +105,40 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   return (
     <Modal
-      title={title}
+      title={
+        <div className="flex items-center gap-3 py-2">
+          <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
+          <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {title}
+          </span>
+        </div>
+      }
       className="app-modal"
-      width="60%"
+      width="70%"
       open={isModalOpen}
       onCancel={handleClose}
       footer={
-        <>
+        <div className="flex justify-end gap-2 pt-4 border-t">
           {!isView && (
             <Button
               loading={isSaving}
               onClick={form.submit}
               icon={isUpdate ? <SaveOutlined /> : <PlusOutlined />}
               type="primary"
+              size="large"
+              className="shadow-md hover:shadow-lg transition-shadow"
             >
               {isUpdate ? 'Lưu' : 'Tạo'}
             </Button>
           )}
-          <Button color="default" variant="filled" onClick={handleClose} icon={<CloseOutlined />}>
+          <Button 
+            size="large"
+            onClick={handleClose} 
+            icon={<CloseOutlined />}
+          >
             Đóng
           </Button>
-        </>
+        </div>
       }
     >
       <Form
@@ -137,61 +150,90 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         disabled={isView}
         labelCol={{ style: { fontWeight: 600 } }}
       >
-        <div className="grid grid-cols-2 gap-x-5">
-          <Form.Item<ICreateKpiDonVi>
-            label="Tên KPI"
-            name="kpi"
-            rules={[{ required: true, message: 'Vui lòng nhập tên KPI' }]}
-          >
-            <Input />
-          </Form.Item>
+        {/* Thông tin cơ bản */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-6 bg-blue-500 rounded-full" />
+            <h3 className="text-lg font-semibold text-gray-700">Thông tin cơ bản</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+            <Form.Item<ICreateKpiDonVi>
+              label="Tên KPI"
+              name="kpi"
+              rules={[{ required: true, message: 'Vui lòng nhập tên KPI' }]}
+            >
+              <Input size="large" placeholder="Nhập tên KPI" />
+            </Form.Item>
 
-          {/* <Form.Item<ICreateKpiDonVi>
-            label="Lĩnh Vực"
-            name="linhVuc"
-            rules={[{ required: true, message: 'Vui lòng nhập lĩnh vực' }]}
-          >
-            <Input />
-          </Form.Item> */}
+            <Form.Item<ICreateKpiDonVi>
+              label="Mục tiêu"
+              name="mucTieu"
+              rules={[{ required: true, message: 'Vui lòng nhập mục tiêu' }]}
+            >
+              <Input size="large" placeholder="Nhập mục tiêu" />
+            </Form.Item>
 
+            <Form.Item<ICreateKpiDonVi>
+              label="Trọng số (%)"
+              name="trongSo"
+              rules={[{ required: true, message: 'Vui lòng nhập trọng số' }]}
+            >
+              <Input size="large" placeholder="Nhập trọng số" />
+            </Form.Item>
+          </div>
+        </div>
 
-          <Form.Item<ICreateKpiDonVi>
-            label="Mục tiêu"
-            name="mucTieu"
-            rules={[{ required: true, message: 'Vui lòng nhập mục tiêu' }]}
-          >
-            <Input />
-          </Form.Item>
+        {/* Phân loại */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-6 bg-purple-500 rounded-full" />
+            <h3 className="text-lg font-semibold text-gray-700">Phân loại</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+            <Form.Item
+              label="Loại KPI"
+              name="loaiKpi"
+              rules={[{ required: true, message: 'Vui lòng chọn loại KPI' }]}
+            >
+              <Select
+                size="large"
+                options={KpiLoaiConst.list.map(x => ({
+                  value: x.value,
+                  label: x.name,
+                }))}
+                placeholder="Chọn loại KPI"
+              />
+            </Form.Item>
 
-          <Form.Item<ICreateKpiDonVi>
-            label="Trọng số"
-            name="trongSo"
-            rules={[{ required: true, message: 'Vui lòng nhập trọng số' }]}
-          >
-            <Input />
-          </Form.Item>
+            <Form.Item<ICreateKpiDonVi>
+              label="Năm học"
+              name="namHoc"
+              rules={[{ required: true, message: 'Vui lòng chọn năm học' }]}
+            >
+              <DatePicker
+                size="large"
+                picker="year"
+                format="YYYY"
+                className="!w-full"
+                placeholder="Chọn năm học"
+              />
+            </Form.Item>
+          </div>
+        </div>
 
-          <Form.Item
-            label="Loại KPI"
-            name="loaiKpi"
-            rules={[{ required: true, message: 'Vui lòng chọn loại KPI' }]}
-          >
-            <Select
-              options={KpiLoaiConst.list.map(x => ({
-                value: x.value,
-                label: x.name,
-              }))}
-              placeholder="Chọn loại KPI"
-            />
-          </Form.Item>
-
-
+        {/* Đơn vị */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-6 bg-green-500 rounded-full" />
+            <h3 className="text-lg font-semibold text-gray-700">Đơn vị thực hiện</h3>
+          </div>
           <Form.Item<ICreateKpiDonVi>
             label="Đơn vị"
             name="idDonVi"
             rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}
           >
             <Select
+              size="large"
               options={phongBanByKpiRole.$list.data.map((pb) => ({
                 value: pb.id,
                 label: pb.tenPhongBan,
@@ -200,19 +242,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
               showSearch
               optionFilterProp="label"
               placeholder="Chọn đơn vị"
-            />
-          </Form.Item>
-
-
-          <Form.Item<ICreateKpiDonVi>
-            label="Năm học"
-            name="namHoc"
-            rules={[{ required: true, message: 'Vui lòng chọn năm học' }]}
-          >
-            <DatePicker
-              picker="year"
-              format="YYYY"
-              className="!w-full"
             />
           </Form.Item>
         </div>

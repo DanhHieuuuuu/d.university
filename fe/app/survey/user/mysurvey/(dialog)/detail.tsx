@@ -100,8 +100,8 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
             if (answer.selectedAnswerId) {
               // For single choice (type 1)
               formValues[`question_${answer.questionId}`] = answer.selectedAnswerId;
-            } else if (answer.selectedAnswerIds && answer.selectedAnswerIds.length > 0) {
-              // For multiple choice (type 2)
+            } else if (answer.selectedAnswerIds && Array.isArray(answer.selectedAnswerIds) && answer.selectedAnswerIds.length > 0) {
+              // For multiple choice (type 2) - ensure it's a valid array
               formValues[`question_${answer.questionId}`] = answer.selectedAnswerIds;
             } else if (answer.textResponse) {
               // For essay (type 3)

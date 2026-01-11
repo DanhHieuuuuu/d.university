@@ -433,6 +433,21 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                     .Where(x => x.IdPhienLamBai == submission.Id)
                     .ToListAsync();
 
+                // Group answers by questionId to handle checkbox questions
+                var groupedAnswers = savedAnswers.GroupBy(x => x.IdCauHoi).Select(g =>
+                {
+                    var answerIds = g.Where(a => a.IdDapAnChon.HasValue).Select(a => a.IdDapAnChon.Value).ToList();
+                    var textResponse = g.FirstOrDefault(a => !string.IsNullOrEmpty(a.CauTraLoiText))?.CauTraLoiText;
+
+                    return new SavedAnswerDto
+                    {
+                        QuestionId = g.Key,
+                        SelectedAnswerId = answerIds.Count == 1 ? answerIds.First() : (int?)null, // Single choice
+                        SelectedAnswerIds = answerIds.Count > 1 ? answerIds : null, // Multiple choice (only if > 1)
+                        TextResponse = textResponse // Essay
+                    };
+                }).ToList();
+
                 return new StartSurveyResponseDto
                 {
                     SubmissionId = submission.Id,
@@ -440,7 +455,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                     TenKhaoSat = surveyEntity.TenKhaoSat,
                     ThoiGianBatDau = submission.ThoiGianBatDau,
                     Questions = questionsDto,
-                    SavedAnswers = _mapper.Map<List<SavedAnswerDto>>(savedAnswers)
+                    SavedAnswers = groupedAnswers
                 };
             }
         }
