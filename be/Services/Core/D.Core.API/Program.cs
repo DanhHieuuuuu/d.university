@@ -56,7 +56,7 @@ namespace D.Core.API
                     });
                 }
                 app.UseCors(ProgramBase.CorsPolicy);
-                app.MapHub<NotificationHub>("/notification-hub");
+                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 app.UseSerilogRequestLogging();
 
                 app.UseAuthentication();

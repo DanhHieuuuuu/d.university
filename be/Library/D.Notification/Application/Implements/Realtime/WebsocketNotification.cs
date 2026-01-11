@@ -52,7 +52,7 @@ namespace D.Notification.ApplicationService.Implements.Realtime
 
                 suppressTx.Complete();
                 await _hubContext.Clients
-                    .Group(entity.ReceiverId.ToString())
+                    .All
                     .SendAsync("ReceiveNotification", new RealtimeNotificationDto
                     {
                         Id = entity.Id,
@@ -61,7 +61,6 @@ namespace D.Notification.ApplicationService.Implements.Realtime
                         CreatedAt = entity.CreatedAt
                     });
         
-                
             }
        
 }
