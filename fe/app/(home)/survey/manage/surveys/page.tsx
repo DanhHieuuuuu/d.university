@@ -1,7 +1,7 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input, Tag, Select, Tooltip } from 'antd';
-import { SearchOutlined, SyncOutlined, PlayCircleOutlined, StopOutlined, EyeOutlined, BarChartOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Tag, Select, Tooltip, Modal } from 'antd';
+import { SearchOutlined, SyncOutlined, PlayCircleOutlined, StopOutlined, EyeOutlined, BarChartOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getPagingSurvey, openSurveyAction, closeSurveyAction, getSurveyById, generateReportAction } from '@redux/feature/survey/surveyThunk';
@@ -114,15 +114,23 @@ const Page = () => {
       label: 'Mở khảo sát',
       icon: <PlayCircleOutlined />,
       command: (record: IViewSurvey) => {
-        if (confirm('Bạn có chắc muốn MỞ khảo sát này?')) {
-            dispatch(openSurveyAction(record.id))
-            .unwrap()
-            .then(() => {
-                toast.success('Đã mở khảo sát');
-                dispatch(getPagingSurvey(query));
-            })
-            .catch((err) => toast.error(err.message || 'Lỗi mở khảo sát'));
-        }
+        Modal.confirm({
+          title: 'Xác nhận mở khảo sát: ' + record.tenKhaoSat,
+          icon: <ExclamationCircleOutlined />,
+          centered: true,
+          okText: 'Mở khảo sát',
+          okType: 'primary',
+          cancelText: 'Hủy',
+          onOk: async () => {
+            try {
+              await dispatch(openSurveyAction(record.id)).unwrap();
+              toast.success('Đã mở khảo sát');
+              dispatch(getPagingSurvey(query));
+            } catch (error: any) {
+              toast.error(error?.message || 'Lỗi mở khảo sát');
+            }
+          }
+        });
       },
       hidden: (record: IViewSurvey) => record.status !== surveyStatusConst.CLOSE
     },
@@ -130,15 +138,23 @@ const Page = () => {
       label: 'Đóng khảo sát',
       icon: <StopOutlined />,
       command: (record: IViewSurvey) => {
-         if (confirm('Bạn có chắc muốn ĐÓNG khảo sát này?')) {
-            dispatch(closeSurveyAction(record.id))
-            .unwrap()
-            .then(() => {
-                toast.success('Đã đóng khảo sát');
-                dispatch(getPagingSurvey(query));
-            })
-            .catch((err) => toast.error(err.message || 'Lỗi đóng khảo sát'));
-         }
+        Modal.confirm({
+          title: 'Xác nhận đóng khảo sát: ' + record.tenKhaoSat,
+          icon: <ExclamationCircleOutlined />,
+          centered: true,
+          okText: 'Đóng khảo sát',
+          okType: 'danger',
+          cancelText: 'Hủy',
+          onOk: async () => {
+            try {
+              await dispatch(closeSurveyAction(record.id)).unwrap();
+              toast.success('Đã đóng khảo sát');
+              dispatch(getPagingSurvey(query));
+            } catch (error: any) {
+              toast.error(error?.message || 'Lỗi đóng khảo sát');
+            }
+          }
+        });
       },
       hidden: (record: IViewSurvey) => record.status !== surveyStatusConst.OPEN
     },
@@ -146,14 +162,22 @@ const Page = () => {
       label: 'Tạo báo cáo',
       icon: <BarChartOutlined />,
       command: (record: IViewSurvey) => {
-        if (confirm('Bạn có chắc muốn tạo báo cáo cho khảo sát này?')) {
-          dispatch(generateReportAction(record.id))
-            .unwrap()
-            .then(() => {
-              toast.success('Đã tạo báo cáo thành công.');
-            })
-            .catch((err) => toast.error(err.message || 'Lỗi tạo báo cáo'));
-         }
+        Modal.confirm({
+          title: 'Xác nhận tạo báo cáo: ' + record.tenKhaoSat,
+          icon: <ExclamationCircleOutlined />,
+          centered: true,
+          okText: 'Tạo báo cáo',
+          okType: 'primary',
+          cancelText: 'Hủy',
+          onOk: async () => {
+            try {
+              await dispatch(generateReportAction(record.id)).unwrap();
+              toast.success('Đã tạo báo cáo thành công');
+            } catch (error: any) {
+              toast.error(error?.message || 'Lỗi tạo báo cáo');
+            }
+          }
+        });
       },
       hidden: (record: IViewSurvey) =>
         record.status !== surveyStatusConst.CLOSE && record.status !== surveyStatusConst.COMPLETE
