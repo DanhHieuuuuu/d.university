@@ -4,5 +4,6 @@
     {
         public IEnumerable<T>? Items { get; set; }
         public int TotalItem { get; set; }
+        public object? Summary { get; set; }
     }
 }

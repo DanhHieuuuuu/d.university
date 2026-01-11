@@ -2,7 +2,7 @@ export class KpiRoleConst {
   static HIEU_TRUONG = "HIEU_TRUONG";
   static PHO_HIEU_TRUONG = "PHO_HIEU_TRUONG";
   static TRUONG_DON_VI_CAP_2 = "TRUONG_DON_VI_CAP_2";
-  static NHAN_VIEN = "NHAN_VIEN";
+  static CHUYEN_VIEN = "CHUYEN_VIEN";
   static GIANG_VIEN = "GIANG_VIEN";
 
   static list = [
@@ -19,8 +19,8 @@ export class KpiRoleConst {
       name: 'Trưởng đơn vị',
     },
     {
-      value: this.NHAN_VIEN,
-      name: 'Nhân viên',
+      value: this.CHUYEN_VIEN,
+      name: 'Chuyên viên',
     },
     {
       value: this.GIANG_VIEN,

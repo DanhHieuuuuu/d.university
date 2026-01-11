@@ -8,9 +8,9 @@ import { createKpiRole, updateKpiRole } from '@redux/feature/kpi/kpiThunk';
 import {clearSeletedKpiRole, resetStatusKpiRole} from '@redux/feature/kpi/kpiSlice';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
-import { KpiRoleConst } from '../../../const/kpiRole.const';
 import { getAllUser } from '@redux/feature/userSlice';
 import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
+import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -31,9 +31,10 @@ const PositionModal: React.FC<PositionModalProps> = ({
   const { $selected, $create, $update } = useAppSelector(
     (state) => state.kpiState.kpiRole
   );
-  const { list: users = [], status } = useAppSelector(
-    (state) => state.userState
+  const { list: users = [] } = useAppSelector(
+    (state) => state.userState.all
   );
+  const status = useAppSelector((state) => state.userState.status);
   const { phongBan } = useAppSelector((state) => state.danhmucState);
 
   const isSaving =

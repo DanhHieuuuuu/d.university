@@ -23,8 +23,7 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KpiLoaiConst } from '../../const/kpiType.const';
-import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
+import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { toast } from 'react-toastify';
 import { getAllPhongBanByKpiRole } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUserByKpiRole } from '@redux/feature/userSlice';
@@ -33,6 +32,7 @@ import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
 import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
 import ConfirmScoredModal from '../../modal/ConfirmScoredModal';
 import { formatKetQua } from '@helpers/kpi/formatResult.helper';
+import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -41,7 +41,7 @@ const Page = () => {
   const { processUpdateStatus } = useKpiStatusAction();
   const watchIdPhongBan = Form.useWatch('idPhongBan', form);
 
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
+  const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { list: listNhanSu } = useAppSelector((state) => state.userState.byKpiRole);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector(
@@ -82,6 +82,16 @@ const Page = () => {
   const scoreSelected = () => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
+      return;
+    }
+    const validItems = list.filter(
+      kpi =>
+        selectedRowKeys.includes(kpi.id) &&
+        kpi.trangThai == KpiTrangThaiConst.DA_GUI_CHAM
+    );
+
+    if (!validItems.length) {
+      toast.warning('Chỉ KPI đang ở trạng thái "Đã gửi chấm" mới được chấm');
       return;
     }
     setOpenChamModal(true);
@@ -209,6 +219,17 @@ const Page = () => {
     }
     cb();
   };
+
+  const loaiSummary = summary?.byLoaiKpi?.find(
+    x => x.loaiKpi === activeLoaiKpi
+  );
+
+  const tongTuDanhGia =
+    loaiSummary?.tuDanhGia ?? summary?.tongTuDanhGia ?? 0;
+
+  const tongCapTren =
+    loaiSummary?.capTren ?? summary?.tongCapTren ?? 0;
+
   const bulkActionItems: MenuProps['items'] = [
     {
       key: 'score',
@@ -282,12 +303,12 @@ const Page = () => {
   };
 
   const columns: IColumn<IViewKpiCaNhan>[] = [
-    {
-      key: 'linhVuc',
-      dataIndex: 'linhVuc',
-      title: 'Lĩnh Vực',
-      width: 150
-    },
+    // {
+    //   key: 'linhVuc',
+    //   dataIndex: 'linhVuc',
+    //   title: 'Lĩnh Vực',
+    //   width: 150
+    // },
     {
       key: 'kpi',
       dataIndex: 'kpi',
@@ -298,7 +319,7 @@ const Page = () => {
       key: 'nhanSu',
       dataIndex: 'nhanSu',
       title: 'Nhân sự',
-      width: 180
+      width: 140
     },
     {
       key: 'mucTieu',
@@ -318,18 +339,18 @@ const Page = () => {
       title: 'Công thức tính',
       width: 200,
     },
-    {
-      key: 'loaiKpi',
-      dataIndex: 'loaiKpi',
-      title: 'Loại KPI',
-      width: 140,
-      render: (val) => KpiLoaiConst.getName(val)
-    },
+    // {
+    //   key: 'loaiKpi',
+    //   dataIndex: 'loaiKpi',
+    //   title: 'Loại KPI',
+    //   width: 140,
+    //   render: (val) => KpiLoaiConst.getName(val)
+    // },
     {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
       title: 'Kết quả thực tế',
-      width: 180,
+      width: 140,
       render: (val, record) =>
         formatKetQua(val, record.loaiKetQua),
     },
@@ -337,8 +358,7 @@ const Page = () => {
       key: 'diemKpi',
       dataIndex: 'diemKpi',
       title: 'Điểm tự đánh giá',
-      width: 130,
-      align: 'center',
+      width: 150,
     },
     {
       key: 'capTrenDanhGia',
@@ -352,6 +372,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQuaCapTren(record.id, v)}
+            editable={record.isActive === 0}
           />
         );
       },
@@ -552,8 +573,24 @@ const Page = () => {
           ...rowSelection,
           fixed: 'left',
         }}
-        scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
+        scroll={{ x: 'max-content', y: 'calc(96vh - 420px)' }}
+        footer={() => (
+          <div className="flex justify-end gap-8">
+            <div>
+              <span className="font-medium">Tổng điểm tự đánh giá:</span>{' '}
+              <span className="text-blue-600 font-semibold">
+                {tongTuDanhGia.toFixed(2)}
+              </span>
+            </div>
 
+            <div>
+              <span className="font-medium">Tổng điểm cấp trên:</span>{' '}
+              <span className="text-green-600 font-semibold">
+                {tongCapTren.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        )}
       />
 
       <PositionModal

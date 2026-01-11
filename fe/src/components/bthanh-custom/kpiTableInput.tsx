@@ -1,5 +1,6 @@
+import { LoaiCongThuc } from '@/constants/kpi/loaiCongThuc.enum';
 import { Input, Select, Checkbox } from 'antd';
-import { LoaiCongThuc } from '@/app/(home)/kpi/const/loaiCongThuc.enum';
+
 
 type Props = {
     loaiKetQua?: LoaiCongThuc;

@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import UserSelect, { UserOption } from '@components/bthanh-custom/userSelect';
-import {clearSeletedKpiCaNhan, resetStatusKpiCaNhan} from '@redux/feature/kpi/kpiSlice';
-import {createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { clearSeletedKpiCaNhan, resetStatusKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
+import { createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { KpiLoaiConst } from '../../../const/kpiType.const';
 import { getAllUser } from '@redux/feature/userSlice';
+import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
+import { LIST_CONG_THUC } from '@/constants/kpi/kpiFormula.const';
+import { LOAI_KET_QUA_OPTIONS } from '@/constants/kpi/loaiCongThuc.enum';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -27,8 +29,20 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiCaNhan);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
-  const { list: users = []} = useAppSelector(state => state.userState.byKpiRole);
+  const { list: users = [] } = useAppSelector(state => state.userState.byKpiRole);
   const status = useAppSelector((state) => state.userState.status);
+  const selectedLoaiKpi = Form.useWatch('loaiKPI', form);
+  const congThucOptions = useMemo(() => {
+    if (!selectedLoaiKpi) return [];
+
+    return LIST_CONG_THUC
+      .filter(ct => ct.loaiKpiApDung.includes(selectedLoaiKpi))
+      .map(ct => ({
+        value: ct.id,
+        label: ct.congThuc,
+      }));
+  }, [selectedLoaiKpi]);
+
   useEffect(() => {
     if (isModalOpen) {
       if (isUpdate || isView) {
@@ -51,6 +65,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
     form.setFieldsValue({
       ...selectedData,
       idNhanSu: nhanSuOption,
+      role: selectedData?.role ?? '',
       namHoc: selectedData.namHoc
         ? dayjs(selectedData.namHoc, 'YYYY')
         : undefined,
@@ -63,7 +78,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       dispatch(clearSeletedKpiCaNhan());
       form.resetFields();
       setIsModalOpen(false);
-      props.onSuccess(); 
+      props.onSuccess();
     }
   }, [$create.status, $update.status, dispatch, form, setIsModalOpen]);
 
@@ -73,7 +88,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   const userOptions: UserOption[] = (users || []).map(u => ({
     value: u.id!,
-    label: `${u.maNhanSu} - ${u.hoDem ?? ''} ${u.ten ?? ''} - ${u.tenPhongBan}`.trim(),
+    label: `${u.maNhanSu} - ${u.hoDem ?? ''} ${u.ten ?? ''} - ${u.tenPhongBan}- ${u.tenChucVu}`.trim(),
     searchText: `${u.maNhanSu} ${u.hoDem} ${u.ten} ${u.tenPhongBan}`
   }));
 
@@ -88,6 +103,8 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       ...values,
       idNhanSu: values.idNhanSu?.value,
       namHoc: values.namHoc.format('YYYY'),
+      idCongThuc: values.idCongThuc,
+      congThucTinh: values.congThucTinh,
     };
 
     console.log('PAYLOAD GỬI BE', payload);
@@ -177,16 +194,60 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Form.Item
             label="Loại KPI"
-            name="loaiKpi"
+            name="loaiKPI"
             rules={[{ required: true, message: 'Vui lòng chọn loại KPI' }]}
           >
             <Select
+              placeholder="Chọn loại KPI"
               options={KpiLoaiConst.list.map(x => ({
                 value: x.value,
                 label: x.name,
               }))}
-              placeholder="Chọn loại KPI"
+              onChange={() => {
+                form.setFieldsValue({
+                  idCongThuc: undefined,
+                  congThucTinh: undefined,
+                });
+              }}
             />
+          </Form.Item>
+
+          <Form.Item
+            label="Công thức tính KPI"
+            name="idCongThuc"
+            rules={[{ required: true, message: 'Vui lòng chọn công thức' }]}
+          >
+            <Select
+              placeholder={
+                selectedLoaiKpi
+                  ? 'Chọn công thức'
+                  : 'Vui lòng chọn Loại KPI trước'
+              }
+              options={congThucOptions}
+              disabled={!selectedLoaiKpi}
+              onChange={(value) => {
+                const selected = LIST_CONG_THUC.find(x => x.id === value);
+                form.setFieldsValue({
+                  congThucTinh: selected?.congThuc,
+                });
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            label="Loại kết quả"
+            name="loaiKetQua"
+            rules={[{ required: true, message: 'Vui lòng chọn loại kết quả' }]}
+          >
+            <Select
+              placeholder="Chọn loại kết quả"
+              options={LOAI_KET_QUA_OPTIONS}
+            />
+          </Form.Item>
+          <Form.Item
+            name="congThucTinh"
+            hidden
+          >
+            <Input />
           </Form.Item>
 
 
@@ -198,7 +259,18 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <UserSelect
               options={userOptions}
               loading={status === ReduxStatus.LOADING}
+              onChange={(value) => {
+                const selectedUser = users.find(u => u.id === value?.value);
+                const roleCode = selectedUser?.tenChucVu ?? '';
+                form.setFieldsValue({ role: roleCode });
+              }}
             />
+          </Form.Item>
+          <Form.Item<ICreateKpiCaNhan>
+            label="Role"
+            name="role"
+          >
+            <Input disabled />
           </Form.Item>
 
 

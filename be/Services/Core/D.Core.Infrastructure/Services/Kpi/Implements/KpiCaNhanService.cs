@@ -85,19 +85,51 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             );
 
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-            var allowedUserIds = await GetAllowedUserIds(userId);
             var isActive = GetKpiIsActive();
+
+            var allowedUserIds = await GetAllowedUserIds(userId);
+
             List<int> nhanSuIdsByDonVi = new();
 
             if (dto.IdPhongBan.HasValue)
             {
                 nhanSuIdsByDonVi = await _unitOfWork.iKpiRoleRepository
                     .TableNoTracking
-                    .Where(x => x.IdDonVi == dto.IdPhongBan)
+                    .Where(x =>
+                        x.IdDonVi == dto.IdPhongBan.Value &&
+                        x.IdNhanSu != userId 
+                    )
                     .Select(x => x.IdNhanSu)
                     .Distinct()
                     .ToListAsync();
             }
+
+            var kpiQuery = _unitOfWork.iKpiCaNhanRepository
+                .TableNoTracking
+                .Where(kpi =>
+                    !kpi.Deleted &&
+                    allowedUserIds.Contains(kpi.IdNhanSu) &&     
+                    kpi.IdNhanSu != userId &&                 
+                    (!dto.IdPhongBan.HasValue ||
+                        nhanSuIdsByDonVi.Contains(kpi.IdNhanSu)) &&
+                    (string.IsNullOrEmpty(dto.Keyword) ||
+                        kpi.KPI!.ToLower().Contains(dto.Keyword.ToLower().Trim())) &&
+                    (!dto.LoaiKpi.HasValue || kpi.LoaiKPI == dto.LoaiKpi) &&
+                    (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc) &&
+                    (!dto.TrangThai.HasValue || kpi.Status == dto.TrangThai) &&
+                    (!dto.IdNhanSu.HasValue || kpi.IdNhanSu == dto.IdNhanSu) &&
+                    kpi.Role != "TRUONG_DON_VI_CAP_2"
+                );
+
+            var total = await kpiQuery.CountAsync();
+
+            var kpis = await kpiQuery
+                .OrderBy(x => x.STT)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .ToListAsync();
+
+            var nhanSuIds = kpis.Select(x => x.IdNhanSu).Distinct().ToList();
 
             var phongBans = await _unitOfWork.iDmPhongBanRepository
                 .TableNoTracking
@@ -105,72 +137,77 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             var nhanSus = await _unitOfWork.iNsNhanSuRepository
                 .TableNoTracking
-                .Where(ns =>
-                    (!dto.IdNhanSu.HasValue || ns.Id == dto.IdNhanSu) &&
-                    (!dto.IdPhongBan.HasValue || nhanSuIdsByDonVi.Contains(ns.Id))
-                )
+                .Where(ns => nhanSuIds.Contains(ns.Id))
                 .ToDictionaryAsync(
                     x => x.Id,
                     x => new
                     {
                         HoTenDayDu = (x.HoDem + " " + x.Ten).Trim(),
-                        TenPhongBan = dto.IdPhongBan.HasValue && phongBans.ContainsKey(dto.IdPhongBan.Value)
-                            ? phongBans[dto.IdPhongBan.Value]
-                            : string.Empty
+                        TenPhongBan = phongBans.Values.FirstOrDefault() ?? string.Empty
                     }
                 );
-            var kpis = await _unitOfWork.iKpiCaNhanRepository
+
+            var summaryQuery = _unitOfWork.iKpiCaNhanRepository
                 .TableNoTracking
                 .Where(kpi =>
                     !kpi.Deleted &&
                     allowedUserIds.Contains(kpi.IdNhanSu) &&
-                    (string.IsNullOrEmpty(dto.Keyword) ||
-                        kpi.KPI!.ToLower().Contains(dto.Keyword.ToLower().Trim())) &&
-                    (!dto.LoaiKpi.HasValue || kpi.LoaiKPI == dto.LoaiKpi) &&
-                    (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc) &&
-                    (!dto.TrangThai.HasValue || kpi.Status == dto.TrangThai)
-                )
-                .ToListAsync();
-            var filteredKpis = kpis.Where(kpi => nhanSus.ContainsKey(kpi.IdNhanSu));
-            var total = filteredKpis.Count();
+                    kpi.IdNhanSu != userId &&
+                    (!dto.IdPhongBan.HasValue || nhanSuIdsByDonVi.Contains(kpi.IdNhanSu)) &&
+                    (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
+                );
+            var summary = new KpiCaNhanSummaryDto
+            {
+                TongTuDanhGia = await summaryQuery.SumAsync(x => (decimal?)(x.DiemKpi ?? 0)) ?? 0,
+                TongCapTren = await summaryQuery.SumAsync(x => (decimal?)(x.DiemKpiCapTren ?? 0)) ?? 0,
+                ByLoaiKpi = await summaryQuery
+                    .Where(x => x.LoaiKPI.HasValue)
+                    .GroupBy(x => x.LoaiKPI!.Value)
+                    .Select(g => new KpiCaNhanSummaryByLoaiDto
+                    {
+                        LoaiKpi = g.Key,
+                        TuDanhGia = g.Sum(x => (decimal?)(x.DiemKpi ?? 0)) ?? 0,
+                        CapTren = g.Sum(x => (decimal?)(x.DiemKpiCapTren ?? 0)) ?? 0
+                    })
+                    .ToListAsync()
 
-            var resultItems = kpis
-                .Skip(dto.SkipCount())
-                .Take(dto.PageSize)
-                .Select(kpi => new KpiCaNhanDto
-                {
-                    Id = kpi.Id,
-                    STT = kpi.STT,
-                    KPI = kpi.KPI,
-                    LoaiKpi = kpi.LoaiKPI,
-                    LinhVuc = kpi.LinhVuc,
-                    ChienLuoc = kpi.ChienLuoc,
+            };
 
-                    IdNhanSu = kpi.IdNhanSu,
-                    NhanSu = nhanSus[kpi.IdNhanSu].HoTenDayDu,
-                    PhongBan = nhanSus[kpi.IdNhanSu].TenPhongBan,
+            var resultItems = kpis.Select(kpi => new KpiCaNhanDto
+            {
+                Id = kpi.Id,
+                STT = kpi.STT,
+                KPI = kpi.KPI,
+                LoaiKpi = kpi.LoaiKPI,
+                LinhVuc = kpi.LinhVuc,
+                ChienLuoc = kpi.ChienLuoc,
 
-                    MucTieu = kpi.MucTieu,
-                    TrongSo = kpi.TrongSo,
-                    Role = kpi.Role,
-                    NamHoc = kpi.NamHoc,
-                    TrangThai = kpi.Status,
-                    LoaiKetQua = kpi.LoaiKetQua,
-                    KetQuaThucTe = kpi.KetQuaThucTe,
-                    CapTrenDanhGia = kpi.CapTrenDanhGia,
-                    DiemKpiCapTren = kpi.DiemKpiCapTren,
-                    DiemKpi = kpi.DiemKpi,
-                    IsActive = kpi.Status == KpiStatus.Scored ? 0 : isActive,
-                    CongThuc = kpi.CongThucTinh
-                })
-                .ToList();
+                IdNhanSu = kpi.IdNhanSu,
+                NhanSu = nhanSus[kpi.IdNhanSu].HoTenDayDu,
+                PhongBan = nhanSus[kpi.IdNhanSu].TenPhongBan,
+
+                MucTieu = kpi.MucTieu,
+                TrongSo = kpi.TrongSo,
+                Role = kpi.Role,
+                NamHoc = kpi.NamHoc,
+                TrangThai = kpi.Status,
+                LoaiKetQua = kpi.LoaiKetQua,
+                KetQuaThucTe = kpi.KetQuaThucTe,
+                CapTrenDanhGia = kpi.CapTrenDanhGia,
+                DiemKpiCapTren = kpi.DiemKpiCapTren,
+                DiemKpi = kpi.DiemKpi,
+                IsActive = kpi.Status == KpiStatus.Evaluated ? 0 : isActive,
+                CongThuc = kpi.CongThucTinh
+            }).ToList();
 
             return new PageResultDto<KpiCaNhanDto>
             {
                 Items = resultItems,
-                TotalItem = total
+                TotalItem = total,
+                Summary = summary
             };
         }
+
 
 
 
@@ -205,6 +242,8 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
                     && (dto.TrangThai == null || kpi.Status == dto.TrangThai)
                     && (string.IsNullOrEmpty(dto.Role) || kpi.Role == dto.Role)
+                    && (kpi.Role != "HIEU_TRUONG")
+                     && (kpi.Role != "TRUONG_DON_VI_CAP_2")
                 )
                 .Select(kpi => new KpiCaNhanDto
                 {
@@ -234,7 +273,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     CongThuc = kpi.CongThucTinh,
                     GhiChu = kpi.GhiChu,
                     IsActive = (
-                            kpi.Status == KpiStatus.Evaluating
+                            kpi.Status == KpiStatus.Create
                             || kpi.Status == KpiStatus.NeedEdit
                             || kpi.Status == KpiStatus.Declared
                         )
@@ -533,6 +572,16 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 .Where(r => r.IdNhanSu == currentUserId)
                 .ToListAsync();
 
+            // Nếu không có role quản lý → KHÔNG xem được gì
+            if (!userRoles.Any(r =>
+                r.Role == "TRUONG_DON_VI_CAP_2" ||
+                r.Role == "TRUONG_DON_VI_CAP_3" ||
+                r.Role == "HIEU_TRUONG" ||
+                r.Role == "CHU_TICH_HOI_DONG_TRUONG"))
+            {
+                return new List<int>();
+            }
+
             var allKpiRoles = await _unitOfWork.iKpiRoleRepository
                 .TableNoTracking
                 .ToListAsync();
@@ -543,77 +592,49 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 switch (role.Role)
                 {
-                    // Nhân viên bình thường: chỉ thấy chính mình
-                    case "GIANG_VIEN":
-                    case "KY_SU":
-                    case "CHUYEN_VIEN":
-                    case "GIANG_VIEN_MOI_VAO":
-                    case "CHUYEN_VIEN_VP_KHOA_KHONG_CO_CN":
-                    case "CHUYEN_VIEN_VP_KHOA_CO_CN":
-                    case "KY_SU_HUONG_DAN_TN":
-                    case "GIANG_VIEN_KIEM_NHIEM":
-                        allowedUserIds.Add(currentUserId);
-                        break;
-
-                    // Trưởng đơn vị: thấy nhân viên + phó trưởng
+                    // ===== TRƯỞNG ĐƠN VỊ =====
                     case "TRUONG_DON_VI_CAP_2":
                     case "TRUONG_DON_VI_CAP_3":
-                        if (role.IdDonVi.HasValue)
-                        {
-                            var membersInUnit = allKpiRoles
-                                .Where(r =>
-                                    r.IdDonVi == role.IdDonVi &&
-                                    r.Role != role.Role &&   
-                                    r.Role != "HIEU_TRUONG" &&
-                                    r.Role != "CHU_TICH_HOI_DONG_TRUONG" &&
-                                    r.Role != "PHO_HIEU_TRUONG"
-                                )
-                                .Select(r => r.IdNhanSu)
-                                .ToList();
 
-                            allowedUserIds.UnionWith(membersInUnit);
+                        if (!role.IdDonVi.HasValue)
+                            break;
 
-                            // Thêm phó trưởng trong đơn vị
-                            var phoTruong = allKpiRoles
-                                .Where(r => r.IdDonVi == role.IdDonVi && r.Role == "PHO_DON_VI_CAP_2")
-                                .Select(r => r.IdNhanSu)
-                                .ToList();
-
-                            allowedUserIds.UnionWith(phoTruong);
-                        }
-                        break;
-
-                    case "PHO_DON_VI_CAP_2":
-                        allowedUserIds.Add(currentUserId);
-                        break;
-
-                    // Hiệu trưởng / Chủ tịch: thấy tất cả nhân viên + trưởng/phó đơn vị
-                    case "HIEU_TRUONG":
-                    case "CHU_TICH_HOI_DONG_TRUONG":
-                        // KPI cá nhân: chỉ nhân viên + phó trưởng (không lấy trưởng đơn vị)
-                        var staffAndPhoTruong = allKpiRoles
+                        var subordinates = allKpiRoles
                             .Where(r =>
+                                r.IdDonVi == role.IdDonVi &&
                                 r.Role != "TRUONG_DON_VI_CAP_2" &&
                                 r.Role != "TRUONG_DON_VI_CAP_3" &&
                                 r.Role != "HIEU_TRUONG" &&
+                                r.Role != "PHO_HIEU_TRUONG" &&
                                 r.Role != "CHU_TICH_HOI_DONG_TRUONG"
                             )
                             .Select(r => r.IdNhanSu)
-                            .Distinct()
-                            .ToList();
+                            .Distinct();
 
-                        allowedUserIds.UnionWith(staffAndPhoTruong);
+                        allowedUserIds.UnionWith(subordinates);
                         break;
 
-                    default:
-                        // Role khác mặc định chỉ thấy mình
-                        allowedUserIds.Add(currentUserId);
+                    // ===== HIỆU TRƯỞNG / CHỦ TỊCH =====
+                    case "HIEU_TRUONG":
+                    case "CHU_TICH_HOI_DONG_TRUONG":
+
+                        var allStaff = allKpiRoles
+                            .Where(r =>
+                                r.Role != "HIEU_TRUONG" &&
+                                r.Role != "PHO_HIEU_TRUONG" &&
+                                r.Role != "CHU_TICH_HOI_DONG_TRUONG"
+                            )
+                            .Select(r => r.IdNhanSu)
+                            .Distinct();
+
+                        allowedUserIds.UnionWith(allStaff);
                         break;
                 }
             }
 
             return allowedUserIds.ToList();
         }
+
 
 
     }

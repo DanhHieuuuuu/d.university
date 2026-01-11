@@ -6,9 +6,9 @@ import { clearSeletedKpiTruong, resetStatusKpiTruong } from '@redux/feature/kpi/
 import { createKpiTruong, updateKpiTruong } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
-import { KpiLoaiConst } from '../../../const/kpiType.const';
 import { ICreateKpiTruong } from '@models/kpi/kpi-truong.model';
 import dayjs from 'dayjs';
+import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 
 type PositionModalProps = {
   isModalOpen: boolean;

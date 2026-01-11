@@ -2,9 +2,9 @@ import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseList, IResponseItem } from '@models/common/response.model';
 import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateCapTrenDanhGiaList, IUpdateKpiCaNhan, IUpdateKpiCaNhanThucTeList, IUpdateTrangThaiKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
-import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanhGiaList, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
+import { ICreateKpiDonVi, IGiaoKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanhGiaList, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
-import { ICreateKpiTruong, IQueryKpiTruong, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
+import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 const apiDanhMucEndpoint = 'kpi';
@@ -183,6 +183,19 @@ const getListKpiDonVi = async (query?: IQueryKpiDonVi) => {
   }
 };
 
+const getListKpiDonViKeKhai = async (query?: IQueryKpiDonVi) => {
+  try {
+    const res = await axios.get(
+      `${apiKpiDonViEndpoint}/find-ke-khai`,
+      { params: { ...query } }
+    );
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
 const createKpiDonVi = async (body: ICreateKpiDonVi) => {
   const res = await axios.post(`${apiKpiDonViEndpoint}/create`, body);
   if (res.data?.code != 200) {
@@ -311,6 +324,50 @@ export const getListTrangThaiKpiDonVi = async () => {
   }
 };
 
+const giaoKpiDonVi = async (
+  body: IGiaoKpiDonVi
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiDonViEndpoint}/giao-kpi`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Giao KPI thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi giao KPI');
+    return Promise.reject(err);
+  }
+};
+
+const getNhanSuDaGiaoByKpiDonVi = async (idKpiDonVi: number) => {
+  try {
+    const res = await axios.get(
+      `${apiKpiDonViEndpoint}/nhan-su-da-giao`,
+      {
+        params: { idKpiDonVi }
+      }
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Không lấy được danh sách nhân sự đã giao'
+      });
+    }
+
+    return Promise.resolve(res.data.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi lấy nhân sự đã giao KPI');
+    return Promise.reject(err);
+  }
+};
+
 //KPI TRƯỜNG'
 const getListKpiTruong = async (query?: IQueryKpiTruong) => {
   try {
@@ -397,6 +454,28 @@ const updateKetQuaThucTeKpiTruong = async (
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả thực tế');
+    return Promise.reject(err);
+  }
+};
+
+const updateKetQuaCapTrenKpiTruong = async (
+  body: IUpdateCapTrenTruongDanhGiaList
+) => {
+  try {
+    const res = await axios.put(
+      `${apiKpiTruongEndpoint}/update-ket-qua-cap-tren`,
+      body
+    );
+
+    if (res.data?.code !== 200) {
+      return Promise.reject({
+        message: res.data?.message || 'Cập nhật kết quả đánh giá thất bại'
+      });
+    }
+
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi cập nhật kết quả đánh giá');
     return Promise.reject(err);
   }
 };
@@ -503,6 +582,7 @@ export const KpiService = {
   updateKetQuaThucTeKpiCaNhan,
   updateKetQuaCapTrenKpiCaNhan,
   getListKpiDonVi,
+  getListKpiDonViKeKhai,
   createKpiDonVi,
   updateKpiDonVi,
   deleteKpiDonVi,
@@ -511,6 +591,8 @@ export const KpiService = {
   updateTrangThaiKpiDonVi,
   updateKetQuaThucTeKpiDonVi,
   updateKetQuaCapTrenKpiDonVi,
+  giaoKpiDonVi,
+  getNhanSuDaGiaoByKpiDonVi,
   getListKpiTruong,
   createKpiTruong,
   updateKpiTruong,
@@ -519,6 +601,7 @@ export const KpiService = {
   getListNamHocKpiTruong,
   updateTrangThaiKpiTruong,
   updateKetQuaThucTeKpiTruong,
+  updateKetQuaCapTrenKpiTruong,
   getListKpiRole,
   createKpiRole,
   updateKpiRole,

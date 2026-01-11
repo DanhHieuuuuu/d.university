@@ -2,9 +2,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { KpiService } from '@services/kpi.service';
 import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateKpiCaNhan, IUpdateTrangThaiKpiCaNhan, IUpdateKpiCaNhanThucTeList, IViewKpiCaNhan, IUpdateCapTrenDanhGiaList } from '@models/kpi/kpi-ca-nhan.model';
-import { ICreateKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanhGiaList, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
+import { ICreateKpiDonVi, IGiaoKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanhGiaList, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
-import { ICreateKpiTruong, IQueryKpiTruong, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong } from '@models/kpi/kpi-truong.model';
+import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong } from '@models/kpi/kpi-truong.model';
 
 export const getAllKpiCaNhan = createAsyncThunk('kpi/list-canhan', async (payload?: IQueryKpiCaNhan) => {
     try {
@@ -139,6 +139,18 @@ export const getAllKpiDonVi = createAsyncThunk('kpi/list-donvi', async (payload?
     }
 });
 
+export const getKpiDonViKeKhai = createAsyncThunk(
+    'kpi-donvi/ke-khai',
+    async (payload: IQueryKpiDonVi | undefined, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.getListKpiDonViKeKhai(payload);
+            return res.data;
+        } catch (err: any) {
+            return rejectWithValue(err?.response?.data);
+        }
+    }
+);
+
 export const getAllIdsKpiDonVi = createAsyncThunk(
     'kpi-donvi/getAllIds',
     async (payload: IQueryKpiDonVi) => {
@@ -253,6 +265,32 @@ export const getListTrangThaiKpiDonVi = createAsyncThunk(
     }
 );
 
+export const giaoKpiDonVi = createAsyncThunk(
+  'kpi/giao-kpi-donvi',
+  async (payload: IGiaoKpiDonVi, { rejectWithValue }) => {
+    try {
+      return await KpiService.giaoKpiDonVi(payload);
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.response?.data || { message: 'Giao KPI thất bại' }
+      );
+    }
+  }
+);
+
+export const getNhanSuDaGiaoByKpiDonVi = createAsyncThunk(
+  'kpi-donvi/get-nhan-su-da-giao',
+  async (idKpiDonVi: number, { rejectWithValue }) => {
+    try {
+      const res = await KpiService.getNhanSuDaGiaoByKpiDonVi(idKpiDonVi);
+      return res;
+    } catch (err: any) {
+      return rejectWithValue(
+        err?.message || 'Không lấy được nhân sự đã giao KPI'
+      );
+    }
+  }
+);
 // Kpi trường
 
 export const getAllKpiTruong = createAsyncThunk('kpi/list-truong', async (payload?: IQueryKpiTruong) => {
@@ -320,6 +358,22 @@ export const updateKetQuaThucTeKpiTruong = createAsyncThunk(
     async (payload: IUpdateKpiTruongThucTeList, { rejectWithValue }) => {
         try {
             const res = await KpiService.updateKetQuaThucTeKpiTruong(payload);
+            return res;
+        } catch (error: any) {
+            return rejectWithValue(
+                error?.response?.data || {
+                    message: 'Cập nhật kết quả thực tế KPI thất bại'
+                }
+            );
+        }
+    }
+);
+
+export const updateKetQuaCapTrenKpiTruong = createAsyncThunk(
+    'kpi/update-ketqua-captren-truong',
+    async (payload: IUpdateCapTrenTruongDanhGiaList, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.updateKetQuaCapTrenKpiTruong(payload);
             return res;
         } catch (error: any) {
             return rejectWithValue(

@@ -4,13 +4,13 @@ import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import UserSelect, { UserOption } from '@components/bthanh-custom/userSelect';
-import {clearSeletedKpiCaNhan, resetStatusKpiCaNhan} from '@redux/feature/kpi/kpiSlice';
-import {createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { clearSeletedKpiCaNhan, resetStatusKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
+import { createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { KpiLoaiConst } from '../../../const/kpiType.const';
 import { getAllUser } from '@redux/feature/userSlice';
+import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -27,7 +27,8 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiCaNhan);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
-  const { list: users = [], status } = useAppSelector(state => state.userState);
+  const { list: users = [] } = useAppSelector(state => state.userState.byKpiRole);
+  const status = useAppSelector((state) => state.userState.status);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -63,7 +64,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       dispatch(clearSeletedKpiCaNhan());
       form.resetFields();
       setIsModalOpen(false);
-      props.onSuccess(); 
+      props.onSuccess();
     }
   }, [$create.status, $update.status, dispatch, form, setIsModalOpen]);
 
@@ -177,7 +178,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Form.Item
             label="Loại KPI"
-            name="loaiKPI"
+            name="loaiKpi"
             rules={[{ required: true, message: 'Vui lòng chọn loại KPI' }]}
           >
             <Select

@@ -19,8 +19,8 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KpiRoleConst } from '../../const/kpiRole.const';
 import { toast } from 'react-toastify';
+import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 
 const Page = () => {
   const [form] = Form.useForm();

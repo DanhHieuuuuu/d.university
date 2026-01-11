@@ -10,5 +10,6 @@ namespace D.Core.Domain.Dtos.Kpi.KpiTruong
     {
         public int Id { get; set; }
         public decimal? KetQuaThucTe { get; set; }
+        public decimal? DiemKpi { get; set; }
     }
 }

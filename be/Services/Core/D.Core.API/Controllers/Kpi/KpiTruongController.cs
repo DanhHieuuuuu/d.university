@@ -1,5 +1,4 @@
 ﻿using D.ControllerBase;
-using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -153,7 +152,26 @@ namespace D.Core.API.Controllers.Kpi
         }
 
         /// <summary>
-        /// Danh sách trạng thái Kpi đơn vị
+        /// Cập nhật kết quả cấp trên Kpi truong
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("kpi-truong/update-ket-qua-cap-tren")]
+        public async Task<ResponseAPI> UpdateKetQuaCapTren([FromBody] UpdateKetQuaCapTrenKpiTruongListDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new("Đã thêm kết quả cấp trên thành công!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Danh sách trạng thái Kpi truong
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>

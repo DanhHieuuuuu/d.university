@@ -1,5 +1,5 @@
+import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { Modal, Form, Input } from 'antd';
-import { KpiTrangThaiConst } from '../const/kpiStatus.const';
 import { useState } from 'react';
 
 

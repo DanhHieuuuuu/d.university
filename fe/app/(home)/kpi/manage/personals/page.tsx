@@ -16,17 +16,18 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KPI_ORDER, KpiLoaiConst } from '../../const/kpiType.const';
-import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
 import { toast } from 'react-toastify';
 import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUser } from '@redux/feature/userSlice';
 import { buildKpiGroupedTable, KpiTableRow } from '@helpers/kpi/kpi.helper';
 import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
 import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
-import { KpiRoleConst } from '../../const/kpiRole.const';
 import { formatKetQua } from '@helpers/kpi/formatResult.helper';
 import { ETableColumnType } from '@/constants/e-table.consts';
+import '@styles/kpi/table.kpi.scss'
+import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
+import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
+import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
@@ -138,6 +139,33 @@ const Page = () => {
     cb();
   };
 
+  const totalDeclaredScore = useMemo(() => {
+    return (list || [])
+      .filter(k => !query.role || k.role === query.role)
+      .reduce((sum, k) => sum + (k.diemKpi ?? 0), 0);
+  }, [list, query.role]);
+
+  const scoreByRole = useMemo(() => {
+    const map: Record<string, number> = {};
+
+    (list || []).forEach(k => {
+      if (!k.role) return;
+      map[k.role] = (map[k.role] || 0) + (k.diemKpi ?? 0);
+    });
+
+    return map;
+  }, [list]);
+
+  const finalScore = useMemo(() => {
+    return (roleByUser || []).reduce((sum, r) => {
+      const tiLe = (r.tiLe ?? 0) / 100;
+      const diemRole = scoreByRole[r.role] ?? 0;
+      return sum + diemRole * tiLe;
+    }, 0);
+  }, [roleByUser, scoreByRole]);
+
+
+
   const bulkActionItems: MenuProps['items'] = [
     { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
     { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
@@ -171,12 +199,12 @@ const Page = () => {
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => onFilterChange({ Keyword: value }), 500);
 
   const columns: IColumn<KpiTableRow<IViewKpiCaNhan>>[] = [
-    {
-      key: 'linhVuc',
-      dataIndex: 'linhVuc', title: 'Lĩnh Vực',
-      width: 150,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
-    },
+    // {
+    //   key: 'linhVuc',
+    //   dataIndex: 'linhVuc', title: 'Lĩnh Vực',
+    //   width: 150,
+    //   render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+    // },
     {
       key: 'kpi', dataIndex: 'kpi', title: 'Tên KPI', width: 400,
       render: (value, record) => {
@@ -186,7 +214,7 @@ const Page = () => {
               <div style={{
                 fontSize: 17,
                 fontWeight: 600,
-                textAlign: '-webkit-center',
+                textAlign: 'center',
                 color: '#0958d9',
               }}>
                 {'KPI ' + KpiLoaiConst.getName(record.loaiKpi)}
@@ -225,7 +253,7 @@ const Page = () => {
       key: 'trongSo',
       dataIndex: 'trongSo',
       title: 'Trọng số',
-      width: 100,
+      width: 80,
       render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
     },
     {
@@ -235,13 +263,13 @@ const Page = () => {
       width: 200,
       render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
     },
-    {
-      key: 'loaiKpi',
-      dataIndex: 'loaiKpi',
-      title: 'Loại KPI',
-      width: 140,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : KpiLoaiConst.getName(val))
-    },
+    // {
+    //   key: 'loaiKpi',
+    //   dataIndex: 'loaiKpi',
+    //   title: 'Loại KPI',
+    //   width: 140,
+    //   render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : KpiLoaiConst.getName(val))
+    // },
     {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
@@ -259,6 +287,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQua(record.id, v)}
+            editable={record.isActive !== 0}
           />
         );
       },
@@ -399,19 +428,47 @@ const Page = () => {
         </div>
       </Form>
 
-      <AppTable
-        loading={status === ReduxStatus.LOADING}
-        rowKey="id"
-        columns={columns}
-        dataSource={tableData}
-        listActions={actions}
-        pagination={false}
-        rowSelection={{
-          ...rowSelection,
-          fixed: 'left',
-        }}
-        scroll={{ x: 'max-content', y: 'calc(110vh - 420px)' }}
-      />
+      <div className="kpi-table-wrapper">
+        <AppTable
+          loading={status === ReduxStatus.LOADING}
+          rowKey="id"
+          columns={columns}
+          dataSource={tableData}
+          listActions={actions}
+          pagination={false}
+          rowSelection={{
+            ...rowSelection,
+            fixed: 'left',
+          }}
+          scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
+          footer={() => (
+            <div className="kpi-table-footer">
+              <div className="footer-row">
+                <strong>Chức vụ:</strong>
+                {roleByUser?.map(r => (
+                  <Tag key={r.role} color="blue">
+                    {KpiRoleConst.getName(r.role)} ({r.tiLe}%)
+                  </Tag>
+                ))}
+              </div>
+
+              <div className="footer-row">
+                <strong>Tổng điểm kê khai:</strong>
+                <span className="score-warning">
+                  {totalDeclaredScore.toFixed(2)}
+                </span>
+              </div>
+
+              <div className="footer-row">
+                <strong>Điểm tổng nhận được:</strong>
+                <span className="score-success">
+                  {finalScore.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
+        />
+      </div>
       <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiCaNhanKeKhai(query)); dispatch(getListTrangThaiKpiCaNhan()); }} />
     </Card>
   );

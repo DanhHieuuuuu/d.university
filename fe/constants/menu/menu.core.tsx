@@ -122,17 +122,17 @@ export const listMenuCore: IMenu[] = [
             label: 'Kê khai Kpi cá nhân',
             routerLink: '/kpi/manage/personals',
             icon: <PartitionOutlined />
-          }
-          // {
-          //   label: 'Kê khai Kpi đơn vị',
-          //   routerLink: '/kpi/list/units',
-          //   icon: <PartitionOutlined />
-          // },
-          // {
-          //   label: 'Kê khai Kpi trường',
-          //   routerLink: '/kpi/list/school',
-          //   icon: <PartitionOutlined />
-          // },
+          },
+          {
+            label: 'Kê khai Kpi đơn vị',
+            routerLink: '/kpi/manage/units',
+            icon: <PartitionOutlined />
+          },
+          {
+            label: 'Kê khai Kpi trường',
+            routerLink: '/kpi/manage/school',
+            icon: <PartitionOutlined />
+          },
         ]
       }
     ]

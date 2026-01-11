@@ -13,6 +13,7 @@ using d.Shared.Permission.Error;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NsNhanSuEntity = D.Core.Domain.Entities.Hrm.NhanSu.NsNhanSu;
+using D.Core.Domain.Entities.Kpi;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -174,8 +175,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 .ToList();
 
             var isHieuTruong = userRoles.Any(x => x.Role == "HIEU_TRUONG");
+
             var donViIds = userRoles
-                .Where(x => (x.Role.StartsWith("TRUONG_DON_VI_CAP_2")|| x.Role.StartsWith("TRUONG_DON_VI_CAP_3")) && x.IdDonVi.HasValue)
+                .Where(x => (x.Role.StartsWith("TRUONG_DON_VI_CAP_2") || x.Role.StartsWith("TRUONG_DON_VI_CAP_3")) && x.IdDonVi.HasValue)
                 .Select(x => x.IdDonVi!.Value)
                 .Distinct()
                 .ToList();
@@ -185,28 +187,27 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             if (isHieuTruong)
             {
                 allowedNhanSuIds = _unitOfWork.iKpiRoleRepository.TableNoTracking
-                    .Select(x => x.IdNhanSu)
+                    .Where(r => r.Role != "TRUONG_DON_VI_CAP_2") 
+                    .Select(r => r.IdNhanSu)
                     .Distinct()
                     .ToList();
             }
             else
             {
                 allowedNhanSuIds = _unitOfWork.iKpiRoleRepository.TableNoTracking
-                    .Where(x => x.IdDonVi.HasValue && donViIds.Contains(x.IdDonVi.Value))
-                    .Select(x => x.IdNhanSu)
+                    .Where(r => r.IdDonVi.HasValue && donViIds.Contains(r.IdDonVi.Value))
+                    .Select(r => r.IdNhanSu)
                     .Distinct()
                     .ToList();
             }
+
             if (dto.IdPhongBan.HasValue)
             {
                 allowedNhanSuIds = _unitOfWork.iKpiRoleRepository.TableNoTracking
-                .Where(x =>
-                    x.IdDonVi == dto.IdPhongBan.Value
-                    && allowedNhanSuIds.Contains(x.IdNhanSu)
-                )
-                .Select(x => x.IdNhanSu)
-                .Distinct()
-                .ToList();
+                    .Where(r => r.IdDonVi == dto.IdPhongBan.Value && allowedNhanSuIds.Contains(r.IdNhanSu))
+                    .Select(r => r.IdNhanSu)
+                    .Distinct()
+                    .ToList();
             }
 
             if (!allowedNhanSuIds.Any())
@@ -218,53 +219,100 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 };
             }
 
-            var query = _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                .Where(x => !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id));
-
-            if (!string.IsNullOrEmpty(dto.Keyword))
-            {
-                var kw = dto.Keyword.ToLower();
-                query = query.Where(x =>
-                    (x.MaNhanSu ?? "").ToLower().Contains(kw) ||
-                    ((x.HoDem ?? "") + " " + (x.Ten ?? "")).ToLower().Contains(kw) ||
-                    (x.SoCccd ?? "").Contains(kw)
-                );
-            }
-
-        
-
-            var totalCount = query.Count();
-            var items = query
+            // Lấy danh sách nhân sự
+            var items = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                .Where(x => !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id))
                 .OrderBy(x => x.Id)
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ToList();
 
-            var (pbDict, cvDict) = GetPhongBanChucVuDict(items);
-
-            var result = items.Select(x => new NsNhanSuByKpiRoleResponseDto
+            if (!isHieuTruong && donViIds.Any())
             {
-                Id = x.Id,
-                MaNhanSu = x.MaNhanSu,
-                HoDem = x.HoDem,
-                Ten = x.Ten,
-                NgaySinh = x.NgaySinh,
-                NoiSinh = x.NoiSinh,
-                SoDienThoai = x.SoDienThoai,
-                Email = x.Email,
-                Email2 = x.Email2,
-                SoCccd = x.SoCccd,
-                TenPhongBan = x.HienTaiPhongBan.HasValue && pbDict.TryGetValue(x.HienTaiPhongBan.Value, out var pbName) ? pbName : null,
-                TenChucVu = x.HienTaiChucVu.HasValue && cvDict.TryGetValue(x.HienTaiChucVu.Value, out var cvName) ? cvName : null,
-                TrangThai = GetTrangThaiText(x),
+                items = items.Where(x => x.Id != userId).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                var kw = dto.Keyword.ToLower();
+                items = items.Where(x =>
+                    (x.MaNhanSu ?? "").ToLower().Contains(kw) ||
+                    ((x.HoDem ?? "") + " " + (x.Ten ?? "")).ToLower().Contains(kw) ||
+                    (x.SoCccd ?? "").Contains(kw)
+                ).ToList();
+            }
+
+            // Lấy tất cả KPI Role của các nhân sự này
+            var kpiRolesDict = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                .Where(r => items.Select(i => i.Id).Contains(r.IdNhanSu) && r.IdDonVi.HasValue)
+                .ToList()
+                .GroupBy(r => r.IdNhanSu)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Lấy tất cả phòng ban cần hiển thị
+            var allDonViIds = kpiRolesDict.Values.SelectMany(v => v.Select(r => r.IdDonVi!.Value)).Distinct().ToList();
+            var pbDict = _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                .Where(p => allDonViIds.Contains(p.Id))
+                .ToDictionary(p => p.Id, p => p.TenPhongBan);
+
+            // Map sang DTO
+            var result = items.SelectMany(x =>
+            {
+                kpiRolesDict.TryGetValue(x.Id, out var rolesOfNhanSu);
+                if (rolesOfNhanSu == null || !rolesOfNhanSu.Any())
+                    return new List<NsNhanSuByKpiRoleResponseDto>();
+
+                // Lọc Role theo người xem
+                IEnumerable<KpiRole> rolesToShow;
+
+                if (isHieuTruong)
+                {
+                    // Hiệu trưởng: tất cả Role nhưng bỏ TRUONG_DON_VI_CAP_2
+                    rolesToShow = rolesOfNhanSu.Where(r => r.Role != "TRUONG_DON_VI_CAP_2");
+                }
+                else
+                {
+                    // Trưởng đơn vị: chỉ Role trong đơn vị do họ quản lý
+                    rolesToShow = rolesOfNhanSu.Where(r => r.IdDonVi.HasValue && donViIds.Contains(r.IdDonVi.Value)).Where(r => r.Role != "PHO_HIEU_TRUONG"); ;
+                }
+
+                // Nếu dto.IdPhongBan filter thì chỉ lấy role ứng với phòng ban đó
+                if (dto.IdPhongBan.HasValue)
+                    rolesToShow = rolesToShow.Where(r => r.IdDonVi == dto.IdPhongBan.Value);
+
+                return rolesToShow.Select(r =>
+                {
+                    var idDonViKpi = r.IdDonVi ?? 0;
+                    var roleName = MapRoleToChucVu(r.Role);
+
+                    return new NsNhanSuByKpiRoleResponseDto
+                    {
+                        Id = x.Id,
+                        MaNhanSu = x.MaNhanSu,
+                        HoDem = x.HoDem,
+                        Ten = x.Ten,
+                        NgaySinh = x.NgaySinh,
+                        NoiSinh = x.NoiSinh,
+                        SoDienThoai = x.SoDienThoai,
+                        Email = x.Email,
+                        Email2 = x.Email2,
+                        SoCccd = x.SoCccd,
+                        TenPhongBan = pbDict.TryGetValue(idDonViKpi, out var pbName) ? pbName : null,
+                        TenChucVu = roleName,
+                        TrangThai = GetTrangThaiText(x),
+                    };
+                });
             }).ToList();
+
 
             return new PageResultDto<NsNhanSuByKpiRoleResponseDto>
             {
                 Items = result,
-                TotalItem = totalCount
+                TotalItem = items.Count
             };
+
         }
+
 
         public void CreateGiaDinhNhanSu(int idNhanSu, CreateNsQuanHeGiaDinhDto dto)
         {
@@ -592,6 +640,19 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 : x.DaVeHuu == true ? "Nghỉ hưu"
                 : x.DaChamDutHopDong == true ? "Chấm dứt HĐ"
                 : "Đang hoạt động";
+        }
+
+        private string MapRoleToChucVu(string role)
+        {
+            return role switch
+            {
+                "HIEU_TRUONG" => "Hiệu trưởng",
+                "PHO_HIEU_TRUONG" => "Phó Hiệu trưởng",
+                "TRUONG_DON_VI_CAP_2" => "Trưởng đơn vị",
+                "GIANG_VIEN" => "Giảng viên",
+                "CHUYEN_VIEN" => "Chuyên viên",
+                _ => role
+            };
         }
 
         #endregion

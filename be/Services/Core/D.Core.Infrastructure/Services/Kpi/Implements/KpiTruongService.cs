@@ -6,6 +6,7 @@ using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
+using D.Core.Infrastructure.Services.Kpi.Common;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using Microsoft.AspNetCore.Http;
@@ -98,6 +99,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     DiemKpiCapTren = kpi.DiemKpiCapTren,
                     CapTrenDanhGia = kpi.CapTrenDanhGia,
                     DiemKpi = kpi.DiemKpi,
+                    CongThuc = kpi.CongThucTinh,
                     IsActive =
                         (
                             kpi.TrangThai == KpiStatus.Evaluating
@@ -248,7 +250,16 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     if (item.KetQuaThucTe.HasValue)
                     {
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
+                        kpi.DiemKpi = item.DiemKpi;
                         kpi.TrangThai = KpiStatus.Declared;
+
+                        kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
+                            kpi.KetQuaThucTe,
+                            kpi.MucTieu,
+                            kpi.TrongSo,
+                            kpi.IdCongThuc,
+                            kpi.LoaiKetQua
+                         );
 
                         _unitOfWork.iKpiTruongRepository.Update(kpi);
                     }
@@ -311,6 +322,46 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             }
 
             await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
+        }
+
+        public void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiTruongListDto dto)
+        {
+            using var transaction = _unitOfWork.Database.BeginTransaction();
+            try
+            {
+                foreach (var item in dto.Items)
+                {
+                    var kpi = _unitOfWork.iKpiTruongRepository.Table
+                        .FirstOrDefault(x => x.Id == item.Id && !x.Deleted);
+
+                    if (kpi == null)
+                        throw new Exception("Không tìm thấy KPI cá nhân");
+
+                    if (item.KetQuaCapTren.HasValue)
+                    {
+                        kpi.CapTrenDanhGia = item.KetQuaCapTren;
+                        kpi.DiemKpiCapTren = item.DiemKpiCapTren;
+                        kpi.TrangThai = KpiStatus.Evaluated;
+                        kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
+                            kpi.CapTrenDanhGia,
+                            kpi.MucTieu,
+                            kpi.TrongSo,
+                            kpi.IdCongThuc,
+                            kpi.LoaiKetQua
+                        );
+
+                        _unitOfWork.iKpiTruongRepository.Update(kpi);
+                    }
+                }
+
+                _unitOfWork.iKpiTruongRepository.SaveChange();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }
