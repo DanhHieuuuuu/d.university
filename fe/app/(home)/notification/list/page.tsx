@@ -11,12 +11,15 @@ import { colors } from '@styles/colors';
 
 const Page = () => {
   const dispatch = useAppDispatch();
-  const { data, totalUnread } = useAppSelector((state) => state.noticeState.$list);
+  const { data, total, totalUnread } = useAppSelector((state) => state.noticeState.$list);
   const [openPopup, setOpenPopup] = useState<boolean>(false);
+  const [pageNumber, setPageNumber] = useState<number>(0);
+  const hasMore = data.length < total;
 
   useEffect(() => {
     dispatch($fetchNotification({ PageIndex: 0, PageSize: 10 }));
   }, []);
+  // }, [pageNumber, dispatch]);
 
   const handleMarkAllAsRead = async () => {
     if (totalUnread > 0) {
@@ -53,11 +56,19 @@ const Page = () => {
             <NotificationItem key={noti.id} item={noti} />
           ))}
         </div>
-        <div className="mt-4 text-center">
-          <Button type="text" style={{ color: colors.primary, fontWeight: 500 }}>
-            Xem thêm
-          </Button>
-        </div>
+        {hasMore && (
+          <div className="mt-4 text-center">
+            <Button
+              type="text"
+              style={{ color: colors.primary, fontWeight: 500 }}
+              onClick={() => {
+                setPageNumber((prev) => prev + 1);
+              }}
+            >
+              Xem thêm
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );

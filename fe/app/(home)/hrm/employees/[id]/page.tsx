@@ -6,8 +6,8 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { formatDateView } from '@utils/index';
 
 import { ReduxStatus } from '@redux/const';
-import { getHoSoNhanSu } from '@redux/feature/nhansu/nhansuThunk';
-import { selectedNhanSu, selectedNhanSuStatus } from '@redux/feature/nhansu/nhansuSelectors';
+import { getHoSoNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
+import { selectedNhanSu, selectedNhanSuStatus } from '@redux/feature/hrm/nhansu/nhansuSelectors';
 
 import HoSoNhanSuLoading from './loading';
 import '@styles/hrm/ho-so-ns.style.scss';

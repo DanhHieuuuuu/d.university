@@ -1,7 +1,7 @@
 import { useRef, useCallback } from 'react';
 
 export function useDebouncedCallback<T extends (...args: any[]) => void>(callback: T, delay: number = 300) {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const debounced = useCallback(
     (...args: Parameters<T>) => {

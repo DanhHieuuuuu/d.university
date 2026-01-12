@@ -5,24 +5,24 @@ export type IQueryHopDong = IQueryPaging & {
 }
 
 export type ICreateHopDong = {
-  soHopDong?: string;
+  soHopDong?: string | null;
   idNhanSu?: number;
   idLoaiHopDong?: number;
-  ngayKyKet?: Date;
-  ngayBatDauThuViec?: Date;
-  ngayKetThucThuViec?: Date;
-  hopDongCoThoiHanTuNgay?: Date;
-  hopDongCoThoiHanDenNgay?: Date;
-  currency: string | null;
-  payFrequency: string | null;
+  ngayKyKet?: Date | null;
+  ngayBatDauThuViec?: Date | null;
+  ngayKetThucThuViec?: Date | null;
+  hopDongCoThoiHanTuNgay?: Date | null;
+  hopDongCoThoiHanDenNgay?: Date | null;
+  currency?: string | null;
+  payFrequency?: string | null;
   maNhanSu?: string;
   maSoThue?: string;
   tenNganHang1?: string;
   atm1?: string;
   tenNganHang2?: string;
   atm2?: string;
-  luongCoBan?: number;
-  ghiChu?: string;
+  luongCoBan?: number | null;
+  ghiChu?: string | null;
   idToBoMon?: number;
   idPhongBan?: number;
   idChucVu?: number;
@@ -31,13 +31,13 @@ export type ICreateHopDong = {
 export type IViewHopDong = {
   id?: number;
   soHopDong?: string | null;
-  idNhanSu?: number | null;
+  idNhanSu?: number;
   hoTen?: string | null;
-  idLoaiHopDong?: number | null;
-  ngayKyKet?: Date;
+  idLoaiHopDong?: number;
+  ngayKyKet?: Date | null;
   ngayBatDauThuViec?: Date | null;
   ngayKetThucThuViec?: Date | null;
-  hopDongCoThoiHanTuNgay?: Date;
+  hopDongCoThoiHanTuNgay?: Date | null;
   hopDongCoThoiHanDenNgay?: Date | null;
   luongCoBan?: number | null;
   ghiChu?: string | null;

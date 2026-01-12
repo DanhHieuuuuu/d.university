@@ -1,8 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Form, Input, InputNumber } from 'antd';
 import { ICreateHopDong } from '@models/nhansu/hopdong.model';
-import { useEffect } from 'react';
 
 export default function SalaryTab() {
   const form = Form.useFormInstance<ICreateHopDong>();
@@ -19,7 +19,12 @@ export default function SalaryTab() {
         label="Lương cơ bản"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
-        <InputNumber className="!w-full" min={0} />
+        <InputNumber<number>
+          formatter={(value) => (value ? `${Number(value).toLocaleString('vi-VN')}` : '')}
+          parser={(value) => (value ? Number(value.replace(/[₫\s.]/g, '')) : 0)}
+          className="!w-full"
+          min={0}
+        />
       </Form.Item>
       <Form.Item label="Đơn vị">
         <Input defaultValue="VNĐ" disabled />

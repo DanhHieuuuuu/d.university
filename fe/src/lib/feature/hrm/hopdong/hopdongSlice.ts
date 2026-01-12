@@ -38,7 +38,7 @@ const hopdongSlice = createSlice({
   name: 'hopdong',
   initialState,
   reducers: {
-    selectMaNhanSu: (state, action: PayloadAction<IViewHopDong>) => {
+    selectNsHopDong: (state, action: PayloadAction<IViewHopDong>) => {
       state.selected.data = action.payload;
     },
     clearSelected: (state) => {
@@ -75,6 +75,6 @@ const hopdongSlice = createSlice({
 
 const hopdongReducer = hopdongSlice.reducer;
 
-export const { selectMaNhanSu, clearSelected, resetStatusCreate } = hopdongSlice.actions;
+export const { selectNsHopDong, clearSelected, resetStatusCreate } = hopdongSlice.actions;
 
 export default hopdongReducer;

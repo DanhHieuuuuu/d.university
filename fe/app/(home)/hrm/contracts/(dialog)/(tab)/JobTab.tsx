@@ -3,17 +3,38 @@
 import { useState } from 'react';
 import { Checkbox, DatePicker, Form, Input, Select } from 'antd';
 import { ICreateHopDong } from '@models/nhansu/hopdong.model';
-import { useAppSelector } from '@redux/hooks';
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { DebounceSelect } from '@components/common/DebounceSelect';
+import { findNhanSuBySdtThunk } from '@redux/feature/hrm/nhansu/nhansuThunk';
 
 const { TextArea } = Input;
 
 export default function JobTab() {
   const form = Form.useFormInstance<ICreateHopDong>();
   const [probation, setProbation] = useState<boolean>(false);
-  const { phongBan, listLoaiHopDong, chucVu, listToBoMon } = useAppSelector((state) => state.danhmucState);
+  const { phongBan, listLoaiHopDong, chucVu, toBoMon } = useAppSelector((state) => state.danhmucState);
+
+  const dispatch = useAppDispatch();
+
+  const fetchNhanSuOptions = async (keyword: string) => {
+    const result = await dispatch(findNhanSuBySdtThunk(keyword));
+
+    if (findNhanSuBySdtThunk.fulfilled.match(result)) {
+      return result.payload;
+    }
+
+    return [];
+  };
 
   return (
     <div className="grid grid-cols-3 gap-x-5">
+      <Form.Item<ICreateHopDong>
+        name={['idNhanSu']}
+        label="Ký hợp đồng với"
+        rules={[{ required: true, message: 'Không được để trống!' }]}
+      >
+        <DebounceSelect placeholder="Nhập số điện thoại" allowClear fetchOptions={fetchNhanSuOptions}  />
+      </Form.Item>
       <Form.Item<ICreateHopDong>
         name={['maNhanSu']}
         label="Mã nhân sự"
@@ -24,7 +45,7 @@ export default function JobTab() {
       <Form.Item<ICreateHopDong> name={['maSoThue']} label="Mã số thuế">
         <Input />
       </Form.Item>
-      <div></div>
+
       <Form.Item<ICreateHopDong> name="soHopDong" label="Số hợp đồng">
         <Input />
       </Form.Item>
@@ -62,7 +83,7 @@ export default function JobTab() {
       <Form.Item<ICreateHopDong> name="idToBoMon" label="Tổ bộ môn">
         <Select
           allowClear
-          options={listToBoMon?.map((item) => {
+          options={toBoMon.$list.data?.map((item) => {
             return { label: item.tenBoMon, value: item.id };
           })}
         />

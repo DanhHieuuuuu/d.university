@@ -9,9 +9,9 @@ import dayjs from 'dayjs';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateNhanSu } from '@models/nhansu/nhansu.model';
-import { clearSelected } from '@redux/feature/nhansu/nhansuSlice';
-import { createNhanSu } from '@redux/feature/nhansu/nhansuThunk';
-import { FamilyTab, JobTab, PersonalTab, SalaryTab } from './(tab-ns)';
+import { clearSelected } from '@redux/feature/hrm/nhansu/nhansuSlice';
+import { createNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
+import { FamilyTab, PersonalTab } from './(tab-ns)';
 
 type NhanSuModalProps = {
   isModalOpen: boolean;
@@ -65,29 +65,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
       label: 'Thông tin gia đình',
       children: <FamilyTab />
     }
-    // {
-    //   key: 'job',
-    //   label: 'Thông tin vị trí làm việc',
-    //   children: <JobTab />
-    // },
-    // {
-    //   key: 'salary',
-    //   label: 'Mức lương',
-    //   children: <SalaryTab />
-    // }
   ];
-
-  const initData = () => {
-    if (selected.status == ReduxStatus.SUCCESS) {
-      const rawData = selected.data;
-      form.setFieldsValue({
-        ...rawData,
-        ngaySinh: rawData.ngaySinh ? dayjs(rawData.ngaySinh) : null,
-        ngayCapCccd: rawData.ngayCapCccd ? dayjs(rawData.ngayCapCccd) : null
-      });
-      console.log('load success');
-    }
-  };
 
   const onCloseModal = () => {
     dispatch(clearSelected());
@@ -155,7 +133,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
       )}
     >
       <Form
-        name="hopDongNhanSu"
+        name="createUpdateNhanSu"
         layout="vertical"
         form={form}
         onFinish={onFinish}

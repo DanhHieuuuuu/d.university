@@ -14,8 +14,8 @@ import { useNavigate } from '@hooks/navigate';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansu/nhansuSlice';
-import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/nhansu/nhansuThunk';
+import { resetStatusCreate, selectMaNhanSu } from '@redux/feature/hrm/nhansu/nhansuSlice';
+import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';

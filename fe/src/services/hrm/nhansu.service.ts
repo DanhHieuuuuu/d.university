@@ -1,5 +1,5 @@
 import { ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
-import { IResponseList } from '@models/common/response.model';
+import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
 
@@ -68,4 +68,17 @@ const getHoSoNhanSu = async (id: number) => {
   }
 };
 
-export const NhanSuService = { findPaging, find, findById, createNhanSu, getHoSoNhanSu };
+const findBySdt = async (phone: string) => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/find?phone=${phone}`);
+    
+
+    const data: IResponseList<IViewNhanSu> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+export const NhanSuService = { findPaging, find, findById, createNhanSu, getHoSoNhanSu, findBySdt };

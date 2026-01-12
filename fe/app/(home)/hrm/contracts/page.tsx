@@ -22,6 +22,8 @@ import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryHopDong, IViewHopDong } from '@models/nhansu/hopdong.model';
 import { getListHopDong } from '@redux/feature/hrm/hopdong/hopdongThunk';
 import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
+import CreateContractModal from './(dialog)/CreateContractModal';
+import { selectNsHopDong } from '@redux/feature/hrm/hopdong/hopdongSlice';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -30,9 +32,6 @@ const Page = () => {
   const { listLoaiHopDong } = useAppSelector((state) => state.danhmucState);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
-  const [isView, setIsModalView] = useState<boolean>(false);
-  const [selectedId, setSelectedId] = useState<number>(0);
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryHopDong>({
     total: totalItem || 0,
@@ -48,27 +47,12 @@ const Page = () => {
   });
 
   const onClickAdd = () => {
-    setIsModalView(false);
-    setIsModalUpdate(false);
     setIsModalOpen(true);
   };
 
-  const onClickUpdate = (id: number) => {
-    setSelectedId(id);
-    setIsModalView(false);
-    setIsModalUpdate(true);
-    setIsModalOpen(true);
-  };
-
-  const onClickView = (id: number) => {
-    setSelectedId(id);
-    setIsModalView(true);
-    setIsModalUpdate(false);
-    setIsModalOpen(true);
-  };
-
-  const refreshData = () => {
-    dispatch(getListHopDong(query));
+  const onClickView = (data: IViewHopDong) => {
+    dispatch(selectNsHopDong(data));
+    // setIsModalOpen(true);
   };
 
   const columns: IColumn<IViewHopDong>[] = [
@@ -132,7 +116,13 @@ const Page = () => {
     }
   ];
 
-  const actions: IAction[] = [];
+  const actions: IAction[] = [
+    {
+      label: 'Xem',
+      icon: <EyeOutlined />,
+      command: (record: IViewHopDong) => onClickView(record)
+    }
+  ];
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ Keyword: value });
@@ -154,7 +144,6 @@ const Page = () => {
     >
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
-          
           <Form.Item<IQueryHopDong> label="Loại hợp đồng:" name="loaiHopDong">
             <Select
               allowClear
@@ -192,6 +181,8 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
+
+      <CreateContractModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </Card>
   );
 };

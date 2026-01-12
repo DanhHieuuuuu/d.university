@@ -51,6 +51,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 query = query.Where(x => dto.Cccd == x.SoCccd);
             }
 
+            if (!string.IsNullOrEmpty(dto.Phone))
+            {
+                query = query.Where(x => x.SoDienThoai!.Contains(dto.Phone));
+            }
+
             if (dto.IdPhongBan != null)
             {
                 query = query.Where(x => x.HienTaiPhongBan == dto.IdPhongBan);
@@ -423,6 +428,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 MaNhanSu = nhanSu.MaNhanSu,
                 HoDem = nhanSu.HoDem,
                 Ten = nhanSu.Ten,
+                HoTen = string.Join(" ", new[] { nhanSu.HoDem, nhanSu.Ten }),
                 NgaySinh = nhanSu.NgaySinh,
                 NoiSinh = nhanSu.NoiSinh,
                 SoDienThoai = nhanSu.SoDienThoai,
