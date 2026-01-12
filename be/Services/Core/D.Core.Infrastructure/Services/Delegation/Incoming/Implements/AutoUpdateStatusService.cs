@@ -1,4 +1,7 @@
 ﻿using D.Constants.Core.Delegation;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,43 +27,59 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             _logger = logger;
         }
 
-        public async Task UpdateExpiredRecordsAsync(ServiceUnitOfWork uow)
+        public async Task UpdateExpiredRecordsAsync(
+            ServiceUnitOfWork uow,
+            INotificationService notificationService)
         {
             var now = DateTime.Now;
+            var tomorrow = now.AddDays(1);
 
-            // Lấy tất cả các delegation
             var delegations = await uow.iDelegationIncomingRepository.Table
-                .Include(d => d.ReceptionTimes) 
+                .Include(d => d.ReceptionTimes)
+                .Where(d => d.Status != DelegationStatus.Expired)
                 .ToListAsync();
 
             foreach (var delegation in delegations)
             {
-                // Tìm bản ghi ReceptionTime gần nhất của delegation
                 var latestReception = delegation.ReceptionTimes
                     .OrderByDescending(x => x.Date.ToDateTime(x.EndDate))
                     .FirstOrDefault();
 
-                if (latestReception != null)
+                if (latestReception == null)
+                    continue;
+
+                var endDateTime = latestReception.Date.ToDateTime(latestReception.EndDate);
+
+                // Sắp hết hạn
+                if (!delegation.IsExpiryNotified
+                    && endDateTime > now
+                    && endDateTime <= tomorrow)
                 {
-                    var endDateTime = latestReception.Date.ToDateTime(latestReception.EndDate);
-
-                    if (endDateTime <= now)
+                    await notificationService.SendAsync(new NotificationMessage
                     {
-                        // Cập nhật trạng thái Delegation thành hết hạn
-                        delegation.Status = DelegationStatus.Expired;
+                        Receiver = new Receiver
+                        {
+                            UserId = delegation.IdStaffReception
+                        },
+                        Title = "Đoàn vào sắp hết hạn",
+                        Content = "Đoàn vào bạn phụ trách sẽ hết hạn trong vòng 24 giờ.",
+                        AltContent =
+                            $"Đoàn {delegation.Name} ({delegation.Code}) sẽ hết hạn tiếp đoàn lúc {endDateTime:dd/MM/yyyy - HH:mm}",
+                        Channel = NotificationChannel.Realtime
+                    });
 
-                        _logger.LogInformation(
-                            $"Delegation {delegation.Id} đã hết hạn lúc {now}");
-                    }
+                    delegation.IsExpiryNotified = true;
+                }
+
+                // Đã hết hạn
+                if (endDateTime <= now)
+                {
+                    delegation.Status = DelegationStatus.Expired;
                 }
             }
 
-            // Lưu thay đổi vào DB
             await uow.SaveChangesAsync();
         }
-
-
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -71,7 +90,9 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     var uow = scope.ServiceProvider.GetRequiredService<ServiceUnitOfWork>();
 
                     var now = DateTime.Now;
-                    await UpdateExpiredRecordsAsync(uow);
+                    var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+
+                    await UpdateExpiredRecordsAsync(uow, notificationService);
 
                     //var expiredList = await uow.iReceptionTimeRepository.TableNoTracking.Where(x => x.Date > now.Date);
 

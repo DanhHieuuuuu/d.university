@@ -3,6 +3,7 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, message, Modal, Select } from 'antd';
 import {
+  AudioOutlined,
   CheckOutlined,
   DeleteOutlined,
   EditOutlined,
@@ -50,6 +51,8 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [showVoiceSearch, setShowVoiceSearch] = useState<boolean>(false);
+  const [voiceData, setVoiceData] = useState<IViewGuestGroup[] | null>(null);
 
   const columns: IColumn<IViewGuestGroup>[] = [
     {
@@ -147,14 +150,14 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.DONE,
+      hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
       command: (record: IViewGuestGroup) => onClickView(record)
     },
     {
       label: 'Chỉnh sửa',
       tooltip: 'Sửa danh sách đoàn vào',
       icon: <EditOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.DONE,
+      hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
       command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
     {
@@ -167,7 +170,7 @@ const Page = () => {
     {
       label: 'Thêm thời gian',
       icon: <PlusOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE,
+      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
     },
     {
@@ -204,6 +207,7 @@ const Page = () => {
       dispatch(getListPhongBan());
       dispatch(getListNhanSu());
       dispatch(getListStatus());
+      setVoiceData(null);
     }
   }, [isModalOpen]);
 
@@ -312,22 +316,35 @@ const Page = () => {
             onClick={() => {
               form.resetFields();
               resetFilter();
+              setVoiceData(null);
+              dispatch(getListGuestGroup(query));
             }}
           >
             Tải lại
           </Button>
+          <Button
+            color="default"
+            variant="filled"
+            icon={<AudioOutlined />}
+            onClick={() => setShowVoiceSearch((prev) => !prev)}
+          ></Button>
         </div>
       </Form>
+      {showVoiceSearch && (
+        <div className="voice-fixed-wrapper">
+          <VoiceSearch onResult={(data) => setVoiceData(data)} />
+        </div>
+      )}
 
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
         columns={columns}
-        dataSource={list}
+        dataSource={voiceData?.length ? voiceData : list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
-     
+
       <CreateDoanVaoModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

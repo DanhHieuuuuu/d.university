@@ -61,6 +61,9 @@ namespace D.Core.Domain.Entities.Delegation.Incoming
         [Column("TotalMoney")]
         [Description("Tổng chi phí")]
         public decimal TotalMoney { get; set; }
+        [Column("IsExpiryNotified")]
+        [Description("Gửi thông báo sắp hết hạn")]
+        public bool IsExpiryNotified { get; set; } = false;
 
         public virtual ICollection<DetailDelegationIncoming>? DelegationDetails { get; set; }
         public virtual ICollection<ReceptionTime>? ReceptionTimes { get; set; }

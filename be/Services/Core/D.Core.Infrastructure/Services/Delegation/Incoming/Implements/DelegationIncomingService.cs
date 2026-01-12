@@ -227,7 +227,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 },
                 Title = "Đoàn vào mới",
                 Content = "Bạn có một đoàn vào mới cần xử lý",
-                AltContent = $"Đoàn {newDoanVao.Name} ({newDoanVao.Code}) vừa được tạo",
+                AltContent = $"Đoàn {newDoanVao.Name} ({newDoanVao.Code}) vừa được tạo cho bạn.",
                 Channel = NotificationChannel.Realtime
             });
             return _mapper.Map<CreateResponseDto>(newDoanVao);
@@ -595,7 +595,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 },
                 Title = "Cập nhật trạng thái đoàn vào",
                 Content = $"Đoàn {delegation.Code} đã được cập nhật trạng thái",
-                AltContent = $"Trạng thái mới: {DelegationStatus.Names[delegation.Status]}",
+                AltContent = $"Cập nhật trạng thái mới: {DelegationStatus.Names[delegation.Status]}",
                 Channel = NotificationChannel.Realtime
             });
         }
