@@ -28,6 +28,7 @@ import { IQueryKpiDonVi, IViewKpiDonVi, NhanSuDaGiaoDto } from '@models/kpi/kpi-
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import AssignKpiModal from '../../modal/AssignKpiModal';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 const Page = () => {
   const [form] = Form.useForm();
   const [assignForm] = Form.useForm();
@@ -210,13 +211,16 @@ const Page = () => {
   };
 
   const totalDeclaredScore = useMemo(() => {
-    return (list || [])
-      .reduce((sum, k) => sum + (k.diemKpi ?? 0), 0);
+    return (list || []).reduce((sum, k) => {
+      const diem = k.diemKpi ?? 0;
+      return sum + (k.loaiKpi === 3 ? -diem : diem);
+    }, 0);
   }, [list]);
-
   const finalScore = useMemo(() => {
-    return (list || [])
-      .reduce((sum, k) => sum + (k.diemKpiCapTren ?? 0), 0);
+    return (list || []).reduce((sum, k) => {
+      const diem = k.diemKpiCapTren ?? 0;
+      return sum + (k.loaiKpi === 3 ? -diem : diem);
+    }, 0);
   }, [list]);
 
   const bulkActionItems: MenuProps['items'] = [
@@ -389,20 +393,6 @@ const Page = () => {
 
   return (
     <div className="space-y-4">
-      {/* Statistics Card - Only Total KPIs */}
-      <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-gray-500 text-sm mb-1">Tổng số KPI</p>
-            <p className="text-2xl font-bold text-blue-600">{(list || []).length}</p>
-          </div>
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <FileTextOutlined className="text-2xl text-blue-600" />
-          </div>
-        </div>
-      </Card>
-
-      {/* Main Card */}
       <Card
         className="h-full"
         title={
@@ -414,9 +404,9 @@ const Page = () => {
           </div>
         }
         extra={
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />} 
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
             onClick={onClickAdd}
             size="large"
             className="shadow-md hover:shadow-lg transition-shadow"
@@ -486,9 +476,9 @@ const Page = () => {
                 placement="bottomRight"
                 styles={{ body: { padding: 16, minWidth: 280 } }}
               >
-                <Button 
+                <Button
                   size="large"
-                  icon={<FilterOutlined />} 
+                  icon={<FilterOutlined />}
                   type={openFilter ? "primary" : "default"}
                 >
                   Bộ lọc
@@ -539,6 +529,7 @@ const Page = () => {
           kpiId={selectedKpiDonVi?.id ?? undefined}
           donViId={selectedKpiDonVi?.data?.idDonVi ?? undefined}
         />
+        <KpiAiChat />
       </Card>
     </div>
   );

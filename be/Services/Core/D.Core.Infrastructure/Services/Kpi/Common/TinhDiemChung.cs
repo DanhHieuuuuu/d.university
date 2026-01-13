@@ -47,6 +47,29 @@ namespace D.Core.Infrastructure.Services.Kpi.Common
                 ? val
                 : 0;
         }
+
+        public static decimal GetPhanTramTruTuanThu(string? tenKpi, decimal ketQua)
+        {
+            if (string.IsNullOrEmpty(tenKpi)) return 0;
+            var name = tenKpi.ToLower();
+
+            // 1. Vi phạm về thời gian làm việc
+            if (name.Contains("thời gian làm việc"))
+                return ketQua > 7 ? 30 : (ketQua == 6 ? 10 : (ketQua == 5 ? 5 : (ketQua == 4 ? 2 : (ketQua == 3 ? 1 : 0))));
+
+            // 2. Vi phạm về quy định chấm công
+            if (name.Contains("chấm công"))
+                return ketQua > 8 ? 30 : (ketQua == 7 ? 10 : (ketQua == 6 ? 5 : (ketQua == 5 ? 2 : (ketQua == 4 ? 1 : 0))));
+
+            // 3, 4, 5. Trật tự tác phong / Quy tắc ứng xử / Đồng phục
+            if (name.Contains("trật tự") || name.Contains("ứng xử") || name.Contains("đồng phục"))
+                return ketQua > 3 ? 30 : (ketQua == 3 ? 10 : (ketQua == 2 ? 5 : (ketQua == 1 ? 2 : 0)));
+
+            // 6. Vi phạm quy trình nghiệp vụ (Quy ước: 4=Văn bản >=2, 3=Văn bản 1, 2=Lời nói 2, 1=Lời nói 1)
+            if (name.Contains("quy trình nghiệp vụ"))
+                return ketQua >= 4 ? 30 : (ketQua == 3 ? 10 : (ketQua == 2 ? 5 : (ketQua == 1 ? 2 : 0)));
+            return 0;
+        }
         public static decimal TinhDiemChung(
             object? ketQua,
             string? mucTieu,

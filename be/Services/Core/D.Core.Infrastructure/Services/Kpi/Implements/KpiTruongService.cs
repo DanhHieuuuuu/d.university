@@ -24,7 +24,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         private readonly IKpiLogStatusService _logKpiService;
 
         public KpiTruongService(
-            ILogger<KpiRoleService> logger,
+            ILogger<KpiTruongService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
@@ -274,15 +274,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
                         kpi.DiemKpi = item.DiemKpi;
                         kpi.TrangThai = KpiStatus.Declared;
-
-                        kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
+                        if (kpi.LoaiKpi == 3)
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                        }
+                        else
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
                             kpi.KetQuaThucTe,
                             kpi.MucTieu,
                             kpi.TrongSo,
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                          );
-
+                        }
                         _unitOfWork.iKpiTruongRepository.Update(kpi);
                         _logKpiService.InsertLog(new InsertKpiLogStatusDto
                         {
@@ -397,14 +402,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.CapTrenDanhGia = item.KetQuaCapTren;
                         kpi.DiemKpiCapTren = item.DiemKpiCapTren;
                         kpi.TrangThai = KpiStatus.Evaluated;
-                        kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
+                        if (kpi.LoaiKpi == 3)
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                        }
+                        else
+                        {
+                            kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
                             kpi.CapTrenDanhGia,
                             kpi.MucTieu,
                             kpi.TrongSo,
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                         );
-
+                        }
                         _unitOfWork.iKpiTruongRepository.Update(kpi);
                         _logKpiService.InsertLog(new InsertKpiLogStatusDto
                         {

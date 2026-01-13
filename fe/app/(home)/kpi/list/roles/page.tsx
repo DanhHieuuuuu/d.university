@@ -21,6 +21,7 @@ import { IQueryKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import PositionModal from './(dialog)/create-or-update';
 import { toast } from 'react-toastify';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -259,6 +260,7 @@ const Page = () => {
         isView={isView}
         setIsModalOpen={setIsModalOpen}
       />
+      <KpiAiChat />
     </Card>
   );
 };

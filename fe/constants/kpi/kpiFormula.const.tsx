@@ -19,5 +19,4 @@ export const LIST_CONG_THUC: ICongThuc[] = [
     { id: 13, congThuc: 'Nếu kết quả thực tế < Mục tiêu: KPI = 0% Nếu kết quả thực tế >= Mục tiêu: KPI = Kết quả thực tế/ Mục tiêu * Trọng số', loaiKpiApDung: [1, 2], },
     { id: 14, congThuc: 'Không hoàn thành: KPI = 0% Hoàn thành: KPI = Trọng số', loaiKpiApDung: [1, 2], },
     { id: 15, congThuc: 'Mỗi lượt vi phạm > mục tiêu trừ 10% điểm trọng số', loaiKpiApDung: [1, 2], },
-    { id: 16, congThuc: 'Mỗi lượt vi phạm > mục tiêu trừ 10% điểm trọng số', loaiKpiApDung: [3], }
 ];

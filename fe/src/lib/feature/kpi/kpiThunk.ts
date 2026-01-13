@@ -6,6 +6,7 @@ import { ICreateKpiDonVi, IGiaoKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanh
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong } from '@models/kpi/kpi-truong.model';
 import { IQueryKpiLogStatus, KpiLogStatusResponse } from '@models/kpi/kpi-log.model';
+import { IAskKpiChatCommand } from '@models/kpi/kpi-chat.model';
 
 export const getAllKpiCaNhan = createAsyncThunk('kpi/list-canhan', async (payload?: IQueryKpiCaNhan) => {
     try {
@@ -481,4 +482,17 @@ export const getKpiLogStatus = createAsyncThunk<KpiLogStatusResponse,IQueryKpiLo
       return rejectWithValue(err?.response?.data || { message: 'Lỗi' });
     }
   }
+);
+
+//Kpi AI Chat
+export const askKpiAi = createAsyncThunk(
+    'kpi/chat-ai',
+    async (payload: IAskKpiChatCommand, { rejectWithValue }) => {
+        try {
+            const res = await KpiService.askKpiAi(payload);
+            return res.data; 
+        } catch (err: any) {
+            return rejectWithValue(err?.response?.data || 'Không thể kết nối với trợ lý AI');
+        }
+    }
 );

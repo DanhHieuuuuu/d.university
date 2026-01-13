@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select } from 'antd';
-import { CloseOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
+import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select, Divider } from 'antd';
+import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, ExperimentOutlined, TeamOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiDonVi, resetStatusKpiDonVi } from '@redux/feature/kpi/kpiSlice';
 import { createKpiDonVi, updateKpiDonVi } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
+import { getAllPhongBanByKpiRole } from '@redux/feature/danh-muc/danhmucThunk';
 import { ICreateKpiDonVi } from '@models/kpi/kpi-don-vi.model';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
+import { LIST_CONG_THUC } from '@/constants/kpi/kpiFormula.const';
+import { LOAI_KET_QUA_OPTIONS } from '@/constants/kpi/loaiCongThuc.enum';
 
 type PositionModalProps = {
   isModalOpen: boolean;
@@ -22,41 +24,45 @@ type PositionModalProps = {
 const PositionModal: React.FC<PositionModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm<any>();
-  const [title, setTitle] = useState<string>('Thêm mới Kpi Đơn vị');
+  const [title, setTitle] = useState<string>('KPI Đơn vị');
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiDonVi);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
   const { phongBanByKpiRole } = useAppSelector((state) => state.danhmucState);
+  
+  const selectedLoaiKpi = Form.useWatch('loaiKpi', form);
+
+  const congThucOptions = useMemo(() => {
+    if (!selectedLoaiKpi) return [];
+    return LIST_CONG_THUC
+      .filter(ct => ct.loaiKpiApDung.includes(selectedLoaiKpi))
+      .map(ct => ({
+        value: ct.id,
+        label: ct.congThuc,
+      }));
+  }, [selectedLoaiKpi]);
 
   useEffect(() => {
     if (isModalOpen) {
-      if (isUpdate || isView) {
-        setTitle(isView ? 'Xem thông tin KPI Đơn vị' : 'Cập nhật KPI Đơn vị');
-      } else {
-        setTitle('Thêm mới KPI đơn vị');
-      }
+      setTitle(isView ? 'Xem thông tin KPI Đơn vị' : isUpdate ? 'Cập nhật KPI Đơn vị' : 'Thêm mới KPI Đơn vị');
+      dispatch(getAllPhongBanByKpiRole({ PageIndex: 1, PageSize: 2000 }));
     }
-  }, [dispatch, isModalOpen, isUpdate, isView]);
+  }, [isModalOpen, isUpdate, isView, dispatch]);
 
   useEffect(() => {
-    if (!$selected.data || phongBanByKpiRole.$list.data.length === 0) return;
-
+    if (!$selected.data || !isModalOpen || phongBanByKpiRole.$list.data.length === 0) return;
     const selectedData = $selected.data;
-
-    const donVi = phongBanByKpiRole.$list.data.find(
-      pb => pb.id === selectedData.idDonVi
-    );
+    const donVi = phongBanByKpiRole.$list.data.find(pb => pb.id === selectedData.idDonVi);
+    const congThucMatched = LIST_CONG_THUC.find(x => x.congThuc === selectedData.congThuc);
 
     form.setFieldsValue({
       ...selectedData,
-      idDonVi: donVi
-        ? { value: donVi.id, label: donVi.tenPhongBan }
-        : undefined,
-      namHoc: selectedData.namHoc
-        ? dayjs(selectedData.namHoc, 'YYYY')
-        : undefined,
+      idDonVi: donVi ? { value: donVi.id, label: donVi.tenPhongBan } : undefined,
+      idCongThuc: congThucMatched?.id,
+      congThucTinh: selectedData.congThuc,
+      namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
     });
-  }, [$selected.data, phongBanByKpiRole.$list.data]);
+  }, [$selected.data, isModalOpen, phongBanByKpiRole.$list.data, form]);
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
@@ -66,12 +72,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       setIsModalOpen(false);
       props.onSuccess();
     }
-  }, [$create.status, $update.status, dispatch, form, setIsModalOpen]);
-
-  useEffect(() => {
-    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 2000 }));
-  }, [dispatch]);
-
+  }, [$create.status, $update.status, dispatch, form, setIsModalOpen, props]);
 
   const handleClose = () => {
     form.resetFields();
@@ -82,21 +83,18 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const handleFinish: FormProps['onFinish'] = async (values: any) => {
     const payload = {
       ...values,
-      idDonVi: values.idDonVi,
+      idDonVi: values.idDonVi?.value ?? values.idDonVi,
       namHoc: values.namHoc.format('YYYY'),
+      trongSo: values.trongSo?.toString() || '0',
     };
-
 
     try {
       if (isUpdate && $selected.data) {
-        await dispatch(
-          updateKpiDonVi({ id: $selected.data.id, ...payload })
-        ).unwrap();
-        toast.success('Cập nhật KPI đơn vị thành công');
+        await dispatch(updateKpiDonVi({ id: $selected.data.id, ...payload })).unwrap();
+        toast.success('Cập nhật thành công');
       } else {
-        console.log("Payload: ",payload);
         await dispatch(createKpiDonVi(payload)).unwrap();
-        toast.success('Thêm mới KPI đơn vị thành công');
+        toast.success('Thêm mới thành công');
       }
     } catch {
       toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
@@ -105,135 +103,95 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   return (
     <Modal
-      title={
-        <div className="flex items-center gap-3 py-2">
-          <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
-          <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            {title}
-          </span>
-        </div>
-      }
-      className="app-modal"
-      width="70%"
+      title={<span className="text-xl font-bold text-blue-700">{title}</span>}
+      width={950} 
       open={isModalOpen}
       onCancel={handleClose}
-      footer={
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          {!isView && (
-            <Button
-              loading={isSaving}
-              onClick={form.submit}
-              icon={isUpdate ? <SaveOutlined /> : <PlusOutlined />}
-              type="primary"
-              size="large"
-              className="shadow-md hover:shadow-lg transition-shadow"
-            >
-              {isUpdate ? 'Lưu' : 'Tạo'}
-            </Button>
-          )}
-          <Button 
-            size="large"
-            onClick={handleClose} 
-            icon={<CloseOutlined />}
+      centered
+      footer={[
+        <Button key="close" onClick={handleClose} icon={<CloseOutlined />}>Đóng</Button>,
+        !isView && (
+          <Button
+            key="submit"
+            loading={isSaving}
+            onClick={form.submit}
+            icon={isUpdate ? <SaveOutlined /> : <PlusOutlined />}
+            type="primary"
+            className="bg-blue-600 shadow-md"
           >
-            Đóng
+            {isUpdate ? 'Lưu thay đổi' : 'Tạo mới'}
           </Button>
-        </div>
-      }
+        ),
+      ]}
     >
       <Form
-        name="kpi-don-vi-form"
-        layout="vertical"
         form={form}
+        layout="vertical"
         onFinish={handleFinish}
-        autoComplete="on"
         disabled={isView}
-        labelCol={{ style: { fontWeight: 600 } }}
+        className="mt-4"
+        requiredMark="optional"
       >
-        {/* Thông tin cơ bản */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1 h-6 bg-blue-500 rounded-full" />
-            <h3 className="text-lg font-semibold text-gray-700">Thông tin cơ bản</h3>
+        <div className="grid grid-cols-2 gap-x-6">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600 font-semibold">
+            <InfoCircleOutlined /> THÔNG TIN KPI ĐƠN VỊ
           </div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-            <Form.Item<ICreateKpiDonVi>
-              label="Tên KPI"
-              name="kpi"
-              rules={[{ required: true, message: 'Vui lòng nhập tên KPI' }]}
-            >
-              <Input size="large" placeholder="Nhập tên KPI" />
-            </Form.Item>
 
-            <Form.Item<ICreateKpiDonVi>
-              label="Mục tiêu"
-              name="mucTieu"
-              rules={[{ required: true, message: 'Vui lòng nhập mục tiêu' }]}
-            >
-              <Input size="large" placeholder="Nhập mục tiêu" />
-            </Form.Item>
+          <Form.Item label="Tên KPI" name="kpi" className="col-span-2" rules={[{ required: true, message: 'Nhập tên KPI' }]}>
+            <Input.TextArea rows={2} placeholder="Nhập tên chỉ số KPI dành cho đơn vị" />
+          </Form.Item>
 
-            <Form.Item<ICreateKpiDonVi>
-              label="Trọng số (%)"
-              name="trongSo"
-              rules={[{ required: true, message: 'Vui lòng nhập trọng số' }]}
-            >
-              <Input size="large" placeholder="Nhập trọng số" />
-            </Form.Item>
+          <Form.Item label="Mục tiêu" name="mucTieu" rules={[{ required: true, message: 'Nhập mục tiêu' }]}>
+            <Input placeholder="Ví dụ: Đạt kết quả tốt..." />
+          </Form.Item>
+
+          <Form.Item label="Trọng số (%)" name="trongSo" rules={[{ required: true }]}>
+            <InputNumber className="w-full" min={0} max={100} precision={2} placeholder="0.00" />
+          </Form.Item>
+
+          <Divider className="col-span-2 my-2" />
+
+
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600 font-semibold">
+            <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
-        </div>
 
-        {/* Phân loại */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1 h-6 bg-purple-500 rounded-full" />
-            <h3 className="text-lg font-semibold text-gray-700">Phân loại</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-            <Form.Item
-              label="Loại KPI"
-              name="loaiKpi"
-              rules={[{ required: true, message: 'Vui lòng chọn loại KPI' }]}
-            >
-              <Select
-                size="large"
-                options={KpiLoaiConst.list.map(x => ({
-                  value: x.value,
-                  label: x.name,
-                }))}
-                placeholder="Chọn loại KPI"
-              />
-            </Form.Item>
+          <Form.Item label="Loại KPI" name="loaiKpi" rules={[{ required: true }]}>
+            <Select 
+              placeholder="Chọn loại" 
+              options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))} 
+              onChange={() => form.setFieldsValue({ idCongThuc: undefined, congThucTinh: undefined })}
+            />
+          </Form.Item>
 
-            <Form.Item<ICreateKpiDonVi>
-              label="Năm học"
-              name="namHoc"
-              rules={[{ required: true, message: 'Vui lòng chọn năm học' }]}
-            >
-              <DatePicker
-                size="large"
-                picker="year"
-                format="YYYY"
-                className="!w-full"
-                placeholder="Chọn năm học"
-              />
-            </Form.Item>
-          </div>
-        </div>
+          <Form.Item label="Năm học" name="namHoc" rules={[{ required: true }]}>
+            <DatePicker picker="year" format="YYYY" className="w-full" />
+          </Form.Item>
 
-        {/* Đơn vị */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1 h-6 bg-green-500 rounded-full" />
-            <h3 className="text-lg font-semibold text-gray-700">Đơn vị thực hiện</h3>
-          </div>
-          <Form.Item<ICreateKpiDonVi>
-            label="Đơn vị"
-            name="idDonVi"
-            rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}
-          >
+          <Form.Item label="Công thức tính KPI" name="idCongThuc" rules={[{ required: true }]}>
             <Select
-              size="large"
+              placeholder={selectedLoaiKpi ? 'Chọn công thức' : 'Chọn Loại KPI trước'}
+              options={congThucOptions}
+              disabled={!selectedLoaiKpi}
+              onChange={(value) => {
+                const selected = LIST_CONG_THUC.find(x => x.id === value);
+                form.setFieldsValue({ congThucTinh: selected?.congThuc });
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item label="Loại kết quả" name="loaiKetQua" rules={[{ required: true }]}>
+            <Select placeholder="Chọn loại kết quả" options={LOAI_KET_QUA_OPTIONS} />
+          </Form.Item>
+
+          <Divider className="col-span-2 my-2" />
+
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600 font-semibold">
+            <TeamOutlined /> ĐƠN VỊ THỰC HIỆN
+          </div>
+
+          <Form.Item label="Đơn vị chủ trì" name="idDonVi" className="col-span-2" rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}>
+            <Select
               options={phongBanByKpiRole.$list.data.map((pb) => ({
                 value: pb.id,
                 label: pb.tenPhongBan,
@@ -241,9 +199,10 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
               loading={phongBanByKpiRole.$list.status === ReduxStatus.LOADING}
               showSearch
               optionFilterProp="label"
-              placeholder="Chọn đơn vị"
+              placeholder="Tìm kiếm và chọn đơn vị thực hiện"
             />
           </Form.Item>
+          <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
         </div>
       </Form>
     </Modal>

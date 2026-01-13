@@ -8,7 +8,7 @@ namespace D.Core.Domain.Entities.Kpi
     [Table(nameof(KpiCaNhan), Schema = DbSchema.Kpi)]
     public class KpiCaNhan : EntityBase
     {
-        public int STT { get; set; }
+        public int? STT { get; set; }
 
         [MaxLength(500)]
         public string? KPI { get; set; }
@@ -25,7 +25,7 @@ namespace D.Core.Domain.Entities.Kpi
 
         public int IdNhanSu { get; set; }
 
-        public int IdKpiDonVi { get; set; }
+        public int? IdKpiDonVi { get; set; }
 
         public string? Role { get; set; }
 

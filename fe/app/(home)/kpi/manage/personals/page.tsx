@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Checkbox, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
+import { Button, Card, Image, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
   PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
   EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined,
@@ -28,6 +28,8 @@ import '@styles/kpi/table.kpi.scss'
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
@@ -142,17 +144,20 @@ const Page = () => {
   const totalDeclaredScore = useMemo(() => {
     return (list || [])
       .filter(k => !query.role || k.role === query.role)
-      .reduce((sum, k) => sum + (k.diemKpi ?? 0), 0);
+      .reduce((sum, k) => {
+        const score = k.diemKpi ?? 0;
+        return k.loaiKpi === 3 ? sum - score : sum + score;
+      }, 0);
   }, [list, query.role]);
 
   const scoreByRole = useMemo(() => {
     const map: Record<string, number> = {};
-
     (list || []).forEach(k => {
       if (!k.role) return;
-      map[k.role] = (map[k.role] || 0) + (k.diemKpi ?? 0);
+      const diem = k.diemKpi ?? 0;
+      const valueToAdd = k.loaiKpi === 3 ? -diem : diem;
+      map[k.role] = (map[k.role] || 0) + valueToAdd;
     });
-
     return map;
   }, [list]);
 
@@ -160,11 +165,9 @@ const Page = () => {
     return (roleByUser || []).reduce((sum, r) => {
       const tiLe = (r.tiLe ?? 0) / 100;
       const diemRole = scoreByRole[r.role] ?? 0;
-      return sum + diemRole * tiLe;
+      return sum + (diemRole * tiLe);
     }, 0);
   }, [roleByUser, scoreByRole]);
-
-
 
   const bulkActionItems: MenuProps['items'] = [
     { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
@@ -199,12 +202,6 @@ const Page = () => {
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => onFilterChange({ Keyword: value }), 500);
 
   const columns: IColumn<KpiTableRow<IViewKpiCaNhan>>[] = [
-    // {
-    //   key: 'linhVuc',
-    //   dataIndex: 'linhVuc', title: 'Lĩnh Vực',
-    //   width: 150,
-    //   render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
-    // },
     {
       key: 'kpi', dataIndex: 'kpi', title: 'Tên KPI', width: 400,
       render: (value, record) => {
@@ -261,15 +258,24 @@ const Page = () => {
       dataIndex: 'congThuc',
       title: 'Công thức tính',
       width: 200,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+
+        if (record.loaiKpi === 3) {
+          return (
+            <Image
+              width={100}
+              src="constants\kpi\tuanThu.png"
+              preview={{
+                mask: <div className="text-xs"><EyeOutlined /> Xem mốc trừ</div>,
+              }}
+              className="rounded border shadow-sm cursor-pointer"
+            />
+          );
+        }
+        return <span className="text-gray-500">{val}</span>;
+      },
     },
-    // {
-    //   key: 'loaiKpi',
-    //   dataIndex: 'loaiKpi',
-    //   title: 'Loại KPI',
-    //   width: 140,
-    //   render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : KpiLoaiConst.getName(val))
-    // },
     {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
@@ -297,7 +303,14 @@ const Page = () => {
       dataIndex: 'diemKpi',
       title: 'Điểm kê khai',
       width: 130,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        if (!val) return 0;
+        if (record.loaiKpi === 3) {
+          return <span className=" text-red-500">-{val}%</span>;
+        }
+        return <span>{val}</span>;
+      },
     },
     {
       key: 'capTrenDanhGia',
@@ -341,20 +354,6 @@ const Page = () => {
   };
   return (
     <div className="space-y-4">
-      {/* Statistics Card - Only Total KPIs */}
-      <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-gray-500 text-sm mb-1">Tổng số KPI</p>
-            <p className="text-2xl font-bold text-blue-600">{(list || []).length}</p>
-          </div>
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <FileTextOutlined className="text-2xl text-blue-600" />
-          </div>
-        </div>
-      </Card>
-
-      {/* Main Card */}
       <Card
         className="h-full"
         title={
@@ -365,17 +364,6 @@ const Page = () => {
             </span>
           </div>
         }
-      // extra={
-      //   <Button 
-      //     type="primary" 
-      //     icon={<PlusOutlined />} 
-      //     onClick={onClickAdd}
-      //     size="large"
-      //     className="shadow-md hover:shadow-lg transition-shadow"
-      //   >
-      //     Thêm mới
-      //   </Button>
-      // }
       >
         <Form form={form} layout="horizontal">
           <div className="flex items-center justify-between mb-6 gap-4">
@@ -518,6 +506,7 @@ const Page = () => {
           />
         </div>
         <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiCaNhanKeKhai(query)); dispatch(getListTrangThaiKpiCaNhan()); }} />
+        <KpiAiChat />
       </Card>
     </div>
   );

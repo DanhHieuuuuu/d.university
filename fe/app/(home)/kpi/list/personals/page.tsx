@@ -34,6 +34,8 @@ import ConfirmScoredModal from '../../modal/ConfirmScoredModal';
 import { formatKetQua } from '@helpers/kpi/formatResult.helper';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import KpiLogModal from '../../modal/KpiLogModal';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -496,14 +498,21 @@ const Page = () => {
             <Form.Item name="idNhanSu" noStyle>
               <Select
                 placeholder={watchIdPhongBan ? "Chọn nhân sự" : "Chọn nhân sự (Tất cả)"}
-                style={{ width: 220 }}
+                style={{ width: 320 }} // Tăng độ rộng lên chút cho đỡ bị mất chữ chức vụ
                 allowClear
                 showSearch
                 optionFilterProp="label"
-                options={listNhanSu?.map((x: any) => ({
-                  value: x.id,
-                  label: (x.hoTen || `${x.hoDem ?? ''} ${x.ten ?? ''}`).trim()
-                }))}
+                options={listNhanSu?.map((x: any) => {
+                  const roleCode = KpiRoleConst.list.find(
+                    (r) => r.name.trim().toLowerCase() === x.tenChucVu?.trim().toLowerCase()
+                  )?.value;
+                  const tenChucVuChuan = KpiRoleConst.getName(roleCode) || x.tenChucVu || '';
+                  const hoTen = (x.hoTen || `${x.hoDem ?? ''} ${x.ten ?? ''}`).trim();
+                  return {
+                    value: x.id,
+                    label: `${hoTen}${tenChucVuChuan ? ` - ${tenChucVuChuan}` : ''}`,
+                  };
+                })}
                 onChange={(val) => onFilterChange({ idNhanSu: val })}
               />
             </Form.Item>
@@ -521,7 +530,6 @@ const Page = () => {
             >
               Tải lại
             </Button>
-            {/* </div> */}
 
           </div>
 
@@ -639,6 +647,7 @@ const Page = () => {
         data={data}
         loading={logStatus === ReduxStatus.LOADING}
       />
+      <KpiAiChat />
 
     </Card>
   );

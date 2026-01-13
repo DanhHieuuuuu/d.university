@@ -8,13 +8,12 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import {  setSelectedKpiTruong } from '@redux/feature/kpi/kpiSlice';
-import {  deleteKpiTruong, getAllKpiTruong, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, getListTrangThaiKpiTruong, updateKetQuaThucTeKpiTruong, updateTrangThaiKpiTruong } from '@redux/feature/kpi/kpiThunk';
+import { setSelectedKpiTruong } from '@redux/feature/kpi/kpiSlice';
+import { deleteKpiTruong, getAllKpiTruong, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, getListTrangThaiKpiTruong, updateKetQuaThucTeKpiTruong, updateTrangThaiKpiTruong } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
-import PositionModal from './(dialog)/create-or-update';
 import { toast } from 'react-toastify';
 import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUser } from '@redux/feature/userSlice';
@@ -27,6 +26,8 @@ import '@styles/kpi/table.kpi.scss'
 import { IQueryKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
+import PositionModal from './(dialog)/create-or-update copy';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
@@ -346,9 +347,9 @@ const Page = () => {
           </div>
         }
         extra={
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />} 
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
             onClick={onClickAdd}
             size="large"
             className="shadow-md hover:shadow-lg transition-shadow"
@@ -418,9 +419,9 @@ const Page = () => {
                 placement="bottomRight"
                 styles={{ body: { padding: 16, minWidth: 280 } }}
               >
-                <Button 
+                <Button
                   size="large"
-                  icon={<FilterOutlined />} 
+                  icon={<FilterOutlined />}
                   type={openFilter ? "primary" : "default"}
                 >
                   Bộ lọc
@@ -465,6 +466,7 @@ const Page = () => {
           />
         </div>
         <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getAllKpiTruong(query)); dispatch(getListTrangThaiKpiTruong()); }} />
+        <KpiAiChat />
       </Card>
     </div>
   );

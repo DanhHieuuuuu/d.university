@@ -224,7 +224,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 };
             }
 
-            // Lấy danh sách nhân sự
             var items = _unitOfWork.iNsNhanSuRepository.TableNoTracking
                 .Where(x => !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id))
                 .OrderBy(x => x.Id)
@@ -247,41 +246,33 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 ).ToList();
             }
 
-            // Lấy tất cả KPI Role của các nhân sự này
             var kpiRolesDict = _unitOfWork.iKpiRoleRepository.TableNoTracking
                 .Where(r => items.Select(i => i.Id).Contains(r.IdNhanSu) && r.IdDonVi.HasValue)
                 .ToList()
                 .GroupBy(r => r.IdNhanSu)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            // Lấy tất cả phòng ban cần hiển thị
             var allDonViIds = kpiRolesDict.Values.SelectMany(v => v.Select(r => r.IdDonVi!.Value)).Distinct().ToList();
             var pbDict = _unitOfWork.iDmPhongBanRepository.TableNoTracking
                 .Where(p => allDonViIds.Contains(p.Id))
                 .ToDictionary(p => p.Id, p => p.TenPhongBan);
 
-            // Map sang DTO
             var result = items.SelectMany(x =>
             {
                 kpiRolesDict.TryGetValue(x.Id, out var rolesOfNhanSu);
                 if (rolesOfNhanSu == null || !rolesOfNhanSu.Any())
                     return new List<NsNhanSuByKpiRoleResponseDto>();
 
-                // Lọc Role theo người xem
                 IEnumerable<KpiRole> rolesToShow;
 
                 if (isHieuTruong)
                 {
-                    // Hiệu trưởng: tất cả Role nhưng bỏ TRUONG_DON_VI_CAP_2
                     rolesToShow = rolesOfNhanSu.Where(r => r.Role != "TRUONG_DON_VI_CAP_2");
                 }
                 else
                 {
-                    // Trưởng đơn vị: chỉ Role trong đơn vị do họ quản lý
                     rolesToShow = rolesOfNhanSu.Where(r => r.IdDonVi.HasValue && donViIds.Contains(r.IdDonVi.Value)).Where(r => r.Role != "PHO_HIEU_TRUONG"); ;
                 }
-
-                // Nếu dto.IdPhongBan filter thì chỉ lấy role ứng với phòng ban đó
                 if (dto.IdPhongBan.HasValue)
                     rolesToShow = rolesToShow.Where(r => r.IdDonVi == dto.IdPhongBan.Value);
 
@@ -303,6 +294,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                         Email2 = x.Email2,
                         SoCccd = x.SoCccd,
                         TenPhongBan = pbDict.TryGetValue(idDonViKpi, out var pbName) ? pbName : null,
+                        IdPhongBan = idDonViKpi,
                         TenChucVu = roleName,
                         TrangThai = GetTrangThaiText(x),
                     };
@@ -653,7 +645,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             return role switch
             {
                 "HIEU_TRUONG" => "Hiệu trưởng",
-                "PHO_HIEU_TRUONG" => "Phó Hiệu trưởng",
+                "PHO_HIEU_TRUONG" => "Phó hiệu trưởng",
                 "TRUONG_DON_VI_CAP_2" => "Trưởng đơn vị",
                 "GIANG_VIEN" => "Giảng viên",
                 "CHUYEN_VIEN" => "Chuyên viên",
