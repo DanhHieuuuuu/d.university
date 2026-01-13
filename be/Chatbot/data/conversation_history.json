@@ -1,20 +1,28 @@
 {
   "sessions": {
-    "1": {
+    "1768268004266": {
       "history": [
         {
           "role": "user",
-          "content": "Chào bạn"
+          "content": "Hi tôi là ai"
         },
         {
           "role": "assistant",
-          "content": "Chào An ơi! Tôi rất vui được hỗ trợ bạn trong việc học tập và giải đáp các thắc mắc của bạn. Bạn cần hỗ trợ gì hôm nay?"
+          "content": "Chào An ơi, bạn là **Nguyễn Văn An**, sinh viên của Trường Đại học D.University, với mã sinh viên **SV001**. Bạn đang trong quá trình học tập tại trường, hiện tại là học kỳ thứ **3** của khóa học **2023-2027**. Tôi rất vui được hỗ trợ bạn trong suốt quá trình học tập!"
+        },
+        {
+          "role": "user",
+          "content": "hãy cho tôi xem bảng điểm của tôi kỳ trước"
+        },
+        {
+          "role": "assistant",
+          "content": "Chào An ơi, dưới đây là bảng điểm của bạn trong Học kỳ 2 - Năm học 2023-2024:\n| Môn học | Điểm tổng kết | Xếp loại |\n| --- | --- | --- |\n| Giải tích 2 | 7.3 | B |\n| Xác suất Thống kê | 8.8 | A |\n| Lập trình Hướng đối tượng | 9.2 | A+ |\n| Cấu trúc Dữ liệu và Giải thuật | 8.3 | B+ |\n| Tiếng Anh 2 | 8.3 | B+ |\n| Kinh tế Chính trị Mác-Lênin | 7.8 | B+ |\n\nTổng quan về điểm của bạn trong kỳ trước:\n- Điểm trung bình học kỳ: **8.28**\n- Điểm trung bình tích lũy: **8.02**\n- Xếp loại học kỳ: **Giỏi**\n\nHy vọng thông tin này hữu ích cho bạn, An ơi!"
         }
       ],
-      "created_at": "2026-01-13T07:11:53.779929",
-      "last_access": "2026-01-13T07:11:53.783009",
-      "title": "Chào bạn"
+      "created_at": "2026-01-13T08:33:24.879696",
+      "last_access": "2026-01-13T08:57:59.353597",
+      "title": "Hi tôi là ai"
     }
   },
-  "last_updated": "2026-01-13T07:11:53.783085"
+  "last_updated": "2026-01-13T08:57:59.353597"
 }

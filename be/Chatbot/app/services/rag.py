@@ -1,8 +1,3 @@
-"""
-Module RAG (Retrieval Augmented Generation) pipeline.
-Ket hop vector store va LLM de tra loi cau hoi.
-"""
-
 import json
 import os
 from typing import List, Dict, Any, Optional, Tuple

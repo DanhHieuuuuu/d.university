@@ -1,8 +1,3 @@
-"""
-Module embedding su dung sentence-transformers.
-Su dung model da ngon ngu ho tro tieng Viet.
-"""
-
 from typing import List
 import numpy as np
 from sentence_transformers import SentenceTransformer

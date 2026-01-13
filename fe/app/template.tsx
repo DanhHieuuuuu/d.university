@@ -18,8 +18,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }, [router, pathname]);
 
   const checkAuth = async () => {
-    // Skip auth check for public survey routes
-    if (pathname?.startsWith('/survey/user')) {
+    // Skip auth check for public routes
+    if (pathname?.startsWith('/survey/user') || pathname?.startsWith('/user/chat-bot')) {
       return;
     }
 
@@ -42,7 +42,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     } else {
       // token còn hạn → có thể gọi API getMe
       dispatch(myPermission());
-      dispatch($fetchNotification({ short: true }));
+      dispatch($fetchNotification({ PageIndex: 1, PageSize: 10, short: true }));
       console.log('Đã xem trang');
     }
   };

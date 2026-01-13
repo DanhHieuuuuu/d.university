@@ -1,8 +1,3 @@
-"""
-Module Query Rewriter.
-Viet lai cau hoi dua tren lich su hoi thoai de search vector hieu qua hon.
-"""
-
 from typing import List, Dict, Optional
 
 

@@ -1,9 +1,3 @@
-"""
-Module quan ly lich su hoi thoai (Conversation Memory).
-Luu tru va truy xuat lich su theo session_id.
-Ho tro luu tru persistent vao file JSON.
-"""
-
 import json
 import os
 import threading

@@ -1,8 +1,3 @@
-"""
-Module goi Groq API de sinh phan hoi tu LLM.
-Khong su dung LangChain, goi truc tiep API.
-"""
-
 import httpx
 from typing import List, Dict, Optional
 
@@ -112,6 +107,14 @@ Quy tắc trả lời:
 - Nếu không có thông tin trong context, hãy nói rõ là bạn không có thông tin đó
 - Khi đưa ra định hướng, hãy dựa vào điểm số và chương trình học để đề xuất phù hợp
 - Thể hiện sự thân thiện và hỗ trợ sinh viên
+
+Quy tắc định dạng (QUAN TRỌNG):
+- Trả lời theo định dạng **Markdown** để dễ đọc
+- Sử dụng **in đậm** cho thông tin quan trọng
+- Sử dụng danh sách (- hoặc 1. 2. 3.) khi liệt kê nhiều mục
+- Sử dụng bảng Markdown khi hiển thị điểm số nhiều môn
+- Sử dụng heading (## hoặc ###) để phân chia các phần nếu câu trả lời dài
+- Sử dụng > để trích dẫn hoặc nhấn mạnh lời khuyên quan trọng
 
 Context thông tin:
 ---

@@ -1,10 +1,3 @@
-"""
-FastAPI Server cho Chatbot tu van sinh vien.
-Su dung RAG pipeline voi Groq LLM.
-Ho tro conversation memory de nho lich su hoi thoai.
-Luu tru lich su vao file JSON de khong mat khi restart.
-"""
-
 import os
 import uuid
 from contextlib import asynccontextmanager
@@ -177,11 +170,25 @@ async def chat(request: ChatRequest):
 @app.post("/api/session/clear")
 async def clear_session(request: ClearSessionRequest):
     """
-    Xoa lich su hoi thoai cua mot session.
+    Xoa lich su hoi thoai cua mot session (POST method).
     Goi khi nguoi dung muon bat dau cuoc hoi thoai moi.
     """
     conversation_memory.clear_session(request.session_id)
     return {"message": "Đã xóa session thành công", "session_id": request.session_id}
+
+
+@app.delete("/api/session/{session_id}")
+async def delete_session(session_id: str):
+    """
+    Xoa mot session theo ID (DELETE method - RESTful).
+    """
+    # Kiem tra session ton tai
+    info = conversation_memory.get_session_info(session_id)
+    if not info:
+        raise HTTPException(status_code=404, detail="Session không tồn tại")
+    
+    conversation_memory.clear_session(session_id)
+    return {"message": "Đã xóa session thành công", "session_id": session_id}
 
 
 @app.get("/api/sessions")

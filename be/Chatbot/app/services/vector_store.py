@@ -1,7 +1,3 @@
-"""
-Module vector store su dung FAISS de luu tru va tim kiem vector.
-"""
-
 import os
 import json
 import pickle

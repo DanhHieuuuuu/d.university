@@ -1,8 +1,3 @@
-"""
-Module chunking du lieu JSON thanh cac doan van ban nho hon.
-Phu hop cho tieng Viet va du lieu co cau truc.
-"""
-
 import json
 from typing import List, Dict, Any
 
