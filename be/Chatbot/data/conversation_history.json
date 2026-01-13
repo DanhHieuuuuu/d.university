@@ -1,0 +1,20 @@
+{
+  "sessions": {
+    "1": {
+      "history": [
+        {
+          "role": "user",
+          "content": "Chào bạn"
+        },
+        {
+          "role": "assistant",
+          "content": "Chào An ơi! Tôi rất vui được hỗ trợ bạn trong việc học tập và giải đáp các thắc mắc của bạn. Bạn cần hỗ trợ gì hôm nay?"
+        }
+      ],
+      "created_at": "2026-01-13T07:11:53.779929",
+      "last_access": "2026-01-13T07:11:53.783009",
+      "title": "Chào bạn"
+    }
+  },
+  "last_updated": "2026-01-13T07:11:53.783085"
+}
