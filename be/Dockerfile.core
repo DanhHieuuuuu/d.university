@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["Services/Core/D.Core.API/D.Core.API.csproj", "Services/Core/D.Core.API/"]
+COPY ["Library/D.Core.Application/D.Core.Application.csproj", "Library/D.Core.Application/"]
+COPY ["Library/D.Core.Domain/D.Core.Domain.csproj", "Library/D.Core.Domain/"]
+COPY ["Library/D.Core.Infrastructure/D.Core.Infrastructure.csproj", "Library/D.Core.Infrastructure/"]
+COPY ["Shared/D.Constants/D.Constants.csproj", "Shared/D.Constants/"]
+COPY ["Shared/d.Shared.Permission/d.Shared.Permission.csproj", "Shared/d.Shared.Permission/"]
+COPY ["Library/D.ApplicationBase/D.ApplicationBase.csproj", "Library/D.ApplicationBase/"]
+COPY ["Library/D.DomainBase/D.DomainBase.csproj", "Library/D.DomainBase/"]
+
+RUN dotnet restore "Services/Core/D.Core.API/D.Core.API.csproj"
+
+COPY . .
+
+WORKDIR "/src/Services/Core/D.Core.API"
+RUN dotnet publish "D.Core.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:10000
+EXPOSE 10000
+ENTRYPOINT ["dotnet", "D.Core.API.dll"]

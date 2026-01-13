@@ -1,0 +1,28 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["Services/Auth/D.Auth.API/D.Auth.API.csproj", "Services/Auth/D.Auth.API/"]
+COPY ["Library/D.Auth.Application/D.Auth.Application.csproj", "Library/D.Auth.Application/"]
+COPY ["Library/D.Auth.Domain/D.Auth.Domain.csproj", "Library/D.Auth.Domain/"]
+COPY ["Library/D.Auth.Infrastructure/D.Auth.Infrastructure.csproj", "Library/D.Auth.Infrastructure/"]
+COPY ["Shared/D.Constants/D.Constants.csproj", "Shared/D.Constants/"]
+COPY ["Shared/d.Shared.Permission/d.Shared.Permission.csproj", "Shared/d.Shared.Permission/"]
+COPY ["Library/D.ApplicationBase/D.ApplicationBase.csproj", "Library/D.ApplicationBase/"]
+COPY ["Library/D.DomainBase/D.DomainBase.csproj", "Library/D.DomainBase/"]
+
+RUN dotnet restore "Services/Auth/D.Auth.API/D.Auth.API.csproj"
+
+
+COPY . .
+
+
+WORKDIR "/src/Services/Auth/D.Auth.API"
+RUN dotnet publish "D.Auth.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:10000
+EXPOSE 10000
+ENTRYPOINT ["dotnet", "D.Auth.API.dll"]
