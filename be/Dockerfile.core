@@ -1,0 +1,28 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["Library/D.ApplicationBase/D.ApplicationBase.csproj", "Library/D.ApplicationBase/"]
+COPY ["Library/D.DomainBase/D.DomainBase.csproj", "Library/D.DomainBase/"]
+COPY ["Library/D.InfrastructureBase/D.InfrastructureBase.csproj", "Library/D.InfrastructureBase/"]
+
+COPY ["Services/Shared/D.Constants/D.Constants.csproj", "Services/Shared/D.Constants/"]
+COPY ["Services/Shared/d.Shared.Permission/d.Shared.Permission.csproj", "Services/Shared/d.Shared.Permission/"]
+
+COPY ["Services/Core/D.Core.Domain/D.Core.Domain.csproj", "Services/Core/D.Core.Domain/"]
+COPY ["Services/Core/D.Core.Application/D.Core.Application.csproj", "Services/Core/D.Core.Application/"]
+COPY ["Services/Core/D.Core.Infrastructure/D.Core.Infrastructure.csproj", "Services/Core/D.Core.Infrastructure/"]
+COPY ["Services/Core/D.Core.API/D.Core.API.csproj", "Services/Core/D.Core.API/"]
+
+RUN dotnet restore "Services/Core/D.Core.API/D.Core.API.csproj"
+COPY . .
+
+WORKDIR "/src/Services/Core/D.Core.API"
+RUN dotnet publish "D.Core.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_URLS=http://0.0.0.0:10001
+EXPOSE 10001
+ENTRYPOINT ["dotnet", "D.Core.API.dll"]
