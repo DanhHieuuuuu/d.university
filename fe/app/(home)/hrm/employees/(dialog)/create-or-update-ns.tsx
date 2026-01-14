@@ -8,9 +8,9 @@ import dayjs from 'dayjs';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ICreateNhanSu } from '@models/nhansu/nhansu.model';
-import { clearSelected } from '@redux/feature/hrm/nhansu/nhansuSlice';
-import { createNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
+import { ICreateNhanSu, IUpdateNhanSu } from '@models/nhansu/nhansu.model';
+import { clearSelected, resetStatusCreate, resetStatusUpdate } from '@redux/feature/hrm/nhansu/nhansuSlice';
+import { createNhanSuThunk, updateNhanSuThunk } from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { FamilyTab, PersonalTab } from './(tab-ns)';
 
 type NhanSuModalProps = {
@@ -22,7 +22,7 @@ type NhanSuModalProps = {
 
 const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   const dispatch = useAppDispatch();
-  const { selected, $create } = useAppSelector((state) => state.nhanSuState);
+  const { selected, $create, $update } = useAppSelector((state) => state.nhanSuState);
 
   const [form] = Form.useForm<ICreateNhanSu>();
   const [title, setTitle] = useState<string>('');
@@ -69,6 +69,8 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
 
   const onCloseModal = () => {
     dispatch(clearSelected());
+    dispatch(resetStatusCreate());
+    dispatch(resetStatusUpdate());
     form.resetFields();
     props.setIsModalOpen(false);
   };
@@ -78,30 +80,20 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
   };
 
   const onFinish: FormProps<ICreateNhanSu>['onFinish'] = async (values) => {
-    // if (props.isUpdate) {
-    //   JobPositionService.update(props.selectedId || '', {
-    //     id: props.selectedId,
-    //     ...values
-    //   }).then(() => {
-    //     toast.success('Cập nhật thành công');
-    //     props.refreshData();
-    //     props.setIsModalOpen(false);
-    //   });
-    // } else {
-    //   JobPositionService.create({
-    //     ...values
-    //   }).then(() => {
-    //     toast.success('Thêm mới thành công');
-    //     props.refreshData();
-    //     props.setIsModalOpen(false);
-    //   });
-    // }
     if (props.isUpdate) {
-      toast.success('Cập nhật thành công');
-      console.log('All form data:', values);
+      const body: IUpdateNhanSu = {
+        idNhanSu: selected.idNhanSu,
+        ...values
+      };
+      
+      await dispatch(updateNhanSuThunk(body));
+
+      if ($update.status === ReduxStatus.SUCCESS) {
+        toast.success('Cập nhật thành công');
+      }
       onCloseModal();
     } else {
-      await dispatch(createNhanSu(values));
+      await dispatch(createNhanSuThunk(values));
 
       if ($create.status === ReduxStatus.SUCCESS) {
         toast.success('Thêm mới thành công');

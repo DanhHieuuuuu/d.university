@@ -55,3 +55,28 @@ export type ICreateNhanSu = {
   canNang?: number;
   nhomMau?: string;
 };
+
+export type IUpdateNhanSu = {
+  idNhanSu: number;
+  hoDem?: string;
+  ten?: string;
+  ngaySinh?: Date;
+  noiSinh?: string;
+  gioiTinh?: number;
+  quocTich?: number;
+  danToc?: number;
+  tonGiao?: number;
+  nguyenQuan?: string;
+  noiOHienTai?: string;
+  soCccd?: string;
+  ngayCapCccd?: Date;
+  noiCapCccd?: string;
+  soDienThoai?: string;
+  email?: string;
+  khanCapSoDienThoai?: string;
+  khanCapNguoiLienHe?: string;
+  thongTinGiaDinh?: ICreateNsQuanHe[];
+  chieuCao?: number;
+  canNang?: number;
+  nhomMau?: string;
+};

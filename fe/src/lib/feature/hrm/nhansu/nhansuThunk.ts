@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { NhanSuService } from '@services/hrm/nhansu.service';
-import { ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateNhanSu, IQueryNhanSu, IUpdateNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 export const getListNhanSu = createAsyncThunk('nhansu/list', async (args: IQueryNhanSu, { rejectWithValue }) => {
   try {
@@ -44,7 +44,7 @@ export const getHoSoNhanSu = createAsyncThunk('nhansu/ho-so', async (idNhanSu: n
   }
 });
 
-export const createNhanSu = createAsyncThunk('nhansu/create', async (payload: ICreateNhanSu, { rejectWithValue }) => {
+export const createNhanSuThunk = createAsyncThunk('nhansu/create', async (payload: ICreateNhanSu, { rejectWithValue }) => {
   try {
     const res = await NhanSuService.createNhanSu(payload);
 
@@ -57,6 +57,23 @@ export const createNhanSu = createAsyncThunk('nhansu/create', async (payload: IC
     });
   }
 });
+
+export const updateNhanSuThunk = createAsyncThunk(
+  'nhansu/update',
+  async (payload: IUpdateNhanSu, { rejectWithValue }) => {
+    try {
+      const res = await NhanSuService.updateNhanSu(payload);
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
 
 export const findNhanSuBySdtThunk = createAsyncThunk(
   'nhansu/find-sdt',

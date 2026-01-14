@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-import { getListNhanSu, getHoSoNhanSu, createNhanSu } from './nhansuThunk';
+import { getListNhanSu, getHoSoNhanSu, createNhanSuThunk, updateNhanSuThunk } from './nhansuThunk';
 
 interface NhanSuState {
   status: ReduxStatus;
@@ -13,11 +13,11 @@ interface NhanSuState {
   $create: {
     status: ReduxStatus;
   };
-  list: IViewNhanSu[];
-  total: number;
-  $createHopDong: {
+  $update: {
     status: ReduxStatus;
   };
+  list: IViewNhanSu[];
+  total: number;
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
@@ -29,11 +29,11 @@ const initialState: NhanSuState = {
   $create: {
     status: ReduxStatus.IDLE
   },
-  list: [],
-  total: 0,
-  $createHopDong: {
+  $update: {
     status: ReduxStatus.IDLE
-  }
+  },
+  list: [],
+  total: 0
 };
 
 const nhanSuSlice = createSlice({
@@ -45,7 +45,7 @@ const nhanSuSlice = createSlice({
     }
   },
   reducers: {
-    selectMaNhanSu: (state, action: PayloadAction<number>) => {
+    selectIdNhanSu: (state, action: PayloadAction<number>) => {
       state.selected.idNhanSu = action.payload;
     },
     clearSelected: (state) => {
@@ -53,6 +53,9 @@ const nhanSuSlice = createSlice({
     },
     resetStatusCreate: (state) => {
       state.$create = { status: ReduxStatus.IDLE };
+    },
+    resetStatusUpdate: (state) => {
+      state.$update = { status: ReduxStatus.IDLE };
     }
   },
   extraReducers: (builder) => {
@@ -80,13 +83,22 @@ const nhanSuSlice = createSlice({
         state.selected.status = ReduxStatus.FAILURE;
         state.selected.data = null;
       })
-      .addCase(createNhanSu.pending, (state) => {
+      .addCase(createNhanSuThunk.pending, (state) => {
         state.$create.status = ReduxStatus.LOADING;
       })
-      .addCase(createNhanSu.fulfilled, (state) => {
+      .addCase(createNhanSuThunk.fulfilled, (state) => {
         state.$create.status = ReduxStatus.SUCCESS;
       })
-      .addCase(createNhanSu.rejected, (state) => {
+      .addCase(createNhanSuThunk.rejected, (state) => {
+        state.$create.status = ReduxStatus.FAILURE;
+      })
+      .addCase(updateNhanSuThunk.pending, (state) => {
+        state.$create.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateNhanSuThunk.fulfilled, (state) => {
+        state.$create.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateNhanSuThunk.rejected, (state) => {
         state.$create.status = ReduxStatus.FAILURE;
       });
   }
@@ -94,6 +106,6 @@ const nhanSuSlice = createSlice({
 
 const nhanSuReducer = nhanSuSlice.reducer;
 
-export const { selectMaNhanSu, clearSelected, resetStatusCreate } = nhanSuSlice.actions;
+export const { selectIdNhanSu, clearSelected, resetStatusCreate, resetStatusUpdate } = nhanSuSlice.actions;
 
 export default nhanSuReducer;

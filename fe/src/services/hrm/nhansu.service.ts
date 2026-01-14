@@ -1,4 +1,4 @@
-import { ICreateNhanSu, IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateNhanSu, IQueryNhanSu, IUpdateNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
@@ -57,6 +57,16 @@ const createNhanSu = async (body: ICreateNhanSu) => {
   }
 };
 
+const updateNhanSu = async (body: IUpdateNhanSu) => {
+  try {
+    const res = await axios.put(`${apiNhanSuEndpoint}/update`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+
 const getHoSoNhanSu = async (id: number) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/ho-so/${id}`);
@@ -71,7 +81,6 @@ const getHoSoNhanSu = async (id: number) => {
 const findBySdt = async (phone: string) => {
   try {
     const res = await axios.get(`${apiNhanSuEndpoint}/find?phone=${phone}`);
-    
 
     const data: IResponseList<IViewNhanSu> = res.data;
     return Promise.resolve(data);
@@ -81,4 +90,4 @@ const findBySdt = async (phone: string) => {
   }
 };
 
-export const NhanSuService = { findPaging, find, findById, createNhanSu, getHoSoNhanSu, findBySdt };
+export const NhanSuService = { findPaging, find, findById, createNhanSu, updateNhanSu, getHoSoNhanSu, findBySdt };
