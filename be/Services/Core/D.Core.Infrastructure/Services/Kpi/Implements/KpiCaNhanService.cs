@@ -25,7 +25,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         private readonly IKpiLogStatusService _logKpiService;
 
         public KpiCaNhanService(
-            ILogger<KpiRoleService> logger,
+            ILogger<KpiCaNhanService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
@@ -138,7 +138,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             var total = await kpiQuery.CountAsync();
 
             var kpis = await kpiQuery
-                .OrderBy(x => x.STT)
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ToListAsync();
@@ -170,27 +169,29 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     (!dto.IdPhongBan.HasValue || nhanSuIdsByDonVi.Contains(kpi.IdNhanSu)) &&
                     (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
                 );
+            var summaryData = await summaryQuery
+                .Select(x => new { x.DiemKpi, x.DiemKpiCapTren, x.LoaiKPI })
+                .ToListAsync();
+
             var summary = new KpiCaNhanSummaryDto
             {
-                TongTuDanhGia = await summaryQuery.SumAsync(x => (decimal?)(x.DiemKpi ?? 0)) ?? 0,
-                TongCapTren = await summaryQuery.SumAsync(x => (decimal?)(x.DiemKpiCapTren ?? 0)) ?? 0,
-                ByLoaiKpi = await summaryQuery
+                TongTuDanhGia = summaryData.Sum(x => x.DiemKpi ?? 0),
+                TongCapTren = summaryData.Sum(x => x.DiemKpiCapTren ?? 0),
+                ByLoaiKpi = summaryData
                     .Where(x => x.LoaiKPI.HasValue)
                     .GroupBy(x => x.LoaiKPI!.Value)
                     .Select(g => new KpiCaNhanSummaryByLoaiDto
                     {
                         LoaiKpi = g.Key,
-                        TuDanhGia = g.Sum(x => (decimal?)(x.DiemKpi ?? 0)) ?? 0,
-                        CapTren = g.Sum(x => (decimal?)(x.DiemKpiCapTren ?? 0)) ?? 0
+                        TuDanhGia = g.Sum(x => x.DiemKpi ?? 0),
+                        CapTren = g.Sum(x => x.DiemKpiCapTren ?? 0)
                     })
-                    .ToListAsync()
-
+                    .ToList()
             };
 
             var resultItems = kpis.Select(kpi => new KpiCaNhanDto
             {
                 Id = kpi.Id,
-                STT = kpi.STT,
                 KPI = kpi.KPI,
                 LoaiKpi = kpi.LoaiKPI,
                 LinhVuc = kpi.LinhVuc,
@@ -261,7 +262,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 .Select(kpi => new KpiCaNhanDto
                 {
                     Id = kpi.Id,
-                    STT = kpi.STT,
                     KPI = kpi.KPI,
                     LoaiKpi = kpi.LoaiKPI,
                     LinhVuc = kpi.LinhVuc,
@@ -351,13 +351,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
                         kpi.DiemKpi = item.DiemKpi;
 
-                        kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
-                            kpi.KetQuaThucTe,
-                            kpi.MucTieu,
-                            kpi.TrongSo,
-                            kpi.IdCongThuc,
-                            kpi.LoaiKetQua
-                         );
+                        if (kpi.LoaiKPI == 3)
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.KPI, kpi.KetQuaThucTe.Value);
+                        }
+                        else
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
+                                kpi.KetQuaThucTe,
+                                kpi.MucTieu,
+                                kpi.TrongSo,
+                                kpi.IdCongThuc,
+                                kpi.LoaiKetQua
+                            );
+                        }
                         kpi.Status = KpiStatus.Declared;
 
                         _unitOfWork.iKpiCaNhanRepository.Update(kpi);
@@ -488,14 +495,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.CapTrenDanhGia = item.KetQuaCapTren;
                         kpi.DiemKpiCapTren = item.DiemKpiCapTren;
                         kpi.Status = KpiStatus.Evaluated;
-                        kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
+                        if (kpi.LoaiKPI == 3)
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.KPI, kpi.KetQuaThucTe.Value);
+                        }
+                        else
+                        {
+                            kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
                             kpi.CapTrenDanhGia,
                             kpi.MucTieu,
                             kpi.TrongSo,
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                         );
-
+                        }
                         _unitOfWork.iKpiCaNhanRepository.Update(kpi);
                         _logKpiService.InsertLog(new InsertKpiLogStatusDto
                         {
@@ -631,7 +644,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 .Where(r => r.IdNhanSu == currentUserId)
                 .ToListAsync();
 
-            // Nếu không có role quản lý → KHÔNG xem được gì
             if (!userRoles.Any(r =>
                 r.Role == "TRUONG_DON_VI_CAP_2" ||
                 r.Role == "TRUONG_DON_VI_CAP_3" ||
@@ -651,7 +663,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 switch (role.Role)
                 {
-                    // ===== TRƯỞNG ĐƠN VỊ =====
                     case "TRUONG_DON_VI_CAP_2":
                     case "TRUONG_DON_VI_CAP_3":
 
@@ -673,14 +684,12 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         allowedUserIds.UnionWith(subordinates);
                         break;
 
-                    // ===== HIỆU TRƯỞNG / CHỦ TỊCH =====
                     case "HIEU_TRUONG":
                     case "CHU_TICH_HOI_DONG_TRUONG":
 
                         var allStaff = allKpiRoles
                             .Where(r =>
                                 r.Role != "HIEU_TRUONG" &&
-                                r.Role != "PHO_HIEU_TRUONG" &&
                                 r.Role != "CHU_TICH_HOI_DONG_TRUONG"
                             )
                             .Select(r => r.IdNhanSu)

@@ -39,13 +39,6 @@ const Page = () => {
 
   const columns: IColumn<IViewRequest>[] = [
     {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      showOnConfig: false,
-      render: (text, record, index) => index + 1
-    },
-    {
       key: 'maYeuCau',
       dataIndex: 'maYeuCau',
       title: 'Mã yêu cầu'
@@ -330,7 +323,6 @@ const Page = () => {
 
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="id"
         columns={columns}
         dataSource={list}
         listActions={actions}

@@ -31,6 +31,8 @@ import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
 import ConfirmScoredModal from '../../modal/ConfirmScoredModal';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+import { ETableColumnType } from '@/constants/e-table.consts';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -417,6 +419,7 @@ const Page = () => {
       key: 'trangThai',
       dataIndex: 'trangThai',
       title: 'Trạng thái',
+      type: ETableColumnType.STATUS,
       render: (value: number) => {
         const status = KpiTrangThaiConst.get(value);
         return status ? (
@@ -622,6 +625,7 @@ const Page = () => {
         onCancel={() => setOpenChamModal(false)}
         onSubmit={handleSubmitScore}
       />
+      <KpiAiChat />
     </Card>
   );
 };

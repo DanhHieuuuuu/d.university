@@ -31,7 +31,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         private readonly IKpiLogStatusService _logKpiService;
 
         public KpiDonViService(
-            ILogger<KpiRoleService> logger,
+            ILogger<KpiDonViService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
@@ -473,13 +473,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         var oldScore = kpi.DiemKpi;
                         kpi.KetQuaThucTe = item.KetQuaThucTe;
                         kpi.DiemKpi = item.DiemKpi;
-                        kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
+                        if (kpi.LoaiKpi == 3)
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                        }
+                        else
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.TinhDiemChung(
                             kpi.KetQuaThucTe,
                             kpi.MucTieu,
                             kpi.TrongSo,
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                          );
+                        }
                         kpi.TrangThai = KpiStatus.Declared;
 
                         _unitOfWork.iKpiDonViRepository.Update(kpi);
@@ -651,13 +658,20 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         var oldScore = kpi.DiemKpi;
                         kpi.CapTrenDanhGia = item.KetQuaCapTren;
                         kpi.DiemKpiCapTren = item.DiemKpiCapTren;
-                        kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
+                        if (kpi.LoaiKpi == 3)
+                        {
+                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                        }
+                        else
+                        {
+                            kpi.DiemKpiCapTren = TinhDiemKPI.TinhDiemChung(
                             kpi.CapTrenDanhGia,
                             kpi.MucTieu,
                             kpi.TrongSo,
                             kpi.IdCongThuc,
                             kpi.LoaiKetQua
                         );
+                        }
                         kpi.TrangThai = KpiStatus.Evaluated;
 
                         _unitOfWork.iKpiDonViRepository.Update(kpi);

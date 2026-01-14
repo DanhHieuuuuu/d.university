@@ -19,32 +19,28 @@ const CreateReceptionTimePage: React.FC = () => {
   const delegationIncomingId = Number(searchParams.get('delegationIncomingId'));
 
   const onFinish = async (values: any) => {
-    console.log('FORM VALUES', values);
     try {
       setLoading(true);
-      
-      const data: ICreateReceptionTime = {
+
+      const items: ICreateReceptionTime[] = values.receptionTimes.map((rt: any) => ({
         delegationIncomingId,
-        date: values.date.format('YYYY-MM-DD'),
-        startDate: values.startTime.format('HH:mm:ss'),
-        endDate: values.endTime.format('HH:mm:ss'),
-        content: values.content,
-        totalPerson: values.totalPerson,
-        address: values.address
-      };
-      const payload: ICreateReceptionTimeList = {
-        items: [data],
-      };      
+        date: rt.date.format('YYYY-MM-DD'),
+        startDate: rt.startTime.format('HH:mm:ss'),
+        endDate: rt.endTime.format('HH:mm:ss'),
+        content: rt.content,
+        totalPerson: rt.totalPerson,
+        address: rt.address
+      }));
+
+      const payload: ICreateReceptionTimeList = { items };
 
       const receptionResult = await dispatch(createReceptionTime(payload)).unwrap();
-      console.log('receptionResult:', receptionResult);
-      //Create Prepare theo từng ReceptionTime
-      const receptionTimes = receptionResult.data;
+
+      // tạo prepares
       await Promise.all(
-        receptionTimes.map((rt: any, index: number) => {
+        receptionResult.data.map((rt: any, index: number) => {
           const prepares = values.receptionTimes[index]?.prepares;
-          console.log('PREPARES:', prepares);
-          if (!prepares || prepares.length === 0) return Promise.resolve();
+          if (!prepares?.length) return Promise.resolve();
 
           return dispatch(
             createPrepare({
@@ -58,10 +54,13 @@ const CreateReceptionTimePage: React.FC = () => {
           ).unwrap();
         })
       );
+
       toast.success('Tạo mới thành công!');
       router.back();
     } catch (err: any) {
       toast.error(String(err));
+    } finally {
+      setLoading(false);
     }
   };
 

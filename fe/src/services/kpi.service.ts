@@ -7,6 +7,7 @@ import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@mo
 import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import {  IQueryKpiLogStatus } from '@models/kpi/kpi-log.model';
+import { IAskKpiChatCommand } from '@models/kpi/kpi-chat.model';
 
 const apiDanhMucEndpoint = 'kpi';
 const apiKpiTruongEndpoint = `${apiDanhMucEndpoint}/kpi-truong`;
@@ -14,7 +15,7 @@ const apiKpiDonViEndpoint = `${apiDanhMucEndpoint}/kpi-donvi`;
 const apiKpiCaNhanEndpoint = `${apiDanhMucEndpoint}/kpi-canhan`;
 const apiKpiRoleEndpoint = `${apiDanhMucEndpoint}/kpi-role`;
 const apiKpiLogEndpoint = `${apiDanhMucEndpoint}/kpi-log`;
-
+const apiKPiChatEndPoint = `${apiDanhMucEndpoint}/kpi-chat`;
 //Kpi Cá nhân
 const getListKpiCaNhan = async (query?: IQueryKpiCaNhan) => {
   try {
@@ -587,6 +588,15 @@ const getKpiLogs = async (query?: IQueryKpiLogStatus) => {
   }
 };
 
+const askKpiAi = async (payload: IAskKpiChatCommand) => {
+  try {
+    const res = await axios.post(`${apiKPiChatEndPoint}/ask`, payload);
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Có lỗi xảy ra khi gọi AI');
+    return Promise.reject(err);
+  }
+};
 
 export const KpiService = {
   getListKpiCaNhan,
@@ -625,4 +635,5 @@ export const KpiService = {
   deleteKpiRole,
   getListKpiRoleByUser,
   getKpiLogs,
+  askKpiAi
 };

@@ -120,6 +120,8 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKpiRoleRepository, KpiRoleRepository>()
                 .AddScoped<IKpiTemplateRepository, KpiTemplateRepository>()
                 .AddScoped<IKpiTruongRepository, KpiTruongRepository>()
+                .AddScoped<IKpiChatService, KpiChatService>()
+                .AddScoped<IKpiTinhDiemService, KpiTinhDiemService>()
             #endregion
             #region Survey
                 .AddScoped<IKsSurveyRequestRepository, SurveyRequestRepository>()

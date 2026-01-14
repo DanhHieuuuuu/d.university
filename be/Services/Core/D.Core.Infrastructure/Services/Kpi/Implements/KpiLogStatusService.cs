@@ -15,7 +15,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         private readonly ServiceUnitOfWork _unitOfWork;
 
         public KpiLogStatusService(
-            ILogger<KpiRoleService> logger,
+            ILogger<KpiLogStatusService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork

@@ -18,6 +18,7 @@ namespace D.ControllerBase
     public static class ProgramBase
     {
         public const string CorsPolicy = "cors_policy";
+        public const string SignalRCors = "signalr_cors";
 
         /// <summary>
         /// Cors configuration for the application.
@@ -32,6 +33,23 @@ namespace D.ControllerBase
                     policy =>
                     {
                         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    }
+                );
+            });
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    SignalRCors,
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins(
+                                "http://localhost:3077",
+                                "http://localhost:5173"
+                            )
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                     }
                 );
             });
@@ -123,7 +141,13 @@ namespace D.ControllerBase
         /// <param name="builder"></param>
         public static void ConfigureRedis(this WebApplicationBuilder builder)
         {
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
+            var connectionString = builder.Configuration.GetConnectionString("Redis");
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = "localhost:6379";
+            }
+            var redis = ConnectionMultiplexer.Connect(connectionString);
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 

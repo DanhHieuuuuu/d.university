@@ -20,7 +20,7 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { getListQuyetDinh } from '@redux/feature/hrm/quyetdinh/quyetdinhThunk';
-import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
+import { formatDateTimeView } from '@utils/index';
 import { IQueryQuyetDinh, IViewQuyetDinh } from '@models/nhansu/quyetdinh.model';
 import { ETableColumnType } from '@/constants/e-table.consts';
 import { NsQuyetDinhTypeConst } from '@/constants/core/hrm/quyet-dinh-type.const';
@@ -75,16 +75,11 @@ const Page = () => {
 
   const columns: IColumn<IViewQuyetDinh>[] = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
-    },
-    {
       key: 'maNhanSu',
       dataIndex: 'maNhanSu',
       title: 'Mã nhân sự'
-    },{
+    },
+    {
       key: 'hoTen',
       dataIndex: 'hoTen',
       title: 'Họ tên'
@@ -97,7 +92,6 @@ const Page = () => {
       align: 'center',
       getTagInfo: (status: number) => NsQuyetDinhTypeConst.getTag(status)
     },
-    
     {
       key: 'noiDungTomTat',
       dataIndex: 'noiDungTomTat',
@@ -109,7 +103,7 @@ const Page = () => {
       title: 'Bắt đầu hiệu lực từ',
       align: 'center',
       render: (val: string) => formatDateTimeView(val)
-    },
+    }
   ];
 
   const actions: IAction[] = [];
@@ -157,9 +151,9 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
+
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="id"
         columns={columns}
         dataSource={data}
         listActions={actions}

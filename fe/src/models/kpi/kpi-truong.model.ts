@@ -44,7 +44,7 @@ export type ICreateKpiTruong = {
     namHoc: string,
     idCongThuc: number,
     congThucTinh?: string,
-    loaiKetQua?: string;
+    loaiKetQua?: LoaiCongThuc;
 };
 
 export type IUpdateTrangThaiKpiTruong = {

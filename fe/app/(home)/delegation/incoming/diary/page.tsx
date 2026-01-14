@@ -22,8 +22,7 @@ const Page = () => {
   const dispatch = useAppDispatch();
 
   // Lấy data từ redux
-  const { status, total: totalLogStatus, listLogStatus } = useAppSelector((state) => state.delegationState);
-  const { total: totalReception, listLogReceptionTime } = useAppSelector((state) => state.delegationState); // giả sử state chung
+  const { status, total: totalLogStatus,total: totalReception, listLogStatus ,listLogReceptionTime} = useAppSelector((state) => state.delegationState);
 
   // Column cho logStatus
   const logStatusColumns: IColumn<ILogStatus>[] = [
@@ -59,7 +58,7 @@ const Page = () => {
   // Column cho logReceptionTime
   const receptionColumns: IColumn<ILogReceptionTime>[] = [
     { key: 'stt', fixed: 'left', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
-    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center', width: 150 },
+    { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center',width:130 },
     { key: 'type', dataIndex: 'type', title: 'Loại', align: 'center' },
     { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 250 },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
@@ -118,7 +117,7 @@ const Page = () => {
             columns={logStatusColumns}
             dataSource={listLogStatus}
             pagination={{ position: ['bottomRight'], ...statusPagination }}
-            scroll={{ x: 'max-content', y: 'calc(100vh - 370px)' }}
+           
           />
         </TabPane>
         <TabPane tab="Nhật ký thời gian tiếp đoàn" key="2">
@@ -128,7 +127,7 @@ const Page = () => {
             columns={receptionColumns}
             dataSource={listLogReceptionTime}
             pagination={{ position: ['bottomRight'], ...receptionPagination }}
-            scroll={{ x: 'max-content', y: 'calc(100vh - 370px)' }}
+          
           />
         </TabPane>
       </Tabs>

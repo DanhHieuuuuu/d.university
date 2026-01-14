@@ -14,22 +14,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
+using D.Notification.ApplicationService.Abstracts;
+using D.InfrastructureBase.Shared;
 
 namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 {
     public class DepartmentSupportService : ServiceBase, IDepartmentSupportService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
+        private readonly INotificationService _notificationService;
 
         public DepartmentSupportService(
             ILogger<DepartmentSupportService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            INotificationService notificationService
         )
             : base(logger, httpContext, mapper)
         {
             _unitOfWork = unitOfWork;
+            _notificationService = notificationService;
         }
 
         public async Task<CreateDepartmentSupportResponseDto> CreateDepartmentSupport(CreateDepartmentSupportRequestDto dto)
@@ -40,13 +47,25 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             var phongBanExist = await _unitOfWork.iDmPhongBanRepository
                 .TableNoTracking
                 .AnyAsync(x => x.Id == dto.DepartmentSupportId && !x.Deleted);
-
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
             if (!phongBanExist)
                 throw new Exception("Không tồn tại phòng ban này");
-
+            //Tạo DepartmentSupport
             var newSupporter = _mapper.Map<DepartmentSupport>(dto);
             _unitOfWork.iDepartmentSupportRepository.Add(newSupporter);
             await _unitOfWork.SaveChangesAsync();
+            await _notificationService.SendAsync(new NotificationMessage
+            {
+                Receiver = new Receiver
+                {
+                    // Người nhận thông báo
+                    UserId = userId,
+                },
+                Title = "Phân công hỗ trợ phòng ban",
+                Content = "Bạn vừa tạo mới hỗ trợ phòng ban.",
+                AltContent = $"Tạo mới phòng ban hỗ trợ (ID: {dto.DepartmentSupportId}).",
+                Channel = NotificationChannel.Realtime
+            });
             return _mapper.Map<CreateDepartmentSupportResponseDto>(newSupporter);
 
         }

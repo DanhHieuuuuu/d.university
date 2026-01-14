@@ -57,12 +57,6 @@ const Page = () => {
 
   const columns: IColumn<IViewHopDong>[] = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
-    },
-    {
       key: 'soHopDong',
       dataIndex: 'soHopDong',
       title: 'Số hợp đồng'
@@ -175,7 +169,6 @@ const Page = () => {
       </Form>
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="id"
         columns={columns}
         dataSource={data}
         listActions={actions}

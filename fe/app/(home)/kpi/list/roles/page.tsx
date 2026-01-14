@@ -21,6 +21,7 @@ import { IQueryKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
 import PositionModal from './(dialog)/create-or-update';
 import { toast } from 'react-toastify';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -91,13 +92,6 @@ const Page = () => {
   };
 
   const columns: IColumn<IViewKpiRole>[] = [
-    {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      align: 'center',
-      render: (value, row, index) => index + 1
-    },
     {
       key: 'tenNhanSu',
       dataIndex: 'tenNhanSu',
@@ -245,7 +239,6 @@ const Page = () => {
       </Form>
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="id"
         columns={columns}
         dataSource={list}
         listActions={actions}
@@ -259,6 +252,7 @@ const Page = () => {
         isView={isView}
         setIsModalOpen={setIsModalOpen}
       />
+      <KpiAiChat />
     </Card>
   );
 };
