@@ -73,11 +73,11 @@ export const usePaginationWithFilter = <T extends IQueryPaging>({
   // xử lý reset filter
   const resetFilter = () => {
     const defaultQuery = {
+      ...initialQuery,
       PageIndex: 1,
       PageSize: 10,
-      Keyword: '',
-      ...initialQuery
-    };
+      Keyword: ''
+    } as T;
 
     setQuery(defaultQuery);
     onQueryChange?.(defaultQuery);
