@@ -38,7 +38,7 @@ const quyetdinhSlice = createSlice({
   name: 'quyetdinh',
   initialState,
   reducers: {
-    selectMaNhanSu: (state, action: PayloadAction<IViewQuyetDinh>) => {
+    selectQuyetDinh: (state, action: PayloadAction<IViewQuyetDinh>) => {
       state.selected.data = action.payload;
     },
     clearSelected: (state) => {
@@ -66,6 +66,6 @@ const quyetdinhSlice = createSlice({
 
 const quyetdinhReducer = quyetdinhSlice.reducer;
 
-export const { selectMaNhanSu, clearSelected, resetStatusCreate } = quyetdinhSlice.actions;
+export const { selectQuyetDinh, clearSelected, resetStatusCreate } = quyetdinhSlice.actions;
 
 export default quyetdinhReducer;

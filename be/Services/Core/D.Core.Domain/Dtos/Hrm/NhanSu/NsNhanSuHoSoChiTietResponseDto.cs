@@ -1,4 +1,5 @@
 ﻿using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
+using D.Core.Domain.Dtos.Hrm.QuaTrinhCongTac;
 
 namespace D.Core.Domain.Dtos.Hrm.NhanSu
 {
@@ -27,6 +28,7 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? KhanCapSoDienThoai { get; set; }
         public string? KhanCapNguoiLienHe { get; set; }
         public List<NsQuanHeGiaDinhResponseDto>? ThongTinGiaDinh { get; set; }
+        public List<NsQuaTrinhCongTacResponseDto>? QuaTrinhCongTac { get; set; }
 
         // Thông tin thuế
         public string? MaSoThue { get; set; }

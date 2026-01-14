@@ -1,19 +1,20 @@
+using System.Text.Json;
 using AutoMapper;
-using d.Shared.Permission.Error;
 using D.Auth.Domain.Entities;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Hrm;
 using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
+using D.Core.Domain.Dtos.Hrm.QuaTrinhCongTac;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
+using d.Shared.Permission.Error;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using NsNhanSuEntity = D.Core.Domain.Entities.Hrm.NhanSu.NsNhanSu;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
@@ -336,7 +337,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             };
         }
 
-
         public NsNhanSuResponseDto CreateNhanSu(CreateNhanSuDto dto)
         {
             _logger.LogInformation(
@@ -390,7 +390,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         public void UpdateNhanSu(UpdateNhanSuDto dto)
         {
-            _logger.LogInformation($"Method {nameof(UpdateNhanSu)} called. Dto: {JsonSerializer.Serialize(dto)}");
+            _logger.LogInformation(
+                $"Method {nameof(UpdateNhanSu)} called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
 
             var nhansu = _unitOfWork.iNsNhanSuRepository.Table.FirstOrDefault(x =>
                 dto.IdNhanSu == x.Id
@@ -430,7 +432,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 _unitOfWork.iNsNhanSuRepository.Update(nhansu);
                 _unitOfWork.iNsNhanSuRepository.SaveChange();
 
-                UpdateGiaDinh(dto);                
+                UpdateGiaDinh(dto);
             }
         }
 
@@ -550,6 +552,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     : null;
 
             result.ThongTinGiaDinh = GetThongTinGiaDinh(idNhanSu);
+            result.QuaTrinhCongTac = GetQuaTrinhCongTac(idNhanSu);
 
             return result;
         }
@@ -557,7 +560,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         #endregion
 
         #region Private helpers
-
 
         // chỉ thêm mới thông tin nhân sự
         private NsNhanSuEntity CreateNewNhanSu(CreateNhanSuDto dto)
@@ -770,6 +772,41 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 "CHUYEN_VIEN" => "Chuyên viên",
                 _ => role,
             };
+        }
+
+        private List<NsQuaTrinhCongTacResponseDto> GetQuaTrinhCongTac(int idNhanSu)
+        {
+            var query =
+                from qtct in _unitOfWork.iNsQuaTrinhCongTacRepository.TableNoTracking
+                where qtct.IdNhanSu == idNhanSu
+
+                join cv in _unitOfWork.iDmChucVuRepository.TableNoTracking
+                    on qtct.IdChucVu equals cv.Id into cvGroup
+                from chucVu in cvGroup.DefaultIfEmpty()
+
+                join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                    on qtct.IdPhongBan equals pb.Id into pbGroup
+                from phongBan in pbGroup.DefaultIfEmpty()
+
+                join tbm in _unitOfWork.iDmToBoMonRepository.TableNoTracking
+                    on qtct.IdToBoMon equals tbm.Id into tbmGroup
+                from toBoMon in tbmGroup.DefaultIfEmpty()
+
+                select new NsQuaTrinhCongTacResponseDto
+                {
+                    Id = qtct.Id,
+                    TuNgay = qtct.NgayBatDau,
+                    DenNgay = qtct.NgayKetThuc,
+                    IdChucVu = qtct.IdChucVu,
+                    IdPhongBan = qtct.IdPhongBan,
+                    IdToBoMon = qtct.IdToBoMon,
+                    Description =
+                      (phongBan != null ? $"Đơn vị: <b><i>{phongBan.TenPhongBan}</i></b>. " : "")
+                      + (chucVu != null ? $"Chức vụ: <b><i>{chucVu.TenChucVu}</i></b>. " : "")
+                      + (toBoMon != null ? $"Tổ bộ môn: <b><i>{toBoMon.TenBoMon}</i></b>." : "")
+                };
+
+            return query.ToList();
         }
 
         #endregion

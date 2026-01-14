@@ -1,5 +1,6 @@
 import { IQueryPaging } from '@models/common/model.common';
-import { ICreateNsQuanHe } from './quanHeGiaDinh.model';
+import { ICreateNsQuanHe, IViewNsQuanHe } from './quanHeGiaDinh.model';
+import { IVIewNsQuaTrinhCongTac } from './quaTrinhCongTac.model';
 
 export type IQueryNhanSu = IQueryPaging & {
   cccd?: string;
@@ -29,7 +30,11 @@ export type IViewNhanSu = {
   khanCapNguoiLienHe?: string;
   tenChucVu: string;
   tenPhongBan: string;
-  thongTinGiaDinh?: ICreateNsQuanHe[];
+  thongTinGiaDinh?: IViewNsQuanHe[];
+  quaTrinhCongTac?: IVIewNsQuaTrinhCongTac[];
+  chieuCao?: number;
+  canNang?: number;
+  nhomMau?: string;
 };
 
 export type ICreateNhanSu = {
