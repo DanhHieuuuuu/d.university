@@ -93,13 +93,6 @@ const Page = () => {
 
   const columns: IColumn<IViewKpiRole>[] = [
     {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      align: 'center',
-      render: (value, row, index) => index + 1
-    },
-    {
       key: 'tenNhanSu',
       dataIndex: 'tenNhanSu',
       title: 'Tên Nhân sự'
@@ -246,7 +239,6 @@ const Page = () => {
       </Form>
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="id"
         columns={columns}
         dataSource={list}
         listActions={actions}

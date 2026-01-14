@@ -31,14 +31,6 @@ const Page = () => {
 
   const columns: IColumn<IViewSurvey>[] = [
     {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      width: 60,
-      align: 'center',
-      render: (text, record, index) => index + 1
-    },
-    {
       key: 'maKhaoSat',
       dataIndex: 'maKhaoSat',
       title: 'Mã khảo sát',
@@ -217,7 +209,6 @@ const Page = () => {
 
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="id"
         columns={columns}
         dataSource={list}
         listActions={actions}

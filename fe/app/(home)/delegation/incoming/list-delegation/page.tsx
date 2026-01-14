@@ -52,15 +52,6 @@ const Page = () => {
 
   const columns: IColumn<IViewGuestGroup>[] = [
     {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      align: 'center',
-      width:60,
-      fixed: 'left',
-      render: (value, row, index) => index + 1
-    },
-    {
       key: 'code',
       dataIndex: 'code',
       title: 'Mã đoàn',

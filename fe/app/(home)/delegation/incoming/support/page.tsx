@@ -52,14 +52,6 @@ const Page = () => {
 
   const columns: IColumn<IDepartmentSupport>[] = [
     {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      align: 'center',
-      fixed: 'left',
-      render: (value, row, index) => index + 1
-    },
-    {
       key: 'departmentSupportName',
       dataIndex: 'departmentSupportName',
       title: 'Phòng ban hỗ trợ'
@@ -167,7 +159,6 @@ const Page = () => {
       </Form>
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="id"
         columns={columns}
         dataSource={listDepartmentSupport}
         listActions={actions}

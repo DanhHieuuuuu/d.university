@@ -41,13 +41,6 @@ const Page = () => {
 
   const columns: IColumn<IViewNhanSu>[] = [
     {
-      key: 'idNhanSu',
-      dataIndex: 'idNhanSu',
-      title: 'ID',
-      align: 'center',
-      showOnConfig: false
-    },
-    {
       key: 'maNhanSu',
       dataIndex: 'maNhanSu',
       title: 'Mã NS',

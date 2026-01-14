@@ -19,6 +19,17 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
   const [openActionIndex, setOpenActionIndex] = useState<number | null>(null);
   const { columns, listActions, rowSelection, ...rest } = props;
 
+  const indexColumn : IColumn<T> = {
+    key: 'stt',
+    dataIndex: 'stt',
+    title: 'STT',
+    align: 'center',
+    width: 60,
+    fixed: 'left',
+    showOnConfig: false,
+    render: (value, record, index) => index + 1
+  };
+
   const openPopupConfig = () => {
     setOpenConfig(true);
   };
@@ -34,7 +45,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     if (!info) return value;
 
     return (
-      <Tag className={info.className} color={info.color}>
+      <Tag bordered={false} className={info.className} color={info.color}>
         {info.label}
       </Tag>
     );
@@ -57,7 +68,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     } else {
       return {
         ...col,
-        minWidth: col.minWidth ?? 60
+        minWidth: col.minWidth ?? 100
       };
     }
   });
@@ -69,13 +80,10 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     width: 50,
     fixed: 'right',
     onCell: (_record: T, index?: number) => {
-    const rowStyle =
-      typeof rest.onRow === 'function'
-        ? rest.onRow(_record)?.style
-        : undefined;
+      const rowStyle = typeof rest.onRow === 'function' ? rest.onRow(_record)?.style : undefined;
 
-    return rowStyle ? { style: rowStyle } : {};
-  },
+      return rowStyle ? { style: rowStyle } : {};
+    },
     render: (_, record, index) => {
       if (!listActions?.length) return null;
 
@@ -126,6 +134,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
   }));
 
   const newColumns = [
+    indexColumn,
     ...enhancedColumns.filter((item) => item.showOnConfig === false || checkedList.includes(item.key as string)),
     configColumn
   ];
@@ -135,6 +144,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
       <Table<T>
         size="small"
         tableLayout="fixed"
+        rowKey="stt"
         columns={newColumns}
         scroll={{ x: 'max-content' }}
         rowSelection={rowSelection}
