@@ -45,27 +45,25 @@ const HomePage: React.FC = () => {
     xField: 'faculty',
     yField: 'students',
     label: {
+      text: 'students',
       position: 'top',
       style: {
         fill: '#000000',
         opacity: 0.6
       }
     },
-    xAxis: {
-      label: {
-        autoRotate: false,
-        autoHide: false
-      }
-    },
-    meta: {
-      faculty: {
-        alias: 'Khoa'
+    axis: {
+      x: {
+        title: 'Khoa',
+        labelAutoRotate: false
       },
-      students: {
-        alias: 'Sinh viên'
+      y: {
+        title: 'Sinh vien'
       }
     },
-    color: '#1890ff'
+    style: {
+      fill: '#1890ff'
+    }
   };
 
   // Dữ liệu biểu đồ tròn - Phân bố nhân sự theo chức vụ
@@ -82,14 +80,18 @@ const HomePage: React.FC = () => {
     colorField: 'type',
     radius: 0.8,
     label: {
-      type: 'outer',
-      content: '{name} {percentage}'
+      text: 'type',
+      position: 'outside'
     },
-    interactions: [
-      {
-        type: 'element-active'
+    legend: {
+      color: {
+        title: false,
+        position: 'bottom'
       }
-    ]
+    },
+    tooltip: {
+      title: 'type'
+    }
   };
 
   // Bảng hoạt động gần đây

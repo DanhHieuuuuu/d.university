@@ -150,7 +150,14 @@ const studentSlice = createSlice({
       })
       .addCase(sinhVienLogin.fulfilled, (state, action) => {
         const { remember } = action.meta.arg;
-        const { data: result, code } = action.payload;
+        const { data: result, status } = action.payload;
+
+        state.$login.loading = false;
+
+        // Chi set authenticated khi status = 1 (thanh cong)
+        if (status !== 1) {
+          return;
+        }
 
         // save token
         setToken({
@@ -162,7 +169,6 @@ const studentSlice = createSlice({
         });
 
         // update state
-        state.$login.loading = false;
         state.user = result.user;
         state.isAuthenticated = true;
       })
