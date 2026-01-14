@@ -3,6 +3,7 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, message, Modal, Select } from 'antd';
 import {
+  AudioOutlined,
   CheckOutlined,
   DeleteOutlined,
   EditOutlined,
@@ -39,6 +40,7 @@ import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
+import VoiceSearch from '../../../../../src/components/hieu-custom/voice-search';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -48,80 +50,90 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [showVoiceSearch, setShowVoiceSearch] = useState<boolean>(false);
+  const [voiceData, setVoiceData] = useState<IViewGuestGroup[] | null>(null);
 
   const columns: IColumn<IViewGuestGroup>[] = [
+    {
+      key: 'stt',
+      dataIndex: 'stt',
+      title: 'STT',
+      align: 'center',
+      width: 60,
+      fixed: 'left',
+      render: (value, row, index) => index + 1
+    },
     {
       key: 'code',
       dataIndex: 'code',
       title: 'Mã đoàn',
       align: 'center',
-      width:100
-      
+      width: 100
     },
     {
       key: 'name',
       dataIndex: 'name',
       title: 'Tên đoàn vào',
-      width:200
+      width: 200
     },
     {
       key: 'content',
       dataIndex: 'content',
       title: 'Nội dung',
-      width:200
+      width: 200
     },
     {
       key: 'phongBan',
       dataIndex: 'phongBan',
       title: 'Phòng ban phụ trách',
-      width:200
+      width: 200
     },
     {
       key: 'location',
       dataIndex: 'location',
       title: 'Địa điểm',
-      width:100
+      width: 100
     },
     {
       key: 'staffReceptionName',
       dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
       align: 'center',
-      width:200
+      width: 200
     },
     {
       key: 'totalPerson',
       dataIndex: 'totalPerson',
       title: 'Tổng số người',
       align: 'center',
-      width: 150
+      width: 120
     },
     {
       key: 'phoneNumber',
       dataIndex: 'phoneNumber',
       title: 'SĐT liên hệ',
-      width:200
+      width: 200
     },
     {
       key: 'requestDate',
       dataIndex: 'requestDate',
       title: 'Ngày yêu cầu',
-      width:200,
+      width: 200,
       render: (value) => <p>{formatDateView(value)}</p>
     },
     {
       key: 'receptionDate',
       dataIndex: 'receptionDate',
       title: 'Ngày tiếp đón',
-      width:200,
+      width: 200,
       render: (value) => <p>{formatDateView(value)}</p>
     },
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
       title: 'Tổng chi phí',
-      align: 'right',
-      width: 150
+      align: 'left',
+      width: 120
     },
     {
       key: 'status',
@@ -137,14 +149,14 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.DONE,
+      hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
       command: (record: IViewGuestGroup) => onClickView(record)
     },
     {
       label: 'Chỉnh sửa',
       tooltip: 'Sửa danh sách đoàn vào',
       icon: <EditOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.DONE,
+      hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
       command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
     {
@@ -157,7 +169,7 @@ const Page = () => {
     {
       label: 'Thêm thời gian',
       icon: <PlusOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE ,
+      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
     },
     {
@@ -194,6 +206,7 @@ const Page = () => {
       dispatch(getListPhongBan());
       dispatch(getListNhanSu());
       dispatch(getListStatus());
+      setVoiceData(null);
     }
   }, [isModalOpen]);
 
@@ -257,7 +270,7 @@ const Page = () => {
   return (
     <Card
       title="Danh sách Đoàn vào"
-      className="h-full"
+      className="min-h-full"
       extra={
         <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
           Thêm mới
@@ -302,22 +315,36 @@ const Page = () => {
             onClick={() => {
               form.resetFields();
               resetFilter();
+              setVoiceData(null);
+              dispatch(getListGuestGroup(query));
             }}
           >
             Tải lại
           </Button>
+          <Button
+            color="default"
+            variant="filled"
+            icon={<AudioOutlined />}
+            onClick={() => setShowVoiceSearch((prev) => !prev)}
+          ></Button>
         </div>
       </Form>
+      {showVoiceSearch && (
+        <div className="voice-fixed-wrapper">
+          <VoiceSearch onResult={(data) => setVoiceData(data)} />
+        </div>
+      )}
 
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
         columns={columns}
-        dataSource={list}
+        dataSource={voiceData?.length ? voiceData : list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
+        height={450}
       />
+
       <CreateDoanVaoModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

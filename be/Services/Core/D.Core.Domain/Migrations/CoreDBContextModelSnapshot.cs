@@ -753,6 +753,10 @@ namespace D.Core.Domain.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdStaffReception");
 
+                    b.Property<bool>("IsExpiryNotified")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsExpiryNotified");
+
                     b.Property<string>("Location")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")

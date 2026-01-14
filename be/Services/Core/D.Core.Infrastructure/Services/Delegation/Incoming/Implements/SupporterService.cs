@@ -7,6 +7,9 @@ using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,16 +25,19 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
     public class SupporterService : ServiceBase, ISupporterService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
+        private readonly INotificationService _notificationService;
 
         public SupporterService(
             ILogger<SupporterService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            INotificationService notificationService
         )
             : base(logger, httpContext, mapper)
         {
             _unitOfWork = unitOfWork;
+            _notificationService = notificationService;
         }
         public async Task<List<CreateSupporterResponseDto>> CreateSupporter(CreateSupporterRequestDto dto)
         {
@@ -59,7 +65,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 if (!nhanSuExist)
                     throw new Exception($"Không tồn tại nhân sự ID = {item.SupporterId}");
 
-                // 3. Create entity
+                //Create entity
                 var supporter = new Supporter
                 {
                     SupporterId = item.SupporterId,
@@ -72,6 +78,27 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             }
 
             await _unitOfWork.SaveChangesAsync();
+            //Gửi thông báo cho supporter
+            var tenPhongBan = await _unitOfWork.iDmPhongBanRepository
+                .TableNoTracking
+                .Where(x => x.Id == dto.DepartmentSupportId && !x.Deleted)
+                .Select(x => x.TenPhongBan)
+                .FirstOrDefaultAsync();
+            //tenPhongBan ??= "không xác định";
+            foreach (var supporter in result)
+            {
+                await _notificationService.SendAsync(new NotificationMessage
+                {
+                    Receiver = new Receiver
+                    {
+                        UserId = supporter.SupporterId // nhân sự được phân công 
+                    },
+                    Title = "Phân công hỗ trợ",
+                    Content = "Bạn vừa được phân công hỗ trợ đoàn vào.",
+                    AltContent = $"Bạn vừa được phân công vào Phòng ban hỗ trợ:{tenPhongBan}",
+                    Channel = NotificationChannel.Realtime
+                });
+            }
 
             return _mapper.Map<List<CreateSupporterResponseDto>>(result);
         }

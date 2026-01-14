@@ -52,6 +52,15 @@ const Page = () => {
 
   const columns: IColumn<IViewGuestGroup>[] = [
     {
+      key: 'stt',
+      dataIndex: 'stt',
+      title: 'STT',
+      align: 'center',
+      fixed: 'left',
+      width:60,
+      render: (value, row, index) => index + 1
+    },
+    {
       key: 'code',
       dataIndex: 'code',
       title: 'Mã đoàn',
@@ -72,6 +81,7 @@ const Page = () => {
       dataIndex: 'idPhongBan',
       title: 'Phòng ban phụ trách',
       align: 'center',
+      width:160,
       render: (value: number) => {
         const pb = listPhongBan.find((p: any) => p.idPhongBan === value);
         return pb ? pb.tenPhongBan : '';
@@ -80,20 +90,23 @@ const Page = () => {
     {
       key: 'location',
       dataIndex: 'location',
-      title: 'Địa điểm'
+      title: 'Địa điểm',
+      align:'center',
+      width:120
     },
     {
       key: 'idStaffReception',
       dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
-      align: 'center'
+      align: 'center',
+      width:160
     },
     {
       key: 'totalPerson',
       dataIndex: 'totalPerson',
       title: 'Tổng số người',
       align: 'center',
-      width: 100,
+      width:120
     },
     {
       key: 'phoneNumber',
@@ -104,7 +117,8 @@ const Page = () => {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
       title: 'Tổng chi phí',
-      align: 'right'
+      align: 'left',
+      width:120
     },
     {
       key: 'status',
