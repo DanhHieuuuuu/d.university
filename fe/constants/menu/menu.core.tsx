@@ -42,8 +42,13 @@ export const listMenuCore: IMenu[] = [
         icon: <UserOutlined />
       },
       {
-        label: 'Danh sách phòng ban',
-        routerLink: '/hrm/departments',
+        label: 'Danh sách hợp đồng',
+        routerLink: '/hrm/contracts',
+        icon: <ApartmentOutlined />
+      },
+      {
+        label: 'Danh sách quyết định',
+        routerLink: '/hrm/decisions',
         icon: <ApartmentOutlined />
       }
     ]
@@ -117,17 +122,17 @@ export const listMenuCore: IMenu[] = [
             label: 'Kê khai Kpi cá nhân',
             routerLink: '/kpi/manage/personals',
             icon: <PartitionOutlined />
-          }
-          // {
-          //   label: 'Kê khai Kpi đơn vị',
-          //   routerLink: '/kpi/list/units',
-          //   icon: <PartitionOutlined />
-          // },
-          // {
-          //   label: 'Kê khai Kpi trường',
-          //   routerLink: '/kpi/list/school',
-          //   icon: <PartitionOutlined />
-          // },
+          },
+          {
+            label: 'Kê khai Kpi đơn vị',
+            routerLink: '/kpi/manage/units',
+            icon: <PartitionOutlined />
+          },
+          {
+            label: 'Kê khai Kpi trường',
+            routerLink: '/kpi/manage/school',
+            icon: <PartitionOutlined />
+          },
         ]
       }
     ]
@@ -204,6 +209,11 @@ export const listMenuCore: IMenu[] = [
       {
         label: 'Danh sách yêu cầu',
         routerLink: '/survey/manage/request',
+        icon: <InboxOutlined />,      
+      },
+      {
+        label: 'Quản lý yêu cầu',
+        routerLink: '/survey/manage/request-manage',
         icon: <InboxOutlined />,      
       },
       {

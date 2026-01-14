@@ -17,6 +17,7 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? Email2 { get; set; }
         public string? TenChucVu { get; set; }
         public string? TenPhongBan { get; set; }
+        public int? IdPhongBan { get; set; }
         public string? TrangThai { get; set; }
     }
 }

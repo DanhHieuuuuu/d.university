@@ -17,4 +17,8 @@
     <ProjectReference Include="..\D.Core.Infrastructure\D.Core.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Command\Kpi\KpiLog\" />
+  </ItemGroup>
+
 </Project>

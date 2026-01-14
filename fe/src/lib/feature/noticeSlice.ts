@@ -45,6 +45,7 @@ interface NotificationState {
     total: number;
     totalUnread: number;
     status: ReduxStatus;
+    loadedPages: number[];
   };
 }
 
@@ -53,7 +54,8 @@ const initialState: NotificationState = {
     data: [],
     total: 0,
     totalUnread: 0,
-    status: ReduxStatus.IDLE
+    status: ReduxStatus.IDLE,
+    loadedPages: []
   }
 };
 
@@ -68,7 +70,22 @@ const noticeSlice = createSlice({
       })
       .addCase($fetchNotification.fulfilled, (state, action) => {
         state.$list.status = ReduxStatus.SUCCESS;
-        state.$list.data = action.payload?.items ?? [];
+
+        const pageIndex = action.meta.arg.PageIndex;
+        const newItems = action.payload?.items ?? [];
+
+        if (state.$list.loadedPages.includes(pageIndex)) {
+          return;
+        }
+
+        state.$list.loadedPages.push(pageIndex);
+
+        if (pageIndex === 0) {
+          state.$list.data = newItems;
+        } else {
+          state.$list.data = [...state.$list.data, ...newItems];
+        }
+
         state.$list.total = action.payload?.totalItem ?? 0;
         state.$list.totalUnread = action.payload?.totalUnread ?? 0;
       })

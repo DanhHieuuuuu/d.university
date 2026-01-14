@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Tabs, Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
+import { Tabs, Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag, Table } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -16,15 +16,14 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getListTrangThaiKpiCaNhan, updateKetQuaCapTrenKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getKpiLogStatus, getListTrangThaiKpiCaNhan, updateKetQuaCapTrenKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KpiLoaiConst } from '../../const/kpiType.const';
-import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
+import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { toast } from 'react-toastify';
 import { getAllPhongBanByKpiRole } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUserByKpiRole } from '@redux/feature/userSlice';
@@ -33,6 +32,10 @@ import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
 import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
 import ConfirmScoredModal from '../../modal/ConfirmScoredModal';
 import { formatKetQua } from '@helpers/kpi/formatResult.helper';
+import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
+import KpiLogModal from '../../modal/KpiLogModal';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -41,7 +44,7 @@ const Page = () => {
   const { processUpdateStatus } = useKpiStatusAction();
   const watchIdPhongBan = Form.useWatch('idPhongBan', form);
 
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
+  const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { list: listNhanSu } = useAppSelector((state) => state.userState.byKpiRole);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector(
@@ -54,7 +57,13 @@ const Page = () => {
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ketQuaCapTrenMap, setKetQuaCapTrenMap] = useState<Record<number, number | undefined>>({});
+  const [openLogModal, setOpenLogModal] = useState(false);
+  const [selectedKpiLogId, setSelectedKpiLogId] = useState<number | null>(null);
   const [activeLoaiKpi, setActiveLoaiKpi] = useState<number>(KpiLoaiConst.CHUC_NANG);
+  const { data, total, status: logStatus } = useAppSelector(
+    state => state.kpiState.kpiLog.$list
+  );
+
   const KPI_TABS = KpiLoaiConst.list.map(x => ({
     key: String(x.value),
     label: `KPI ${x.name}`,
@@ -65,6 +74,8 @@ const Page = () => {
     dispatch(getAllUserByKpiRole({ PageIndex: 1, PageSize: 2000 }));
     dispatch(getListTrangThaiKpiCaNhan());
   }, [dispatch]);
+
+
 
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
@@ -82,6 +93,16 @@ const Page = () => {
   const scoreSelected = () => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
+      return;
+    }
+    const validItems = list.filter(
+      kpi =>
+        selectedRowKeys.includes(kpi.id) &&
+        kpi.trangThai == KpiTrangThaiConst.DA_GUI_CHAM
+    );
+
+    if (!validItems.length) {
+      toast.warning('Chỉ KPI đang ở trạng thái "Đã gửi chấm" mới được chấm');
       return;
     }
     setOpenChamModal(true);
@@ -209,6 +230,17 @@ const Page = () => {
     }
     cb();
   };
+
+  const loaiSummary = summary?.byLoaiKpi?.find(
+    x => x.loaiKpi === activeLoaiKpi
+  );
+
+  const tongTuDanhGia =
+    loaiSummary?.tuDanhGia ?? summary?.tongTuDanhGia ?? 0;
+
+  const tongCapTren =
+    loaiSummary?.capTren ?? summary?.tongCapTren ?? 0;
+
   const bulkActionItems: MenuProps['items'] = [
     {
       key: 'score',
@@ -267,6 +299,19 @@ const Page = () => {
   const onClickView = (record: IViewKpiCaNhan) => {
     dispatch(setSelectedKpiCaNhan(record)); setModalMode('view');
   };
+  const onClickViewLog = (record: IViewKpiCaNhan) => {
+    setSelectedKpiLogId(record.id);
+    setOpenLogModal(true);
+
+    dispatch(
+      getKpiLogStatus({
+        kpiId: record.id,
+        PageIndex: 1,
+        PageSize: 50,
+        capKpi: 1
+      })
+    );
+  };
   const onClickDelete = (record: IViewKpiCaNhan) => {
     Modal.confirm({
       title: `Xóa Kpi ${record.kpi} của ${record.nhanSu}?`,
@@ -282,12 +327,12 @@ const Page = () => {
   };
 
   const columns: IColumn<IViewKpiCaNhan>[] = [
-    {
-      key: 'linhVuc',
-      dataIndex: 'linhVuc',
-      title: 'Lĩnh Vực',
-      width: 150
-    },
+    // {
+    //   key: 'linhVuc',
+    //   dataIndex: 'linhVuc',
+    //   title: 'Lĩnh Vực',
+    //   width: 150
+    // },
     {
       key: 'kpi',
       dataIndex: 'kpi',
@@ -298,7 +343,7 @@ const Page = () => {
       key: 'nhanSu',
       dataIndex: 'nhanSu',
       title: 'Nhân sự',
-      width: 180
+      width: 140
     },
     {
       key: 'mucTieu',
@@ -318,18 +363,18 @@ const Page = () => {
       title: 'Công thức tính',
       width: 200,
     },
-    {
-      key: 'loaiKpi',
-      dataIndex: 'loaiKpi',
-      title: 'Loại KPI',
-      width: 140,
-      render: (val) => KpiLoaiConst.getName(val)
-    },
+    // {
+    //   key: 'loaiKpi',
+    //   dataIndex: 'loaiKpi',
+    //   title: 'Loại KPI',
+    //   width: 140,
+    //   render: (val) => KpiLoaiConst.getName(val)
+    // },
     {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
       title: 'Kết quả thực tế',
-      width: 180,
+      width: 140,
       render: (val, record) =>
         formatKetQua(val, record.loaiKetQua),
     },
@@ -337,8 +382,7 @@ const Page = () => {
       key: 'diemKpi',
       dataIndex: 'diemKpi',
       title: 'Điểm tự đánh giá',
-      width: 130,
-      align: 'center',
+      width: 150,
     },
     {
       key: 'capTrenDanhGia',
@@ -352,6 +396,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQuaCapTren(record.id, v)}
+            editable={record.isActive === 0}
           />
         );
       },
@@ -377,7 +422,8 @@ const Page = () => {
   const actions: IAction[] = [
     { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView },
     { label: 'Sửa', icon: <EditOutlined />, command: onClickUpdate },
-    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete }
+    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete },
+    { label: 'Nhật ký trạng thái', icon: <EyeOutlined />, command: onClickViewLog }
   ];
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
@@ -452,14 +498,21 @@ const Page = () => {
             <Form.Item name="idNhanSu" noStyle>
               <Select
                 placeholder={watchIdPhongBan ? "Chọn nhân sự" : "Chọn nhân sự (Tất cả)"}
-                style={{ width: 220 }}
+                style={{ width: 320 }} // Tăng độ rộng lên chút cho đỡ bị mất chữ chức vụ
                 allowClear
                 showSearch
                 optionFilterProp="label"
-                options={listNhanSu?.map((x: any) => ({
-                  value: x.id,
-                  label: (x.hoTen || `${x.hoDem ?? ''} ${x.ten ?? ''}`).trim()
-                }))}
+                options={listNhanSu?.map((x: any) => {
+                  const roleCode = KpiRoleConst.list.find(
+                    (r) => r.name.trim().toLowerCase() === x.tenChucVu?.trim().toLowerCase()
+                  )?.value;
+                  const tenChucVuChuan = KpiRoleConst.getName(roleCode) || x.tenChucVu || '';
+                  const hoTen = (x.hoTen || `${x.hoDem ?? ''} ${x.ten ?? ''}`).trim();
+                  return {
+                    value: x.id,
+                    label: `${hoTen}${tenChucVuChuan ? ` - ${tenChucVuChuan}` : ''}`,
+                  };
+                })}
                 onChange={(val) => onFilterChange({ idNhanSu: val })}
               />
             </Form.Item>
@@ -477,7 +530,6 @@ const Page = () => {
             >
               Tải lại
             </Button>
-            {/* </div> */}
 
           </div>
 
@@ -552,8 +604,24 @@ const Page = () => {
           ...rowSelection,
           fixed: 'left',
         }}
-        scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
+        scroll={{ x: 'max-content', y: 'calc(96vh - 420px)' }}
+        footer={() => (
+          <div className="flex justify-end gap-8">
+            <div>
+              <span className="font-medium">Tổng điểm tự đánh giá:</span>{' '}
+              <span className="text-blue-600 font-semibold">
+                {tongTuDanhGia.toFixed(2)}
+              </span>
+            </div>
 
+            <div>
+              <span className="font-medium">Tổng điểm cấp trên:</span>{' '}
+              <span className="text-green-600 font-semibold">
+                {tongCapTren.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        )}
       />
 
       <PositionModal
@@ -573,6 +641,14 @@ const Page = () => {
         onCancel={() => setOpenChamModal(false)}
         onSubmit={handleSubmitScore}
       />
+      <KpiLogModal
+        open={openLogModal}
+        onCancel={() => setOpenLogModal(false)}
+        data={data}
+        loading={logStatus === ReduxStatus.LOADING}
+      />
+      <KpiAiChat />
+
     </Card>
   );
 };

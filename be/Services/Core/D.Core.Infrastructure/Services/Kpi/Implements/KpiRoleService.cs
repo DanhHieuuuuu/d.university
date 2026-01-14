@@ -142,17 +142,18 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         {
             _logger.LogInformation($"{nameof(GetRoleByUserId)} ");
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-            var roles = _unitOfWork.iKpiRoleRepository
-                        .TableNoTracking
-                        .Where(x => x.IdNhanSu == userId)
-                        .Select(x => x.Role)
-                        .Distinct()
-                        .OrderByDescending(x => x)
-                        .ToList();
-            var result = roles.Select(y => new GetKpiRoleByUserResponseDto
-            {
-                Role = y
-            }).ToList();
+            var result = (
+                from role in _unitOfWork.iKpiRoleRepository.TableNoTracking
+                where role.IdNhanSu == userId && role.Role != "HIEU_TRUONG" && role.Role != "TRUONG_DON_VI_CAP_2"
+                select new GetKpiRoleByUserResponseDto
+                {
+                    Role = role.Role,
+                    TiLe = role.TiLe
+                }
+            )
+            .Distinct()
+            .OrderByDescending(x => x.Role)
+            .ToList();
 
             return result;
         }

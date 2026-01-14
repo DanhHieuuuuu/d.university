@@ -35,8 +35,8 @@ namespace D.Core.Infrastructure
             return services
                 .AddScoped<ServiceUnitOfWork>()
                 .AddScoped<INsNhanSuService, NsNhanSuService>()
-                .AddScoped<INsDecisionService, NsDecisionService>()
-                .AddScoped<INsContractService, NsContractService>()
+                .AddScoped<INsQuyetDinhService, NsQuyetDinhService>()
+                .AddScoped<INsHopDongService, NsHopDongService>()
                 .AddScoped<IDmDanhMucService, DmDanhMucService>()
                 .AddScoped<ISvSinhVienService, SvSinhVienService>()
                 .AddScoped<IDaoTaoService, DaoTaoService>()
@@ -63,7 +63,8 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKpiCaNhanService, KpiCaNhanService>()
                 .AddScoped<IKpiDonViService, KpiDonViService>()
                 .AddScoped<IKpiTruongService, KpiTruongService>()
-                .AddScoped<IKpiTemplateService, KpiTemplateService>();
+                .AddScoped<IKpiTemplateService, KpiTemplateService>()
+                .AddScoped<IKpiLogStatusService, KpiLogStatusService>();
             #endregion
         }
 
@@ -119,6 +120,8 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKpiRoleRepository, KpiRoleRepository>()
                 .AddScoped<IKpiTemplateRepository, KpiTemplateRepository>()
                 .AddScoped<IKpiTruongRepository, KpiTruongRepository>()
+                .AddScoped<IKpiChatService, KpiChatService>()
+                .AddScoped<IKpiTinhDiemService, KpiTinhDiemService>()
             #endregion
             #region Survey
                 .AddScoped<IKsSurveyRequestRepository, SurveyRequestRepository>()

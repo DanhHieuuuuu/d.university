@@ -279,7 +279,15 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             var query = _unitOfWork.iKsSurveyRepository.TableNoTracking
                 .Include(s => s.SurveyRequest)
-                .Where(s => s.Status == SurveyStatus.Open);
+                .AsQueryable();
+
+            if (dto.Status.HasValue)
+            {
+                query = query.Where(s => s.Status == dto.Status.Value);
+            }
+            else             {
+                query = query.Where(s => s.Status == SurveyStatus.Open);
+            }
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
@@ -425,6 +433,21 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                     .Where(x => x.IdPhienLamBai == submission.Id)
                     .ToListAsync();
 
+                // Group answers by questionId to handle checkbox questions
+                var groupedAnswers = savedAnswers.GroupBy(x => x.IdCauHoi).Select(g =>
+                {
+                    var answerIds = g.Where(a => a.IdDapAnChon.HasValue).Select(a => a.IdDapAnChon.Value).ToList();
+                    var textResponse = g.FirstOrDefault(a => !string.IsNullOrEmpty(a.CauTraLoiText))?.CauTraLoiText;
+
+                    return new SavedAnswerDto
+                    {
+                        QuestionId = g.Key,
+                        SelectedAnswerId = answerIds.Count == 1 ? answerIds.First() : (int?)null, // Single choice
+                        SelectedAnswerIds = answerIds.Count > 1 ? answerIds : null, // Multiple choice (only if > 1)
+                        TextResponse = textResponse // Essay
+                    };
+                }).ToList();
+
                 return new StartSurveyResponseDto
                 {
                     SubmissionId = submission.Id,
@@ -432,7 +455,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                     TenKhaoSat = surveyEntity.TenKhaoSat,
                     ThoiGianBatDau = submission.ThoiGianBatDau,
                     Questions = questionsDto,
-                    SavedAnswers = _mapper.Map<List<SavedAnswerDto>>(savedAnswers)
+                    SavedAnswers = groupedAnswers
                 };
             }
         }
@@ -462,23 +485,43 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             var surveyInfo = _unitOfWork.iKsSurveyRepository.FindById(submission.IdKhaoSat);
 
-            var correctAnswers = await _unitOfWork.iKsSurveyRequestRepository
+            var correctAnswersList = await _unitOfWork.iKsSurveyRequestRepository
                 .GetCorrectAnswersAsync(surveyInfo.IdYeuCau);
+
+            var correctAnswersDict = correctAnswersList.ToDictionary(x => x.AnswerId, x => x.Value);
+
+            var questionTypes = await _unitOfWork.iKsSurveyQuestionRepository.TableNoTracking
+                .Where(q => q.IdYeuCau == surveyInfo.IdYeuCau)
+                .ToDictionaryAsync(q => q.Id, q => q.LoaiCauHoi);
 
             var userAnswers = await _unitOfWork.iKsSurveySubmissionAnswerRepository.Table
                 .Where(x => x.IdPhienLamBai == submission.Id).ToListAsync();
 
             double totalScore = 0;
-            int correctCount = 0;
+            int correctQuestionsCount = 0;
 
-            foreach (var ua in userAnswers)
+            var userAnswersGroup = userAnswers.GroupBy(x => x.IdCauHoi);
+
+            foreach (var group in userAnswersGroup)
             {
-                var correct = correctAnswers.FirstOrDefault(c => c.QuestionId == ua.IdCauHoi);
-                if (correct != null && ua.IdDapAnChon == correct.AnswerId)
+                var questionId = group.Key;
+                var selectedAnswerIds = group.Select(x => x.IdDapAnChon).Where(id => id.HasValue).Select(id => id.Value).Distinct().ToList();
+                if (questionTypes.TryGetValue(questionId, out int type) && type == 1 && selectedAnswerIds.Count > 1)
                 {
-                    totalScore += 1;
-                    correctCount++;
+                    continue;
                 }
+
+                bool isQuestionCorrect = false;
+                foreach (var answerId in selectedAnswerIds)
+                {
+                    if (correctAnswersDict.TryGetValue(answerId, out int scoreValue))
+                    {
+                        totalScore += scoreValue; 
+                        isQuestionCorrect = true; 
+                    }
+                }
+
+                if (isQuestionCorrect) correctQuestionsCount++;
             }
 
             submission.TrangThai = SubmissionStatus.Submitted;
@@ -490,7 +533,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             await LogSubmissionActivityAsync(
                 submission.Id,
                 "Submit",
-                $"Nộp bài. Điểm: {totalScore}. Đúng: {correctCount}/{correctAnswers.Count}"
+                $"Nộp bài. Điểm: {totalScore}. Số câu trả lời có điểm: {correctQuestionsCount}/{questionTypes.Count}"
             );
 
             await _unitOfWork.SaveChangesAsync();
@@ -501,8 +544,8 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             {
                 SubmissionId = submission.Id,
                 TotalScore = totalScore,
-                TotalCorrect = correctCount,
-                TotalQuestions = correctAnswers.Count,
+                TotalCorrect = correctQuestionsCount,
+                TotalQuestions = questionTypes.Count,
                 SubmitTime = submission.ThoiGianNop.Value
             };
         }
@@ -516,13 +559,29 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             foreach (var item in newAnswers)
             {
-                var existing = existingAnswers.FirstOrDefault(x => x.IdCauHoi == item.QuestionId);
-                if (existing != null)
+                // Delete existing answers for this question first
+                var existingForQuestion = existingAnswers.Where(x => x.IdCauHoi == item.QuestionId).ToList();
+                foreach (var existing in existingForQuestion)
                 {
-                    existing.IdDapAnChon = item.SelectedAnswerId;
-                    existing.CauTraLoiText = item.TextResponse;
-                    _unitOfWork.iKsSurveySubmissionAnswerRepository.Update(existing);
+                    _unitOfWork.iKsSurveySubmissionAnswerRepository.Delete(existing);
                 }
+
+                // Handle multiple choice (type 2) - create multiple records
+                if (item.SelectedAnswerIds != null && item.SelectedAnswerIds.Any())
+                {
+                    foreach (var answerId in item.SelectedAnswerIds)
+                    {
+                        var newAns = new KsSurveySubmissionAnswer
+                        {
+                            IdPhienLamBai = submissionId,
+                            IdCauHoi = item.QuestionId,
+                            IdDapAnChon = answerId,
+                            CauTraLoiText = null
+                        };
+                        await _unitOfWork.iKsSurveySubmissionAnswerRepository.AddAsync(newAns);
+                    }
+                }
+                // Handle single choice (type 1) or essay (type 3) - single record
                 else
                 {
                     var newAns = new KsSurveySubmissionAnswer

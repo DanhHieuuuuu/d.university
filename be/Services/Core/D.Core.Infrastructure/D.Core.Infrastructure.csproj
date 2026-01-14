@@ -16,9 +16,5 @@
     <ProjectReference Include="..\..\Shared\d.Shared.Permission\d.Shared.Permission.csproj" />
     <ProjectReference Include="..\D.Core.Domain\D.Core.Domain.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\Kpi\Abstracts\" />
-    <Folder Include="Services\Kpi\Implements\" />
-  </ItemGroup>
 
 </Project>

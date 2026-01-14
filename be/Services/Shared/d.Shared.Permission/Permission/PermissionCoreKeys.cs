@@ -38,6 +38,29 @@
         #endregion
 
         #region Survey - Khảo sát
+        public const string CoreMenuKhaoSat = $"{PermissionPrefixKeys.Menu}khaosat";
+
+        // Request
+        public const string SurveyMenuRequest = $"{PermissionPrefixKeys.Menu}survey_request";
+        public const string SurveyButtonRequestCreate = $"{PermissionPrefixKeys.Button}survey_request_create";
+        public const string SurveyButtonRequestUpdate = $"{PermissionPrefixKeys.Button}survey_request_update";
+        public const string SurveyButtonRequestDelete = $"{PermissionPrefixKeys.Button}survey_request_delete";
+        public const string SurveyButtonRequestSubmit = $"{PermissionPrefixKeys.Button}survey_request_submit";
+        public const string SurveyButtonRequestCancelSubmit = $"{PermissionPrefixKeys.Button}survey_request_cancel_submit";
+
+        // Request management
+        public const string SurveyMenuRequestApproval = $"{PermissionPrefixKeys.Menu}survey_request_approval";
+        public const string SurveyButtonRequestApprove = $"{PermissionPrefixKeys.Button}survey_request_approve";
+        public const string SurveyButtonRequestReject = $"{PermissionPrefixKeys.Button}survey_request_reject";
+
+        // Survey Management
+        public const string SurveyMenuManagement = $"{PermissionPrefixKeys.Menu}survey_management";
+        public const string SurveyButtonSurveyOpen = $"{PermissionPrefixKeys.Button}survey_open";
+        public const string SurveyButtonSurveyClose = $"{PermissionPrefixKeys.Button}survey_close";
+
+        // Report Management
+        public const string SurveyMenuReport = $"{PermissionPrefixKeys.Menu}survey_report";
+        public const string SurveyButtonReportGenerate = $"{PermissionPrefixKeys.Button}survey_report_generate";
 
         #endregion
     }

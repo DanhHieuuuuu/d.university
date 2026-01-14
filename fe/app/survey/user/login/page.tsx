@@ -44,7 +44,7 @@ function SurveyLoginPage() {
 
       if (data.status == 1) {
         toast.success('Đăng nhập thành công');
-        router.push('/survey/manage/surveys');
+        router.push('/survey/user/mysurvey');
       } else {
         toast.error(data.message || 'Đăng nhập thất bại');
       }

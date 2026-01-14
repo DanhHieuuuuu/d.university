@@ -10,12 +10,12 @@ export interface IViewRequest {
   maYeuCau: string;
   tenKhaoSatYeuCau: string;
   moTa: string;
-  thoiGianBatDau: string | Date; 
+  thoiGianBatDau: string | Date;
   thoiGianKetThuc: string | Date;
   idPhongBan: number;
   trangThai: number;
   lyDoTuChoi: string;
-  
+
   targets?: ITarget[];
   questions?: IQuestion[];
   criterias?: ICriteria[];
@@ -35,7 +35,7 @@ export interface ICreateRequest {
 
 export type IUpdateRequest = ICreateRequest & {
   id: number;
-}
+};
 
 export interface ITarget {
   loaiDoiTuong: number;
@@ -50,7 +50,6 @@ export interface IAnswer {
   value: number;
   thuTu: number;
   isCorrect: boolean;
-  moTa: string;
 }
 
 export interface IQuestion {
@@ -59,7 +58,6 @@ export interface IQuestion {
   loaiCauHoi: number;
   batBuoc: boolean;
   thuTu: number;
-  moTa: string;
   answers: IAnswer[];
 }
 

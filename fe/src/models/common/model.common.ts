@@ -2,8 +2,8 @@
  * COMMOM MODEL FOR REQUEST PAGING
  */
 export type IQueryPaging = {
-  PageIndex?: number;
-  PageSize?: number;
+  PageIndex: number;
+  PageSize: number;
   Keyword?: string;
   Queryable?: string[];
 

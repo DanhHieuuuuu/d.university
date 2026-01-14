@@ -14,6 +14,8 @@ namespace D.Core.Domain.Dtos.Kpi.KpiTruong
         public int LoaiKpi { get; set; }
         public string? NamHoc { get; set; }
         public decimal? KetQuaThucTe { get; set; }
-        public LoaiCongThuc? LoaiCongThuc { get; set; }
+        public int? IdCongThuc { get; set; }
+        public string? CongThucTinh { get; set; }
+        public string? LoaiKetQua { get; set; }
     }
 }

@@ -35,11 +35,6 @@ namespace D.Core.Domain.Entities.Survey
         [Description("kết quả")]
         public bool IsCorrect { get; set; }
 
-        [Column("Description")]
-        [Description("Mô tả")]
-        [MaxLength(500)]
-        public string MoTa { get; set; }
-
         [ForeignKey(nameof(IdCauHoi))]
         public virtual KsSurveyQuestion Question { get; set; }
     }

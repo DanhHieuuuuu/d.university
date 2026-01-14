@@ -9,9 +9,9 @@ namespace D.Core.Application.Query.Hrm.QuyetDinh
     public class FindPagingNsQuyetDinh
         : IQueryHandler<NsQuyetDinhRequestDto, PageResultDto<NsQuyetDinhResponseDto>>
     {
-        public INsDecisionService _service;
+        public INsQuyetDinhService _service;
 
-        public FindPagingNsQuyetDinh(INsDecisionService service)
+        public FindPagingNsQuyetDinh(INsQuyetDinhService service)
         {
             _service = service;
         }

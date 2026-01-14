@@ -77,8 +77,9 @@ export interface ISurveyExam {
 
 export interface ISavedAnswer {
   questionId: number;
-  selectedAnswerId?: number;
-  textResponse?: string;
+  selectedAnswerId?: number; // For single choice (type 1)
+  selectedAnswerIds?: number[]; // For multiple choice (type 2)
+  textResponse?: string; // For essay (type 3)
 }
 
 export interface IStartSurveyResponse {

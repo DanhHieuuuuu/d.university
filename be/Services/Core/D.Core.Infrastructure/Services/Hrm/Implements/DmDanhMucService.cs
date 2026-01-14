@@ -177,8 +177,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 .Where(x => x.IdNhanSu == userId)
                 .ToList();
             var isHieuTruong = userRoles.Any(x => x.Role == "HIEU_TRUONG");
-            var donViIds = userRoles
-                .Where(x => x.Role.StartsWith("TRUONG_DON_VI_CAP_2") && x.IdDonVi.HasValue)
+            var donViIds = userRoles.Where(x => x.IdDonVi.HasValue && 
+                ( x.Role == "PHO_HIEU_TRUONG" || x.Role == "TRUONG_DON_VI_CAP_2"))
                 .Select(x => x.IdDonVi!.Value)
                 .Distinct()
                 .ToList();
@@ -187,7 +187,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             {
                 if (!donViIds.Any())
                 {
-                    // User không phải hiệu trưởng và không phải trưởng đơn vị => không trả gì
                     return new PageResultDto<DmPhongBanByKpiRoleResponseDto>
                     {
                         Items = new List<DmPhongBanByKpiRoleResponseDto>(),

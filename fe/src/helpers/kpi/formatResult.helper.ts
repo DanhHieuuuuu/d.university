@@ -1,4 +1,4 @@
-import { LoaiCongThuc } from "@/app/(home)/kpi/const/loaiCongThuc.enum";
+import { LoaiCongThuc } from "@/constants/kpi/loaiCongThuc.enum";
 
 export const formatKetQua = (
   value: number | undefined,

@@ -8,9 +8,9 @@ namespace D.Core.Application.Query.Hrm.HopDong
     public class FindPagingNsHopDong
         : IQueryHandler<NsHopDongRequestDto, PageResultDto<NsHopDongResponseDto>>
     {
-        public INsContractService _service;
+        public INsHopDongService _service;
 
-        public FindPagingNsHopDong(INsContractService service)
+        public FindPagingNsHopDong(INsHopDongService service)
         {
             _service = service;
         }
