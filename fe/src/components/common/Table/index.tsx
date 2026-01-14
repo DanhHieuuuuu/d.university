@@ -6,12 +6,13 @@ import type { CheckboxOptionType } from 'antd';
 import { SettingOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { IAction, IColumn } from '@models/common/table.model';
 import { ETableColumnType } from '@/constants/e-table.consts';
-import '@styles/table.style.scss';
+// import '@styles/table.style.scss';
 
 interface AppTableProps<T> extends TableProps<T> {
   columns: IColumn<T>[];
   listActions?: IAction[];
   rowSelection?: TableProps<T>['rowSelection'];
+  height?: number;
 }
 
 const AppTable = <T extends object>(props: AppTableProps<T>) => {
@@ -136,7 +137,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         size="small"
         tableLayout="fixed"
         columns={newColumns}
-        scroll={{ x: 'max-content', y:370 }}
+        scroll={{ x: 'max-content', y: props.height ?? 370 }}
         rowSelection={rowSelection}
         {...rest}
       />

@@ -343,6 +343,7 @@ const Page = () => {
         dataSource={voiceData?.length ? voiceData : list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+        height={450}
       />
 
       <CreateDoanVaoModal
