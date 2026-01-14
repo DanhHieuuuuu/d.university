@@ -48,15 +48,15 @@ const Page = () => {
 
   // Load danh sách khóa học, ngành và môn học khi mount
   useEffect(() => {
-    dispatch(getAllKhoaHoc({ PageSize: 1000 }));
-    dispatch(getAllNganh({ PageSize: 1000 }));
-    dispatch(getAllMonHoc({ PageSize: 1000 }));
+    dispatch(getAllKhoaHoc({ PageIndex: 1, PageSize: 1000 }));
+    dispatch(getAllNganh({ PageIndex: 1, PageSize: 1000 }));
+    dispatch(getAllMonHoc({ PageIndex: 1, PageSize: 1000 }));
   }, [dispatch]);
 
   // Load danh sách chuyên ngành khi chọn ngành (sử dụng API filter)
   useEffect(() => {
     if (selectedNganhId) {
-      dispatch(getAllChuyenNganh({ NganhId: selectedNganhId, PageSize: 1000 }));
+      dispatch(getAllChuyenNganh({ NganhId: selectedNganhId, PageIndex: 1, PageSize: 1000 }));
     }
   }, [dispatch, selectedNganhId]);
 
@@ -67,6 +67,7 @@ const Page = () => {
         getAllChuongTrinhKhung({
           NganhId: selectedNganhId,
           ChuyenNganhId: selectedChuyenNganhId,
+          PageIndex: 1,
           PageSize: 10
         })
       );
@@ -82,6 +83,7 @@ const Page = () => {
       dispatch(
         getAllChuongTrinhKhungMon({
           ChuongTrinhKhungId: currentChuongTrinhKhung.id,
+          PageIndex: 1,
           PageSize: 1000
         })
       );
