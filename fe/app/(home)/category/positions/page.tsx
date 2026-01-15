@@ -72,12 +72,6 @@ const Page = () => {
 
   const columns: IColumn<IViewChucVu>[] = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
-    },
-    {
       key: 'maChucVu',
       dataIndex: 'maChucVu',
       title: 'Mã chức vụ'

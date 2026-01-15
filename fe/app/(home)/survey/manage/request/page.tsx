@@ -323,6 +323,7 @@ const Page = () => {
 
       <AppTable
         loading={status === ReduxStatus.LOADING}
+        rowKey="id"
         columns={columns}
         dataSource={list}
         listActions={actions}

@@ -72,12 +72,6 @@ const Page = () => {
 
   const columns: IColumn<IViewPhongBan>[] = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
-    },
-    {
       key: 'maPhongBan',
       dataIndex: 'maPhongBan',
       title: 'Mã phòng ban'

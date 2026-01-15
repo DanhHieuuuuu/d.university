@@ -287,6 +287,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 Id = x.Id,
                 MaBoMon = x.MaBoMon,
                 TenBoMon = x.TenBoMon,
+                IdPhongBan = x.IdPhongBan,
                 PhongBan = x.IdPhongBan.HasValue
                     ? _unitOfWork.iDmPhongBanRepository.FindById(x.IdPhongBan.Value).TenPhongBan
                     : null,

@@ -7,6 +7,7 @@ export type IViewToBoMon = {
   tenBoMon: string;
   ngayThanhLap: Date;
   phongBan: string;
+  idPhongBan: number;
 };
 
 export type ICreateToBoMon = {

@@ -26,6 +26,7 @@ export type ICreateHopDong = {
   idToBoMon?: number;
   idPhongBan?: number;
   idChucVu?: number;
+  hasProbation: boolean;
 };
 
 export type IViewHopDong = {

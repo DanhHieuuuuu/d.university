@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Checkbox, Modal, Popover, Space, Table, TableProps, Tag } from 'antd';
 import type { CheckboxOptionType } from 'antd';
 import { SettingOutlined, EllipsisOutlined } from '@ant-design/icons';
@@ -20,16 +20,18 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
   const [openActionIndex, setOpenActionIndex] = useState<number | null>(null);
   const { columns, listActions, rowSelection, ...rest } = props;
 
-  const indexColumn : IColumn<T> = {
-    key: 'stt',
-    dataIndex: 'stt',
-    title: 'STT',
-    align: 'center',
-    width: 60,
-    fixed: 'left',
-    showOnConfig: false,
-    render: (value, record, index) => index + 1
-  };
+  const indexColumn: IColumn<T> = useMemo(
+    () => ({
+      key: '__index',
+      title: 'STT',
+      width: 60,
+      align: 'center',
+      fixed: 'left',
+      showOnConfig: false,
+      render: (_: any, __: T, index: number) => index + 1
+    }),
+    []
+  );
 
   const openPopupConfig = () => {
     setOpenConfig(true);
@@ -39,7 +41,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     setOpenConfig(false);
   };
 
-  const renderStatusColumn = (value: any, col: IColumn<T>, record?: T) => {
+  const renderStatusColumn = useCallback((value: any, col: IColumn<T>, record?: T) => {
     if (!col.getTagInfo) return value;
 
     const info = col.getTagInfo(value, record);
@@ -50,29 +52,25 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         {info.label}
       </Tag>
     );
-  };
+  }, []);
 
-  const enhancedColumns: IColumn<T>[] = columns.map((col) => {
-    if (col.type === ETableColumnType.STATUS) {
-      return {
-        ...col,
-        fixed: col.fixed ?? 'right',
-        width: col.width ?? 150,
-        render: (value: any, record: T, index: number) => {
-          if (col.render) {
-            return col.render(value, record, index);
-          }
+  const enhancedColumns: IColumn<T>[] = useMemo(() => {
+    return columns.map((col) => {
+      if (col.type === ETableColumnType.STATUS) {
+        return {
+          ...col,
+          fixed: col.fixed ?? 'right',
+          width: col.width ?? 150,
+          render: col.render ? col.render : (value: any, record: T) => renderStatusColumn(value, col, record)
+        };
+      }
 
-          return renderStatusColumn(value, col, record);
-        }
-      };
-    } else {
       return {
         ...col,
         minWidth: col.minWidth ?? 100
       };
-    }
-  });
+    });
+  }, [columns]);
 
   const configColumn: IColumn<T> = {
     key: 'config',
@@ -92,7 +90,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         .filter((act) => !act.hidden?.(record))
         .map((act, idx) => (
           <Button
-            key={idx}
+            key={act.label ?? idx}
             size="middle"
             title={act.tooltip ?? act.label}
             color={act.color ?? 'default'}
@@ -134,19 +132,20 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     disabled: showOnConfig === false
   }));
 
-  const newColumns = [
-    indexColumn,
-    ...enhancedColumns.filter((item) => item.showOnConfig === false || checkedList.includes(item.key as string)),
-    configColumn
-  ];
+  const finalColumns = useMemo(() => {
+    return [
+      indexColumn,
+      ...enhancedColumns.filter((c) => c.showOnConfig === false || checkedList.includes(String(c.key))),
+      configColumn
+    ];
+  }, [indexColumn, enhancedColumns, checkedList, configColumn]);
 
   return (
     <>
       <Table<T>
         size="small"
         tableLayout="fixed"
-        rowKey="stt"
-        columns={newColumns}
+        columns={finalColumns}
         scroll={{ x: 'max-content', y: props.height ?? 370 }}
         rowSelection={rowSelection}
         {...rest}

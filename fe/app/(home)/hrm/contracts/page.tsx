@@ -1,29 +1,25 @@
 'use client';
 
-import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input, Select } from 'antd';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { Button, Card, Form, Select } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  LockOutlined,
-  UnlockOutlined
-} from '@ant-design/icons';
+  EyeOutlined} from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
 
 import AppTable from '@components/common/Table';
+import { IAction, IColumn } from '@models/common/table.model';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
-import { IAction, IColumn } from '@models/common/table.model';
+
 import { IQueryHopDong, IViewHopDong } from '@models/nhansu/hopdong.model';
 import { getListHopDong } from '@redux/feature/hrm/hopdong/hopdongThunk';
-import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
+import { resetStatusCreate, selectNsHopDong } from '@redux/feature/hrm/hopdong/hopdongSlice';
 import CreateContractModal from './(dialog)/CreateContractModal';
-import { selectNsHopDong } from '@redux/feature/hrm/hopdong/hopdongSlice';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -87,21 +83,23 @@ const Page = () => {
       dataIndex: 'hopDongCoThoiHanTuNgay',
       title: 'Có hiệu lực từ',
       align: 'center',
-      render: (val: string) => formatDateTimeView(val)
+      render: (val: string) => formatDateView(val)
     },
     {
       key: 'hopDongCoThoiHanDenNgay',
       dataIndex: 'hopDongCoThoiHanDenNgay',
       title: 'Có hiệu lực đến',
       align: 'center',
-      render: (val: string) => (val != null ? formatDateTimeView(val) : '')
+      render: (val: string) => (val != null ? formatDateView(val) : '-')
     },
     {
       key: 'luongCoBan',
       dataIndex: 'luongCoBan',
-      title: 'Lương cơ bản',
+      title: 'Mức lương',
       align: 'center',
-      render: (val: number) => formatCurrency(val)
+      render: (val: number) => {
+        return <span>{formatCurrency(val)} đ</span>
+      } 
     },
     {
       key: 'ghiChu',
@@ -117,6 +115,13 @@ const Page = () => {
       command: (record: IViewHopDong) => onClickView(record)
     }
   ];
+
+  useEffect(() => {
+      if (!isModalOpen) {
+        dispatch(resetStatusCreate());
+        dispatch(getListHopDong(query));
+      }
+    }, [isModalOpen]);
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ Keyword: value });
@@ -169,6 +174,7 @@ const Page = () => {
       </Form>
       <AppTable
         loading={status === ReduxStatus.LOADING}
+        rowKey="id"
         columns={columns}
         dataSource={data}
         listActions={actions}
