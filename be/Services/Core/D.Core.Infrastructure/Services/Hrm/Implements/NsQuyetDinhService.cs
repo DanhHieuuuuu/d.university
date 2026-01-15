@@ -82,7 +82,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             {
                 throw new UserFriendlyException(
                     ErrorCodeConstant.CodeNotFound,
-                    "Không tồn tại quyết định có Id"
+                    $"Không tồn tại quyết định có Id: {idQuyetDinh}"
                 );
             }
             else
@@ -121,7 +121,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             {
                 throw new UserFriendlyException(
                     ErrorCodeConstant.CodeNotFound,
-                    "Không tồn tại quyết định có Id"
+                    $"Không tồn tại quyết định có Id: {idQuyetDinh}"
                 );
             }
             else if (quyetdinh.Status == NsQuyetDinhStatus.PheDuyet)

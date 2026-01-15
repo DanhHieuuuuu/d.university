@@ -6,6 +6,7 @@
         public string? MaBoMon { get; set; }
         public string? TenBoMon { get; set; }
         public DateTime? NgayThanhLap { get; set; }
+        public int? IdPhongBan { get; set; }
         public string? PhongBan { get; set; }
     }
 }
