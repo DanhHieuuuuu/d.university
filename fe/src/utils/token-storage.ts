@@ -3,8 +3,8 @@ import { TOKEN, REFRESH_TOKEN, EXPIRED_TOKEN, EXPIRED_REFRESH_TOKEN } from '@/co
 type TokenPayload = {
   accessToken: string;
   refreshToken: string;
-  expiredAccessToken: string; // ISO string
-  expiredRefreshToken: string; // ISO string
+  expiredAccessToken: string;
+  expiredRefreshToken: string;
   remember: boolean;
 };
 
