@@ -3,13 +3,11 @@ import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select,
 import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, ExperimentOutlined, BankOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiTruong, resetStatusKpiTruong } from '@redux/feature/kpi/kpiSlice';
-import { createKpiTruong, updateKpiTruong } from '@redux/feature/kpi/kpiThunk';
+import { createKpiTruong, updateKpiTruong, getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
-import { ICreateKpiTruong } from '@models/kpi/kpi-truong.model';
 import dayjs from 'dayjs';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
-import { LIST_CONG_THUC } from '@/constants/kpi/kpiFormula.const';
 import { LOAI_KET_QUA_OPTIONS } from '@/constants/kpi/loaiCongThuc.enum';
 
 type PositionModalProps = {
@@ -25,9 +23,10 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const [form] = Form.useForm<any>();
   const [title, setTitle] = useState<string>('KPI Trường');
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiTruong);
+  const { listCongThuc } = useAppSelector((state) => state.kpiState);
+
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
-  const selectedLoaiKpi = Form.useWatch('loaiKpi', form);
 
   const loaiKpiOptions = useMemo(() => {
     return KpiLoaiConst.list
@@ -35,32 +34,33 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       .map(x => ({ value: x.value, label: x.name }));
   }, []);
 
-  // Lọc Công thức
   const congThucOptions = useMemo(() => {
-    if (!selectedLoaiKpi) return [];
-    return LIST_CONG_THUC
-      .filter(ct => ct.loaiKpiApDung.includes(selectedLoaiKpi))
-      .map(ct => ({ value: ct.id, label: ct.congThuc }));
-  }, [selectedLoaiKpi]);
+    return (listCongThuc?.data || []).map((ct: any) => ({
+      value: ct.id,
+      label: ct.tenCongThuc,
+    }));
+  }, [listCongThuc?.data]);
 
   useEffect(() => {
     if (isModalOpen) {
       setTitle(isView ? 'Xem thông tin KPI Trường' : isUpdate ? 'Cập nhật KPI Trường' : 'Thêm mới KPI Trường');
+      if (listCongThuc.data.length === 0) {
+        dispatch(getListKpiCongThuc({}));
+      }
     }
-  }, [isModalOpen, isUpdate, isView]);
+  }, [isModalOpen, isUpdate, isView, dispatch, listCongThuc.data.length]);
 
   useEffect(() => {
     if (!$selected.data || !isModalOpen) return;
     const selectedData = $selected.data;
-    const congThucMatched = LIST_CONG_THUC.find(x => x.congThuc === selectedData.congThuc);
 
     form.setFieldsValue({
       ...selectedData,
-      idCongThuc: congThucMatched?.id,
+      idCongThuc: selectedData.idCongThuc, 
       congThucTinh: selectedData.congThuc,
       namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
     });
-  }, [$selected.data, isModalOpen, form]);
+  }, [$selected.data, isModalOpen, form, listCongThuc.data]);
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
@@ -100,7 +100,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   return (
     <Modal
       title={<span className="text-xl font-bold text-blue-700">{title}</span>}
-      width={950} 
+      width={950}
       open={isModalOpen}
       onCancel={handleClose}
       centered
@@ -129,7 +129,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         requiredMark="optional"
       >
         <div className="grid grid-cols-2 gap-x-6">
-          {/* PHẦN 1: THÔNG TIN CHIẾN LƯỢC */}
           <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600 font-semibold">
             <BankOutlined /> THÔNG TIN CHIẾN LƯỢC TRƯỜNG
           </div>
@@ -148,7 +147,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          {/* PHẦN 2: CÔNG THỨC & CHỈ SỐ */}
           <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600 font-semibold">
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
@@ -167,12 +165,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Form.Item label="Công thức tính KPI" name="idCongThuc" rules={[{ required: true }]}>
             <Select
-              placeholder={selectedLoaiKpi ? 'Chọn công thức' : 'Chọn Loại KPI trước'}
+              placeholder="Chọn công thức từ hệ thống"
               options={congThucOptions}
-              disabled={!selectedLoaiKpi}
+              loading={listCongThuc.status === ReduxStatus.LOADING}
               onChange={(value) => {
-                const selected = LIST_CONG_THUC.find(x => x.id === value);
-                form.setFieldsValue({ congThucTinh: selected?.congThuc });
+                const selected = listCongThuc.data.find((x: any) => x.id === value);
+                form.setFieldsValue({ congThucTinh: selected?.tenCongThuc });
               }}
             />
           </Form.Item>

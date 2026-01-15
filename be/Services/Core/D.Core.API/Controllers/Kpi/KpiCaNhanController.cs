@@ -1,5 +1,6 @@
 ﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
+using D.Core.Domain.Dtos.Kpi.KpiCongThuc;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -209,11 +210,12 @@ namespace D.Core.API.Controllers.Kpi
         }
 
         /// <summary>
-        /// Get Thời gian kê khai ca nhan
-        /// </summary>     
+        /// Danh sách công thức KPI
+        /// </summary>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("kpi-canhan/ke-khai-time")]
-        public async Task<ResponseAPI> GetKeKhaiCaNhanTime([FromQuery] KpiKeKhaiTimeCaNhanRequestDto dto)
+        [HttpGet("kpi-congthuc/danh-sach")]
+        public async Task<ResponseAPI> GetAllKpiCongThuc([FromQuery] GetCongThucRequestDto dto)
         {
             try
             {
@@ -224,7 +226,6 @@ namespace D.Core.API.Controllers.Kpi
             {
                 return BadRequest(ex);
             }
-
         }
     }
 }

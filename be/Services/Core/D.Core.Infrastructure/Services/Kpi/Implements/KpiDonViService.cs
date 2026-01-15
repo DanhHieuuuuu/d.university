@@ -1,25 +1,22 @@
 ﻿using AutoMapper;
-using D.Auth.Domain;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiLogStatus;
 using D.Core.Domain.Entities.Kpi;
 using D.Core.Domain.Entities.Kpi.Constants;
-using D.Core.Domain.Migrations;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.Core.Infrastructure.Services.Kpi.Common;
-using D.DomainBase.Common;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Extensions;
-using System.Globalization;
-using System.Linq;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -29,19 +26,23 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         private readonly ServiceUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IKpiLogStatusService _logKpiService;
+        private readonly INotificationService _notificationService;
 
         public KpiDonViService(
             ILogger<KpiDonViService> logger,
             IHttpContextAccessor contextAccessor,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
-            IKpiLogStatusService logKpiService
+            IKpiLogStatusService logKpiService,
+            INotificationService notificationService
+
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             _logKpiService = logKpiService;
+            _notificationService = notificationService;
 
         }
         public int? GetKpiIsActive()
@@ -157,6 +158,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         : string.Empty,
                     LoaiKpi = kpi.LoaiKpi,
                     CongThuc = kpi.CongThucTinh,
+                    IdCongThuc = kpi.IdCongThuc,
                     NamHoc = kpi.NamHoc,
                     TrangThai = kpi.TrangThai,
                     KetQuaThucTe = kpi.KetQuaThucTe,
@@ -272,6 +274,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         DiemKpi = kpi.DiemKpi,
                         DiemKpiCapTren = kpi.DiemKpiCapTren,
                         CapTrenDanhGia = kpi.CapTrenDanhGia,
+                        IdCongThuc = kpi.IdCongThuc,
                         LoaiKetQua = kpi.LoaiKetQua,
                         IsActive = kpi.TrangThai == KpiStatus.Evaluated ? 0 : isActive,
                     })
@@ -547,7 +550,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             });
         }
 
-        public void UpdateTrangThaiKpiDonVi(UpdateTrangThaiKpiDonViDto dto)
+        public async Task UpdateTrangThaiKpiDonVi(UpdateTrangThaiKpiDonViDto dto)
         {
             _logger.LogInformation($"{nameof(UpdateTrangThaiKpiDonVi)} => dto = {JsonSerializer.Serialize(dto)}");
 
@@ -575,68 +578,10 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     CapKpi = 2,
                     Reason = dto.Note
                 });
+                await SendKpiStatusNotification(kpi, dto.TrangThai, dto.Note);
             }
 
-            _unitOfWork.iKpiDonViRepository.SaveChange();
-        }
-
-        public KpiKeKhaiTimeDonViDto GetKpiKeKhaiTime()
-        {
-            _logger.LogInformation($"{nameof(GetKpiKeKhaiTime)}");
-
-            // Lấy Start / End từ SysVar
-            var sysVars = _unitOfWork.iSysVarRepository
-                .Table
-                .Where(x =>
-                    x.GrName == "KPI_KeKhaiDonVi_Time" &&
-                    (x.VarName == "START_DATE" || x.VarName == "END_DATE"))
-                .Select(x => new
-                {
-                    x.VarName,
-                    x.VarValue
-                })
-                .ToList();
-
-            DateTime? startDate = null;
-            DateTime? endDate = null;
-
-            foreach (var item in sysVars)
-            {
-                // Bỏ qua nếu giá trị cấu hình rỗng hoặc chưa được nhập
-                if (string.IsNullOrWhiteSpace(item.VarValue))
-                    continue;
-
-                if (!DateTime.TryParseExact(
-                    item.VarValue,
-                    "dd/MM/yyyy",
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var parsedDate))
-                {
-                    _logger.LogWarning("SysVar KPI_KeKhaiDonVi_Time - {VarName} có giá trị không hợp lệ: {VarValue}", item.VarName, item.VarValue);
-                    continue;
-                }
-
-                if (item.VarName == "START_DATE")
-                    startDate = parsedDate;
-
-                if (item.VarName == "END_DATE")
-                    endDate = parsedDate;
-            }
-
-            var today = DateTime.Now.Date;
-
-            var isKeKhaiTime = startDate.HasValue
-                && endDate.HasValue
-                && today >= startDate.Value.Date
-                && today <= endDate.Value.Date;
-
-            return new KpiKeKhaiTimeDonViDto
-            {
-                IsKeKhaiTime = isKeKhaiTime,
-                StartDate = startDate ?? DateTime.MinValue,
-                EndDate = endDate ?? DateTime.MinValue
-            };
+            await _unitOfWork.iKpiDonViRepository.SaveChangeAsync();
         }
 
         public void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiDonViListDto dto)
@@ -721,6 +666,90 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 IdKpiTruong = kpiTruong.Id,
                 TrangThai = kpiTruong.TrangThai
             };
+        }
+
+        public async Task<List<object>> GetKpiDonViContextForAi(List<int>? allowedDonViIds)
+        {
+            var query = _unitOfWork.iKpiDonViRepository.TableNoTracking.Where(x => !x.Deleted);
+            if (allowedDonViIds != null)
+                query = query.Where(x => x.IdDonVi.HasValue && allowedDonViIds.Contains(x.IdDonVi.Value));
+
+            var kpis = await query.ToListAsync();
+            var donViDict = await _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                .ToDictionaryAsync(x => x.Id, x => x.TenPhongBan);
+
+            return kpis.GroupBy(x => x.IdDonVi).Select(group => new {
+                TenDonVi = donViDict.GetValueOrDefault(group.Key ?? 0, "Đơn vị ẩn danh"),
+                TongDiemDonViTuCham = group.Sum(s => s.DiemKpi ?? 0),
+                TongDiemDonViCapTren = group.Sum(s => s.DiemKpiCapTren ?? 0),
+                DanhSachKPI = group.Select(k => {
+                    double.TryParse(k.TrongSo, out double trongSoNumeric);
+
+                    return new
+                    {
+                        TenKPI = k.Kpi,
+                        MucTieu = k.MucTieu ?? "Chưa có mục tiêu",
+                        TrongSo = trongSoNumeric,
+                        LoaiKPI = k.LoaiKpi switch
+                        {
+                            1 => "Chức năng",
+                            2 => "Mục tiêu",
+                            3 => "Tuân thủ",
+                            _ => "Khác"
+                        },
+                        KetQua = k.KetQuaThucTe ?? 0,
+                        DiemTuCham = k.DiemKpi ?? 0,
+                        DiemCapTren = k.DiemKpiCapTren ?? 0
+                    };
+                }).ToList()
+            }).ToList<object>();
+        }
+
+        private async Task SendKpiStatusNotification(KpiDonVi kpi, int newStatus, string note)
+        {
+            if (newStatus == KpiStatus.Evaluated)
+            {
+                var donVi = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                    .FirstOrDefault(r => r.IdDonVi == kpi.IdDonVi);
+
+                if (donVi?.IdDonVi != null)
+                {
+                    var truongDonViId = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                        .Where(r => r.IdDonVi == donVi.IdDonVi && r.Role == "PHO_HIEU_TRUONG")
+                        .Select(r => r.IdNhanSu)
+                        .FirstOrDefault();
+
+                    if (truongDonViId != 0)
+                    {
+                        var donViName = _unitOfWork.iDmPhongBanRepository.TableNoTracking.FirstOrDefault(u => u.Id == kpi.IdDonVi);
+
+                        await _notificationService.SendAsync(new NotificationMessage
+                        {
+                            Receiver = new Receiver { UserId = truongDonViId },
+                            Title = $"KPI gửi chấm từ đơn vị {donViName}",
+                            Content = $"Đơn vị đã gửi chấm KPI.",
+                            Channel = NotificationChannel.Realtime
+                        });
+                    }
+                }
+            }
+            else if (newStatus == KpiStatus.Scored || newStatus == KpiStatus.PrincipalApprove)
+            {
+                string title = newStatus == KpiStatus.Evaluated ? "KPI đã được đánh giá" : "Cấp trên phê duyệt";
+                string content = newStatus == KpiStatus.Evaluated
+                    ? $"KPI '{kpi.Kpi}' của bạn đã được Phó hiệu trưởng chấm. Đánh giá: {note}."
+                    : $"KPI '{kpi.Kpi}' của bạn đã được Hiệu trưởng phê duyệt.";
+                var truongDonVi = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                    .FirstOrDefault(r => r.IdDonVi == kpi.IdDonVi && r.Role == "TRUONG_DON_VI_CAP_2");
+
+                await _notificationService.SendAsync(new NotificationMessage
+                {
+                    Receiver = new Receiver { UserId = truongDonVi.IdNhanSu },
+                    Title = title,
+                    Content = content,
+                    Channel = NotificationChannel.Realtime
+                });
+            }
         }
     }
 }

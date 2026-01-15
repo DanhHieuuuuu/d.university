@@ -8,13 +8,12 @@ namespace D.Core.Domain.Entities.Kpi
     [Table(nameof(KpiTruong), Schema = DbSchema.Kpi)]
     public class KpiTruong : EntityBase
     {
-        //public int? STT { get; set; }
         [MaxLength(250)]
         public string? LinhVuc { get; set; }
         [MaxLength(250)]
         public string? ChienLuoc { get; set; }
         [MaxLength(500)]
-        public string? Kpi { get; set; }
+        public string Kpi { get; set; }
         [MaxLength(250)]
         public string? MucTieu { get; set; }
         [MaxLength(250)]
@@ -25,7 +24,6 @@ namespace D.Core.Domain.Entities.Kpi
         public int? TrangThai { get; set; }
         public decimal? KetQuaThucTe { get; set; }
         public decimal? CapTrenDanhGia { get; set; }
-        public bool? IsKeKhai { get; set; }
         public string? CongThucTinh { get; set; }
         [MaxLength(255)]
         public string? LoaiKetQua { get; set; }

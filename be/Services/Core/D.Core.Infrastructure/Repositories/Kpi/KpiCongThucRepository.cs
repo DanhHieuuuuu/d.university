@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Http;
 
 namespace D.Core.Infrastructure.Repositories.Kpi
 {
-    public class KpiTemplateRepository : RepositoryBase<KpiTemplate>, IKpiTemplateRepository
+    public class KpiCongThucRepository : RepositoryBase<KpiCongThuc>, IKpiCongThucRepository
     {
-        public KpiTemplateRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
+        public KpiCongThucRepository(IDbContext dbContext, IHttpContextAccessor httpContext)
             : base(dbContext, httpContext) { }
     }
 
-    public interface IKpiTemplateRepository : IRepositoryBase<KpiTemplate>
+    public interface IKpiCongThucRepository : IRepositoryBase<KpiCongThuc>
     {
     }
 }

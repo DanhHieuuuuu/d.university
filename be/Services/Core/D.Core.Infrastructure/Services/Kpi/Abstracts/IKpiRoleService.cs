@@ -11,5 +11,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         public void UpdateKpiRole(UpdateKpiRoleDto dto);
         public void Delete(DeleteKpiRoleDto dto);
         List<GetKpiRoleByUserResponseDto> GetRoleByUserId();
+
     }
 }

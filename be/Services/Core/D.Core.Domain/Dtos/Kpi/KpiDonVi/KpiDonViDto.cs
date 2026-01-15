@@ -26,5 +26,6 @@ namespace D.Core.Domain.Dtos.Kpi.KpiDonVi
         public string? GhiChu { get; set; }
         public int? IsActive { get; set; }
         public string? CongThuc { get; set; }
+        public int? IdCongThuc { get; set; }
     }
 }

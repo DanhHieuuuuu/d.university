@@ -34,6 +34,7 @@ import { ETableColumnType } from '@/constants/e-table.consts';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import KpiLogModal from '../../modal/KpiLogModal';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -78,7 +79,8 @@ const Page = () => {
     initialQuery: {
       PageIndex: 1,
       PageSize: 10,
-      Keyword: ''
+      Keyword: '',
+      loaiKpi: KpiLoaiConst.CHUC_NANG,
     },
     onQueryChange: (newQuery) => {
       dispatch(getAllKpiDonVi(newQuery));
@@ -700,6 +702,7 @@ const Page = () => {
         data={data}
         loading={logStatus === ReduxStatus.LOADING}
       />
+      <KpiAiChat />
     </Card>
   );
 };

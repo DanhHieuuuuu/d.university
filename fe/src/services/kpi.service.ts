@@ -8,6 +8,7 @@ import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUp
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import {  IQueryKpiLogStatus } from '@models/kpi/kpi-log.model';
 import { IAskKpiChatCommand } from '@models/kpi/kpi-chat.model';
+import { IQueryKpiCongThuc, IViewKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
 
 const apiDanhMucEndpoint = 'kpi';
 const apiKpiTruongEndpoint = `${apiDanhMucEndpoint}/kpi-truong`;
@@ -16,6 +17,7 @@ const apiKpiCaNhanEndpoint = `${apiDanhMucEndpoint}/kpi-canhan`;
 const apiKpiRoleEndpoint = `${apiDanhMucEndpoint}/kpi-role`;
 const apiKpiLogEndpoint = `${apiDanhMucEndpoint}/kpi-log`;
 const apiKPiChatEndPoint = `${apiDanhMucEndpoint}/kpi-chat`;
+const apiKpiCongThucEndpoint = `${apiDanhMucEndpoint}/kpi-congthuc`;
 //Kpi Cá nhân
 const getListKpiCaNhan = async (query?: IQueryKpiCaNhan) => {
   try {
@@ -598,6 +600,18 @@ const askKpiAi = async (payload: IAskKpiChatCommand) => {
   }
 };
 
+const getListKpiCongThuc = async (query?: IQueryKpiCongThuc) => {
+  try {
+    const res = await axios.get(`${apiKpiCongThucEndpoint}/danh-sach`, {
+      params: { ...query }
+    });
+    return res.data.data as IViewKpiCongThuc[];
+  } catch (err) {
+    processApiMsgError(err, 'Không thể lấy danh sách công thức');
+    return Promise.reject(err);
+  }
+};
+
 export const KpiService = {
   getListKpiCaNhan,
   getListKpiCaNhanKeKhai,
@@ -635,5 +649,6 @@ export const KpiService = {
   deleteKpiRole,
   getListKpiRoleByUser,
   getKpiLogs,
-  askKpiAi
+  askKpiAi,
+  getListKpiCongThuc,
 };

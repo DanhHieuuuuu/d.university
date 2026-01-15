@@ -1,11 +1,6 @@
 ﻿using D.ApplicationBase;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D.Core.Application.Command.Kpi.KpiCaNhan
 {
@@ -20,8 +15,7 @@ namespace D.Core.Application.Command.Kpi.KpiCaNhan
 
         public async Task Handle(UpdateTrangThaiKpiDto request, CancellationToken cancellationToken)
         {
-            _service.UpdateTrangThaiKpiCaNhan(request);
-            return;
+            await _service.UpdateTrangThaiKpiCaNhan(request);
         }
     }
 }

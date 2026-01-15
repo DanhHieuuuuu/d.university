@@ -31,6 +31,7 @@ export type IViewKpiTruong = {
     loaiKetQua?: LoaiCongThuc;
     ghiChu?: string;
     congThuc?: string;
+    idCongThuc?: number;
 };
 
 export type ICreateKpiTruong = {

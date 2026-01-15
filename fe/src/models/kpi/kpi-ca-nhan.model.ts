@@ -33,9 +33,10 @@ export type IViewKpiCaNhan = {
   role?: string,
   ghiChu?: string,
   congThuc?:string;
+  idCongThuc?: number;
   linhVuc?: string,
   chienLuoc?: string,
-  isCaNhanKeKhai?: boolean,
+  idPhongBan?: number;
 };
 
 export type ICreateKpiCaNhan = {

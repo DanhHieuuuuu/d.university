@@ -63,7 +63,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKpiCaNhanService, KpiCaNhanService>()
                 .AddScoped<IKpiDonViService, KpiDonViService>()
                 .AddScoped<IKpiTruongService, KpiTruongService>()
-                .AddScoped<IKpiTemplateService, KpiTemplateService>()
+                .AddScoped<IKpiCongThucService, KpiCongThucService>()
                 .AddScoped<IKpiLogStatusService, KpiLogStatusService>();
             #endregion
         }
@@ -118,7 +118,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKpiDonViRepository, KpiDonViRepository>()
                 .AddScoped<IKpiLogStatusRepository, KpiLogStatusRepository>()
                 .AddScoped<IKpiRoleRepository, KpiRoleRepository>()
-                .AddScoped<IKpiTemplateRepository, KpiTemplateRepository>()
+                .AddScoped<IKpiCongThucRepository, KpiCongThucRepository>()
                 .AddScoped<IKpiTruongRepository, KpiTruongRepository>()
                 .AddScoped<IKpiChatService, KpiChatService>()
                 .AddScoped<IKpiTinhDiemService, KpiTinhDiemService>()

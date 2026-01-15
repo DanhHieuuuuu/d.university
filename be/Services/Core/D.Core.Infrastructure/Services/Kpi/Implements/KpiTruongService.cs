@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using D.ControllerBase.Exceptions;
-using D.Core.Domain;
-using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiLogStatus;
 using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.Core.Domain.Entities.Kpi;
@@ -10,6 +8,9 @@ using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.Core.Infrastructure.Services.Kpi.Common;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,6 +23,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         private readonly ServiceUnitOfWork _unitOfWork;
         private readonly IKpiCaNhanService _kpiCaNhanService;
         private readonly IKpiLogStatusService _logKpiService;
+        private readonly INotificationService _notificationService;
 
         public KpiTruongService(
             ILogger<KpiTruongService> logger,
@@ -29,13 +31,15 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
             IKpiCaNhanService kpiCaNhanService,
-            IKpiLogStatusService kpiLogStatusService
+            IKpiLogStatusService kpiLogStatusService,
+            INotificationService notificationService
         )
             : base(logger, contextAccessor, mapper)
         {
             _unitOfWork = unitOfWork;
             _kpiCaNhanService = kpiCaNhanService;
             _logKpiService = kpiLogStatusService;
+            _notificationService = notificationService;
         }
 
         public async Task CreateKpiTruong(CreateKpiTruongDto dto)
@@ -120,6 +124,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     CapTrenDanhGia = kpi.CapTrenDanhGia,
                     DiemKpi = kpi.DiemKpi,
                     CongThuc = kpi.CongThucTinh,
+                    IdCongThuc = kpi.IdCongThuc,
                     IsActive =
                         (
                             kpi.TrangThai == KpiStatus.Evaluating
@@ -377,6 +382,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     CapKpi = 3,
                     Reason = dto.Note
                 });
+                await SendKpiStatusNotification(kpi, dto.TrangThai, dto.Note);
             }
 
             await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
@@ -435,6 +441,78 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             {
                 transaction.Rollback();
                 throw;
+            }
+        }
+
+        public async Task<List<object>> GetKpiTruongContextForAi()
+        {
+            var kpis = await _unitOfWork.iKpiTruongRepository.TableNoTracking
+                .Where(x => !x.Deleted)
+                .ToListAsync();
+
+            if (!kpis.Any()) return new List<object>();
+
+            return kpis.Select(k => {
+                double.TryParse(k.TrongSo, out double trongSoNumeric);
+
+                return new
+                {
+                    LinhVuc = k.LinhVuc ?? "Chiến lược chung",
+                    ChienLuoc = k.ChienLuoc ?? "N/A", 
+                    TenKPI = k.Kpi,
+                    LoaiKPI = k.LoaiKpi switch
+                    {
+                        1 => "Chức năng",
+                        2 => "Mục tiêu",
+                        3 => "Tuân thủ",
+                        _ => "Khác"
+                    },
+                    MucTieu = k.MucTieu ?? "Chưa xác định",
+                    TrongSo = trongSoNumeric,
+                    KetQuaThucTe = k.KetQuaThucTe ?? 0,
+                    DiemTuCham = k.DiemKpi ?? 0,
+                    DiemCapTren = k.DiemKpiCapTren ?? 0,
+                    CongThuc = k.CongThucTinh ?? "Không công thức tính" 
+                };
+            }).ToList<object>();
+        }
+
+        private async Task SendKpiStatusNotification(KpiTruong kpi, int newStatus, string? note)
+        {
+            if (newStatus == KpiStatus.Evaluated)
+            {
+                var truongDonViId = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                    .Where(r => r.Role == "CHU_TICH_HOI_DONG_TRUONG")
+                    .Select(r => r.IdNhanSu)
+                    .FirstOrDefault();
+
+                if (truongDonViId != 0)
+                {
+                    await _notificationService.SendAsync(new NotificationMessage
+                    {
+                        Receiver = new Receiver { UserId = truongDonViId },
+                        Title = $"KPI gửi chấm từ Hiệu trưởng",
+                        Content = $"Hiệu trưởng đã gửi chấm KPI trường.",
+                        Channel = NotificationChannel.Realtime
+                    });
+                }
+            }
+            else if (newStatus == KpiStatus.Scored || newStatus == KpiStatus.PrincipalApprove)
+            {
+                string title = newStatus == KpiStatus.Evaluated ? "KPI đã được đánh giá" : "Hội đồng phê duyệt";
+                string content = newStatus == KpiStatus.Evaluated
+                    ? $"KPI '{kpi.Kpi}' của bạn đã được Hội đồng đánh giá. Đánh giá: {note ?? "Không đánh giá gì thêm"}."
+                    : $"KPI '{kpi.Kpi}' của bạn đã được hội đồng phê duyệt.";
+                var hieuTruong = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                    .FirstOrDefault(r =>  r.Role == "HIEU_TRUONG");
+
+                await _notificationService.SendAsync(new NotificationMessage
+                {
+                    Receiver = new Receiver { UserId = hieuTruong.IdNhanSu },
+                    Title = title,
+                    Content = content,
+                    Channel = NotificationChannel.Realtime
+                });
             }
         }
     }

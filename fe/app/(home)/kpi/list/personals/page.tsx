@@ -16,7 +16,7 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getKpiLogStatus, getListTrangThaiKpiCaNhan, updateKetQuaCapTrenKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getAllKpiCaNhan, getKpiLogStatus, getListKpiCongThuc, getListTrangThaiKpiCaNhan, updateKetQuaCapTrenKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -498,7 +498,7 @@ const Page = () => {
             <Form.Item name="idNhanSu" noStyle>
               <Select
                 placeholder={watchIdPhongBan ? "Chọn nhân sự" : "Chọn nhân sự (Tất cả)"}
-                style={{ width: 320 }} // Tăng độ rộng lên chút cho đỡ bị mất chữ chức vụ
+                style={{ width: 320 }} 
                 allowClear
                 showSearch
                 optionFilterProp="label"
@@ -632,6 +632,7 @@ const Page = () => {
         onSuccess={() => {
           dispatch(getAllKpiCaNhan(query));
           dispatch(getListTrangThaiKpiCaNhan());
+          dispatch(getListKpiCongThuc({}));
         }}
       />
       <ConfirmScoredModal

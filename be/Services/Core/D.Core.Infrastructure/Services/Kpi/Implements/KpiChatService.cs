@@ -1,33 +1,32 @@
 ﻿using AutoMapper;
-using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiChat;
-using D.Core.Domain.Dtos.Kpi.KpiDonVi;
-using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Threading.Tasks;
+
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
 {
     public class KpiChatService : ServiceBase, IKpiChatService
     {
         private readonly ServiceUnitOfWork _unitOfWork;
+        private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IKpiLogStatusService _logKpiService;
         private readonly IKpiCaNhanService _kpiCaNhanService;
         private readonly IKpiDonViService _kpiDonViService;
         private readonly IKpiTruongService _kpiTruongService;
+        private readonly string _apiKey;
+        private readonly string _baseUrl;
         public KpiChatService(
             ILogger<KpiChatService> logger,
             IHttpContextAccessor contextAccessor,
@@ -36,7 +35,8 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             IKpiLogStatusService logKpiService,
             IKpiCaNhanService kpiCaNhanService,
             IKpiDonViService kpiDonViService,
-            IKpiTruongService kpiTruongService
+            IKpiTruongService kpiTruongService,
+            IConfiguration configuration
         )
             : base(logger, contextAccessor, mapper)
         {
@@ -46,6 +46,9 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             _kpiCaNhanService = kpiCaNhanService;
             _kpiDonViService = kpiDonViService;
             _kpiTruongService = kpiTruongService;
+            _configuration = configuration;
+            _apiKey = _configuration["DifyConfig:ApiKey"];
+            _baseUrl = _configuration["DifyConfig:BaseUrl"];
         }
 
         public async Task<string> GetKpiContextForChat(int userId)
@@ -53,74 +56,70 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             var userRoles = await _unitOfWork.iKpiRoleRepository.TableNoTracking
                                 .Where(x => x.IdNhanSu == userId).ToListAsync();
 
-            var contextBuilder = new StringBuilder();
-            contextBuilder.AppendLine("Dữ liệu KPI bạn được phép truy cập:");
+            bool isHieuTruong = userRoles.Any(r => r.Role == "HIEU_TRUONG" || r.Role == "CHU_TICH_HOI_DONG_TRUONG");
+            List<int>? managedDonViIds = isHieuTruong ? null :
+                userRoles.Where(r => r.IdDonVi.HasValue).Select(r => r.IdDonVi!.Value).Distinct().ToList();
 
-            if (userRoles.Any(r => r.Role == "HIEU_TRUONG" || r.Role == "CHU_TICH_HOI_DONG_TRUONG"))
+            var finalContext = new
             {
-                var kpiTruong =  _kpiTruongService.GetAllKpiTruong(new FilterKpiTruongDto { PageSize = 100 });
-                contextBuilder.AppendLine("- KPI Trường: " + JsonSerializer.Serialize(kpiTruong));
-            }
+                KpiCapTruong = isHieuTruong ? await _kpiTruongService.GetKpiTruongContextForAi() : null,
+                KpiCacDonVi = (isHieuTruong || (managedDonViIds?.Any() ?? false))
+                                ? await _kpiDonViService.GetKpiDonViContextForAi(managedDonViIds) : null,
+                KpiCaNhan = await _kpiCaNhanService.GetKpiCaNhanContextForAi(userId, await _kpiCaNhanService.GetAllowedUserIds(userId))
+            };
 
-            var kpiDonVi = _kpiDonViService.GetAllKpiDonVi(new FilterKpiDonViDto { PageSize = 100 });
-            if (kpiDonVi.TotalItem > 0)
+            return JsonSerializer.Serialize(finalContext, new JsonSerializerOptions
             {
-                contextBuilder.AppendLine("- KPI Các đơn vị quản lý: " + JsonSerializer.Serialize(kpiDonVi));
-            }
-
-            var kpiCaNhan = await _kpiCaNhanService.GetAllKpiCaNhan(new FilterKpiCaNhanDto { PageSize = 100 });
-            if (kpiCaNhan.TotalItem > 0)
-            {
-                contextBuilder.AppendLine("- KPI Nhân sự cấp dưới: " + JsonSerializer.Serialize(kpiCaNhan));
-            }
-
-            return contextBuilder.ToString();
+                WriteIndented = false, 
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
         }
 
         public async Task<string> AskKpiQuestion(string userQuery)
         {
-            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-            string kpiContext = await GetKpiContextForChat(userId);
-            var requestBody = new
-            {
-                inputs = new
-                {
-                    test_input = kpiContext, 
-                    userinput = new
-                    {        
-                        query = userQuery,
-                        files = new string[] { } 
-                    }
-                },
-                query = userQuery,
-                user = $"user_{userId}",
-                response_mode = "blocking"
-            };
-            using var client = new HttpClient();
-            //var apiKey = "app-X9zV8lo3Imn9UC7pt2MU6qwY";
-            var apiKey = "app-8JynRrUdCAJabRXOTziG7DTr";
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-
             try
             {
-                var response = await client.PostAsJsonAsync("https://api.dify.ai/v1/chat-messages", requestBody);
+                var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+                string kpiContext = await GetKpiContextForChat(userId);
+                _logger.LogInformation("--- SENDING JSON CONTEXT TO DIFY ---\n{0}", kpiContext);
+
+                var requestBody = new
+                {
+                    inputs = new { kpi_data = kpiContext },
+                    query = userQuery,
+                    user = $"user_{userId}",
+                    response_mode = "blocking"
+                };
+
+                using var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(120);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+
+                var response = await client.PostAsJsonAsync(_baseUrl, requestBody);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<DifyChatResponse>();
                     return result?.Answer ?? "AI không có phản hồi.";
                 }
-                else
+                var errorCode = (int)response.StatusCode;
+                var errorContent = await response.Content.ReadAsStringAsync();
+
+                if (errorCode == 429)
                 {
-                    var error = await response.Content.ReadAsStringAsync();
-                    _logger.LogError($"Dify API Error: {error}");
-                    return "Có lỗi xảy ra khi kết nối với AI (Lỗi API).";
+                    return "Hệ thống AI đang quá tải hoặc hết hạn mức (Quota). Vui lòng thử lại sau ít phút.";
                 }
+
+                _logger.LogError($"Dify API Error: {errorCode} - {errorContent}");
+                return $"Có lỗi xảy ra khi kết nối với AI (Mã lỗi: {errorCode}).";
+            }
+            catch (TaskCanceledException)
+            {
+                return "AI phản hồi quá lâu, vui lòng thử lại với câu hỏi ngắn gọn hơn.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi gọi Dify Service");
+                _logger.LogError(ex, "Lỗi nghiêm trọng khi gọi Dify Service");
                 return "Hệ thống bận, vui lòng thử lại sau.";
             }
         }

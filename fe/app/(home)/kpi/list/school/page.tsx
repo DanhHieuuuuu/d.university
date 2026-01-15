@@ -73,7 +73,8 @@ const Page = () => {
     initialQuery: {
       PageIndex: 1,
       PageSize: 10,
-      Keyword: ''
+      Keyword: '',
+      loaiKpi: KpiLoaiConst.CHUC_NANG,
     },
     onQueryChange: (newQuery) => {
       dispatch(getAllKpiTruong(newQuery));

@@ -37,6 +37,10 @@ namespace d.Shared.Permission.Permission
             { PermissionCoreKeys.CoreMenuDelegation, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuDelegation, PermissionName = "Quản lý đoàn vào / ra", ParentKey = null } },
             #endregion
 
+            #region Kpi
+            //{ PermissionCoreKeys.CoreMenuDelegation, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuDelegation, PermissionName = "Quản lý đoàn vào / ra", ParentKey = null } },
+            #endregion
+
             #region Survey - Khảo sát
             { PermissionCoreKeys.CoreMenuKhaoSat, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreMenuKhaoSat, PermissionName = "Quản lý khảo sát", ParentKey = null } },
 
