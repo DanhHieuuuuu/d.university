@@ -109,7 +109,5 @@ export type IKpiCaNhanLoaiSummary = {
 export type IKpiCaNhanSummary = {
   tongTuDanhGia: number;
   tongCapTren: number;
-  diemCaNhanThuan: number;
-  diemTongKetCuoiCung: number;
   byLoaiKpi: IKpiCaNhanLoaiSummary[];
 }

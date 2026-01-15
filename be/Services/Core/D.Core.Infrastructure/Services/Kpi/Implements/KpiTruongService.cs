@@ -14,6 +14,7 @@ using D.Notification.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -90,24 +91,47 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
         public PageResultDto<KpiTruongDto> GetAllKpiTruong(FilterKpiTruongDto dto)
         {
-            _logger.LogInformation(
-                $"{nameof(GetAllKpiTruong)} => dto = {JsonSerializer.Serialize(dto)}"
-            );
-            var kpis = _unitOfWork.iKpiTruongRepository.TableNoTracking.ToList();
-            var isActive = _kpiCaNhanService.GetKpiIsActive();
+            _logger.LogInformation($"{nameof(GetAllKpiTruong)} => dto = {JsonSerializer.Serialize(dto)}");
 
-            var query =
-                from kpi in kpis
-                where
-                    !kpi.Deleted &&
-                    (
-                    string.IsNullOrEmpty(dto.Keyword)
-                    || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower().Trim())
-                    )
+            var isActive = _kpiCaNhanService.GetKpiIsActive();
+            var queryBase = _unitOfWork.iKpiTruongRepository.TableNoTracking
+                .Where(kpi => !kpi.Deleted
+                    && (string.IsNullOrEmpty(dto.Keyword) || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower().Trim()))
                     && (dto.LoaiKpi == null || kpi.LoaiKpi == dto.LoaiKpi)
                     && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
                     && (dto.TrangThai == null || kpi.TrangThai == dto.TrangThai)
-                select new KpiTruongDto
+                );
+            var summaryData = queryBase
+                .Select(x => new { x.DiemKpi, x.DiemKpiCapTren, x.LoaiKpi }) 
+                .ToList();
+            decimal tongTuDanhGia = summaryData.Sum(x =>
+                x.LoaiKpi == 3 ? -(x.DiemKpi ?? 0) : (x.DiemKpi ?? 0)
+            );
+
+            decimal tongCapTren = summaryData.Sum(x =>
+                x.LoaiKpi == 3 ? -(x.DiemKpiCapTren ?? 0) : (x.DiemKpiCapTren ?? 0)
+            );
+            var summaryDto = new KpiTruongSummaryDto
+            {
+                TongTuDanhGia = tongTuDanhGia,
+                TongCapTren = tongCapTren,
+                ByLoaiKpi = summaryData
+                    .Where(x => x.LoaiKpi.HasValue)
+                    .GroupBy(x => x.LoaiKpi!.Value)
+                    .Select(g => new KpiTruongSummaryByLoaiDto
+                    {
+                        LoaiKpi = g.Key,
+                        TuDanhGia = g.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpi ?? 0) : (x.DiemKpi ?? 0)),
+                        CapTren = g.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpiCapTren ?? 0) : (x.DiemKpiCapTren ?? 0))
+                    }).ToList()
+            };
+
+            var totalCount = queryBase.Count();
+            var pagedItems = queryBase
+                .OrderBy(x => x.Id)
+                .Skip(dto.SkipCount())
+                .Take(dto.PageSize)
+                .Select(kpi => new KpiTruongDto
                 {
                     Id = kpi.Id,
                     LinhVuc = kpi.LinhVuc,
@@ -125,26 +149,15 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     DiemKpi = kpi.DiemKpi,
                     CongThuc = kpi.CongThucTinh,
                     IdCongThuc = kpi.IdCongThuc,
-                    IsActive =
-                        (
-                            kpi.TrangThai == KpiStatus.Evaluating
-                            || kpi.TrangThai == KpiStatus.NeedEdit
-                            || kpi.TrangThai == KpiStatus.Declared
-                        )
-                            ? isActive
-                            : 0,
-                };
-
-            var totalCount = query.Count();
-            var pagedItems = query
-                .Skip(dto.SkipCount())
-                .Take(dto.PageSize)
+                    IsActive = (kpi.TrangThai == KpiStatus.Evaluating || kpi.TrangThai == KpiStatus.NeedEdit || kpi.TrangThai == KpiStatus.Declared) ? isActive : 0,
+                })
                 .ToList();
 
             return new PageResultDto<KpiTruongDto>
             {
                 Items = pagedItems,
-                TotalItem = totalCount
+                TotalItem = totalCount,
+                Summary = summaryDto
             };
         }
 
@@ -444,39 +457,24 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             }
         }
 
-        public async Task<List<object>> GetKpiTruongContextForAi()
+        public async Task<string> GetKpiTruongContextForAi()
         {
             var kpis = await _unitOfWork.iKpiTruongRepository.TableNoTracking
-                .Where(x => !x.Deleted)
-                .ToListAsync();
+                .Where(x => !x.Deleted).ToListAsync();
 
-            if (!kpis.Any()) return new List<object>();
+            if (!kpis.Any()) return "### KPI Trường: Không có dữ liệu.";
 
-            return kpis.Select(k => {
-                double.TryParse(k.TrongSo, out double trongSoNumeric);
+            var sb = new StringBuilder();
+            sb.AppendLine("## [KPI CHIẾN LƯỢC CẤP TRƯỜNG]");
+            sb.AppendLine("| Lĩnh vực | Chiến lược | Tên KPI | Kết quả thực tế | Điểm được chấm |");
+            sb.AppendLine("| :--- | :--- | :--- | :---: | :---: |");
 
-                return new
-                {
-                    LinhVuc = k.LinhVuc ?? "Chiến lược chung",
-                    ChienLuoc = k.ChienLuoc ?? "N/A", 
-                    TenKPI = k.Kpi,
-                    LoaiKPI = k.LoaiKpi switch
-                    {
-                        1 => "Chức năng",
-                        2 => "Mục tiêu",
-                        3 => "Tuân thủ",
-                        _ => "Khác"
-                    },
-                    MucTieu = k.MucTieu ?? "Chưa xác định",
-                    TrongSo = trongSoNumeric,
-                    KetQuaThucTe = k.KetQuaThucTe ?? 0,
-                    DiemTuCham = k.DiemKpi ?? 0,
-                    DiemCapTren = k.DiemKpiCapTren ?? 0,
-                    CongThuc = k.CongThucTinh ?? "Không công thức tính" 
-                };
-            }).ToList<object>();
+            foreach (var k in kpis)
+            {
+                sb.AppendLine($"| {k.LinhVuc ?? "Chung"} | {k.ChienLuoc ?? "N/A"} | {k.Kpi} | {k.KetQuaThucTe} | {k.DiemKpiCapTren} |");
+            }
+            return sb.ToString();
         }
-
         private async Task SendKpiStatusNotification(KpiTruong kpi, int newStatus, string? note)
         {
             if (newStatus == KpiStatus.Evaluated)

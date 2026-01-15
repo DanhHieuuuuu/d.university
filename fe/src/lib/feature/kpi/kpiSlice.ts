@@ -31,7 +31,7 @@ import {
     askKpiAi,
     getListKpiCongThuc,
 } from './kpiThunk';
-import { IViewKpiTruong } from '@models/kpi/kpi-truong.model';
+import { IKpiTruongSummary, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import { KpiLogStatusDto } from '@models/kpi/kpi-log.model';
 import { IViewKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
 
@@ -48,7 +48,7 @@ interface KpiState {
             status: ReduxStatus;
         };
     };
-    kpiTruong: CRUD<IViewKpiTruong>;
+    kpiTruong: CRUD<IViewKpiTruong, IKpiTruongSummary>;
     kpiRole: CRUD<IViewKpiRole>;
     nhanSuDaGiao: {
         data: NhanSuDaGiaoDto[];
@@ -343,6 +343,7 @@ const kpiSlice = createSlice({
                 state.kpiDonVi.$list.status = ReduxStatus.SUCCESS;
                 state.kpiDonVi.$list.data = action.payload?.items || [];
                 state.kpiDonVi.$list.total = action.payload?.totalItem || 0;
+                state.kpiDonVi.$list.summary = action.payload?.summary;
             })
             .addCase(getKpiDonViKeKhai.rejected, (state) => {
                 state.kpiDonVi.$list.status = ReduxStatus.FAILURE;
@@ -435,6 +436,7 @@ const kpiSlice = createSlice({
                 state.kpiTruong.$list.status = ReduxStatus.SUCCESS;
                 state.kpiTruong.$list.data = action.payload?.items || [];
                 state.kpiTruong.$list.total = action.payload?.totalItem || 0;
+                state.kpiTruong.$list.summary = action.payload?.summary;
             })
             .addCase(getAllKpiTruong.rejected, (state) => {
                 state.kpiTruong.$list.status = ReduxStatus.FAILURE;

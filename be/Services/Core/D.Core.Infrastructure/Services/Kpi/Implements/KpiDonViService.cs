@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text;
 using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -102,190 +103,162 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             });
         }
 
+        // 1. Hàm Kê khai cho Trưởng đơn vị
         public PageResultDto<KpiDonViDto> FindPagingKeKhai(FilterKpiDonViKeKhaiDto dto)
         {
-            _logger.LogInformation(
-        $"{nameof(FindPagingKeKhai)} => dto = {JsonSerializer.Serialize(dto)}"
-    );
+            _logger.LogInformation($"{nameof(FindPagingKeKhai)} => dto = {JsonSerializer.Serialize(dto)}");
 
             var isActive = GetKpiIsActive();
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-
-            var donViIdsQuanLy = _unitOfWork.iKpiRoleRepository
-                .TableNoTracking
-                .Where(x =>
-                    x.IdNhanSu == userId &&
-                    x.Role == "TRUONG_DON_VI_CAP_2"
-                )
+            var donViIdsQuanLy = _unitOfWork.iKpiRoleRepository.TableNoTracking
+                .Where(x => x.IdNhanSu == userId && x.Role == "TRUONG_DON_VI_CAP_2")
                 .Select(x => x.IdDonVi)
                 .Distinct()
                 .ToList();
 
             if (!donViIdsQuanLy.Any())
             {
-                return new PageResultDto<KpiDonViDto>
-                {
-                    Items = new List<KpiDonViDto>(),
-                    TotalItem = 0
-                };
+                return new PageResultDto<KpiDonViDto> { Items = new List<KpiDonViDto>(), TotalItem = 0 };
             }
 
-            var kpis = _unitOfWork.iKpiDonViRepository.TableNoTracking.ToList();
-            var donvis = _unitOfWork.iDmPhongBanRepository
-                .TableNoTracking
-                .ToDictionary(x => x.Id, x => x.TenPhongBan);
-
-            var query =
-                from kpi in kpis
-                where
-                    !kpi.Deleted
-                    && donViIdsQuanLy.Contains(kpi.IdDonVi)
-                    && (string.IsNullOrEmpty(dto.Keyword)
-                        || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower().Trim()))
+            var donvis = _unitOfWork.iDmPhongBanRepository.TableNoTracking.ToDictionary(x => x.Id, x => x.TenPhongBan);
+            var queryBase = _unitOfWork.iKpiDonViRepository.TableNoTracking
+                .Where(kpi => !kpi.Deleted
+                    && kpi.IdDonVi.HasValue && donViIdsQuanLy.Contains(kpi.IdDonVi.Value)
+                    && (string.IsNullOrEmpty(dto.Keyword) || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower().Trim()))
                     && (dto.IdDonVi == null || kpi.IdDonVi == dto.IdDonVi)
                     && (dto.LoaiKpi == null || kpi.LoaiKpi == dto.LoaiKpi)
                     && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
                     && (dto.TrangThai == null || kpi.TrangThai == dto.TrangThai)
-                select new KpiDonViDto
-                {
-                    Id = kpi.Id,
-                    Kpi = kpi.Kpi,
-                    MucTieu = kpi.MucTieu,
-                    TrongSo = kpi.TrongSo,
-                    IdDonVi = kpi.IdDonVi,
-                    DonVi = kpi.IdDonVi != null && donvis.ContainsKey(kpi.IdDonVi.Value)
-                        ? donvis[kpi.IdDonVi.Value]
-                        : string.Empty,
-                    LoaiKpi = kpi.LoaiKpi,
-                    CongThuc = kpi.CongThucTinh,
-                    IdCongThuc = kpi.IdCongThuc,
-                    NamHoc = kpi.NamHoc,
-                    TrangThai = kpi.TrangThai,
-                    KetQuaThucTe = kpi.KetQuaThucTe,
-                    CapTrenDanhGia = kpi.CapTrenDanhGia,
-                    DiemKpiCapTren = kpi.DiemKpiCapTren,
-                    DiemKpi = kpi.DiemKpi,
-                    LoaiKetQua = kpi.LoaiKetQua,
-                    GhiChu = kpi.GhiChu,
-                    IsActive =
-                        (kpi.TrangThai == KpiStatus.Assigned
-                         || kpi.TrangThai == KpiStatus.NeedEdit
-                         || kpi.TrangThai == KpiStatus.Declared)
-                            ? isActive
-                            : 0
-                };
+                );
 
-            var totalCount = query.Count();
-            var pagedItems = query
+            var totalCount = queryBase.Count();
+            var pagedItemsRaw = queryBase
+                .OrderBy(x => x.Id)
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ToList();
-
-            return new PageResultDto<KpiDonViDto>
-            {
-                Items = pagedItems,
-                TotalItem = totalCount
-            };
-        }
-
-        public PageResultDto<KpiDonViDto> GetAllKpiDonVi(FilterKpiDonViDto dto)
-        {
-            _logger.LogInformation(
-                $"{nameof(GetAllKpiDonVi)} => dto = {JsonSerializer.Serialize(dto)}"
-            );
-            var isActive = GetKpiIsActive();
-            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-            var userRoles = _unitOfWork.iKpiRoleRepository
-                .TableNoTracking
-                .Where(x => x.IdNhanSu == userId)
+            var summaryData = queryBase
+                .Select(x => new { x.DiemKpi, x.DiemKpiCapTren, x.LoaiKpi })
                 .ToList();
-            List<int>? allowedDonViIds = null;
-            if (userRoles.Any(r => r.Role == "HIEU_TRUONG"))
-            {
-                allowedDonViIds = null;
-            }
-            else if (userRoles.Any(r => r.Role == "PHO_HIEU_TRUONG"))
-            {
-                allowedDonViIds = userRoles
-                    .Where(r => r.Role == "PHO_HIEU_TRUONG" && r.IdDonVi.HasValue)
-                    .Select(r => r.IdDonVi!.Value)
-                    .Distinct()
-                    .ToList();
-            }
-            else
-            {
-                return new PageResultDto<KpiDonViDto>
-                {
-                    Items = new List<KpiDonViDto>(),
-                    TotalItem = 0
-                };
-            }
-            //var kpis = _unitOfWork.iKpiDonViRepository.TableNoTracking.ToList();
-            var donvis = _unitOfWork.iDmPhongBanRepository.TableNoTracking.ToDictionary(x => x.Id, x => x.TenPhongBan);
-            var kpiQuery = _unitOfWork.iKpiDonViRepository
-                    .TableNoTracking
-                    .Where(kpi =>
-                        !kpi.Deleted
-                        && kpi.IdDonVi.HasValue
-                        && (allowedDonViIds == null || allowedDonViIds.Contains(kpi.IdDonVi.Value))
-                        && (string.IsNullOrEmpty(dto.Keyword) || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower()))
-                        && (dto.IdDonVi == null || kpi.IdDonVi == dto.IdDonVi)
-                        && (dto.LoaiKpi == null || kpi.LoaiKpi == dto.LoaiKpi)
-                        && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
-                        && (dto.TrangThai == null || kpi.TrangThai == dto.TrangThai)
-                    );
-            var summary = new KpiDonViSummaryDto
-            {
-                TongTuDanhGia = kpiQuery.Sum(x => (decimal?)(x.DiemKpi ?? 0)) ?? 0,
-                TongCapTren = kpiQuery.Sum(x => (decimal?)(x.DiemKpiCapTren ?? 0)) ?? 0,
+            decimal tongTuDanhGia = summaryData.Sum(x =>
+                x.LoaiKpi == 3 ? -(x.DiemKpi ?? 0) : (x.DiemKpi ?? 0)
+            );
 
-                ByLoaiKpi = kpiQuery
+            decimal tongCapTren = summaryData.Sum(x =>
+                x.LoaiKpi == 3 ? -(x.DiemKpiCapTren ?? 0) : (x.DiemKpiCapTren ?? 0)
+            );
+
+            var summaryDto = new KpiDonViSummaryDto
+            {
+                TongTuDanhGia = tongTuDanhGia,
+                TongCapTren = tongCapTren,
+                ByLoaiKpi = summaryData
                     .Where(x => x.LoaiKpi.HasValue)
                     .GroupBy(x => x.LoaiKpi!.Value)
                     .Select(g => new KpiDonViSummaryByLoaiDto
                     {
                         LoaiKpi = g.Key,
-                        TuDanhGia = g.Sum(x => (decimal?)(x.DiemKpi ?? 0)) ?? 0,
-                        CapTren = g.Sum(x => (decimal?)(x.DiemKpiCapTren ?? 0)) ?? 0
-                    })
-                    .ToList()
+                        TuDanhGia = g.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpi ?? 0) : (x.DiemKpi ?? 0)),
+                        CapTren = g.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpiCapTren ?? 0) : (x.DiemKpiCapTren ?? 0))
+                    }).ToList()
             };
-            var totalCount = kpiQuery.Count();
-
-            var pagedItems = kpiQuery
-                    .OrderBy(x => x.Id)
-                    .Skip(dto.SkipCount())
-                    .Take(dto.PageSize)
-                    .Select(kpi => new KpiDonViDto
-                    {
-                        Id = kpi.Id,
-                        Kpi = kpi.Kpi,
-                        MucTieu = kpi.MucTieu,
-                        TrongSo = kpi.TrongSo,
-                        IdDonVi = kpi.IdDonVi,
-                        DonVi = kpi.IdDonVi.HasValue && donvis.ContainsKey(kpi.IdDonVi.Value)
-                            ? donvis[kpi.IdDonVi.Value]
-                            : string.Empty,
-                        LoaiKpi = kpi.LoaiKpi,
-                        CongThuc = kpi.CongThucTinh,
-                        NamHoc = kpi.NamHoc,
-                        TrangThai = kpi.TrangThai,
-                        KetQuaThucTe = kpi.KetQuaThucTe,
-                        DiemKpi = kpi.DiemKpi,
-                        DiemKpiCapTren = kpi.DiemKpiCapTren,
-                        CapTrenDanhGia = kpi.CapTrenDanhGia,
-                        IdCongThuc = kpi.IdCongThuc,
-                        LoaiKetQua = kpi.LoaiKetQua,
-                        IsActive = kpi.TrangThai == KpiStatus.Evaluated ? 0 : isActive,
-                    })
-                    .ToList();
+            var resultItems = pagedItemsRaw.Select(kpi => new KpiDonViDto
+            {
+                Id = kpi.Id,
+                Kpi = kpi.Kpi,
+                MucTieu = kpi.MucTieu,
+                TrongSo = kpi.TrongSo,
+                IdDonVi = kpi.IdDonVi,
+                DonVi = (kpi.IdDonVi.HasValue && donvis.ContainsKey(kpi.IdDonVi.Value)) ? donvis[kpi.IdDonVi.Value] : string.Empty,
+                LoaiKpi = kpi.LoaiKpi,
+                CongThuc = kpi.CongThucTinh,
+                IdCongThuc = kpi.IdCongThuc,
+                NamHoc = kpi.NamHoc,
+                TrangThai = kpi.TrangThai,
+                KetQuaThucTe = kpi.KetQuaThucTe,
+                CapTrenDanhGia = kpi.CapTrenDanhGia,
+                DiemKpiCapTren = kpi.DiemKpiCapTren,
+                DiemKpi = kpi.DiemKpi,
+                LoaiKetQua = kpi.LoaiKetQua,
+                GhiChu = kpi.GhiChu,
+                IsActive = (kpi.TrangThai == KpiStatus.Assigned || kpi.TrangThai == KpiStatus.NeedEdit || kpi.TrangThai == KpiStatus.Declared) ? isActive : 0
+            }).ToList();
 
             return new PageResultDto<KpiDonViDto>
             {
-                Items = pagedItems,
+                Items = resultItems,
                 TotalItem = totalCount,
-                Summary = summary
+                Summary = summaryDto
             };
+        }
+        public PageResultDto<KpiDonViDto> GetAllKpiDonVi(FilterKpiDonViDto dto)
+        {
+            _logger.LogInformation($"{nameof(GetAllKpiDonVi)} => dto = {JsonSerializer.Serialize(dto)}");
+
+            var isActive = GetKpiIsActive();
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var userRoles = _unitOfWork.iKpiRoleRepository.TableNoTracking.Where(x => x.IdNhanSu == userId).ToList();
+            List<int>? allowedDonViIds = null;
+
+            if (userRoles.Any(r => r.Role == "HIEU_TRUONG")) allowedDonViIds = null;
+            else if (userRoles.Any(r => r.Role == "PHO_HIEU_TRUONG"))
+                allowedDonViIds = userRoles.Where(r => r.Role == "PHO_HIEU_TRUONG" && r.IdDonVi.HasValue).Select(r => r.IdDonVi!.Value).Distinct().ToList();
+            else return new PageResultDto<KpiDonViDto> { Items = new List<KpiDonViDto>(), TotalItem = 0 };
+
+            var donvis = _unitOfWork.iDmPhongBanRepository.TableNoTracking.ToDictionary(x => x.Id, x => x.TenPhongBan);
+
+            var queryBase = _unitOfWork.iKpiDonViRepository.TableNoTracking
+                .Where(kpi => !kpi.Deleted && kpi.IdDonVi.HasValue
+                    && (allowedDonViIds == null || allowedDonViIds.Contains(kpi.IdDonVi.Value))
+                    && (string.IsNullOrEmpty(dto.Keyword) || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower()))
+                    && (dto.IdDonVi == null || kpi.IdDonVi == dto.IdDonVi)
+                    && (dto.LoaiKpi == null || kpi.LoaiKpi == dto.LoaiKpi)
+                    && (string.IsNullOrEmpty(dto.NamHoc) || kpi.NamHoc == dto.NamHoc)
+                    && (dto.TrangThai == null || kpi.TrangThai == dto.TrangThai)
+                );
+
+            var totalCount = queryBase.Count();
+            var pagedItemsRaw = queryBase.OrderBy(x => x.Id).Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
+            var summaryData = queryBase.Select(x => new { x.DiemKpi, x.DiemKpiCapTren, x.LoaiKpi }).ToList();
+
+            decimal tongTuDanhGia = summaryData.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpi ?? 0) : (x.DiemKpi ?? 0));
+            decimal tongCapTren = summaryData.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpiCapTren ?? 0) : (x.DiemKpiCapTren ?? 0));
+
+            var summaryDto = new KpiDonViSummaryDto
+            {
+                TongTuDanhGia = tongTuDanhGia,
+                TongCapTren = tongCapTren,
+                ByLoaiKpi = summaryData.Where(x => x.LoaiKpi.HasValue).GroupBy(x => x.LoaiKpi!.Value)
+                    .Select(g => new KpiDonViSummaryByLoaiDto
+                    {
+                        LoaiKpi = g.Key,
+                        TuDanhGia = g.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpi ?? 0) : (x.DiemKpi ?? 0)),
+                        CapTren = g.Sum(x => x.LoaiKpi == 3 ? -(x.DiemKpiCapTren ?? 0) : (x.DiemKpiCapTren ?? 0))
+                    }).ToList()
+            };
+            var resultItems = pagedItemsRaw.Select(kpi => new KpiDonViDto
+            {
+                Id = kpi.Id,
+                Kpi = kpi.Kpi,
+                MucTieu = kpi.MucTieu,
+                TrongSo = kpi.TrongSo,
+                IdDonVi = kpi.IdDonVi,
+                DonVi = (kpi.IdDonVi.HasValue && donvis.ContainsKey(kpi.IdDonVi.Value)) ? donvis[kpi.IdDonVi.Value] : string.Empty,
+                LoaiKpi = kpi.LoaiKpi,
+                CongThuc = kpi.CongThucTinh,
+                NamHoc = kpi.NamHoc,
+                TrangThai = kpi.TrangThai,
+                KetQuaThucTe = kpi.KetQuaThucTe,
+                DiemKpi = kpi.DiemKpi,
+                DiemKpiCapTren = kpi.DiemKpiCapTren,
+                CapTrenDanhGia = kpi.CapTrenDanhGia,
+                IdCongThuc = kpi.IdCongThuc,
+                LoaiKetQua = kpi.LoaiKetQua,
+                IsActive = kpi.TrangThai == KpiStatus.Evaluated ? 0 : isActive,
+            }).ToList();
+
+            return new PageResultDto<KpiDonViDto> { Items = resultItems, TotalItem = totalCount, Summary = summaryDto };
         }
 
         public List<TrangThaiKpiDonViResponseDto> GetListTrangThai()
@@ -668,7 +641,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             };
         }
 
-        public async Task<List<object>> GetKpiDonViContextForAi(List<int>? allowedDonViIds)
+        public async Task<string> GetKpiDonViContextForAi(List<int>? allowedDonViIds)
         {
             var query = _unitOfWork.iKpiDonViRepository.TableNoTracking.Where(x => !x.Deleted);
             if (allowedDonViIds != null)
@@ -678,31 +651,28 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             var donViDict = await _unitOfWork.iDmPhongBanRepository.TableNoTracking
                 .ToDictionaryAsync(x => x.Id, x => x.TenPhongBan);
 
-            return kpis.GroupBy(x => x.IdDonVi).Select(group => new {
-                TenDonVi = donViDict.GetValueOrDefault(group.Key ?? 0, "Đơn vị ẩn danh"),
-                TongDiemDonViTuCham = group.Sum(s => s.DiemKpi ?? 0),
-                TongDiemDonViCapTren = group.Sum(s => s.DiemKpiCapTren ?? 0),
-                DanhSachKPI = group.Select(k => {
-                    double.TryParse(k.TrongSo, out double trongSoNumeric);
+            if (!kpis.Any()) return "### KPI Đơn vị: Không có dữ liệu.";
 
-                    return new
-                    {
-                        TenKPI = k.Kpi,
-                        MucTieu = k.MucTieu ?? "Chưa có mục tiêu",
-                        TrongSo = trongSoNumeric,
-                        LoaiKPI = k.LoaiKpi switch
-                        {
-                            1 => "Chức năng",
-                            2 => "Mục tiêu",
-                            3 => "Tuân thủ",
-                            _ => "Khác"
-                        },
-                        KetQua = k.KetQuaThucTe ?? 0,
-                        DiemTuCham = k.DiemKpi ?? 0,
-                        DiemCapTren = k.DiemKpiCapTren ?? 0
-                    };
-                }).ToList()
-            }).ToList<object>();
+            var sb = new StringBuilder();
+            sb.AppendLine("## [BÁO CÁO KPI CẤP ĐƠN VỊ]");
+
+            var groupedByDonVi = kpis.GroupBy(x => x.IdDonVi);
+            foreach (var group in groupedByDonVi)
+            {
+                var tenDV = donViDict.GetValueOrDefault(group.Key ?? 0, "Đơn vị ẩn danh");
+                sb.AppendLine($"### Đơn vị: {tenDV}");
+                sb.AppendLine($"- **Tổng điểm đơn vị tự chấm:** {group.Sum(s => s.DiemKpi ?? 0)}");
+                sb.AppendLine("| KPI Đơn vị | Mục tiêu | Trọng số | Kết quả thực tế | Tự chấm | Công thức tính");
+                sb.AppendLine("| :--- | :--- | :---: | :---: | :---: |:---:|");
+
+                foreach (var k in group)
+                {
+                    double.TryParse(k.TrongSo, out double ts);
+                    sb.AppendLine($"| {k.Kpi} | {k.MucTieu} | {ts}% | {k.KetQuaThucTe} | {k.DiemKpi} | {k.CongThucTinh}");
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
         }
 
         private async Task SendKpiStatusNotification(KpiDonVi kpi, int newStatus, string note)

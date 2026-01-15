@@ -57,22 +57,35 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                                 .Where(x => x.IdNhanSu == userId).ToListAsync();
 
             bool isHieuTruong = userRoles.Any(r => r.Role == "HIEU_TRUONG" || r.Role == "CHU_TICH_HOI_DONG_TRUONG");
-            List<int>? managedDonViIds = isHieuTruong ? null :
-                userRoles.Where(r => r.IdDonVi.HasValue).Select(r => r.IdDonVi!.Value).Distinct().ToList();
+            var managerRoles = new[] { "PHO_HIEU_TRUONG", "TRUONG_DON_VI_CAP_2", "TRUONG_DON_VI_CAP_3" };
 
-            var finalContext = new
-            {
-                KpiCapTruong = isHieuTruong ? await _kpiTruongService.GetKpiTruongContextForAi() : null,
-                KpiCacDonVi = (isHieuTruong || (managedDonViIds?.Any() ?? false))
-                                ? await _kpiDonViService.GetKpiDonViContextForAi(managedDonViIds) : null,
-                KpiCaNhan = await _kpiCaNhanService.GetKpiCaNhanContextForAi(userId, await _kpiCaNhanService.GetAllowedUserIds(userId))
-            };
+            var managedDonViIds = userRoles
+                .Where(r => r.IdDonVi.HasValue && managerRoles.Contains(r.Role))
+                .Select(r => r.IdDonVi!.Value)
+                .Distinct()
+                .ToList();
 
-            return JsonSerializer.Serialize(finalContext, new JsonSerializerOptions
+            bool hasManagerRights = isHieuTruong || managedDonViIds.Any();
+            var fullContext = new StringBuilder();
+            fullContext.AppendLine("# BÁO CÁO DỮ LIỆU KPI QUẢN LÝ");
+            fullContext.AppendLine($" Thời gian: {DateTime.Now:HH:mm dd/MM/yyyy}");
+            fullContext.AppendLine("---");
+            if (isHieuTruong)
             {
-                WriteIndented = false, 
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
+                fullContext.AppendLine(await _kpiTruongService.GetKpiTruongContextForAi());
+                fullContext.AppendLine("---");
+            }
+
+            if (hasManagerRights)
+            {
+                var queryDonViIds = isHieuTruong ? null : managedDonViIds;
+                fullContext.AppendLine(await _kpiDonViService.GetKpiDonViContextForAi(queryDonViIds));
+                fullContext.AppendLine("---");
+            }
+            var allowedStaffIds = await _kpiCaNhanService.GetAllowedUserIds(userId);
+            fullContext.AppendLine(await _kpiCaNhanService.GetKpiCaNhanContextForAi(userId, allowedStaffIds));
+
+            return fullContext.ToString();
         }
 
         public async Task<string> AskKpiQuestion(string userQuery)
@@ -80,12 +93,10 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             try
             {
                 var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-                string kpiContext = await GetKpiContextForChat(userId);
-                _logger.LogInformation("--- SENDING JSON CONTEXT TO DIFY ---\n{0}", kpiContext);
-
+                string kpiMarkdownContext = await GetKpiContextForChat(userId);
                 var requestBody = new
                 {
-                    inputs = new { kpi_data = kpiContext },
+                    inputs = new { kpi_data = kpiMarkdownContext },
                     query = userQuery,
                     user = $"user_{userId}",
                     response_mode = "blocking"
@@ -103,19 +114,9 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     return result?.Answer ?? "AI không có phản hồi.";
                 }
                 var errorCode = (int)response.StatusCode;
-                var errorContent = await response.Content.ReadAsStringAsync();
-
-                if (errorCode == 429)
-                {
-                    return "Hệ thống AI đang quá tải hoặc hết hạn mức (Quota). Vui lòng thử lại sau ít phút.";
-                }
-
-                _logger.LogError($"Dify API Error: {errorCode} - {errorContent}");
-                return $"Có lỗi xảy ra khi kết nối với AI (Mã lỗi: {errorCode}).";
-            }
-            catch (TaskCanceledException)
-            {
-                return "AI phản hồi quá lâu, vui lòng thử lại với câu hỏi ngắn gọn hơn.";
+                return errorCode == 429
+                    ? "Hệ thống AI đang bận (Quota), vui lòng thử lại sau."
+                    : $"Có lỗi xảy ra (Mã lỗi: {errorCode}).";
             }
             catch (Exception ex)
             {

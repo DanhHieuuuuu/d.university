@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Checkbox, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
+import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
   PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
   EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined,
-  RobotFilled, FileTextOutlined
+  FileTextOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -28,13 +28,13 @@ import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import PositionModal from './(dialog)/create-or-update copy';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
-
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
+  const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,7 +56,7 @@ const Page = () => {
 
   const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiTruong>({
     total: totalItem || 0,
-    initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
+    initialQuery: { PageIndex: 1, PageSize: 1000, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getAllKpiTruong(newQuery)),
     triggerFirstLoad: true
   });
@@ -137,17 +137,6 @@ const Page = () => {
     if (!selectedRowKeys.length) return toast.warning('Vui lòng chọn ít nhất một KPI');
     cb();
   };
-
-  const totalDeclaredScore = useMemo(() => {
-    return (list || [])
-      .reduce((sum, k) => sum + (k.diemKpi ?? 0), 0);
-  }, [list]);
-
-  const finalScore = useMemo(() => {
-    return (list || [])
-      .reduce((sum, k) => sum + (k.diemKpiCapTren ?? 0), 0);
-  }, [list]);
-
   const bulkActionItems: MenuProps['items'] = [
     { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
     { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
@@ -181,18 +170,6 @@ const Page = () => {
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => onFilterChange({ Keyword: value }), 500);
 
   const columns: IColumn<KpiTableRow<IViewKpiTruong>>[] = [
-    {
-      key: 'linhVuc',
-      dataIndex: 'linhVuc', title: 'Lĩnh Vực',
-      width: 150,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
-    },
-    {
-      key: 'chienLuoc',
-      dataIndex: 'chienLuoc', title: 'Chiến lược',
-      width: 150,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
-    },
     {
       key: 'kpi', dataIndex: 'kpi', title: 'Tên KPI', width: 400,
       render: (value, record) => {
@@ -249,7 +226,10 @@ const Page = () => {
       dataIndex: 'congThuc',
       title: 'Công thức tính',
       width: 200,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        return <span className="text-gray-500">{val}</span>;
+      },
     },
     {
       key: 'ketQuaThucTe',
@@ -268,7 +248,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQua(record.id, v)}
-            editable={record.isActive == 0}
+            editable={record.isActive !== 0}
           />
         );
       },
@@ -278,7 +258,11 @@ const Page = () => {
       dataIndex: 'diemKpi',
       title: 'Điểm kê khai',
       width: 130,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        // Thêm màu đỏ cho KPI phạt
+        return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
+      },
     },
     {
       key: 'capTrenDanhGia',
@@ -295,7 +279,11 @@ const Page = () => {
       dataIndex: 'diemKpiCapTren',
       title: 'Điểm cấp trên',
       width: 130,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        // Thêm màu đỏ cho KPI phạt
+        return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
+      },
     },
 
     {
@@ -320,22 +308,9 @@ const Page = () => {
     getCheckboxProps: (record: any) => ({ disabled: record.rowType !== 'data', style: record.rowType !== 'data' ? { display: 'none' } : {} }),
     onChange: setSelectedRowKeys,
   };
+
   return (
     <div className="space-y-4">
-      {/* Statistics Card - Only Total KPIs */}
-      <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-gray-500 text-sm mb-1">Tổng số KPI</p>
-            <p className="text-2xl font-bold text-blue-600">{(list || []).length}</p>
-          </div>
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <FileTextOutlined className="text-2xl text-blue-600" />
-          </div>
-        </div>
-      </Card>
-
-      {/* Main Card */}
       <Card
         className="h-full"
         title={
@@ -450,14 +425,14 @@ const Page = () => {
                   <div className="flex flex-col items-center justify-center">
                     <span className="text-sm text-gray-600 mb-1">Tổng điểm kê khai</span>
                     <span className="text-2xl font-bold text-orange-600">
-                      {totalDeclaredScore.toFixed(2)}
+                      {summary?.tongTuDanhGia?.toFixed(2) ?? 0}
                     </span>
                   </div>
 
                   <div className="flex flex-col items-center justify-center border-l border-gray-300 pl-4">
                     <span className="text-sm text-gray-600 mb-1">Điểm tổng nhận được</span>
                     <span className="text-2xl font-bold text-green-600">
-                      {finalScore.toFixed(2)}
+                      {summary?.tongCapTren?.toFixed(2) ?? 0}
                     </span>
                   </div>
                 </div>

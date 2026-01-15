@@ -20,7 +20,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         List<TrangThaiKpiDonViResponseDto> GetListTrangThai();
         Task<GetTrangThaiKpiTruongByKpiDonViResponseDto> GetTrangThaiKpiTruongByKpiDonViAsync(GetTrangThaiKpiTruongByKpiDonViRequestDto dto);
         int? GetKpiIsActive();
-        Task<List<object>> GetKpiDonViContextForAi(List<int>? allowedDonViIds);
+        Task<string> GetKpiDonViContextForAi(List<int>? allowedDonViIds);
 
     }
 }
