@@ -11,7 +11,11 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (pathname?.startsWith('/survey/user') || pathname?.startsWith('/user/chat-bot')) {
+    if (
+      pathname?.startsWith('/login') ||
+      pathname?.startsWith('/survey/user') ||
+      pathname?.startsWith('/user/chat-bot')
+    ) {
       return;
     }
 

@@ -59,6 +59,11 @@ export const attachAuthInterceptor = (api: AxiosInstance) => {
         _retry?: boolean;
       };
 
+      // Nếu đang ở trang /login -> reject
+      if (window.location.pathname.startsWith('/login')) {
+        return Promise.reject(error);
+      }
+
       // Không có response -> lỗi network
       if (!error.response) {
         return Promise.reject(error);
