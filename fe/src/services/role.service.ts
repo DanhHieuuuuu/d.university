@@ -4,7 +4,7 @@ import { attachAuthInterceptor } from '@utils/axios-interceptor';
 import { processApiMsgError } from '@utils/index';
 import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { IPermissionTree } from '@models/permission';
-import { ICreateRole, IQueryRole, IRole, IUpdateRole, IUpdateRolePermission } from '@models/role';
+import { ICreateRole, IQueryRole, IRole, IUpdateRole, IUpdateRolePermission, IUpdateRoleStatus } from '@models/role';
 
 /**
  * Cấu hình riêng axios cho role service
@@ -64,6 +64,16 @@ const update = async (body: IUpdateRole) => {
   }
 };
 
+const updateStatus = async (body: IUpdateRoleStatus) => {
+  try {
+    const res = await authApi.put(`${apiRoleEndpoint}/${body.id}/change-status`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật trạng thái của role.');
+    return Promise.reject(err);
+  }
+}
+
 const deleteRole = async (roleId: number) => {
   try {
     const res = await authApi.delete(`${apiRoleEndpoint}/${roleId}`);
@@ -111,6 +121,7 @@ export const RoleService = {
   findById,
   create,
   update,
+  updateStatus,
   deleteRole,
   updatePermission,
   getPermissionTree,

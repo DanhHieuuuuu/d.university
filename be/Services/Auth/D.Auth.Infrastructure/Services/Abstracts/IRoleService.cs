@@ -11,5 +11,6 @@ namespace D.Auth.Infrastructure.Services.Abstracts
         void UpdateRole(UpdateRoleDto dto);
         void DeleteRole(int id);
         void UpdateRolePermission(UpdateRolePermissionDto dto);
+        void UpdateStatusRole(UpdateRoleStatusDto dto);
     }
 }
