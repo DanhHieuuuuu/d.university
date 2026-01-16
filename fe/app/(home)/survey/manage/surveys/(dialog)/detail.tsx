@@ -97,9 +97,11 @@ const SurveyDetailModal: React.FC<SurveyDetailModalProps> = ({
     <Card 
         title="Nội dung câu hỏi" 
         size="small" 
-        bordered={false} 
-        headStyle={{display: 'none'}}
-        bodyStyle={{ padding: 0, maxHeight: '500px', overflowY: 'auto' }}
+        variant="borderless"
+        styles={{
+          header: { display: 'none' },
+          body: { padding: 0, maxHeight: '500px', overflowY: 'auto' }
+        }}
     >
         <Form.List name="questions">
             {(fields) => (
@@ -128,32 +130,35 @@ const SurveyDetailModal: React.FC<SurveyDetailModalProps> = ({
                                 </Col>
                              </Row>
 
-                             {/* Render Answers */}
+                             {/* Answers */}
                              <div className="pl-4 border-l-2 border-blue-200 mt-2">
                                 <Form.List name={[name, 'answers']}>
                                     {(answerFields) => (
                                         <>
-                                            {answerFields.map((ans) => (
-                                                <Row key={ans.key} gutter={8} align="middle" className="mb-2">
+                                            {answerFields.map((ans) => {
+                                              const { key, ...ansRestField } = ans;
+                                              return (
+                                                <Row key={key} gutter={8} align="middle" className="mb-2">
                                                     <Col span={1}>
-                                                         <Form.Item {...ans} name={[ans.name, 'isCorrect']} valuePropName="checked" noStyle>
+                                                         <Form.Item name={[ans.name, 'isCorrect']} valuePropName="checked" noStyle>
                                                             <Checkbox disabled />
                                                          </Form.Item>
                                                     </Col>
                                                     <Col span={16}>
-                                                        <Form.Item {...ans} name={[ans.name, 'noiDung']} noStyle>
+                                                        <Form.Item name={[ans.name, 'noiDung']} noStyle>
                                                             <Input size="small" disabled className="bg-transparent border-none text-black" />
                                                         </Form.Item>
                                                     </Col>
                                                     <Col span={7}>
-                                                         <Form.Item {...ans} name={[ans.name, 'value']} noStyle>
+                                                         <Form.Item name={[ans.name, 'value']} noStyle>
                                                             <span className="text-xs text-gray-500 italic">
                                                                 (Điểm: {form.getFieldValue(['questions', name, 'answers', ans.name, 'value'])})
                                                             </span>
                                                          </Form.Item>
                                                     </Col>
                                                 </Row>
-                                            ))}
+                                              );
+                                            })}
                                             {answerFields.length === 0 && (
                                                 <span className="text-gray-400 italic text-xs">Không có đáp án (Tự luận)</span>
                                             )}

@@ -6,11 +6,13 @@ using D.Core.Infrastructure.Services.Survey.Request.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
+using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -337,6 +339,64 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
             );
 
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public List<RequestSurveyQuestionDto> ReadExcel(Stream fileStream)
+        {
+            var questions = new List<RequestSurveyQuestionDto>();
+
+            try
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(fileStream))
+                {
+                    var result = reader.AsDataSet(new ExcelDataSetConfiguration()
+                    {
+                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration() { UseHeaderRow = true }
+                    });
+                    if (result.Tables.Count == 0 || !result.Tables.Contains("data"))
+                    {
+                        throw new Exception("File Excel không đúng định dạng. Thiếu sheet 'data'");
+                    }
+                    var table = result.Tables["data"];
+                    RequestSurveyQuestionDto currentQuestion = null;
+                    foreach (DataRow row in table.Rows)
+                    {
+                        // Skip empty rows
+                        if (row.ItemArray.All(field => field == null || string.IsNullOrWhiteSpace(field.ToString())))
+                            continue;
+                        string noiDungCauHoi = row["Nội dung câu hỏi(*)"]?.ToString()?.Trim();
+                        // New question
+                        if (!string.IsNullOrEmpty(noiDungCauHoi))
+                        {
+                            currentQuestion = new RequestSurveyQuestionDto
+                            {
+                                MaCauHoi = row["Mã câu hỏi(*)"]?.ToString()?.Trim(),
+                                NoiDung = noiDungCauHoi,
+                                LoaiCauHoi = int.TryParse(row["Loại câu hỏi(*)(1:Đơn, 2:Nhiều, 3:Tự luận)"]?.ToString(), out int loai) ? loai : 1,
+                                BatBuoc = row["Bắt buộc (X)"]?.ToString()?.Trim().ToUpper() == "X",
+                                Answers = new List<RequestQuestionAnswerDto>()
+                            };
+                            questions.Add(currentQuestion);
+                        }
+                        // Answer
+                        string noiDungDapAn = row["Đáp án(*)"]?.ToString()?.Trim();
+                        if (currentQuestion != null && !string.IsNullOrEmpty(noiDungDapAn))
+                        {
+                            currentQuestion.Answers.Add(new RequestQuestionAnswerDto
+                            {
+                                NoiDung = noiDungDapAn,
+                                Value = int.TryParse(row["Điểm (Value)"]?.ToString(), out int val) ? val : 0,
+                                IsCorrect = row["Đáp án đúng? (X)"]?.ToString()?.Trim().ToUpper() == "X"
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi đọc file Excel: {ex.Message}");
+            }
+            return questions;
         }
 
     }

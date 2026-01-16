@@ -1,18 +1,19 @@
 'use client';
 import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Space, Select, Card, Checkbox, Tabs, TabsProps } from 'antd';
-import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
+import { Button, Col, DatePicker, Form, Input, Modal, Row, Space, Select, Card, Checkbox, Tabs, TabsProps, Upload } from 'antd';
+import { CloseOutlined, SaveOutlined, FileExcelOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { createRequest, updateRequest } from '@redux/feature/survey/surveyThunk';
+import { createRequest, updateRequest, importExcelQuestions } from '@redux/feature/survey/surveyThunk';
 import { resetRequestStatus } from '@redux/feature/survey/surveySlice';
 import { ICreateRequest, IUpdateRequest, IViewRequest } from '@models/survey/request.model';
-import { surveyStatusConst } from '@/app/(home)/survey/const/targetType.const';
+import { surveyTargetConst } from '@/constants/core/survey/targetType.const';
 import { getListPhongBan } from '@redux/feature/delegation/delegationThunk';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import { getAllKhoa } from '@redux/feature/dao-tao/khoaThunk';
 import { IViewKhoa } from '@models/dao-tao/khoa.model';
 import dayjs from 'dayjs';
+
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -163,6 +164,24 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
     toast.error('Vui lòng kiểm tra lại thông tin nhập liệu');
   };
 
+  const handleExcelImport = async (file: File) => {
+    try {
+      const result = await dispatch(importExcelQuestions(file)).unwrap();
+      
+      if (result && result.length > 0) {
+        form.setFieldValue('questions', result);
+        toast.success(`Đã import ${result.length} câu hỏi từ Excel`);
+        setActiveTab('2');
+      } else {
+        toast.warning('File Excel không có câu hỏi nào');
+      }
+    } catch (error: any) {
+      console.error('Import error:', error);
+      toast.error(error?.message || 'Import Excel thất bại');
+    }
+    return false;
+  };
+
   const handleCancel = () => {
     setIsModalOpen(false);
     form.resetFields();
@@ -270,9 +289,9 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
               rules={[{ required: true, message: 'Chọn loại đối tượng' }]}
             >
               <Select placeholder="Chọn loại đối tượng" disabled={isViewMode}>
-                <Option value={surveyStatusConst.ALL}>{surveyStatusConst.getName(surveyStatusConst.ALL)}</Option>
-                <Option value={surveyStatusConst.STUDENT}>{surveyStatusConst.getName(surveyStatusConst.STUDENT)}</Option>
-                <Option value={surveyStatusConst.LECTURER}>{surveyStatusConst.getName(surveyStatusConst.LECTURER)}</Option>
+                <Option value={surveyTargetConst.ALL}>{surveyTargetConst.getName(surveyTargetConst.ALL)}</Option>
+                <Option value={surveyTargetConst.STUDENT}>{surveyTargetConst.getName(surveyTargetConst.STUDENT)}</Option>
+                <Option value={surveyTargetConst.LECTURER}>{surveyTargetConst.getName(surveyTargetConst.LECTURER)}</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -284,7 +303,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                 const targetType = getFieldValue(['targets', 0, 'loaiDoiTuong']);
                 return (
                   <Row gutter={16}>
-                    {(targetType === surveyStatusConst.ALL || targetType === surveyStatusConst.STUDENT) && (
+                    {(targetType === surveyTargetConst.ALL || targetType === surveyTargetConst.STUDENT) && (
                       <Col span={12}>
                         <Form.Item
                           label="Khoa"
@@ -300,7 +319,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                         </Form.Item>
                       </Col>
                     )}
-                    {(targetType === surveyStatusConst.ALL || targetType === surveyStatusConst.LECTURER) && (
+                    {(targetType === surveyTargetConst.ALL || targetType === surveyTargetConst.LECTURER) && (
                       <Col span={12}>
                         <Form.Item
                           label="Phòng ban"
@@ -396,7 +415,23 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
   );
 
   const renderQuestionsTab = () => (
-    <Card title="Danh sách câu hỏi" size="small">
+    <Card 
+      title="Danh sách câu hỏi" 
+      size="small"
+      extra={
+        !isViewMode && (
+          <Upload
+            accept=".xlsx,.xls"
+            showUploadList={false}
+            beforeUpload={handleExcelImport}
+          >
+            <Button icon={<FileExcelOutlined />} type="dashed">
+              Import từ Excel
+            </Button>
+          </Upload>
+        )
+      }
+    >
       <Form.List name="questions">
         {(fields, { add, remove }) => (
           <>
@@ -436,7 +471,6 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                         placeholder="Loại câu hỏi" 
                         disabled={isViewMode}
                         onChange={(value) => {
-                          // Clear answers when switching to essay type
                           if (value === 3) {
                             form.setFieldValue(['questions', name, 'answers'], []);
                           }
@@ -475,7 +509,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                     
                     // Only show answers for type 1 (Trắc nghiệm) or type 2 (Chọn nhiều đáp án)
                     if (questionType === 3) {
-                      return null; // Hide answers for essay questions
+                      return null;
                     }
 
                     return (
@@ -483,45 +517,47 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                         <Form.List name={[name, 'answers']}>
                           {(answerFields, { add: addAnswer, remove: removeAnswer }) => (
                             <>
-                              {answerFields.map((answerField, index) => (
-                          <Row key={answerField.key} gutter={16} align="middle" style={{ marginBottom: 8 }}>
-                            <Col span={7}>
-                              <Form.Item
-                                {...answerField}
-                                label={index === 0 ? "Nội dung đáp án" : null}
-                                name={[answerField.name, 'noiDung']}
-                                rules={[{ required: true, message: 'Nhập nội dung' }]}
-                                style={{ marginBottom: 0 }}
-                              >
-                                <Input placeholder="Nội dung" disabled={isViewMode} />
-                              </Form.Item>
-                            </Col>
-                            <Col span={5}>
-                              <Form.Item {...answerField} label={index === 0 ? "Giá trị" : null} name={[answerField.name, 'value']} style={{ marginBottom: 0 }}>
-                                <Input type="number" placeholder="Số" disabled={isViewMode} />
-                              </Form.Item>
-                            </Col>
-                            {!isViewMode && (
-                              <Col span={5}>
-                                <Form.Item {...answerField} label={index === 0 ? "Thứ tự" : null} name={[answerField.name, 'thuTu']} style={{ marginBottom: 0 }}>
-                                  <Input type="number" placeholder="Thứ tự" disabled value={index + 1} />
-                                </Form.Item>
-                              </Col>
-                            )}
-                            <Col span={5}>
-                              <Form.Item {...answerField} label={index === 0 ? "Đáp án đúng" : null} name={[answerField.name, 'isCorrect']} valuePropName="checked" style={{ marginBottom: 0 }}>
-                                <Checkbox disabled={isViewMode}>Đúng</Checkbox>
-                              </Form.Item>
-                            </Col>
-                            <Col span={2}>
-                              {!isViewMode && (
-                                <Button type="link" danger onClick={() => removeAnswer(answerField.name)} style={index === 0 ? { marginTop: 30 } : {}}>
-                                  X
-                                </Button>
-                              )}
-                            </Col>
-                          </Row>
-                        ))}
+                              {answerFields.map((answerField, index) => {
+                                const { key, ...answerRestField } = answerField;
+                                return (
+                                  <Row key={key} gutter={16} align="middle" style={{ marginBottom: 8 }}>
+                                    <Col span={7}>
+                                      <Form.Item
+                                        label={index === 0 ? "Nội dung đáp án" : null}
+                                        name={[answerField.name, 'noiDung']}
+                                        rules={[{ required: true, message: 'Nhập nội dung' }]}
+                                        style={{ marginBottom: 0 }}
+                                      >
+                                        <Input placeholder="Nội dung" disabled={isViewMode} />
+                                      </Form.Item>
+                                    </Col>
+                                    <Col span={5}>
+                                      <Form.Item label={index === 0 ? "Giá trị" : null} name={[answerField.name, 'value']} style={{ marginBottom: 0 }}>
+                                        <Input type="number" placeholder="Số" disabled={isViewMode} />
+                                      </Form.Item>
+                                    </Col>
+                                    {!isViewMode && (
+                                      <Col span={5}>
+                                        <Form.Item label={index === 0 ? "Thứ tự" : null} name={[answerField.name, 'thuTu']} style={{ marginBottom: 0 }}>
+                                          <Input type="number" placeholder="Thứ tự" disabled value={index + 1} />
+                                        </Form.Item>
+                                      </Col>
+                                    )}
+                                    <Col span={5}>
+                                      <Form.Item label={index === 0 ? "Đáp án đúng" : null} name={[answerField.name, 'isCorrect']} valuePropName="checked" style={{ marginBottom: 0 }}>
+                                        <Checkbox disabled={isViewMode}>Đúng</Checkbox>
+                                      </Form.Item>
+                                    </Col>
+                                    <Col span={2}>
+                                      {!isViewMode && (
+                                        <Button type="link" danger onClick={() => removeAnswer(answerField.name)} style={index === 0 ? { marginTop: 30 } : {}}>
+                                          X
+                                        </Button>
+                                      )}
+                                    </Col>
+                                  </Row>
+                                );
+                              })}
                         {!isViewMode && (
                           <Button type="dashed" size="small" onClick={() => addAnswer({ thuTu: answerFields.length + 1 })} style={{ marginTop: 8 }}>
                             + Thêm đáp án

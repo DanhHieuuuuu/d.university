@@ -4,8 +4,11 @@ using D.Core.Domain.Dtos.Survey.Report;
 using D.Core.Domain.Dtos.Survey.Request;
 using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
+using D.Core.Domain.Dtos.Survey.AI;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using d.Shared.Permission;
+using d.Shared.Permission.Permission;
 
 namespace D.Core.API.Controllers.Survey
 {
@@ -26,6 +29,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuRequest)]
         [HttpGet("paging-request")]
         public async Task<ResponseAPI> PagingRequest([FromQuery] FilterSurveyRequestDto dto)
         {
@@ -45,6 +49,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuRequest)]
         [HttpGet("get-request-by-id/{id}")]
         public async Task<ResponseAPI> GetRequestById([FromRoute] int id)
         {
@@ -65,6 +70,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestCreate)]
         [HttpPost("create-request")]
         public async Task<ResponseAPI> CreateRequest([FromBody] CreateRequestSurveyRequestDto dto)
         {
@@ -84,6 +90,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestUpdate)]
         [HttpPut("update-request")]
         public async Task<ResponseAPI> UpdateRequest([FromBody] UpdateRequestSurveyRequestDto dto)
         {
@@ -103,6 +110,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestDelete)]
         [HttpDelete("delete-request/{id}")]
         public async Task<ResponseAPI> DeleteRequest([FromRoute] int id)
         {
@@ -123,6 +131,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestSubmit)]
         [HttpPost("submit-request/{id}")]
         public async Task<ResponseAPI> SubmitRequest([FromRoute] int id)
         {
@@ -143,6 +152,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestCancelSubmit)]
         [HttpPost("cancel-submit/{id}")]
         public async Task<ResponseAPI> CancelSubmitRequest([FromRoute] int id)
         {
@@ -157,12 +167,35 @@ namespace D.Core.API.Controllers.Survey
                 return BadRequest(ex);
             }
         }
+        
+        /// <summary>
+        /// Import câu hỏi từ file Excel
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestCreate)]
+        [HttpPost("import-excel-questions")]
+        [Consumes("multipart/form-data")]
+        public async Task<ResponseAPI> ImportExcelQuestions(IFormFile file)
+        {
+            try
+            {
+                var dto = new ImportExcelQuestionsDto { File = file };
+                var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
         /// <summary>
         /// Duyệt (Pending -> Approved)
         /// </summary>
         /// /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestApprove)]
         [HttpPost("approve-request/{id}")]
         public async Task<ResponseAPI> ApproveRequest([FromRoute] int id)
         {
@@ -182,6 +215,7 @@ namespace D.Core.API.Controllers.Survey
         /// </summary>
         /// /// /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonRequestReject)]
         [HttpPost("reject-request")]
         public async Task<ResponseAPI> RejectRequest([FromBody] RejectRequestDto dto)
         {
@@ -199,6 +233,7 @@ namespace D.Core.API.Controllers.Survey
         /// <summary>
         /// Lấy danh sách khảo sát (Paging)
         /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuManagement)]
         [HttpGet("paging-survey")]
         public async Task<ResponseAPI> PagingSurvey([FromQuery] FilterSurveyDto dto)
         {
@@ -216,6 +251,7 @@ namespace D.Core.API.Controllers.Survey
         /// <summary>
         /// Lấy chi tiết khảo sát
         /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuManagement)]
         [HttpGet("get-survey-by-id/{id}")]
         public async Task<ResponseAPI> GetSurveyById([FromRoute] int id)
         {
@@ -234,6 +270,7 @@ namespace D.Core.API.Controllers.Survey
         /// <summary>
         /// Mở khảo sát
         /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonSurveyOpen)]
         [HttpPost("open-survey/{id}")]
         public async Task<IActionResult> OpenSurvey([FromRoute] int id)
         {
@@ -251,6 +288,7 @@ namespace D.Core.API.Controllers.Survey
         /// <summary>
         /// Đóng khảo sát
         /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonSurveyClose)]
         [HttpPost("close-survey/{id}")]
         public async Task<IActionResult> CloseSurvey([FromRoute] int id)
         {
@@ -347,6 +385,7 @@ namespace D.Core.API.Controllers.Survey
         /// <summary>
         /// Tạo báo cáo khảo sát
         /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonReportGenerate)]
         [HttpPost("generate-report/{surveyId}")]
         public async Task<IActionResult> GenerateReport([FromRoute] int surveyId)
         {
@@ -364,6 +403,7 @@ namespace D.Core.API.Controllers.Survey
         /// <summary>
         /// Lấy danh sách báo cáo khảo sát (Paging)
         /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuReport)]
         [HttpGet("paging-report")]
         public async Task<ResponseAPI> PagingReport([FromQuery] FilterReportSurveyDto query)
         {
@@ -381,12 +421,68 @@ namespace D.Core.API.Controllers.Survey
         /// <summary>
         /// Lấy chi tiết báo cáo khảo sát theo Id
         /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuReport)]
         [HttpGet("get-report-by-id/{id}")]
         public async Task<IActionResult> GetReportDetail([FromRoute] int id)
         {
             try
             {
                 var result = await _mediator.Send(new GetReportDetailDto(id));
+                return Ok(new ResponseAPI(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseAPI(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Lấy dữ liệu khảo sát cho AI
+        /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonAIReportGenerate)]
+        [HttpGet("get-ai-analysis-data/{reportId}")]
+        public async Task<IActionResult> GetAIAnalysisData([FromRoute] int reportId)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetAIDataDto(reportId));
+                return Ok(new ResponseAPI(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseAPI(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Phân tích khảo sát với AI (Lấy data + Gọi Dify + Lưu kết quả)
+        /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyButtonAIReportGenerate)]
+        [HttpPost("analyze-survey-with-ai/{reportId}")]
+        public async Task<IActionResult> AnalyzeSurveyWithAI([FromRoute] int reportId)
+        {
+            try
+            {
+                var dto = new AnalyzeSurveyWithAIDto { ReportId = reportId };
+                var result = await _mediator.Send(dto);
+                return Ok(new ResponseAPI(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseAPI(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Lấy kết quả phân tích AI theo Report ID
+        /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuReport)]
+        [HttpGet("get-ai-by-id/{reportId}")]
+        public async Task<IActionResult> GetAIReportDetail([FromRoute] int reportId)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetAIReportDetailDto(reportId));
                 return Ok(new ResponseAPI(result));
             }
             catch (Exception ex)

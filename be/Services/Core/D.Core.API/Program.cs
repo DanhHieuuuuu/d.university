@@ -43,6 +43,7 @@ namespace D.Core.API
                 builder.Services.AddMediatRServices();
                 builder.ConfigureCors();
                 builder.ConfigureS3();
+                builder.Services.AddHttpClient();
 
                 var app = builder.Build();
 

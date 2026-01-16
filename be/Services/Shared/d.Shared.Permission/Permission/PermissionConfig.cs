@@ -65,6 +65,7 @@ namespace d.Shared.Permission.Permission
             // Report Management
             { PermissionCoreKeys.SurveyMenuReport, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyMenuReport, PermissionName = "Báo cáo khảo sát", ParentKey = PermissionCoreKeys.CoreMenuKhaoSat } },
             { PermissionCoreKeys.SurveyButtonReportGenerate, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonReportGenerate, PermissionName = "Tạo báo cáo", ParentKey = PermissionCoreKeys.SurveyMenuReport } },
+            { PermissionCoreKeys.SurveyButtonAIReportGenerate, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonAIReportGenerate, PermissionName = "Đánh giá bằng AI", ParentKey = PermissionCoreKeys.SurveyMenuReport } },
 
             #endregion
         };

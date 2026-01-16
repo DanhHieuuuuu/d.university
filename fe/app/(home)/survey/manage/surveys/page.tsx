@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getPagingSurvey, openSurveyAction, closeSurveyAction, getSurveyById, generateReportAction } from '@redux/feature/survey/surveyThunk';
 import { setSelectedSurvey, clearSelectedSurvey } from '@redux/feature/survey/surveySlice';
 import { IQuerySurvey, IViewSurvey, ISurveyDetail } from '@models/survey/survey.model';
-import { surveyStatusConst } from '../../const/surveyStatus.const';
+import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
 import AppTable from '@components/common/Table';
 import { IAction, IColumn } from '@models/common/table.model';
 import { formatDateTimeView } from '@utils/index';
@@ -15,6 +15,9 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import SurveyDetailModal from './(dialog)/detail';
 import { toast } from 'react-toastify';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { isGranted } from '@hooks/isGranted';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const { Option } = Select;
 
@@ -28,6 +31,10 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [selectedSurvey, setSelectedSurveyState] = useState<ISurveyDetail | null>(null);
+
+  const canOpenSurvey = isGranted(PermissionCoreConst.SurveyButtonSurveyOpen);
+  const canCloseSurvey = isGranted(PermissionCoreConst.SurveyButtonSurveyClose);
+  const canGenerateReport = isGranted(PermissionCoreConst.SurveyButtonReportGenerate);
 
   const columns: IColumn<IViewSurvey>[] = [
     {
@@ -124,7 +131,9 @@ const Page = () => {
           }
         });
       },
-      hidden: (record: IViewSurvey) => record.status !== surveyStatusConst.CLOSE
+      hidden: (record: IViewSurvey) => 
+        !canOpenSurvey ||
+        record.status !== surveyStatusConst.CLOSE
     },
     {
       label: 'Đóng khảo sát',
@@ -148,7 +157,9 @@ const Page = () => {
           }
         });
       },
-      hidden: (record: IViewSurvey) => record.status !== surveyStatusConst.OPEN
+      hidden: (record: IViewSurvey) => 
+        !canCloseSurvey ||
+        record.status !== surveyStatusConst.OPEN
     },
     {
       label: 'Tạo báo cáo',
@@ -172,6 +183,7 @@ const Page = () => {
         });
       },
       hidden: (record: IViewSurvey) =>
+        !canGenerateReport ||
         record.status !== surveyStatusConst.CLOSE && record.status !== surveyStatusConst.COMPLETE
     }
   ];
@@ -190,20 +202,20 @@ const Page = () => {
   return (
     <Card title="Quản lý khảo sát (Survey)" className="h-full">
       <Form form={form} layout="vertical" className='mb-4'>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Form.Item label="Tìm kiếm" name="Keyword" style={{marginBottom: 0}}>
+        <div className="grid grid-cols-3 gap-3">
+          <Form.Item name="Keyword">
             <Input placeholder="Mã/Tên khảo sát" onChange={(e) => handleDebouncedSearch(e.target.value)} prefix={<SearchOutlined />} />
           </Form.Item>
-          <Form.Item label="Trạng thái" name="status" style={{marginBottom: 0}}>
-            <Select placeholder="Tất cả trạng thái" allowClear onChange={(val) => onFilterChange({ status: val })}>
+          <Form.Item name="status">
+            <Select placeholder="Chọn trạng thái" allowClear onChange={(val) => onFilterChange({ status: val })}>
               {surveyStatusConst.list.map((s) => (
                 <Option key={s.value} value={s.value}>{s.name}</Option>
               ))}
             </Select>
           </Form.Item>
-          <div className="flex items-end">
-             <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); resetFilter(); }}>Tải lại</Button>
-          </div>
+          <Form.Item colon={false}>
+            <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); resetFilter(); }}>Tải lại</Button>
+          </Form.Item>
         </div>
       </Form>
 
@@ -228,4 +240,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.SurveyMenuManagement);

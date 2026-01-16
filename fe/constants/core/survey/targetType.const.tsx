@@ -1,4 +1,4 @@
-export class surveyStatusConst {
+export class surveyTargetConst {
   static ALL = 0;
   static STUDENT = 1;
   static LECTURER = 2;

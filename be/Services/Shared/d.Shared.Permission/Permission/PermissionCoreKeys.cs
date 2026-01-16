@@ -86,6 +86,7 @@
         // Report Management
         public const string SurveyMenuReport = $"{PermissionPrefixKeys.Menu}survey_report";
         public const string SurveyButtonReportGenerate = $"{PermissionPrefixKeys.Button}survey_report_generate";
+        public const string SurveyButtonAIReportGenerate = $"{PermissionPrefixKeys.Button}survey_ai_report_generate";
 
         #endregion
     }

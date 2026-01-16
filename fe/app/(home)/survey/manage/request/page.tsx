@@ -1,10 +1,10 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input, Tag, Select, Modal } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, CheckOutlined, CloseOutlined, EyeOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, Tag, Select, Modal, Dropdown, Space, MenuProps } from 'antd';
+import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, CheckOutlined, CloseOutlined, EyeOutlined, ExclamationCircleOutlined, DownOutlined, FileExcelOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getPagingRequest, approveRequestAction, rejectRequestAction, submitRequestAction, cancelSubmitRequestAction, removeRequest, getRequestById } from '@redux/feature/survey/surveyThunk';
+import { getPagingRequest, submitRequestAction, cancelSubmitRequestAction, removeRequest, getRequestById } from '@redux/feature/survey/surveyThunk';
 import { resetRequestStatus, setSelectedRequest, clearSelectedRequest } from '@redux/feature/survey/surveySlice';
 
 import { IQueryRequest, IViewRequest } from '@models/survey/request.model';
@@ -16,7 +16,11 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import CreateOrUpdateRequestModal from './(dialog)/create-or-update';
 import { toast } from 'react-toastify';
-import { requestStatusConst } from '../../const/requestStatus.const';
+import { requestStatusConst } from '@/constants/core/survey/requestStatus.const';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { isGranted } from '@hooks/isGranted';
+import { FileService } from '@services/file.service';
 
 const { Option } = Select;
 
@@ -30,6 +34,13 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequestState] = useState<IViewRequest | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
+
+  const canCreate = isGranted(PermissionCoreConst.SurveyButtonRequestCreate);
+  const canUpdate = isGranted(PermissionCoreConst.SurveyButtonRequestUpdate);
+  const canSubmit = isGranted(PermissionCoreConst.SurveyButtonRequestSubmit);
+  const canCancelSubmit = isGranted(PermissionCoreConst.SurveyButtonRequestCancelSubmit);
+  const canDelete = isGranted(PermissionCoreConst.SurveyButtonRequestDelete);
+
 
   const onClickAdd = () => {
     setSelectedRequestState(null);
@@ -122,7 +133,9 @@ const Page = () => {
           toast.error('Không thể tải chi tiết yêu cầu');
         }
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
+      hidden: (record: IViewRequest) => 
+        !canUpdate || 
+        (record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED)
     },
     {
       label: 'Gửi duyệt',
@@ -139,7 +152,9 @@ const Page = () => {
             toast.error('Gửi duyệt thất bại');
           });
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
+      hidden: (record: IViewRequest) => 
+        !canSubmit || 
+        (record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED)
     },
     {
       label: 'Hủy gửi duyệt',
@@ -156,64 +171,9 @@ const Page = () => {
             toast.error('Hủy gửi duyệt thất bại');
           });
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING // Chỉ cho phép khi chờ duyệt
-    },
-    {
-      label: 'Duyệt',
-      icon: <CheckOutlined />,
-      command: (record: IViewRequest) => {
-        dispatch(approveRequestAction(record.id))
-          .unwrap()
-          .then(() => {
-            toast.success('Duyệt yêu cầu thành công');
-            dispatch(getPagingRequest(query));
-          })
-          .catch((err) => {
-            console.error(err);
-            toast.error('Duyệt yêu cầu thất bại');
-          });
-      },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING // Chỉ cho phép khi chờ duyệt
-    },
-    {
-      label: 'Từ chối',
-      icon: <CloseOutlined />,
-      command: (record: IViewRequest) => {
-        let rejectReason = '';
-        Modal.confirm({
-          title: 'Từ chối yêu cầu khảo sát "' + record.tenKhaoSatYeuCau + '"',
-          icon: <ExclamationCircleOutlined />,
-          centered: true,
-          content: (
-            <div>
-              <Input.TextArea
-                rows={4}
-                placeholder="Nhập lý do từ chối..."
-                onChange={(e) => (rejectReason = e.target.value)}
-                style={{ marginTop: 12 }}
-              />
-            </div>
-          ),
-          okText: 'Từ chối',
-          okType: 'danger',
-          cancelText: 'Hủy',
-          onOk: async () => {
-            if (!rejectReason || !rejectReason.trim()) {
-              toast.error('Vui lòng nhập lý do từ chối');
-              return Promise.reject();
-            }
-            try {
-              await dispatch(rejectRequestAction({ id: record.id, reason: rejectReason })).unwrap();
-              toast.success('Từ chối yêu cầu thành công');
-              dispatch(getPagingRequest(query));
-            } catch (error: any) {
-              toast.error(error?.message || 'Từ chối yêu cầu thất bại');
-              return Promise.reject();
-            }
-          }
-        });
-      },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING
+      hidden: (record: IViewRequest) => 
+        !canCancelSubmit || 
+        record.trangThai !== requestStatusConst.PENDING
     },
     {
       label: 'Xóa',
@@ -246,7 +206,9 @@ const Page = () => {
           }
         });
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
+      hidden: (record: IViewRequest) => 
+        !canDelete || 
+        (record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED)
     }
   ];
 
@@ -276,22 +238,52 @@ const Page = () => {
     onFilterChange({ trangThai: value });
   };
 
+  const handleDownloadTemplate = async () => {
+    try {
+      const blob = await FileService.downloadFile('survey/fa86d703-cdef-4e8b-993a-683126300d4d.xlsx');
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'survey_template.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      console.error('Download error:', error);
+      toast.error(error?.message || 'Không thể tải xuống file mẫu');
+    }
+  };
+
+  const menuItems: MenuProps['items'] = [
+    {
+      key: 'download-template',
+      label: 'Tải mẫu Excel',
+      icon: <FileExcelOutlined />,
+      onClick: handleDownloadTemplate
+    }
+  ];
+
   return (
     <Card
       title="Danh sách yêu cầu khảo sát"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
+        canCreate ? (
+          <Space>
+            <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+              Thêm mới
+            </Button>           
+          </Space>
+        ) : null
       }
     >
-      <Form form={form} layout="horizontal" initialValues={{ trangThai: requestStatusConst.DRAFT }}>
-        <div className="grid grid-cols-3 gap-4">
-          <Form.Item<IQueryRequest> label="Tìm kiếm:" name="Keyword">
-            <Input placeholder="Mã yêu cầu/tên khảo sát" onChange={(e) => handleSearch(e)} />
+      <Form form={form} layout="vertical" initialValues={{ trangThai: requestStatusConst.DRAFT }}>
+        <div className="grid grid-cols-4 gap-3">
+          <Form.Item<IQueryRequest>  name="Keyword">
+            <Input placeholder="Nhập mã yêu cầu/tên khảo sát" onChange={(e) => handleSearch(e)} />
           </Form.Item>
-          <Form.Item label="Trạng thái:" name="trangThai">
+          <Form.Item  name="trangThai">
             <Select placeholder="Chọn trạng thái" allowClear onChange={handleStatusFilter}>
               {requestStatusConst.list.map((status) => (
                 <Option key={status.value} value={status.value}>
@@ -300,15 +292,8 @@ const Page = () => {
               ))}
             </Select>
           </Form.Item>
-        </div>
-        <Form.Item>
-          <div className="flex flex-row justify-center space-x-2">
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              Tìm kiếm
-            </Button>
+          <Form.Item colon={false}>
             <Button
-              color="default"
-              variant="filled"
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
@@ -317,8 +302,16 @@ const Page = () => {
             >
               Tải lại
             </Button>
-          </div>
-        </Form.Item>
+          </Form.Item>
+          <Form.Item colon={false} className="justify-self-end">
+            <Dropdown menu={{ items: menuItems }}>
+              <Button>
+                Chức năng <DownOutlined />
+              </Button>
+            </Dropdown>
+          </Form.Item>
+        </div>
+
       </Form>
 
       <AppTable
@@ -343,4 +336,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.SurveyMenuRequest);

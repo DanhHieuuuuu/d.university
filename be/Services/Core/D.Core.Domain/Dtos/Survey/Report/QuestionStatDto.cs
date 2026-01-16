@@ -11,6 +11,7 @@ namespace D.Core.Domain.Dtos.Survey.Report
         public int QuestionId { get; set; }
         public string Content { get; set; }
         public int Type { get; set; } // 1: Trắc nghiệm, 3: Tự luận
+        public bool BatBuoc { get; set; }
         public List<AnswerStatDto> Answers { get; set; } = new();
         public List<string> RecentTextResponses { get; set; } = new();
     }

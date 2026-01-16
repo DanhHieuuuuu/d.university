@@ -6,7 +6,7 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getPagingRequest, approveRequestAction, rejectRequestAction, getRequestById } from '@redux/feature/survey/surveyThunk';
 import { setSelectedRequest, clearSelectedRequest } from '@redux/feature/survey/surveySlice';
-
+import { requestStatusConst } from '@/constants/core/survey/requestStatus.const';
 import { IQueryRequest, IViewRequest } from '@models/survey/request.model';
 
 import AppTable from '@components/common/Table';
@@ -16,7 +16,11 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import CreateOrUpdateRequestModal from '../request/(dialog)/create-or-update';
 import { toast } from 'react-toastify';
-import { requestStatusConst } from '../../const/requestStatus.const';
+
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { isGranted } from '@hooks/isGranted';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+
 
 const { Option } = Select;
 
@@ -31,6 +35,9 @@ const Page = () => {
   const [selectedRequest, setSelectedRequestState] = useState<IViewRequest | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
 
+  const canApprove = isGranted(PermissionCoreConst.SurveyButtonRequestApprove);
+  const canReject = isGranted(PermissionCoreConst.SurveyButtonRequestReject);
+  
   const columns: IColumn<IViewRequest>[] = [
     {
       key: 'maYeuCau',
@@ -84,7 +91,7 @@ const Page = () => {
     }
   ];
 
-  // Actions for admin - only view, approve, reject
+  // Actions
   const actions: IAction[] = [
     {
       label: 'Xem chi tiết',
@@ -129,7 +136,9 @@ const Page = () => {
           }
         });
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING
+      hidden: (record: IViewRequest) => 
+        !canApprove || 
+        record.trangThai !== requestStatusConst.PENDING
     },
     {
       label: 'Từ chối',
@@ -170,7 +179,9 @@ const Page = () => {
           }
         });
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.PENDING
+      hidden: (record: IViewRequest) => 
+        !canReject || 
+        record.trangThai !== requestStatusConst.PENDING
     }
   ];
 
@@ -180,7 +191,6 @@ const Page = () => {
       PageIndex: 1,
       PageSize: 10,
       Keyword: '',
-      // No default status filter - show all requests
     },
     onQueryChange: (newQuery) => {
       dispatch(getPagingRequest(newQuery));
@@ -205,13 +215,13 @@ const Page = () => {
       title="Quản lý yêu cầu khảo sát"
       className="h-full"
     >
-      <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-3 gap-4">
-          <Form.Item<IQueryRequest> label="Tìm kiếm:" name="Keyword">
+      <Form form={form} layout="vertical">
+        <div className="grid grid-cols-3 gap-3">
+          <Form.Item<IQueryRequest> name="Keyword">
             <Input placeholder="Mã yêu cầu/tên khảo sát" onChange={(e) => handleSearch(e)} />
           </Form.Item>
-          <Form.Item label="Trạng thái:" name="trangThai">
-            <Select placeholder="Tất cả trạng thái" allowClear onChange={handleStatusFilter}>
+          <Form.Item name="trangThai">
+            <Select placeholder="Chọn trạng thái" allowClear onChange={handleStatusFilter}>
               {requestStatusConst.list.map((status) => (
                 <Option key={status.value} value={status.value}>
                   {status.name}
@@ -219,15 +229,8 @@ const Page = () => {
               ))}
             </Select>
           </Form.Item>
-        </div>
-        <Form.Item>
-          <div className="flex flex-row justify-center space-x-2">
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              Tìm kiếm
-            </Button>
+          <Form.Item colon={false}>
             <Button
-              color="default"
-              variant="filled"
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
@@ -236,8 +239,8 @@ const Page = () => {
             >
               Tải lại
             </Button>
-          </div>
-        </Form.Item>
+          </Form.Item>
+        </div>
       </Form>
 
       <AppTable
@@ -262,4 +265,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.SurveyMenuRequestApproval);

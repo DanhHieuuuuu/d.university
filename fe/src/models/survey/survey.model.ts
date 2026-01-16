@@ -60,6 +60,7 @@ export interface IMySurveyItem {
   status: number;
   statusName: string;
   maYeuCauGoc?: string;
+  thoiGianNop?: string | Date;
 }
 
 export interface IAnswerExam {
@@ -94,6 +95,24 @@ export interface IStartSurveyResponse {
 export interface ISubmitSurvey {
   submissionId: number;
   answers: ISavedAnswer[];
+}
+
+// AI Report Models
+export interface IAIReportDetail {
+  id: number;
+  idBaoCao: number;
+  idTieuChi: number;
+  diemCamXuc: number;
+  nhanCamXuc: string;
+  tomTatNoiDung: string;
+  xuHuong: string;
+  goiYCaiThien: string;
+  tenTieuChi: string;
+  weight: number;
+}
+
+export interface IAnalyzeWithAI {
+  reportId: number;
 }
 
 export interface ISurveyResult {

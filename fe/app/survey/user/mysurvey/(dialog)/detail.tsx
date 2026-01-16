@@ -14,7 +14,7 @@ interface SurveyDetailDialogProps {
   onClose: () => void;
 }
 
-const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
+const AUTO_SAVE_INTERVAL = 30000; // 30s
 
 const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogProps) => {
   const [form] = Form.useForm();
@@ -24,15 +24,14 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
   const [answers, setAnswers] = useState<Map<number, ISavedAnswer>>(new Map());
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingRef = useRef(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  // Load survey data when dialog opens
   useEffect(() => {
-    if (isOpen && surveyId) {
+    if (isOpen && surveyId && !loadingRef.current) {
       loadSurveyData();
     }
     return () => {
-      // Clear auto-save timer when dialog closes
       if (autoSaveTimerRef.current) {
         clearInterval(autoSaveTimerRef.current);
       }
@@ -40,7 +39,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
   }, [isOpen, surveyId]);
 
   const handleClose = async () => {
-    // Save draft before closing if there are answers
+    // Save draft before close
     if (surveyData && answers.size > 0) {
       try {
         const answersArray = Array.from(answers.values());
@@ -51,21 +50,18 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
         messageApi.success('Đã lưu bản nháp', 1);
       } catch (error) {
         console.error('Save on close error:', error);
-        // Don't block closing even if save fails
       }
     }
     onClose();
   };
 
-  // Set up auto-save
+  // Set auto-save
   useEffect(() => {
     if (surveyData && isOpen) {
-      // Clear existing timer
       if (autoSaveTimerRef.current) {
         clearInterval(autoSaveTimerRef.current);
       }
 
-      // Set up new timer
       autoSaveTimerRef.current = setInterval(() => {
         handleAutoSave();
       }, AUTO_SAVE_INTERVAL);
@@ -79,6 +75,9 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
   }, [surveyData, isOpen, answers]);
 
   const loadSurveyData = async () => {
+    if (loadingRef.current) return;
+    
+    loadingRef.current = true;
     setLoading(true);
     try {
       const response = await SurveyService.startSurvey(surveyId);
@@ -86,7 +85,6 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
         const data: IStartSurveyResponse = response.data;
         setSurveyData(data);
 
-        // Load saved answers if any
         if (data.savedAnswers && data.savedAnswers.length > 0) {
           const savedAnswersMap = new Map<number, ISavedAnswer>();
           data.savedAnswers.forEach((answer) => {
@@ -98,13 +96,13 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
           const formValues: any = {};
           data.savedAnswers.forEach((answer) => {
             if (answer.selectedAnswerId) {
-              // For single choice (type 1)
+              // Single choice (type 1)
               formValues[`question_${answer.questionId}`] = answer.selectedAnswerId;
             } else if (answer.selectedAnswerIds && Array.isArray(answer.selectedAnswerIds) && answer.selectedAnswerIds.length > 0) {
-              // For multiple choice (type 2) - ensure it's a valid array
+              // Multiple choice (type 2)
               formValues[`question_${answer.questionId}`] = answer.selectedAnswerIds;
             } else if (answer.textResponse) {
-              // For essay (type 3)
+              // Essay (type 3)
               formValues[`question_${answer.questionId}`] = answer.textResponse;
             }
           });
@@ -120,6 +118,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
       onClose();
     } finally {
       setLoading(false);
+      loadingRef.current = false;
     }
   };
 
@@ -151,7 +150,6 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
       messageApi.success('Đã tự động lưu bản nháp', 2);
     } catch (error) {
       console.error('Auto-save error:', error);
-      // Don't show error toast for auto-save failures to avoid annoying users
     }
   };
 
@@ -160,7 +158,6 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
   const handleSubmit = async () => {
     if (!surveyData) return;
 
-    // Validate all questions are answered
     const unansweredQuestions = surveyData.questions.filter(
       (q) => !answers.has(q.id)
     );
@@ -170,30 +167,34 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
       return;
     }
 
-    if (!confirm('Bạn có chắc chắn muốn nộp bài khảo sát? Sau khi nộp bạn không thể chỉnh sửa.')) {
-      return;
-    }
+    Modal.confirm({
+      title: 'Xác nhận nộp bài',
+      content: 'Bạn có chắc chắn muốn nộp bài khảo sát? Sau khi nộp bạn không thể chỉnh sửa.',
+      okText: 'Nộp bài',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        setSubmitting(true);
+        try {
+          const answersArray = Array.from(answers.values());
+          const response = await SurveyService.submitSurvey({
+            submissionId: surveyData.submissionId,
+            answers: answersArray
+          });
 
-    setSubmitting(true);
-    try {
-      const answersArray = Array.from(answers.values());
-      const response = await SurveyService.submitSurvey({
-        submissionId: surveyData.submissionId,
-        answers: answersArray
-      });
-
-      if (response.status === 1) {
-        toast.success('Nộp bài khảo sát thành công!');
-        onClose();
-      } else {
-        toast.error(response.message || 'Nộp bài thất bại');
+          if (response.status === 1) {
+            toast.success('Nộp bài khảo sát thành công!');
+            onClose();
+          } else {
+            toast.error(response.message || 'Nộp bài thất bại');
+          }
+        } catch (error) {
+          console.error('Submit error:', error);
+          toast.error('Nộp bài thất bại');
+        } finally {
+          setSubmitting(false);
+        }
       }
-    } catch (error) {
-      console.error('Submit error:', error);
-      toast.error('Nộp bài thất bại');
-    } finally {
-      setSubmitting(false);
-    }
+    });
   };
 
   const getProgress = () => {
@@ -303,7 +304,6 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
           </div>
         ) : surveyData ? (
           <div>
-            {/* Progress Bar */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Tiến độ hoàn thành</span>

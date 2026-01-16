@@ -204,26 +204,31 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Khảo sát',
     routerLink: '/survey',
+    permissionKeys: [PermissionCoreConst.CoreMenuKhaoSat],
     icon: <FormOutlined />,
     items: [
       {
         label: 'Danh sách yêu cầu',
         routerLink: '/survey/manage/request',
+        permissionKeys: [PermissionCoreConst.SurveyMenuRequest],
         icon: <InboxOutlined />,      
       },
       {
         label: 'Quản lý yêu cầu',
         routerLink: '/survey/manage/request-manage',
+        permissionKeys: [PermissionCoreConst.SurveyMenuRequestApproval],
         icon: <InboxOutlined />,      
       },
       {
         label: 'Danh sách khảo sát',
         routerLink: '/survey/manage/surveys',
+        permissionKeys: [PermissionCoreConst.SurveyMenuManagement],
         icon: <FileTextOutlined />
       },
       {
         label: 'Báo cáo khảo sát',
         routerLink: '/survey/manage/report',
+        permissionKeys: [PermissionCoreConst.SurveyMenuReport],
         icon: <BarChartOutlined />
       }
     ]

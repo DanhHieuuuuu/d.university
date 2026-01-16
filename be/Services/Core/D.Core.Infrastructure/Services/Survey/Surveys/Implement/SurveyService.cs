@@ -197,56 +197,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             };
 
             await _unitOfWork.iKsSurveyLogRepository.AddAsync(log);
-        }
-
-        //public async Task<PageResultDto<SurveyResponseDto>> GetMySurveysAsync(FilterMySurveyDto dto)
-        //{
-        //    _logger.LogInformation($"{nameof(GetMySurveysAsync)} method called, dto: {JsonSerializer.Serialize(dto)}.");
-
-        //    var userId = CommonUntil.GetCurrentUserId(_httpContextAccessor);
-
-        //    var user = await _unitOfWork.iNsNhanSuRepository.TableNoTracking.FirstOrDefaultAsync(u => u.Id == userId);
-        //    if (user == null) throw new Exception("Không tìm thấy thông tin người dùng.");
-
-        //    var query = _unitOfWork.iKsSurveyRepository.TableNoTracking
-        //        .Include(s => s.SurveyRequest)
-        //            .ThenInclude(r => r.Targets)
-        //        .Where(s => s.Status == SurveyStatus.Open);
-
-        //    if (!string.IsNullOrEmpty(dto.Keyword))
-        //    {
-        //        query = query.Where(s => s.TenKhaoSat.Contains(dto.Keyword) || s.MaKhaoSat.Contains(dto.Keyword));
-        //    }
-
-        //    var allOpenSurveys = await query.ToListAsync();
-
-        //    var validSurveys = allOpenSurveys.Where(s =>
-        //    {
-        //        var targets = s.SurveyRequest.Targets;
-        //        if (targets == null || !targets.Any()) return true; // Không target = All
-
-        //        foreach (var t in targets)
-        //        {
-        //            if (t.LoaiDoiTuong == SurveyTarget.All) return true;
-        //            if (t.LoaiDoiTuong == SurveyTarget.Lecturer)
-        //            {
-        //                bool matchPhongBan = (t.IdPhongBan == null) || (t.IdPhongBan == user.HienTaiPhongBan);
-        //                if (matchPhongBan) return true;
-        //            }
-        //            // TODO: Check Student
-        //        }
-        //        return false;
-        //    }).ToList();
-
-        //    var total = validSurveys.Count();
-        //    var items = validSurveys.Skip((dto.PageIndex - 1) * dto.PageSize).Take(dto.PageSize).ToList();
-
-        //    return new PageResultDto<SurveyResponseDto>
-        //    {
-        //        Items = _mapper.Map<List<SurveyResponseDto>>(items),
-        //        TotalItem = total,
-        //    };
-        //}
+        }  
 
         public async Task<PageResultDto<SurveyResponseDto>> GetMySurveysAsync(FilterMySurveyDto dto)
         {
@@ -320,9 +271,23 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                 .Take(dto.PageSize)
                 .ToListAsync();
 
+            var result = _mapper.Map<List<SurveyResponseDto>>(items);
+
+            foreach (var item in result)
+            {
+                var submission = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
+                    .Where(sub => sub.IdKhaoSat == item.Id && sub.IdNguoiDung == userId && sub.ThoiGianNop != null)
+                    .FirstOrDefaultAsync();
+                
+                if (submission != null)
+                {
+                    item.ThoiGianNop = submission.ThoiGianNop;
+                }
+            }
+
             return new PageResultDto<SurveyResponseDto>
             {
-                Items = _mapper.Map<List<SurveyResponseDto>>(items),
+                Items = result,
                 TotalItem = total,
             };
         }

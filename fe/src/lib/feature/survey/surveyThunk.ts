@@ -226,3 +226,39 @@ export const getReportDetail = createAsyncThunk('survey/get-report-detail', asyn
     return rejectWithValue(err);
   }
 });
+
+export const analyzeWithAI = createAsyncThunk(
+  'survey/analyze-with-ai',
+  async (reportId: number, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.analyzeWithAI(reportId);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const getAIReportDetail = createAsyncThunk(
+  'survey/get-ai-report-detail',
+  async (reportId: number, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.getAIReportDetail(reportId);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const importExcelQuestions = createAsyncThunk(
+  'survey/import-excel-questions',
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.importExcelQuestions(file);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data || 'Import Excel thất bại');
+    }
+  }
+);

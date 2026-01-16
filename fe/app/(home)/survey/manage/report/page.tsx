@@ -1,10 +1,10 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag, Select } from 'antd';
-import { SearchOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
+import { SearchOutlined, SyncOutlined, EyeOutlined, RobotOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getPagingReport, generateReportAction, getReportDetail } from '@redux/feature/survey/surveyThunk';
+import { getPagingReport, generateReportAction, getReportDetail, analyzeWithAI } from '@redux/feature/survey/surveyThunk';
 import { resetReportStatus, setSelectedSurvey } from '@redux/feature/survey/surveySlice';
 
 import { IQueryReport, IReportItem, IReportDetail } from '@models/survey/report.model';
@@ -15,6 +15,9 @@ import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { toast } from 'react-toastify';
 import ReportDetailModal from './(dialog)/detail';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { isGranted } from '@hooks/isGranted';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -25,6 +28,8 @@ const Page = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<IReportDetail | null>(null);
+
+  const canGenerateAIReport = isGranted(PermissionCoreConst.SurveyButtonAIReportGenerate);
 
   const columns: IColumn<IReportItem>[] = [
     // {
@@ -73,6 +78,20 @@ const Page = () => {
           toast.error('Không thể tải chi tiết báo cáo');
         }
       }
+    },
+    {
+      label: 'Phân tích AI',
+      icon: <RobotOutlined />,
+      command: async (record: IReportItem) => {
+        try {
+          await dispatch(analyzeWithAI(record.reportId)).unwrap();
+          toast.success('Phân tích AI thành công!');
+        } catch (error: any) {
+          console.error('Lỗi phân tích AI:', error);
+          toast.error('Không thể phân tích với AI');
+        }
+      },
+      hidden: (record: IReportItem) => !canGenerateAIReport
     }
   ];
 
@@ -100,20 +119,13 @@ const Page = () => {
 
   return (
     <Card title="Danh sách báo cáo khảo sát" className="h-full">
-      <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-2 gap-4">
-          <Form.Item<IQueryReport> label="Tìm kiếm:" name="Keyword">
+      <Form form={form} layout="vertical">
+        <div className="grid grid-cols-2 gap-3">
+          <Form.Item<IQueryReport> name="Keyword">
             <Input placeholder="Nhập tên khảo sát" onChange={(e) => handleSearch(e)} />
           </Form.Item>
-        </div>
-        <Form.Item>
-          <div className="flex flex-row justify-center space-x-2">
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              Tìm kiếm
-            </Button>
+          <Form.Item colon={false}>
             <Button
-              color="default"
-              variant="filled"
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
@@ -122,8 +134,8 @@ const Page = () => {
             >
               Tải lại
             </Button>
-          </div>
-        </Form.Item>
+          </Form.Item>
+        </div>
       </Form>
 
       <AppTable
@@ -147,4 +159,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.SurveyMenuReport);
