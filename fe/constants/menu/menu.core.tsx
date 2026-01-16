@@ -135,26 +135,31 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Đoàn vào',
     routerLink: '/delegation/incoming',
+    permissionKeys: [PermissionCoreConst.CoreMenuDelegation],
     icon: <DelegationIcon />,
     items: [
       {
         label: 'Danh sách đoàn vào',
         routerLink: '/delegation/incoming/list-delegation',
+        permissionKeys: [PermissionCoreConst.CoreMenuListDoanVao],
         icon: <SuggestIcon />
       },
       {
         label: 'Xử lý đoàn vào',
         routerLink: '/delegation/incoming/process',
+        permissionKeys: [PermissionCoreConst.CoreMenuXuLyDoanVao],
         icon: <HourglassOutlined />
       },
       {
         label: 'Phòng ban hỗ trợ',
         routerLink: '/delegation/incoming/support',
+        permissionKeys: [PermissionCoreConst.CoreMenuDepartment],
         icon: <TeamOutlined />
       },
       {
         label: 'Nhật ký đoàn vào',
         routerLink: '/delegation/incoming/diary',
+        permissionKeys: [PermissionCoreConst.CoreMenuLog],
         icon: <HistoryOutlined />
       }
     ]

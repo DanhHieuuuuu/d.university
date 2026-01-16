@@ -14,7 +14,28 @@ export class PermissionCoreConst {
   public static readonly CoreButtonDeleteNhanSu = `${PermissionCoreConst.Button}hrm_delete_nhansu`;
 
   // Đoàn vào / ra
-  public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}delegation`;
+  public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}dio`;
+
+  public static readonly CoreMenuListDoanVao = `${PermissionCoreConst.Menu}dio_danhsach`;
+  public static readonly CoreButtonCreateDoanVao = `${PermissionCoreConst.Button}dio_danhsach_create`;
+  public static readonly CoreButtonUpdateDoanVao = `${PermissionCoreConst.Button}dio_danhsach_update`;
+  public static readonly CoreButtonDeleteDoanVao = `${PermissionCoreConst.Button}dio_danhsach_delete`;
+  public static readonly CoreButtonViewDoanVao = `${PermissionCoreConst.Button}dio_danhsach_view`;
+
+  public static readonly CoreMenuXuLyDoanVao = `${PermissionCoreConst.Menu}dio_xuly`;
+  public static readonly CoreButtonCreateXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_create`;
+  public static readonly CoreButtonUpdateXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_update`;
+  public static readonly CoreButtonDeleteXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_delete`;
+  public static readonly CoreButtonViewXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_view`;
+
+  public static readonly CoreMenuDepartment = `${PermissionCoreConst.Menu}dio_department`;
+  public static readonly CoreButtonCreateDepartment = `${PermissionCoreConst.Button}dio_department_create`;
+  public static readonly CoreButtonUpdateDepartment = `${PermissionCoreConst.Button}dio_department_update`;
+  public static readonly CoreButtonDeleteDepartment = `${PermissionCoreConst.Button}dio_department_delete`;
+  public static readonly CoreButtonViewDepartment = `${PermissionCoreConst.Button}dio_department_view`;
+
+  public static readonly CoreMenuLog = `${PermissionCoreConst.Menu}dio_log`;
+  public static readonly CoreTableLog = `${PermissionCoreConst.Table}dio_log_table`;
 
   // Admin
   public static readonly UserMenuAdmin = `${PermissionCoreConst.Menu}admin_permission`;

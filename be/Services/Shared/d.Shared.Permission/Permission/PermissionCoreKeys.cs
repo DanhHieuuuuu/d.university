@@ -34,7 +34,31 @@
         #endregion
 
         #region Delegation - Đoàn vào / Đoàn ra
-        public const string CoreMenuDelegation = $"{PermissionPrefixKeys.Menu}delegation";
+        public const string CoreMenuDelegation = $"{PermissionPrefixKeys.Menu}dio";
+
+        public const string CoreMenuListDoanVao = $"{PermissionPrefixKeys.Menu}dio_danhsach";
+        public const string CoreButtonCreateDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_create";
+        public const string CoreButtonUpdateDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_update";
+        public const string CoreButtonDeleteDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_delete";
+        public const string CoreButtonViewDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_view";
+
+        public const string CoreMenuXuLyDoanVao = $"{PermissionPrefixKeys.Menu}dio_xuly";
+        public const string CoreButtonCreateXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_create";
+        public const string CoreButtonUpdateXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_update";
+        public const string CoreButtonDeleteXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_delete";
+        public const string CoreButtonViewXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_view";
+              
+        public const string CoreMenuDepartment = $"{PermissionPrefixKeys.Menu}dio_department";
+        public const string CoreButtonCreateDepartment = $"{PermissionPrefixKeys.Button}dio_department_create";
+        public const string CoreButtonUpdateDepartment = $"{PermissionPrefixKeys.Button}dio_department_update";
+        public const string CoreButtonDeleteDepartment = $"{PermissionPrefixKeys.Button}dio_department_delete";
+        public const string CoreButtonViewDepartment = $"{PermissionPrefixKeys.Button}dio_department_view";
+
+        public const string CoreMenuLog = $"{PermissionPrefixKeys.Menu}dio_log";
+        public const string CoreTableLog = $"{PermissionPrefixKeys.Table}dio_log_table";
+
+
+
         #endregion
 
         #region Survey - Khảo sát
