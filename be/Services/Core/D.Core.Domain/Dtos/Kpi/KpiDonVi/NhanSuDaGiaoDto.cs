@@ -8,6 +8,6 @@ namespace D.Core.Domain.Dtos.Kpi.KpiDonVi
         public string? HoTen { get; set; }
         public string? TrongSo { get; set; }
         public int? IdKpiDonVi { get; set; }
-        public float? TyLeThamGia { get; set; }
+        //public float? TyLeThamGia { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace D.Core.Domain.Entities.Survey
         public int? IdDapAnChon { get; set; }
 
         [Column("TextResponse")]
-        [Description("Nội dung trả lời tự luận (hoặc ý kiến khác)")]
+        [Description("Nội dung trả lời tự luận")]
         public string? CauTraLoiText { get; set; }
 
         [ForeignKey(nameof(IdPhienLamBai))]

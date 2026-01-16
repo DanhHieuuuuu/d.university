@@ -1,4 +1,5 @@
-import { LoaiCongThuc } from '@/app/(home)/kpi/const/loaiCongThuc.enum';
+
+import { LoaiCongThuc } from '@/constants/kpi/loaiCongThuc.enum';
 import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryKpiDonVi = IQueryPaging & {
@@ -26,6 +27,8 @@ export type IViewKpiDonVi = {
   loaiKetQua?: LoaiCongThuc;
   ghiChu?: string;
   congThuc?:string;
+  idCongThuc?: number;
+  
 };
 
 export type ICreateKpiDonVi = {
@@ -37,6 +40,9 @@ export type ICreateKpiDonVi = {
   idDonVi: number,
   namHoc: string,
   idKpiTruong?: number,
+  idCongThuc: number,
+  congThucTinh?: string,
+  loaiKetQua?: LoaiCongThuc;
 };
 
 export type IUpdateTrangThaiKpiDonVi = {
@@ -83,4 +89,33 @@ export interface IViewNhanSu {
   hienTaiPhongBan?: number,
   maNhanSu?: string,
   tenHienThi?: string,
+}
+
+export interface IKpiDonViLoaiSummary {
+  loaiKpi: number;
+  tuDanhGia: number;
+  capTren: number;
+}
+
+export interface IKpiDonViSummary {
+  tongTuDanhGia: number;
+  tongCapTren: number;
+  byLoaiKpi: IKpiDonViLoaiSummary[];
+}
+
+
+export interface IGiaoKpiDonVi {
+  idKpiDonVi: number;
+  nhanSus: {
+    idNhanSu: number;
+    trongSo?: string;
+  }[];
+}
+
+export interface NhanSuDaGiaoDto {
+  id?: number;
+  idNhanSu: number;
+  hoTen?: string;
+  trongSo?: string;
+  idKpiDonVi?: number;
 }

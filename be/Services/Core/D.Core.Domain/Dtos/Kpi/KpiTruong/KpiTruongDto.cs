@@ -20,5 +20,8 @@ namespace D.Core.Domain.Dtos.Kpi.KpiTruong
         public decimal? CapTrenDanhGia { get; set; }
         public decimal? DiemKpi { get; set; }
         public int? IsActive { get; set; }
+        public string? GhiChu { get; set; }
+        public string? CongThuc { get; set; }
+        public int? IdCongThuc { get; set; }
     }
 }

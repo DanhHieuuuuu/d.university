@@ -25,5 +25,11 @@ namespace D.Core.Domain.Entities.Kpi
         [Description("Lý do")]
         [MaxLength(255)]
         public string? Reason { get; set; }
+        [Description("Loại KPI")]
+        public int? CapKpi { get; set; }
+        [Description("Tên người thực hiện")]
+        [MaxLength(255)]
+        public string CreatedByName { get; set; } = string.Empty;
+
     }
 }

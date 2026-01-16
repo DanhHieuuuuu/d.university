@@ -27,13 +27,6 @@ const Page = () => {
   const [selectedReport, setSelectedReport] = useState<IReportDetail | null>(null);
 
   const columns: IColumn<IReportItem>[] = [
-    {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      showOnConfig: false,
-      render: (text, record, index) => index + 1
-    },
     // {
     //   key: 'surveyId',
     //   dataIndex: 'surveyId',

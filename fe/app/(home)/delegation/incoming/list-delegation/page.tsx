@@ -16,7 +16,6 @@ import {
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansu/nhansuSlice';
 import AppTable from '@components/common/Table';
 import { IAction, IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
@@ -33,9 +32,9 @@ import {
   getListStatus,
   updateStatus
 } from '@redux/feature/delegation/delegationThunk';
-import { select } from '@redux/feature/delegation/delegationSlice';
+import { resetStatusCreate, select } from '@redux/feature/delegation/delegationSlice';
 import { ETableColumnType } from '@/constants/e-table.consts';
-import { DelegationStatusConst } from '../../consts/delegation-status.consts';
+import { DelegationStatusConst } from '../../../../../constants/core/delegation/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
@@ -55,15 +54,6 @@ const Page = () => {
   const [voiceData, setVoiceData] = useState<IViewGuestGroup[] | null>(null);
 
   const columns: IColumn<IViewGuestGroup>[] = [
-    {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      align: 'center',
-      width: 60,
-      fixed: 'left',
-      render: (value, row, index) => index + 1
-    },
     {
       key: 'code',
       dataIndex: 'code',
@@ -343,6 +333,7 @@ const Page = () => {
         dataSource={voiceData?.length ? voiceData : list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+        height={450}
       />
 
       <CreateDoanVaoModal

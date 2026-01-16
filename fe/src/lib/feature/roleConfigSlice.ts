@@ -1,79 +1,136 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ReduxStatus } from '@redux/const';
 import { CRUD } from '@models/common/common';
-import { ICreateRole, IQueryRole, IRole, IRoleDetail, IUpdateRole, IUpdateRolePermission } from '@models/role';
+import {
+  ICreateRole,
+  IQueryRole,
+  IRole,
+  IRoleDetail,
+  IUpdateRole,
+  IUpdateRolePermission,
+  IUpdateRoleStatus
+} from '@models/role';
 import { RoleService } from '@services/role.service';
 import { IPermissionTree } from '@models/permission';
 
-export const getListRole = createAsyncThunk('role-config/list', async (args: IQueryRole) => {
+export const getListRole = createAsyncThunk('role-config/list', async (args: IQueryRole, { rejectWithValue }) => {
   try {
     const res = await RoleService.findPaging(args);
 
     return res.data;
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 
-export const getDetailRole = createAsyncThunk('role-config/detail', async (args: number) => {
+export const getDetailRole = createAsyncThunk('role-config/detail', async (args: number, { rejectWithValue }) => {
   try {
     const res = await RoleService.findById(args);
 
     return res.data;
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 
-export const createRole = createAsyncThunk('role-config/create', async (args: ICreateRole) => {
+export const createRole = createAsyncThunk('role-config/create', async (args: ICreateRole, { rejectWithValue }) => {
   try {
     const res = await RoleService.create(args);
 
     return res.data;
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 
-export const updateRole = createAsyncThunk('role-config/update', async (args: IUpdateRole) => {
+export const updateRole = createAsyncThunk('role-config/update', async (args: IUpdateRole, { rejectWithValue }) => {
   try {
     const res = await RoleService.update(args);
 
     return res.data;
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 
-export const deleteRole = createAsyncThunk('role-config/delete', async (args: number) => {
+export const updateRoleStatusThunk = createAsyncThunk(
+  'role-config/update-status',
+  async (args: { id: number; status: number }, { rejectWithValue }) => {
+    try {
+      const req: IUpdateRoleStatus = {
+        id: args.id,
+        status: args.status
+      };
+      const res = await RoleService.updateStatus(req);
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);
+
+export const deleteRole = createAsyncThunk('role-config/delete', async (args: number, { rejectWithValue }) => {
   try {
     const res = await RoleService.deleteRole(args);
 
     return res.data;
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 
-export const getListPermissionTree = createAsyncThunk('role-config/permission-tree', async () => {
+export const getListPermissionTree = createAsyncThunk('role-config/permission-tree', async (_, { rejectWithValue }) => {
   try {
     const res = await RoleService.getPermissionTree();
 
     return res.data;
   } catch (error: any) {
-    console.error(error);
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
   }
 });
 
 export const updateRolePermisison = createAsyncThunk(
   'role-config/permission-update',
-  async (args: IUpdateRolePermission) => {
+  async (args: IUpdateRolePermission, { rejectWithValue }) => {
     try {
       const res = await RoleService.updatePermission(args);
 
       return res.data;
     } catch (error: any) {
-      console.error(error);
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
     }
   }
 );
@@ -89,6 +146,9 @@ interface RoleConfigState {
   $updateRolePermission: {
     status: ReduxStatus;
   };
+  $updateRoleStatus: {
+    status: ReduxStatus;
+  };
 }
 
 const initialState: RoleConfigState = {
@@ -102,6 +162,9 @@ const initialState: RoleConfigState = {
   selected: { status: ReduxStatus.IDLE, id: null, data: null },
   permissionTree: [],
   $updateRolePermission: {
+    status: ReduxStatus.IDLE
+  },
+  $updateRoleStatus: {
     status: ReduxStatus.IDLE
   }
 };
@@ -121,6 +184,7 @@ const roleConfigSlice = createSlice({
       state.roleGroup.$update.status = ReduxStatus.IDLE;
       state.roleGroup.$delete.status = ReduxStatus.IDLE;
       state.$updateRolePermission.status = ReduxStatus.IDLE;
+      state.$updateRoleStatus.status = ReduxStatus.IDLE;
     }
   },
   extraReducers: (builder) => {
@@ -153,6 +217,21 @@ const roleConfigSlice = createSlice({
       })
       .addCase(updateRole.rejected, (state) => {
         state.roleGroup.$update.status = ReduxStatus.FAILURE;
+      })
+      .addCase(updateRoleStatusThunk.pending, (state) => {
+        state.$updateRoleStatus.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateRoleStatusThunk.fulfilled, (state, action) => {
+        state.$updateRoleStatus.status = ReduxStatus.SUCCESS;
+
+        const updated = action.meta.arg;
+        const index = state.roleGroup.$list.data.findIndex((x) => x.id === updated.id);
+        if (index !== -1) {
+          state.roleGroup.$list.data[index].status = updated.status;
+        }
+      })
+      .addCase(updateRoleStatusThunk.rejected, (state) => {
+        state.$updateRoleStatus.status = ReduxStatus.FAILURE;
       })
       .addCase(deleteRole.pending, (state) => {
         state.roleGroup.$delete.status = ReduxStatus.LOADING;

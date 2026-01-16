@@ -3825,16 +3825,14 @@ namespace D.Core.Domain.Migrations
                     b.Property<int?>("IdCongThuc")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdKpiDonVi")
+                    b.Property<int?>("IdKpiDonVi")
                         .HasColumnType("int");
 
                     b.Property<int>("IdNhanSu")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsCaNhanKeKhai")
-                        .HasColumnType("bit");
-
                     b.Property<string>("KPI")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -3867,9 +3865,6 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("STT")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Status")
                         .HasColumnType("int");
 
@@ -3883,6 +3878,52 @@ namespace D.Core.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("KpiCaNhan", "kpi");
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiCongThuc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenCongThuc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("isActive")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiCongThuc", "kpi");
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.Kpi.KpiDonVi", b =>
@@ -3939,13 +3980,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<int?>("IdKpiTruong")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsKeKhai")
-                        .HasColumnType("bit");
-
                     b.Property<decimal?>("KetQuaThucTe")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Kpi")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -3990,7 +4029,15 @@ namespace D.Core.Domain.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CapKpi")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("CreatedByName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -4203,13 +4250,11 @@ namespace D.Core.Domain.Migrations
                     b.Property<int?>("IdCongThuc")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsKeKhai")
-                        .HasColumnType("bit");
-
                     b.Property<decimal?>("KetQuaThucTe")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Kpi")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -4475,12 +4520,6 @@ namespace D.Core.Domain.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("bit")
                         .HasColumnName("IsCorrect");
-
-                    b.Property<string>("MoTa")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("Description");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)
@@ -4786,12 +4825,6 @@ namespace D.Core.Domain.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("QuestionCode");
-
-                    b.Property<string>("MoTa")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)")
-                        .HasColumnName("Description");
 
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(255)

@@ -12,6 +12,5 @@ namespace D.Core.Domain.Dtos.Survey.Request
         public int Value { get; set; }
         public int ThuTu { get; set; }
         public bool IsCorrect { get; set; }
-        public string MoTa { get; set; }
      }
 }

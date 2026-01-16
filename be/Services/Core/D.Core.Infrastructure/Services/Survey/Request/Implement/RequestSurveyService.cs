@@ -106,14 +106,20 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-            var entity = await _unitOfWork.iKsSurveyRequestRepository.GetDetailWithNavigationsAsync(dto.Id);
+            var entity = await _unitOfWork.iKsSurveyRequestRepository.GetDetailWithNavigationsForUpdateAsync(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
             if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)
                 throw new Exception("Chỉ được chỉnh sửa khi phiếu ở trạng thái Nháp hoặc bị Từ chối.");
 
             string changeDesc = $"Cập nhật thông tin phiếu {entity.MaYeuCau}";
 
-            _mapper.Map(dto, entity);
+            // Map only scalar properties, not collections (to avoid tracking conflicts)
+            entity.MaYeuCau = dto.MaYeuCau;
+            entity.TenKhaoSatYeuCau = dto.TenKhaoSatYeuCau;
+            entity.MoTa = dto.MoTa;
+            entity.ThoiGianBatDau = dto.ThoiGianBatDau;
+            entity.ThoiGianKetThuc = dto.ThoiGianKetThuc;
+            entity.IdPhongBan = dto.IdPhongBan;
 
             var oldTargets = entity.Targets.ToList();
             foreach (var item in oldTargets)

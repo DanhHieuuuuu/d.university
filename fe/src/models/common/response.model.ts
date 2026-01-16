@@ -1,10 +1,11 @@
 import { EStatusResonse } from './common';
 
-export interface IResponseList<Item> {
+export interface IResponseList<Item, Summary = any> {
   code: number;
   data: {
     items: Item[];
     totalItem: number;
+    summary?: Summary;
   };
   message: string;
   status: EStatusResonse;

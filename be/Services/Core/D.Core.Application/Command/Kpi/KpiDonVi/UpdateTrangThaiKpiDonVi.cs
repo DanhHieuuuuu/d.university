@@ -15,7 +15,7 @@ namespace D.Core.Application.Command.Kpi.KpiDonVi
 
         public async Task Handle(UpdateTrangThaiKpiDonViDto request, CancellationToken cancellationToken)
         {
-            _service.UpdateTrangThaiKpiDonVi(request);
+            await _service.UpdateTrangThaiKpiDonVi(request);
             return;
         }
     }

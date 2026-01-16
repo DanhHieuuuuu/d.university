@@ -31,11 +31,21 @@ namespace D.Core.Infrastructure.Repositories.Survey
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<KsSurveyRequest> GetDetailWithNavigationsForUpdateAsync(int id)
+        {
+            return await Table
+                .Include(x => x.Targets.Where(t => t.Deleted == false))
+                .Include(x => x.Criterias.Where(c => c.Deleted == false))
+                .Include(x => x.Questions.Where(q => q.Deleted == false).OrderBy(q => q.ThuTu))
+                .ThenInclude(q => q.Answers.Where(a => a.Deleted == false).OrderBy(a => a.ThuTu))
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
         public async Task<List<KsSurveyQuestion>> GetQuestionsByRequestIdAsync(int requestId)
         {
             return await _dbContext.Set<KsSurveyQuestion>()
                 .Include(q => q.Answers)
-                .Where(q => q.IdYeuCau == requestId) // Lưu ý: Check tên cột FK trong DB (IdRequest hay SurveyRequestId?)
+                .Where(q => q.IdYeuCau == requestId)
                 .OrderBy(q => q.Id)
                 .AsNoTracking()
                 .ToListAsync();
@@ -50,7 +60,8 @@ namespace D.Core.Infrastructure.Repositories.Survey
                         select new CorrectAnswerDto
                         {
                             QuestionId = q.Id,
-                            AnswerId = a.Id
+                            AnswerId = a.Id,
+                            Value = a.Value
                         };
             return await query.ToListAsync();
         }
@@ -61,6 +72,7 @@ namespace D.Core.Infrastructure.Repositories.Survey
     {
         bool IsMaYeuCauExist(string code);
         Task<KsSurveyRequest> GetDetailWithNavigationsAsync(int id);
+        Task<KsSurveyRequest> GetDetailWithNavigationsForUpdateAsync(int id);
         Task<List<KsSurveyQuestion>> GetQuestionsByRequestIdAsync(int requestId);
         Task<List<CorrectAnswerDto>> GetCorrectAnswersAsync(int requestId);
     }

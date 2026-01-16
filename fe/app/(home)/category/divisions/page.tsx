@@ -72,12 +72,6 @@ const Page = () => {
 
   const columns: IColumn<IViewToBoMon>[] = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
-    },
-    {
       key: 'maBoMon',
       dataIndex: 'maBoMon',
       title: 'Mã bộ môn'

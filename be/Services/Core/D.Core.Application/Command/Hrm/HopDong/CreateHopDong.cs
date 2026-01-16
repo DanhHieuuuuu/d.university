@@ -6,9 +6,9 @@ namespace D.Core.Application.Command.Hrm.HopDong
 {
     public class CreateHopDong : ICommandHandler<CreateHopDongDto>
     {
-        public INsContractService _nsContractService { get; set; }
+        public INsHopDongService _nsContractService { get; set; }
 
-        public CreateHopDong(INsContractService nsContractService)
+        public CreateHopDong(INsHopDongService nsContractService)
         {
             _nsContractService = nsContractService;
         }

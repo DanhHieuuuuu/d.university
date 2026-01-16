@@ -3,7 +3,6 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Select } from 'antd';
 import {
-  DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
@@ -14,8 +13,8 @@ import { useNavigate } from '@hooks/navigate';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansu/nhansuSlice';
-import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/nhansu/nhansuThunk';
+import { resetStatusCreate, resetStatusUpdate, selectIdNhanSu } from '@redux/feature/hrm/nhansu/nhansuSlice';
+import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
@@ -40,13 +39,6 @@ const Page = () => {
   const [isView, setIsModalView] = useState<boolean>(false);
 
   const columns: IColumn<IViewNhanSu>[] = [
-    {
-      key: 'idNhanSu',
-      dataIndex: 'idNhanSu',
-      title: 'ID',
-      align: 'center',
-      showOnConfig: false
-    },
     {
       key: 'maNhanSu',
       dataIndex: 'maNhanSu',
@@ -102,16 +94,16 @@ const Page = () => {
     },
     {
       label: 'Sửa',
-      tooltip: 'Sửa thông tin nhân viên',
+      tooltip: 'Sửa thông tin nhân sự',
       icon: <EditOutlined />,
       command: (record: IViewNhanSu) => onClickUpdate(record)
     },
-    {
-      label: 'Xóa',
-      color: 'red',
-      icon: <DeleteOutlined />,
-      command: (record: IViewNhanSu) => console.log('delete', record)
-    }
+    // {
+    //   label: 'Xóa',
+    //   color: 'red',
+    //   icon: <DeleteOutlined />,
+    //   command: (record: IViewNhanSu) => console.log('delete', record)
+    // }
   ];
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryNhanSu>({
@@ -130,6 +122,7 @@ const Page = () => {
   useEffect(() => {
     if (!isModalOpen) {
       dispatch(resetStatusCreate());
+      dispatch(resetStatusUpdate());
       dispatch(getListNhanSu(query));
     }
   }, [isModalOpen]);
@@ -149,13 +142,13 @@ const Page = () => {
   };
 
   const onClickView = (data: IViewNhanSu) => {
-    dispatch(selectMaNhanSu(data.idNhanSu));
+    dispatch(selectIdNhanSu(data.idNhanSu));
     dispatch(getHoSoNhanSu(data.idNhanSu));
     navigateTo(`/hrm/employees/${data.idNhanSu}`);
   };
 
   const onClickUpdate = (data: IViewNhanSu) => {
-    dispatch(selectMaNhanSu(data.idNhanSu));
+    dispatch(selectIdNhanSu(data.idNhanSu));
     dispatch(getHoSoNhanSu(data.idNhanSu));
     setIsModalView(false);
     setIsModalUpdate(true);

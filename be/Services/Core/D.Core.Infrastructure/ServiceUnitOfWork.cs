@@ -1,4 +1,5 @@
-﻿using D.Core.Infrastructure.Repositories.DaoTao;
+﻿using D.Core.Domain.Entities.Kpi;
+using D.Core.Infrastructure.Repositories.DaoTao;
 using D.Core.Infrastructure.Repositories.Delegation.Incoming;
 using D.Core.Infrastructure.Repositories.File;
 using D.Core.Infrastructure.Repositories.Hrm;
@@ -68,8 +69,8 @@ namespace D.Core.Infrastructure
         private KpiCaNhanRepository _kpiCaNhanRepository;
         private KpiDonViRepository _kpiDonViRepository;
         private KpiLogStatusRepository _kpiLogStatusRepository;
-        private KpiTemplateRepository _kpiTemplateRepository;
         private KpiTruongRepository _kpiTruongRepository;
+        private KpiCongThucRepository _kpiCongThucRepository;
         #endregion
         #region Sysvar
         private SysvarRepository _sysVarRepository;
@@ -562,15 +563,15 @@ namespace D.Core.Infrastructure
                 return _kpiLogStatusRepository;
             }
         }
-        public IKpiTemplateRepository iKpiTemplateRepository
+        public IKpiCongThucRepository iKpiCongThucRepository
         {
             get
             {
-                if (_kpiTemplateRepository == null)
+                if (_kpiCongThucRepository == null)
                 {
-                    _kpiTemplateRepository = new KpiTemplateRepository(_dbContext, _httpContext);
+                    _kpiCongThucRepository = new KpiCongThucRepository(_dbContext, _httpContext);
                 }
-                return _kpiTemplateRepository;
+                return _kpiCongThucRepository;
             }
         }
         public IKpiTruongRepository iKpiTruongRepository

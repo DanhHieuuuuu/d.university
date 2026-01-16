@@ -8,7 +8,6 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
     {
         public int Id { get; set; }
         public string? KPI { get; set; }
-        public int STT { get; set; }
         public string? LinhVuc { get; set; }
         public string? MucTieu { get; set; }
         public string? ChienLuoc { get; set; }
@@ -31,6 +30,7 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
         public int? IsActive { get; set; }
         public bool? IsCaNhanKeKhai { get; set; }
         public string? GhiChu { get; set; }
-        public decimal? TongDiem { get; set; }
+        public decimal? TongDiemTichHop { get; set; }
+        public int? IdPhongBan { get; set; }
     }
 }

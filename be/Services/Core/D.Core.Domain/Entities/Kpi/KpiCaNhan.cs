@@ -8,10 +8,9 @@ namespace D.Core.Domain.Entities.Kpi
     [Table(nameof(KpiCaNhan), Schema = DbSchema.Kpi)]
     public class KpiCaNhan : EntityBase
     {
-        public int STT { get; set; }
 
         [MaxLength(500)]
-        public string? KPI { get; set; }
+        public string KPI { get; set; }
         public string? LinhVuc { get; set; }
         public string? ChienLuoc { get; set; }
 
@@ -25,7 +24,7 @@ namespace D.Core.Domain.Entities.Kpi
 
         public int IdNhanSu { get; set; }
 
-        public int IdKpiDonVi { get; set; }
+        public int? IdKpiDonVi { get; set; }
 
         public string? Role { get; set; }
 
@@ -39,7 +38,6 @@ namespace D.Core.Domain.Entities.Kpi
         public string? LoaiKetQua { get; set; }
         public int? IdCongThuc { get; set; }
         public decimal? DiemKpi { get; set; }
-        public bool? IsCaNhanKeKhai { get; set; }
         public decimal? CapTrenDanhGia { get; set; }
         public decimal? DiemKpiCapTren { get; set; }
         [MaxLength(1000)]

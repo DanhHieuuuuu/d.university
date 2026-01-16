@@ -15,8 +15,7 @@ namespace D.Core.Application.Command.Kpi.KpiDonVi
 
         public async Task Handle(GiaoKpiDonViDto request, CancellationToken cancellationToken)
         {
-            _service.GiaoKpiDonVi(request);
-            return;
+            await _service.GiaoKpiDonVi(request);
         }
     }
 }

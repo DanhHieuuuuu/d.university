@@ -14,7 +14,6 @@ import {
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { resetStatusCreate, selectMaNhanSu } from '@redux/feature/nhansu/nhansuSlice';
 import AppTable from '@components/common/Table';
 import { IAction, IColumn } from '@models/common/table.model';
 import { formatDateView } from '@utils/index';
@@ -34,7 +33,7 @@ import {
 } from '@redux/feature/delegation/delegationThunk';
 import { select } from '@redux/feature/delegation/delegationSlice';
 import { ETableColumnType } from '@/constants/e-table.consts';
-import { DelegationStatusConst } from '../../consts/delegation-status.consts';
+import { DelegationStatusConst } from '../../../../../constants/core/delegation/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
 import CreateDepartmentSupportModal from './(dialog)/create';
@@ -51,14 +50,6 @@ const Page = () => {
   const [isView, setIsModalView] = useState<boolean>(false);
 
   const columns: IColumn<IDepartmentSupport>[] = [
-    {
-      key: 'stt',
-      dataIndex: 'stt',
-      title: 'STT',
-      align: 'center',
-      fixed: 'left',
-      render: (value, row, index) => index + 1
-    },
     {
       key: 'departmentSupportName',
       dataIndex: 'departmentSupportName',

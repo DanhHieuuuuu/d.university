@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string? SoHopDong { get; set; }
         public int? IdNhanSu { get; set; }
+        public string? HoTen { get; set; }
         public int? IdLoaiHopDong { get; set; }
         public DateTime? NgayKyKet { get; set; }
         public DateTime? NgayBatDauThuViec { get; set; }

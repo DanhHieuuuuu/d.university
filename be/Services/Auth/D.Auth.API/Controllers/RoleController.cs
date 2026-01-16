@@ -131,6 +131,34 @@ namespace D.Auth.API.Controllers
         }
 
         /// <summary>
+        /// Cập nhật trạng thái của role (Active / Disabled)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("{id}/change-status")]
+        public async Task<ResponseAPI> UpdateRoleStatusApi(
+            [FromRoute] int id,
+            [FromBody] UpdateRoleStatusDto dto
+        )
+        {
+            try
+            {
+                var req = new UpdateRoleStatusDto
+                {
+                    Id = id,
+                    Status = dto.Status,
+                };
+                await _mediator.Send(req);
+                return new("Cập nhật trạng thái role thành công");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Xoá role (soft delete)
         /// </summary>
         /// <param name="id"></param>

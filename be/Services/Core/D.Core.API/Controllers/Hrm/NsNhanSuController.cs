@@ -99,6 +99,26 @@ namespace D.Core.API.Controllers.Hrm
         }
 
         /// <summary>
+        /// Cập nhật thông tin nhân sự (thông tin cá nhân, thông tin gia đình)
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonUpdateNhanSu)]
+        [HttpPut("update")]
+        public async Task<ResponseAPI> UpdateNhanSu(UpdateNhanSuDto dto)
+        {
+            try
+            {
+                await _mediator.Send(dto);
+                return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Lấy thông tin nhân sự bằng số điện thoại, mã nhân sự
         /// </summary>
         /// <param name="dto"></param>

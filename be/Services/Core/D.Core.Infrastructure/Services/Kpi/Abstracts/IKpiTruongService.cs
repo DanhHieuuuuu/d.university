@@ -1,4 +1,5 @@
-﻿using D.Core.Domain.Dtos.Kpi.KpiTruong;
+﻿using D.Core.Domain.Dtos.Kpi.KpiDonVi;
+using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.DomainBase.Dto;
 
 namespace D.Core.Infrastructure.Services.Kpi.Abstracts
@@ -15,6 +16,8 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         List<TrangThaiKpiTruongResponseDto> GetListTrangThai();
         Task UpdateKetQuaThucTe(UpdateKpiThucTeKpiTruongListDto dto);
         Task UpdateTrangThaiKpiTruong(UpdateTrangThaiKpiTruongDto dto);
+        void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiTruongListDto dto);
+        Task<string> GetKpiTruongContextForAi();
     }
 }
 

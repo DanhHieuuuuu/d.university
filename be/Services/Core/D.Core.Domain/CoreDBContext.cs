@@ -102,6 +102,7 @@ namespace D.Core.Domain
         public DbSet<KpiRole> KpiRoles { get; set; }
         public DbSet<KpiTemplate> KpiTemplates { get; set; }
         public DbSet<KpiTruong> KpiTruongs { get; set; }
+        public DbSet<KpiCongThuc> KpiCongThucs { get; set; }
 
         #endregion
 

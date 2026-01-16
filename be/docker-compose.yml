@@ -1,0 +1,22 @@
+services:
+  auth-api:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    ports:
+      - "10000:10000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Redis=innocent-mustang-37889.upstash.io:6379,password=AZQBAAIncDIwMGQxYjRhNGQ4MjU0M2IzYmM3ODU5Zjk4MzI1NTE3ZHAyMzc4ODk,ssl=true,abortConnect=false
+
+  core-api:
+    container_name: core-service
+    build:
+      context: .
+      dockerfile: Dockerfile.core
+    ports:
+      - "10001:10001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Redis=innocent-mustang-37889.upstash.io:6379,password=AZQBAAIncDIwMGQxYjRhNGQ4MjU0M2IzYmM3ODU5Zjk4MzI1NTE3ZHAyMzc4ODk,ssl=true,abortConnect=false

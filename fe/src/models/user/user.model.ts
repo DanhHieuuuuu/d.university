@@ -17,6 +17,7 @@ export type IUserView = {
   soCccd?: string;
   tenChucVu?: string;
   tenPhongBan?: string;
+  idPhongBan?: number;
   trangThai?: string;
   roleIds?: number[];
 };

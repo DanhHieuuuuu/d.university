@@ -1,41 +1,26 @@
 import axios from 'axios';
-import { TOKEN } from '@/constants/base.const';
+import { attachAuthInterceptor } from '@utils/axios-interceptor';
+
 import { processApiMsgError } from '@utils/index';
-import { ICreateRole, IQueryRole, IRole, IUpdateRole, IUpdateRolePermission } from '@models/role';
 import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { IPermissionTree } from '@models/permission';
+import { ICreateRole, IQueryRole, IRole, IUpdateRole, IUpdateRolePermission, IUpdateRoleStatus } from '@models/role';
 
 /**
  * Cấu hình riêng axios cho role service
  */
 
-const _axios = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+const authApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
 });
 
-_axios.interceptors.request.use(
-  (config) => {
-    // Lấy token từ  sessionStorage trước, nếu không có thì lấy từ localStorage
-    const token = sessionStorage.getItem(TOKEN) || localStorage.getItem(TOKEN);
-
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+attachAuthInterceptor(authApi);
 
 const apiRoleEndpoint = 'role';
 
 const findPaging = async (query: IQueryRole) => {
   try {
-    const res = await _axios.get(`${apiRoleEndpoint}/find`, {
+    const res = await authApi.get(`${apiRoleEndpoint}/find`, {
       params: {
         ...query
       }
@@ -51,7 +36,7 @@ const findPaging = async (query: IQueryRole) => {
 
 const findById = async (id: number) => {
   try {
-    const res = await _axios.get(`${apiRoleEndpoint}/${id}`);
+    const res = await authApi.get(`${apiRoleEndpoint}/${id}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, '');
@@ -61,7 +46,7 @@ const findById = async (id: number) => {
 
 const create = async (body: ICreateRole) => {
   try {
-    const res = await _axios.post(`${apiRoleEndpoint}/create-role`, body);
+    const res = await authApi.post(`${apiRoleEndpoint}/create-role`, body);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Không thể tạo role mới');
@@ -71,7 +56,7 @@ const create = async (body: ICreateRole) => {
 
 const update = async (body: IUpdateRole) => {
   try {
-    const res = await _axios.put(`${apiRoleEndpoint}/${body.id}`, body);
+    const res = await authApi.put(`${apiRoleEndpoint}/${body.id}`, body);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Không thể cập nhật role');
@@ -79,9 +64,19 @@ const update = async (body: IUpdateRole) => {
   }
 };
 
+const updateStatus = async (body: IUpdateRoleStatus) => {
+  try {
+    const res = await authApi.put(`${apiRoleEndpoint}/${body.id}/change-status`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể cập nhật trạng thái của role.');
+    return Promise.reject(err);
+  }
+}
+
 const deleteRole = async (roleId: number) => {
   try {
-    const res = await _axios.delete(`${apiRoleEndpoint}/${roleId}`);
+    const res = await authApi.delete(`${apiRoleEndpoint}/${roleId}`);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Không thể cập nhật role');
@@ -91,7 +86,7 @@ const deleteRole = async (roleId: number) => {
 
 const updatePermission = async (body: IUpdateRolePermission) => {
   try {
-    const res = await _axios.post(`${apiRoleEndpoint}/${body.roleId}/permissions`, body);
+    const res = await authApi.post(`${apiRoleEndpoint}/${body.roleId}/permissions`, body);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Không thể cập nhật permission cho role');
@@ -101,7 +96,7 @@ const updatePermission = async (body: IUpdateRolePermission) => {
 
 const getPermissionTree = async () => {
   try {
-    const res = await _axios.get(`${apiRoleEndpoint}/tree-permissions`);
+    const res = await authApi.get(`${apiRoleEndpoint}/tree-permissions`);
     const data: IResponseItem<IPermissionTree[]> = res.data;
     return Promise.resolve(data);
   } catch (err) {
@@ -112,7 +107,7 @@ const getPermissionTree = async () => {
 
 const getMyPermission = async () => {
   try {
-    const res = await _axios.get(`${apiRoleEndpoint}/my-permissions`);
+    const res = await authApi.get(`${apiRoleEndpoint}/my-permissions`);
     const data: IResponseItem<string[]> = res.data;
     return Promise.resolve(data);
   } catch (err) {
@@ -126,6 +121,7 @@ export const RoleService = {
   findById,
   create,
   update,
+  updateStatus,
   deleteRole,
   updatePermission,
   getPermissionTree,

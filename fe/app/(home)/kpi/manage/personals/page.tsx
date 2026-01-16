@@ -1,39 +1,40 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Checkbox, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
+import { Button, Card, Image, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
-  PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
-  EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined,
-  RobotFilled
+  SearchOutlined, SyncOutlined, EyeOutlined, FilterOutlined,
+  CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getKpiCaNhanKeKhai, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, updateKetQuaThucTeKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getKpiCaNhanKeKhai, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, updateKetQuaThucTeKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
 import { IQueryKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
 import PositionModal from './(dialog)/create-or-update';
-import { KPI_ORDER, KpiLoaiConst } from '../../const/kpiType.const';
-import { KpiTrangThaiConst } from '../../const/kpiStatus.const';
 import { toast } from 'react-toastify';
 import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { getAllUser } from '@redux/feature/userSlice';
 import { buildKpiGroupedTable, KpiTableRow } from '@helpers/kpi/kpi.helper';
 import KetQuaInput from '@components/bthanh-custom/kpiTableInput';
 import { useKpiStatusAction } from '@hooks/kpi/UpdateStatusKPI';
-import { KpiRoleConst } from '../../const/kpiRole.const';
 import { formatKetQua } from '@helpers/kpi/formatResult.helper';
 import { ETableColumnType } from '@/constants/e-table.consts';
+import '@styles/kpi/table.kpi.scss'
+import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
+import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
+import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
+import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
-
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
+  const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.caNhan);
   const { data: roleByUser, status: roleByUserStatus } = useAppSelector((state) => state.kpiState.meta.role.caNhan);
 
@@ -56,7 +57,7 @@ const Page = () => {
 
   const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
-    initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
+    initialQuery: { PageIndex: 1, PageSize: 1000, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getKpiCaNhanKeKhai(newQuery)),
     triggerFirstLoad: true
   });
@@ -137,7 +138,6 @@ const Page = () => {
     if (!selectedRowKeys.length) return toast.warning('Vui lòng chọn ít nhất một KPI');
     cb();
   };
-
   const bulkActionItems: MenuProps['items'] = [
     { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
     { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
@@ -172,12 +172,6 @@ const Page = () => {
 
   const columns: IColumn<KpiTableRow<IViewKpiCaNhan>>[] = [
     {
-      key: 'linhVuc',
-      dataIndex: 'linhVuc', title: 'Lĩnh Vực',
-      width: 150,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
-    },
-    {
       key: 'kpi', dataIndex: 'kpi', title: 'Tên KPI', width: 400,
       render: (value, record) => {
         if (record.rowType === 'group') {
@@ -186,7 +180,7 @@ const Page = () => {
               <div style={{
                 fontSize: 17,
                 fontWeight: 600,
-                textAlign: '-webkit-center',
+                textAlign: 'center',
                 color: '#0958d9',
               }}>
                 {'KPI ' + KpiLoaiConst.getName(record.loaiKpi)}
@@ -225,7 +219,7 @@ const Page = () => {
       key: 'trongSo',
       dataIndex: 'trongSo',
       title: 'Trọng số',
-      width: 100,
+      width: 80,
       render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
     },
     {
@@ -233,14 +227,23 @@ const Page = () => {
       dataIndex: 'congThuc',
       title: 'Công thức tính',
       width: 200,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
-    },
-    {
-      key: 'loaiKpi',
-      dataIndex: 'loaiKpi',
-      title: 'Loại KPI',
-      width: 140,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : KpiLoaiConst.getName(val))
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+
+        if (record.loaiKpi === 3) {
+          return (
+            <Image
+              width={100}
+              src="constants\kpi\tuanThu.png"
+              preview={{
+                mask: <div className="text-xs"><EyeOutlined /> Xem mốc trừ</div>,
+              }}
+              className="rounded border shadow-sm cursor-pointer"
+            />
+          );
+        }
+        return <span className="text-gray-500">{val}</span>;
+      },
     },
     {
       key: 'ketQuaThucTe',
@@ -259,6 +262,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQua(record.id, v)}
+            editable={record.isActive !== 0}
           />
         );
       },
@@ -268,7 +272,14 @@ const Page = () => {
       dataIndex: 'diemKpi',
       title: 'Điểm kê khai',
       width: 130,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        if (!val) return 0;
+        if (record.loaiKpi === 3) {
+          return <span className=" text-red-500">-{val}%</span>;
+        }
+        return <span>{val}</span>;
+      },
     },
     {
       key: 'capTrenDanhGia',
@@ -311,109 +322,161 @@ const Page = () => {
     onChange: setSelectedRowKeys,
   };
   return (
-    <Card
-      title="Kê khai KPI cá nhân"
-      className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
-      }
-    >
-      <Form form={form} layout="horizontal">
-        <div className="flex items-center justify-between mb-6 gap-4">
-          <div className="flex items-center gap-2 flex-1">
-            <Input
-              placeholder="Tìm KPI..."
-              prefix={<SearchOutlined />}
-              allowClear
-              onChange={(e) => handleDebouncedSearch(e.target.value)}
-              className="max-w-[250px]"
-            />
-            <Form.Item name="role" noStyle>
-              <Select
-                placeholder="Vị trí làm việc"
-                style={{ width: 180 }}
+    <div className="space-y-4">
+      <Card
+        className="h-full"
+        title={
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
+            <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Kê khai KPI cá nhân
+            </span>
+          </div>
+        }
+      >
+        <Form form={form} layout="horizontal">
+          <div className="flex items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                placeholder="Tìm KPI..."
+                prefix={<SearchOutlined />}
                 allowClear
-                loading={roleByUserStatus === ReduxStatus.LOADING}
-                options={roleByUser?.map(r => ({
-                  value: r.role,
-                  label: KpiRoleConst.getName(r.role)
-                }))}
-                onChange={(value) => onFilterChange({ role: value })}
+                onChange={(e) => handleDebouncedSearch(e.target.value)}
+                className="max-w-[250px]"
+                size="large"
               />
-            </Form.Item>
-            <Button
-              color="default"
-              variant="filled"
-              icon={<SyncOutlined />}
-              onClick={() => {
-                form.resetFields();
-                filterForm.resetFields();
-                onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: undefined, trangThai: undefined });
-                setKetQuaMap({});
-                setSelectedRowKeys([]);
-              }}
-            >
-              Tải lại
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              icon={<SaveOutlined />}
-              type="primary"
-              onClick={handleSaveKetQua}
-
-            >
-              Lưu kết quả
-            </Button>
-            <Dropdown
-              menu={{ items: bulkActionItems }}
-              trigger={['click']}
-              disabled={selectedRowKeys.length === 0}
-            >
+              <Form.Item name="role" noStyle>
+                <Select
+                  placeholder="Vị trí làm việc"
+                  style={{ width: 180 }}
+                  allowClear
+                  size="large"
+                  loading={roleByUserStatus === ReduxStatus.LOADING}
+                  options={Array.from(new Set(roleByUser?.map(r => r.role) || [])).map(role => ({
+                    value: role,
+                    label: KpiRoleConst.getName(role)
+                  }))}
+                  onChange={(value) => onFilterChange({ role: value })}
+                />
+              </Form.Item>
               <Button
-                type={selectedRowKeys.length > 0 ? 'primary' : 'default'}
-                icon={<EllipsisOutlined />}
+                size="large"
+                icon={<SyncOutlined />}
+                onClick={() => {
+                  form.resetFields();
+                  filterForm.resetFields();
+                  onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: undefined, trangThai: undefined });
+                  setKetQuaMap({});
+                  setSelectedRowKeys([]);
+                }}
               >
-                Thao tác
-                {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
+                Tải lại
               </Button>
-            </Dropdown>
+            </div>
 
-            <Popover
-              content={filterContent}
-              title="Bộ lọc"
-              trigger="click"
-              open={openFilter}
-              onOpenChange={setOpenFilter}
-              placement="bottomRight"
-              styles={{ body: { padding: 16, minWidth: 280 } }}
-            >
-              <Button icon={<FilterOutlined />} type={openFilter ? "primary" : "default"}>
-                Bộ lọc
+            <div className="flex items-center gap-2">
+              <Button
+                icon={<SaveOutlined />}
+                type="primary"
+                size="large"
+                onClick={handleSaveKetQua}
+                className="shadow-md hover:shadow-lg transition-shadow"
+              >
+                Lưu kết quả
               </Button>
-            </Popover>
+              <Dropdown
+                menu={{ items: bulkActionItems }}
+                trigger={['click']}
+                disabled={selectedRowKeys.length === 0}
+              >
+                <Button
+                  size="large"
+                  type={selectedRowKeys.length > 0 ? 'primary' : 'default'}
+                  icon={<EllipsisOutlined />}
+                  className={selectedRowKeys.length > 0 ? "shadow-md hover:shadow-lg transition-shadow" : ""}
+                >
+                  Thao tác
+                  {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
+                </Button>
+              </Dropdown>
+
+              <Popover
+                content={filterContent}
+                title="Bộ lọc"
+                trigger="click"
+                open={openFilter}
+                onOpenChange={setOpenFilter}
+                placement="bottomRight"
+                styles={{ body: { padding: 16, minWidth: 280 } }}
+              >
+                <Button
+                  size="large"
+                  icon={<FilterOutlined />}
+                  type={openFilter ? "primary" : "default"}
+                >
+                  Bộ lọc
+                </Button>
+              </Popover>
+            </div>
           </div>
-        </div>
-      </Form>
+        </Form>
 
-      <AppTable
-        loading={status === ReduxStatus.LOADING}
-        rowKey="id"
-        columns={columns}
-        dataSource={tableData}
-        listActions={actions}
-        pagination={false}
-        rowSelection={{
-          ...rowSelection,
-          fixed: 'left',
-        }}
-        scroll={{ x: 'max-content', y: 'calc(110vh - 420px)' }}
-      />
-      <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiCaNhanKeKhai(query)); dispatch(getListTrangThaiKpiCaNhan()); }} />
-    </Card>
+        <div className="kpi-table-wrapper">
+          <AppTable
+            loading={status === ReduxStatus.LOADING}
+            rowKey="id"
+            columns={columns}
+            dataSource={tableData}
+            listActions={actions}
+            pagination={false}
+            rowSelection={{
+              ...rowSelection,
+              fixed: 'left',
+            }}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 520px)' }}
+            footer={() => (
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-600 mb-2 font-medium">Chức vụ & Tỷ lệ:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {(() => {
+                        const mergedRoles = (roleByUser || []).reduce<Record<string, number>>((acc, r) => {
+                          if (!r.role) return acc;
+                          acc[r.role] = (acc[r.role] || 0) + (r.tiLe ?? 0);
+                          return acc;
+                        }, {});
+
+                        return Object.entries(mergedRoles).map(([role, tiLe]) => (
+                          <Tag key={role} color="blue" className="text-sm px-3 py-1">
+                            {KpiRoleConst.getName(role)} ({tiLe}%)
+                          </Tag>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center border-l border-r border-gray-300 px-4">
+                    <span className="text-sm text-gray-600 mb-1">Điểm tự đánh giá (Kết quả)</span>
+                    <span className="text-2xl font-bold text-orange-600">
+                      {summary?.tongTuDanhGia?.toFixed(2) ?? 0}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center">
+                    <span className="text-sm text-gray-600 mb-1">Điểm cấp trên chốt (Kết quả)</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      {summary?.tongCapTren?.toFixed(2) ?? 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          />
+        </div>
+        <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiCaNhanKeKhai(query)); dispatch(getListTrangThaiKpiCaNhan()); }} />
+        <KpiAiChat />
+      </Card>
+    </div>
   );
 };
 
