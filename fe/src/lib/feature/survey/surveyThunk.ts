@@ -1,7 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { SurveyService } from '@services/survey.service';
 import { IQueryRequest, ICreateRequest, IUpdateRequest, IRejectRequest } from '@models/survey/request.model';
-import { IQuerySurvey, IQueryMySurvey, ISubmitSurvey, IUpdateSurvey } from '@models/survey/survey.model';
+import {
+  IQuerySurvey,
+  IQueryMySurvey,
+  ISubmitSurvey,
+  IUpdateSurvey,
+  IQuerySurveyLog
+} from '@models/survey/survey.model';
 import { IQueryReport } from '@models/survey/report.model';
 
 export const getPagingRequest = createAsyncThunk(
@@ -226,3 +232,51 @@ export const getReportDetail = createAsyncThunk('survey/get-report-detail', asyn
     return rejectWithValue(err);
   }
 });
+
+export const analyzeWithAI = createAsyncThunk(
+  'survey/analyze-with-ai',
+  async (reportId: number, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.analyzeWithAI(reportId);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const getAIReportDetail = createAsyncThunk(
+  'survey/get-ai-report-detail',
+  async (reportId: number, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.getAIReportDetail(reportId);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const importExcelQuestions = createAsyncThunk(
+  'survey/import-excel-questions',
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.importExcelQuestions(file);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data || 'Import Excel thất bại');
+    }
+  }
+);
+
+export const getPagingSurveyLog = createAsyncThunk(
+  'survey/paging-log',
+  async (payload: IQuerySurveyLog, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.pagingSurveyLog(payload);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err);
+    }
+  }
+);

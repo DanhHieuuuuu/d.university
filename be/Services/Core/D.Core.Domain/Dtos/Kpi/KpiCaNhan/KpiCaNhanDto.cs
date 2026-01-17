@@ -31,5 +31,6 @@ namespace D.Core.Domain.Dtos.Kpi.KpiCaNhan
         public bool? IsCaNhanKeKhai { get; set; }
         public string? GhiChu { get; set; }
         public decimal? TongDiemTichHop { get; set; }
+        public int? IdPhongBan { get; set; }
     }
 }

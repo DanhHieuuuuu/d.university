@@ -5,6 +5,7 @@ using D.Auth.Domain.Entities;
 using D.Auth.Infrastructure.Services.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
+using d.Shared.Permission.Role;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +32,12 @@ namespace D.Auth.Infrastructure.Services.Implements
                 $"{nameof(CreateRole)} method called. Dto: {JsonSerializer.Serialize(request)}"
             );
 
-            var entity = _mapper.Map<Role>(request);
+            var entity = new Role
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Status = RoleStatus.Active,
+            };
 
             _unitOfWork.iRoleRepository.Add(entity);
             _unitOfWork.iRoleRepository.SaveChange();
@@ -88,6 +94,29 @@ namespace D.Auth.Infrastructure.Services.Implements
             else
             {
                 throw new Exception($"RoleId: {id} không tồn tại hoặc đã bị xóa");
+            }
+        }
+
+        public void UpdateStatusRole(UpdateRoleStatusDto dto)
+        {
+            _logger.LogInformation(
+                $"{nameof(UpdateStatusRole)} method called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
+
+            var existRole = _unitOfWork.iRoleRepository.TableNoTracking.FirstOrDefault(r =>
+                r.Id == dto.Id
+            );
+
+            if (existRole != null)
+            {
+                existRole.Status = dto.Status;
+
+                _unitOfWork.iRoleRepository.Update(existRole);
+                _unitOfWork.iRoleRepository.SaveChange();
+            }
+            else
+            {
+                throw new Exception($"RoleId: {dto.Id} không tồn tại hoặc đã bị xóa");
             }
         }
 

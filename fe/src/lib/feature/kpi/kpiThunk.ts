@@ -7,6 +7,7 @@ import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@mo
 import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong } from '@models/kpi/kpi-truong.model';
 import { IQueryKpiLogStatus, KpiLogStatusResponse } from '@models/kpi/kpi-log.model';
 import { IAskKpiChatCommand } from '@models/kpi/kpi-chat.model';
+import { IQueryKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
 
 export const getAllKpiCaNhan = createAsyncThunk('kpi/list-canhan', async (payload?: IQueryKpiCaNhan) => {
     try {
@@ -495,4 +496,16 @@ export const askKpiAi = createAsyncThunk(
             return rejectWithValue(err?.response?.data || 'Không thể kết nối với trợ lý AI');
         }
     }
+);
+//Kpi Công Thức
+export const getListKpiCongThuc = createAsyncThunk(
+  'kpi/getListKpiCongThuc',
+  async (query: IQueryKpiCongThuc | undefined, { rejectWithValue }) => {
+    try {
+      const data = await KpiService.getListKpiCongThuc(query);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
 );

@@ -9,7 +9,7 @@ namespace D.Core.Domain.Entities.Kpi
     public class KpiDonVi : EntityBase
     {
         [MaxLength(500)]
-        public string? Kpi { get; set; }
+        public string Kpi { get; set; }
         [MaxLength(250)]
         public string? MucTieu { get; set; }
         [MaxLength(250)]
@@ -24,7 +24,6 @@ namespace D.Core.Domain.Entities.Kpi
         public string? CongThucTinh { get; set; }
         public string? LoaiKetQua { get; set; }
         public decimal? DiemKpi { get; set; }
-        public bool? IsKeKhai { get; set; }
         [MaxLength(255)]
 
         public int? IdCongThuc { get; set; }

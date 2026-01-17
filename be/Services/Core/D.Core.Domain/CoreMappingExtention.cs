@@ -24,7 +24,6 @@ using D.Core.Domain.Dtos.Hrm.NhanSu;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using D.Core.Domain.Dtos.Kpi.KpiRole;
-using D.Core.Domain.Dtos.Kpi.KpiTemplate;
 using D.Core.Domain.Dtos.Kpi.KpiTruong;
 using D.Core.Domain.Dtos.Hrm.QuanHeGiaDinh;
 using D.Core.Domain.Dtos.SinhVien;
@@ -45,6 +44,7 @@ using System.Reflection;
 using D.Core.Domain.Dtos.Hrm.HopDong;
 using D.Core.Domain.Dtos.Hrm.QuyetDinh;
 using D.Core.Domain.Dtos.Kpi.KpiLogStatus;
+using D.Core.Domain.Dtos.Kpi.KpiCongThuc;
 
 namespace D.Core.Domain
 {
@@ -243,17 +243,15 @@ namespace D.Core.Domain
             CreateMap<KpiRole, KpiRoleResponseDto>();
             CreateMap<CreateKpiRoleDto, KpiRole>();
             CreateMap<CreateKpiCaNhanDto, KpiCaNhan>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => KpiStatus.Create));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => KpiStatus.Assigned));
             CreateMap<KpiDonVi, KpiDonViDto>();
             CreateMap<CreateKpiDonViDto, KpiDonVi>()
             .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => KpiStatus.Create));
             CreateMap<KpiTruong, KpiTruongDto>();
             CreateMap<CreateKpiTruongDto, KpiTruong>()
             .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => KpiStatus.Create));
-
-            CreateMap<KpiTemplate, KpiTemplateDto>();
-            CreateMap<CreateKpiTemplateDto, KpiTemplate>();
             CreateMap<KpiLogStatus, KpiLogStatusDto>();
+            CreateMap<KpiCongThuc, KpiCongThucDto>();
             #endregion
         }
 

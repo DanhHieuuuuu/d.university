@@ -35,4 +35,28 @@ export class PermissionCoreConst {
   public static readonly UserButtonAccountManagerUpdatePermission = `${PermissionCoreConst.Button}update_permission_account`;
   public static readonly UserButtonAccountManagerUpdate = `${PermissionCoreConst.Button}update_account`;
   public static readonly UserButtonAccountManagerLock = `${PermissionCoreConst.Button}lock_account`;
+
+  // Khảo sát - Survey
+  public static readonly CoreMenuKhaoSat = `${PermissionCoreConst.Menu}khaosat`;
+
+  public static readonly SurveyMenuRequest = `${PermissionCoreConst.Menu}survey_request`;
+  public static readonly SurveyButtonRequestCreate = `${PermissionCoreConst.Button}survey_request_create`;
+  public static readonly SurveyButtonRequestUpdate = `${PermissionCoreConst.Button}survey_request_update`;
+  public static readonly SurveyButtonRequestDelete = `${PermissionCoreConst.Button}survey_request_delete`;
+  public static readonly SurveyButtonRequestSubmit = `${PermissionCoreConst.Button}survey_request_submit`;
+  public static readonly SurveyButtonRequestCancelSubmit = `${PermissionCoreConst.Button}survey_request_cancel_submit`;
+
+  public static readonly SurveyMenuRequestApproval = `${PermissionCoreConst.Menu}survey_request_approval`;
+  public static readonly SurveyButtonRequestApprove = `${PermissionCoreConst.Button}survey_request_approve`;
+  public static readonly SurveyButtonRequestReject = `${PermissionCoreConst.Button}survey_request_reject`;
+
+  public static readonly SurveyMenuManagement = `${PermissionCoreConst.Menu}survey_management`;
+  public static readonly SurveyButtonSurveyOpen = `${PermissionCoreConst.Button}survey_open`;
+  public static readonly SurveyButtonSurveyClose = `${PermissionCoreConst.Button}survey_close`;
+
+  public static readonly SurveyMenuReport = `${PermissionCoreConst.Menu}survey_report`;
+  public static readonly SurveyButtonReportGenerate = `${PermissionCoreConst.Button}survey_report_generate`;
+  public static readonly SurveyButtonAIReportGenerate = `${PermissionCoreConst.Button}survey_ai_report_generate`;
+
+  public static readonly SurveyMenuLogging = `${PermissionCoreConst.Menu}survey_logging`;
 }

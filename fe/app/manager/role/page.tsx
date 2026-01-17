@@ -3,7 +3,15 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Breadcrumb, Button, Card, Form, Input, Modal } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  LockOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
+  UnlockOutlined
+} from '@ant-design/icons';
 import { KeyIcon } from '@components/custom-icon';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { IAction, IColumn } from '@models/common/table.model';
@@ -19,10 +27,13 @@ import {
   getListPermissionTree,
   getListRole,
   resetStatusRole,
-  setSelectedRoleId
+  setSelectedRoleId,
+  updateRoleStatusThunk
 } from '@redux/feature/roleConfigSlice';
 import CreateRoleModal from './(dialog)/create-or-update';
 import RolePermissionModal from './(dialog)/update-permission';
+import { ETableColumnType } from '@/constants/e-table.consts';
+import { RoleStatusConst } from '@/constants/auth/role.const';
 
 const breadcrumbItems = [
   {
@@ -108,16 +119,28 @@ const Page = () => {
     }
   };
 
+  const handleActiveRole = async (roleId: number) => {
+    const result = await dispatch(updateRoleStatusThunk({ id: roleId, status: RoleStatusConst.ACTIVE })).unwrap();
+    if (result != undefined) {
+      toast.success(result?.message || 'Thành công');
+      dispatch(resetStatusRole());
+    }
+  };
+
+  const handleDisableRole = async (roleId: number) => {
+    const result = await dispatch(updateRoleStatusThunk({ id: roleId, status: RoleStatusConst.DISABLED })).unwrap();
+    if (result != undefined) {
+      toast.success(result?.message || 'Thành công');
+      dispatch(resetStatusRole());
+    }
+  };
+
   const columns: IColumn<IRole>[] = [
-    {
-      key: 'id',
-      dataIndex: 'id',
-      title: 'ID'
-    },
     {
       key: 'name',
       dataIndex: 'name',
-      title: 'Tên nhóm quyền'
+      title: 'Tên nhóm quyền',
+      width: 200
     },
     {
       key: 'description',
@@ -127,12 +150,17 @@ const Page = () => {
     {
       key: 'totalUser',
       dataIndex: 'totalUser',
-      title: 'Số người dùng'
+      title: 'Số người dùng',
+      align: 'center',
+      width: 150
     },
     {
       key: 'status',
       dataIndex: 'status',
-      title: 'Trạng thái'
+      title: 'Trạng thái',
+      align: 'center',
+      type: ETableColumnType.STATUS,
+      getTagInfo: (value) => RoleStatusConst.getTag(value)
     }
   ];
 
@@ -147,6 +175,20 @@ const Page = () => {
       tooltip: 'Cập nhật',
       icon: <EditOutlined />,
       command: (record: IRole) => onClickUpdate(record)
+    },
+    {
+      label: 'Kích hoạt',
+      tooltip: 'Kích hoạt',
+      icon: <UnlockOutlined />,
+      hidden: (record: IRole) => record.status === RoleStatusConst.ACTIVE,
+      command: (record: IRole) => handleActiveRole(record.id!)
+    },
+    {
+      label: 'Khóa',
+      tooltip: 'Khóa',
+      icon: <LockOutlined />,
+      hidden: (record: IRole) => record.status === RoleStatusConst.DISABLED,
+      command: (record: IRole) => handleDisableRole(record.id!)
     },
     {
       label: 'Xóa',

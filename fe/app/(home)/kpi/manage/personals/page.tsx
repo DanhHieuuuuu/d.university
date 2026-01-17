@@ -2,14 +2,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Image, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
-  PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
-  EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined,
-  RobotFilled, TrophyOutlined, FileTextOutlined, StarOutlined
+  SearchOutlined, SyncOutlined, EyeOutlined, FilterOutlined,
+  CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiCaNhan, getAllIdsKpiCaNhan, getKpiCaNhanKeKhai, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, updateKetQuaThucTeKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiCaNhan, getKpiCaNhanKeKhai, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, updateKetQuaThucTeKpiCaNhan, updateTrangThaiKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -35,8 +34,7 @@ const Page = () => {
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
-
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
+  const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.caNhan);
   const { data: roleByUser, status: roleByUserStatus } = useAppSelector((state) => state.kpiState.meta.role.caNhan);
 
@@ -59,7 +57,7 @@ const Page = () => {
 
   const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
-    initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
+    initialQuery: { PageIndex: 1, PageSize: 1000, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getKpiCaNhanKeKhai(newQuery)),
     triggerFirstLoad: true
   });
@@ -140,35 +138,6 @@ const Page = () => {
     if (!selectedRowKeys.length) return toast.warning('Vui lòng chọn ít nhất một KPI');
     cb();
   };
-
-  const totalDeclaredScore = useMemo(() => {
-    return (list || [])
-      .filter(k => !query.role || k.role === query.role)
-      .reduce((sum, k) => {
-        const score = k.diemKpi ?? 0;
-        return k.loaiKpi === 3 ? sum - score : sum + score;
-      }, 0);
-  }, [list, query.role]);
-
-  const scoreByRole = useMemo(() => {
-    const map: Record<string, number> = {};
-    (list || []).forEach(k => {
-      if (!k.role) return;
-      const diem = k.diemKpi ?? 0;
-      const valueToAdd = k.loaiKpi === 3 ? -diem : diem;
-      map[k.role] = (map[k.role] || 0) + valueToAdd;
-    });
-    return map;
-  }, [list]);
-
-  const finalScore = useMemo(() => {
-    return (roleByUser || []).reduce((sum, r) => {
-      const tiLe = (r.tiLe ?? 0) / 100;
-      const diemRole = scoreByRole[r.role] ?? 0;
-      return sum + (diemRole * tiLe);
-    }, 0);
-  }, [roleByUser, scoreByRole]);
-
   const bulkActionItems: MenuProps['items'] = [
     { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
     { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
@@ -469,7 +438,7 @@ const Page = () => {
               <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex flex-col">
-                    <span className="text-sm text-gray-600 mb-2 font-medium">Chức vụ:</span>
+                    <span className="text-sm text-gray-600 mb-2 font-medium">Chức vụ & Tỷ lệ:</span>
                     <div className="flex flex-wrap gap-2">
                       {(() => {
                         const mergedRoles = (roleByUser || []).reduce<Record<string, number>>((acc, r) => {
@@ -488,16 +457,15 @@ const Page = () => {
                   </div>
 
                   <div className="flex flex-col items-center justify-center border-l border-r border-gray-300 px-4">
-                    <span className="text-sm text-gray-600 mb-1">Tổng điểm kê khai</span>
+                    <span className="text-sm text-gray-600 mb-1">Điểm tự đánh giá (Kết quả)</span>
                     <span className="text-2xl font-bold text-orange-600">
-                      {totalDeclaredScore.toFixed(2)}
+                      {summary?.tongTuDanhGia?.toFixed(2) ?? 0}
                     </span>
                   </div>
-
                   <div className="flex flex-col items-center justify-center">
-                    <span className="text-sm text-gray-600 mb-1">Điểm tổng nhận được</span>
+                    <span className="text-sm text-gray-600 mb-1">Điểm cấp trên chốt (Kết quả)</span>
                     <span className="text-2xl font-bold text-green-600">
-                      {finalScore.toFixed(2)}
+                      {summary?.tongCapTren?.toFixed(2) ?? 0}
                     </span>
                   </div>
                 </div>

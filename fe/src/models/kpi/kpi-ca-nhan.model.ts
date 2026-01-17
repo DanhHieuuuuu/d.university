@@ -33,9 +33,10 @@ export type IViewKpiCaNhan = {
   role?: string,
   ghiChu?: string,
   congThuc?:string;
+  idCongThuc?: number;
   linhVuc?: string,
   chienLuoc?: string,
-  isCaNhanKeKhai?: boolean,
+  idPhongBan?: number;
 };
 
 export type ICreateKpiCaNhan = {
@@ -108,7 +109,5 @@ export type IKpiCaNhanLoaiSummary = {
 export type IKpiCaNhanSummary = {
   tongTuDanhGia: number;
   tongCapTren: number;
-  diemCaNhanThuan: number;
-  diemTongKetCuoiCung: number;
   byLoaiKpi: IKpiCaNhanLoaiSummary[];
 }

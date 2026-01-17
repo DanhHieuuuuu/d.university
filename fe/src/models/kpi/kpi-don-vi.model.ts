@@ -27,6 +27,7 @@ export type IViewKpiDonVi = {
   loaiKetQua?: LoaiCongThuc;
   ghiChu?: string;
   congThuc?:string;
+  idCongThuc?: number;
   
 };
 

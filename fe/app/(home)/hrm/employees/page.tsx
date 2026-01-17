@@ -3,7 +3,6 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Select } from 'antd';
 import {
-  DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
@@ -14,7 +13,7 @@ import { useNavigate } from '@hooks/navigate';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { resetStatusCreate, selectIdNhanSu } from '@redux/feature/hrm/nhansu/nhansuSlice';
+import { resetStatusCreate, resetStatusUpdate, selectIdNhanSu } from '@redux/feature/hrm/nhansu/nhansuSlice';
 import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
@@ -123,6 +122,7 @@ const Page = () => {
   useEffect(() => {
     if (!isModalOpen) {
       dispatch(resetStatusCreate());
+      dispatch(resetStatusUpdate());
       dispatch(getListNhanSu(query));
     }
   }, [isModalOpen]);

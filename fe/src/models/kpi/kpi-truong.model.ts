@@ -13,6 +13,18 @@ export interface IViewGetListKpiTruong {
     kpi?: string;
 }
 
+export interface IKpiTruongLoaiSummary {
+  loaiKpi: number;
+  tuDanhGia: number;
+  capTren: number;
+}
+
+export interface IKpiTruongSummary {
+  tongTuDanhGia: number;
+  tongCapTren: number;
+  byLoaiKpi: IKpiTruongLoaiSummary[];
+}
+
 export type IViewKpiTruong = {
     id: number;
     linhVuc: string;
@@ -31,6 +43,7 @@ export type IViewKpiTruong = {
     loaiKetQua?: LoaiCongThuc;
     ghiChu?: string;
     congThuc?: string;
+    idCongThuc?: number;
 };
 
 export type ICreateKpiTruong = {

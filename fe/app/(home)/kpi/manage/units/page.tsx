@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Checkbox, Divider, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Table, Tag } from 'antd';
+import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
   PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
   EyeOutlined, FilterOutlined, CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined,
-  RobotFilled, FileTextOutlined
+  RobotFilled
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -29,17 +29,17 @@ import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import AssignKpiModal from '../../modal/AssignKpiModal';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+
 const Page = () => {
   const [form] = Form.useForm();
-  const [assignForm] = Form.useForm();
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
-
-  const { list: users = [] } = useAppSelector(state => state.userState.byKpiRole);
-  const { data: list, status, total: totalItem } = useAppSelector((state) => state.kpiState.kpiDonVi.$list);
+  const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiDonVi.$list);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.donVi);
+  const { data: namHocDonVi, status: namHocStatus } = useAppSelector((state) => state.kpiState.meta.namHoc.donVi);
+
   const [nhanSuDaGiao, setNhanSuDaGiao] = useState<NhanSuDaGiaoDto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
@@ -48,7 +48,7 @@ const Page = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ketQuaMap, setKetQuaMap] = useState<Record<number, number | undefined>>({});
   const [openAssignModal, setOpenAssignModal] = useState(false);
-  const [assignLoading, setAssignLoading] = useState(false);
+
   const selectedKpiDonVi = useAppSelector((state) => state.kpiState.kpiDonVi.$selected);
 
   const tableData = useMemo(() => {
@@ -170,58 +170,11 @@ const Page = () => {
     }
   };
 
-  const handleSubmitAssign = async () => {
-    if (!selectedKpiDonVi?.id) return;
-
-
-    const payload = {
-      idKpiDonVi: selectedKpiDonVi.id,
-      nhanSus: nhanSuDaGiao.map(x => ({
-        idNhanSu: x.idNhanSu,
-        trongSo: x.trongSo
-      }))
-    };
-    if (!payload.nhanSus.length) {
-      toast.warning('Chưa có nhân sự nào được giao');
-      return;
-    }
-
-    if (payload.nhanSus.some(x => !x.trongSo)) {
-      toast.warning('Có nhân sự chưa nhập trọng số');
-      return;
-    }
-
-    try {
-      await dispatch(giaoKpiDonVi(payload)).unwrap();
-      toast.success('Giao KPI thành công');
-      setOpenAssignModal(false);
-      dispatch(getNhanSuDaGiaoByKpiDonVi(selectedKpiDonVi.id));
-    } catch (err) {
-      console.error('GIAO KPI ERROR', err);
-      toast.error('Giao KPI thất bại');
-      console.log('SUBMIT STATE', nhanSuDaGiao);
-    }
-  };
-
-
-
   const requiredSelect = (cb: () => void) => {
     if (!selectedRowKeys.length) return toast.warning('Vui lòng chọn ít nhất một KPI');
     cb();
   };
 
-  const totalDeclaredScore = useMemo(() => {
-    return (list || []).reduce((sum, k) => {
-      const diem = k.diemKpi ?? 0;
-      return sum + (k.loaiKpi === 3 ? -diem : diem);
-    }, 0);
-  }, [list]);
-  const finalScore = useMemo(() => {
-    return (list || []).reduce((sum, k) => {
-      const diem = k.diemKpiCapTren ?? 0;
-      return sum + (k.loaiKpi === 3 ? -diem : diem);
-    }, 0);
-  }, [list]);
 
   const bulkActionItems: MenuProps['items'] = [
     { key: 'propose', label: 'Đề xuất', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(proposeSelected) },
@@ -234,6 +187,14 @@ const Page = () => {
     <Form form={filterForm} layout="vertical" onValuesChange={(_, values) => { onFilterChange(values); setOpenFilter(false); }}>
       <Form.Item label="Loại KPI" name="loaiKpi">
         <Select allowClear placeholder="Chọn loại KPI" options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))} />
+      </Form.Item>
+      <Form.Item name="namHoc" label="Năm học">
+        <Select
+          allowClear
+          placeholder="Chọn năm học"
+          loading={namHocStatus === ReduxStatus.LOADING}
+          options={namHocDonVi.map(x => ({ value: x.namHoc, label: x.namHoc }))}
+        />
       </Form.Item>
       <Form.Item label="Trạng thái" name="trangThai">
         <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiCaNhan} />
@@ -268,114 +229,68 @@ const Page = () => {
         if (record.rowType === 'group') {
           return {
             children: (
-              <div style={{
-                fontSize: 17,
-                fontWeight: 600,
-                textAlign: 'center',
-                color: '#0958d9',
-              }}>
+              <div style={{ fontSize: 17, fontWeight: 600, textAlign: 'center', color: '#0958d9' }}>
                 {'KPI ' + KpiLoaiConst.getName(record.loaiKpi)}
               </div>
             ),
             props: { colSpan: columns.length },
           };
         }
-
         if (record.rowType === 'total') {
           return {
             children: (
-              <div style={{
-                fontSize: 15,
-                fontWeight: 600,
-                textAlign: 'left',
-              }}>
+              <div style={{ fontSize: 15, fontWeight: 600, textAlign: 'left' }}>
                 TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{record.trongSo}%</span>
               </div>
             ),
             props: { colSpan: columns.length },
           };
         }
-
         return value;
       },
     },
+    { key: 'mucTieu', dataIndex: 'mucTieu', title: 'Mục tiêu', width: 250, render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val), },
+    { key: 'trongSo', dataIndex: 'trongSo', title: 'Trọng số', width: 80, render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val) },
     {
-      key: 'mucTieu',
-      dataIndex: 'mucTieu',
-      title: 'Mục tiêu',
-      width: 250,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
-    },
-    {
-      key: 'trongSo',
-      dataIndex: 'trongSo',
-      title: 'Trọng số',
-      width: 80,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
-    },
-    {
-      key: 'congThuc',
-      dataIndex: 'congThuc',
-      title: 'Công thức tính',
-      width: 200,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val)
-    },
-    {
-      key: 'ketQuaThucTe',
-      dataIndex: 'ketQuaThucTe',
-      title: 'Kết quả thực tế',
-      width: 200,
+      key: 'congThuc', dataIndex: 'congThuc', title: 'Công thức tính', width: 200,
       render: (val, record) => {
-        if (record.rowType !== 'data') {
-          return { props: { colSpan: 0 } };
-        }
-
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        return <span className="text-gray-500">{val}</span>;
+      },
+    },
+    {
+      key: 'ketQuaThucTe', dataIndex: 'ketQuaThucTe', title: 'Kết quả thực tế', width: 200,
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
         const value = ketQuaMap[record.id] ?? val;
-
         return (
-          <KetQuaInput
-            loaiKetQua={record.loaiKetQua}
-            value={value}
-            onChange={(v) => updateKetQua(record.id, v)}
-            editable={record.isActive !== 0}
-          />
+          <KetQuaInput loaiKetQua={record.loaiKetQua} value={value} onChange={(v) => updateKetQua(record.id, v)} editable={record.isActive !== 0} />
         );
       },
     },
     {
-      key: 'diemKpi',
-      dataIndex: 'diemKpi',
-      title: 'Điểm kê khai',
-      width: 130,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      key: 'diemKpi', dataIndex: 'diemKpi', title: 'Điểm kê khai', width: 130,
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        // Thêm màu đỏ cho KPI phạt
+        return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
+      },
     },
     {
-      key: 'capTrenDanhGia',
-      dataIndex: 'capTrenDanhGia',
-      title: 'Cấp trên đánh giá',
-      width: 180,
-      render: (val, record) =>
-        record.rowType !== 'data'
-          ? { props: { colSpan: 0 } }
-          : formatKetQua(val, record.loaiKetQua),
+      key: 'capTrenDanhGia', dataIndex: 'capTrenDanhGia', title: 'Cấp trên đánh giá', width: 180,
+      render: (val, record) => record.rowType !== 'data' ? { props: { colSpan: 0 } } : formatKetQua(val, record.loaiKetQua),
     },
     {
-      key: 'diemKpiCapTren',
-      dataIndex: 'diemKpiCapTren',
-      title: 'Điểm cấp trên',
-      width: 130,
-      render: (val, record) => (record.rowType !== 'data' ? { props: { colSpan: 0 } } : val),
+      key: 'diemKpiCapTren', dataIndex: 'diemKpiCapTren', title: 'Điểm cấp trên', width: 130,
+      render: (val, record) => {
+        if (record.rowType !== 'data') return { props: { colSpan: 0 } };
+        // Thêm màu đỏ cho KPI phạt
+        return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
+      },
     },
-
     {
-      key: 'trangThai',
-      dataIndex: 'trangThai', title: 'Trạng thái',
-      width: 150,
-      type: ETableColumnType.STATUS,
-      render: (val, record) =>
-        record.rowType !== 'data'
-          ? { props: { colSpan: 0 } }
-          : <Tag color={KpiTrangThaiConst.get(val)?.color}>{KpiTrangThaiConst.get(val)?.text}</Tag>,
+      key: 'trangThai', dataIndex: 'trangThai', title: 'Trạng thái', width: 150, type: ETableColumnType.STATUS,
+      render: (val, record) => record.rowType !== 'data' ? { props: { colSpan: 0 } } : <Tag color={KpiTrangThaiConst.get(val)?.color}>{KpiTrangThaiConst.get(val)?.text}</Tag>,
     },
   ];
 
@@ -404,13 +319,7 @@ const Page = () => {
           </div>
         }
         extra={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={onClickAdd}
-            size="large"
-            className="shadow-md hover:shadow-lg transition-shadow"
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} size="large" className="shadow-md hover:shadow-lg transition-shadow">
             Thêm mới
           </Button>
         }
@@ -418,71 +327,21 @@ const Page = () => {
         <Form form={form} layout="horizontal">
           <div className="flex items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-2 flex-1">
-              <Input
-                placeholder="Tìm KPI..."
-                prefix={<SearchOutlined />}
-                allowClear
-                onChange={(e) => handleDebouncedSearch(e.target.value)}
-                className="max-w-[250px]"
-                size="large"
-              />
-              <Button
-                size="large"
-                icon={<SyncOutlined />}
-                onClick={() => {
-                  form.resetFields();
-                  filterForm.resetFields();
-                  onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined });
-                  setKetQuaMap({});
-                  setSelectedRowKeys([]);
-                }}
-              >
+              <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" size="large" />
+              <Button size="large" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined }); setKetQuaMap({}); setSelectedRowKeys([]); }}>
                 Tải lại
               </Button>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                icon={<SaveOutlined />}
-                type="primary"
-                size="large"
-                onClick={handleSaveKetQua}
-                className="shadow-md hover:shadow-lg transition-shadow"
-              >
-                Lưu kết quả
-              </Button>
-              <Dropdown
-                menu={{ items: bulkActionItems }}
-                trigger={['click']}
-                disabled={selectedRowKeys.length === 0}
-              >
-                <Button
-                  size="large"
-                  type={selectedRowKeys.length > 0 ? 'primary' : 'default'}
-                  icon={<EllipsisOutlined />}
-                  className={selectedRowKeys.length > 0 ? "shadow-md hover:shadow-lg transition-shadow" : ""}
-                >
-                  Thao tác
-                  {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
+              <Button icon={<SaveOutlined />} type="primary" size="large" onClick={handleSaveKetQua} className="shadow-md hover:shadow-lg transition-shadow"> Lưu kết quả </Button>
+              <Dropdown menu={{ items: bulkActionItems }} trigger={['click']} disabled={selectedRowKeys.length === 0}>
+                <Button size="large" type={selectedRowKeys.length > 0 ? 'primary' : 'default'} icon={<EllipsisOutlined />} className={selectedRowKeys.length > 0 ? "shadow-md hover:shadow-lg transition-shadow" : ""}>
+                  Thao tác {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
                 </Button>
               </Dropdown>
-
-              <Popover
-                content={filterContent}
-                title="Bộ lọc"
-                trigger="click"
-                open={openFilter}
-                onOpenChange={setOpenFilter}
-                placement="bottomRight"
-                styles={{ body: { padding: 16, minWidth: 280 } }}
-              >
-                <Button
-                  size="large"
-                  icon={<FilterOutlined />}
-                  type={openFilter ? "primary" : "default"}
-                >
-                  Bộ lọc
-                </Button>
+              <Popover content={filterContent} title="Bộ lọc" trigger="click" open={openFilter} onOpenChange={setOpenFilter} placement="bottomRight" styles={{ body: { padding: 16, minWidth: 280 } }}>
+                <Button size="large" icon={<FilterOutlined />} type={openFilter ? "primary" : "default"}> Bộ lọc </Button>
               </Popover>
             </div>
           </div>
@@ -496,10 +355,7 @@ const Page = () => {
             dataSource={tableData}
             listActions={actions}
             pagination={false}
-            rowSelection={{
-              ...rowSelection,
-              fixed: 'left',
-            }}
+            rowSelection={{ ...rowSelection, fixed: 'left' }}
             scroll={{ x: 'max-content', y: 'calc(100vh - 520px)' }}
             footer={() => (
               <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200">
@@ -507,14 +363,14 @@ const Page = () => {
                   <div className="flex flex-col items-center justify-center">
                     <span className="text-sm text-gray-600 mb-1">Tổng điểm kê khai</span>
                     <span className="text-2xl font-bold text-orange-600">
-                      {totalDeclaredScore.toFixed(2)}
+                      {summary?.tongTuDanhGia?.toFixed(2) ?? 0}
                     </span>
                   </div>
 
                   <div className="flex flex-col items-center justify-center border-l border-gray-300 pl-4">
                     <span className="text-sm text-gray-600 mb-1">Điểm tổng nhận được</span>
                     <span className="text-2xl font-bold text-green-600">
-                      {finalScore.toFixed(2)}
+                      {summary?.tongCapTren?.toFixed(2) ?? 0}
                     </span>
                   </div>
                 </div>
@@ -523,12 +379,7 @@ const Page = () => {
           />
         </div>
         <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiDonViKeKhai(query)); dispatch(getListTrangThaiKpiDonVi()); }} />
-        <AssignKpiModal
-          open={openAssignModal}
-          onClose={() => setOpenAssignModal(false)}
-          kpiId={selectedKpiDonVi?.id ?? undefined}
-          donViId={selectedKpiDonVi?.data?.idDonVi ?? undefined}
-        />
+        <AssignKpiModal open={openAssignModal} onClose={() => setOpenAssignModal(false)} kpiId={selectedKpiDonVi?.id ?? undefined} donViId={selectedKpiDonVi?.data?.idDonVi ?? undefined} />
         <KpiAiChat />
       </Card>
     </div>

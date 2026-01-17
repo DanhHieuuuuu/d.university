@@ -17,6 +17,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         Task UpdateKetQuaThucTe(UpdateKpiThucTeKpiTruongListDto dto);
         Task UpdateTrangThaiKpiTruong(UpdateTrangThaiKpiTruongDto dto);
         void UpdateKetQuaCapTren(UpdateKetQuaCapTrenKpiTruongListDto dto);
+        Task<string> GetKpiTruongContextForAi();
     }
 }
 

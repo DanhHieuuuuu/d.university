@@ -67,7 +67,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     new CreateNsQuyetDinhDto
                     {
                         IdNhanSu = dto.IdNhanSu,
-                        MaNhanSu = nhansu.MaNhanSu,
+                        MaNhanSu = dto.MaNhanSu,
                         NoiDungTomTat =
                             $"tuyển dụng nhân sự mới: {string.Join(" ", nhansu.HoDem, nhansu.Ten)}",
                         LoaiQuyetDinh = NsLoaiQuyetDinh.TiepNhan,
@@ -82,7 +82,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     {
                         IdQuyetDinh = quyetDinhTuyenDung.Id,
                         IdNhanSu = dto.IdNhanSu,
-                        MaNhanSu = nhansu.MaNhanSu,
+                        MaNhanSu = dto.MaNhanSu,
                         IdChucVu = dto.IdChucVu,
                         IdPhongBan = dto.IdPhongBan,
                         IdToBoMon = dto.IdToBoMon,
@@ -135,7 +135,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var totalCount = query.Count();
 
             var items = query
-                .OrderBy(x => x.HopDong.CreatedDate)
+                .OrderByDescending(x => x.HopDong.CreatedDate)
                 .ThenBy(x => x.HopDong.Id)
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)

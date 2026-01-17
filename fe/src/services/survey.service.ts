@@ -4,7 +4,9 @@ import {
   IQueryMySurvey,
   ISubmitSurvey,
   ICreateSurvey,
-  IUpdateSurvey
+  IUpdateSurvey,
+  IQuerySurveyLog,
+  IViewSurveyLog
 } from '@models/survey/survey.model';
 import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
@@ -236,6 +238,53 @@ const getReportDetail = async (id: number) => {
   }
 };
 
+const analyzeWithAI = async (reportId: number) => {
+  try {
+    const res = await axios.post(`${apiSurveyEndpoint}/analyze-survey-with-ai/${reportId}`);
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể phân tích khảo sát với AI.');
+    throw err;
+  }
+};
+
+const getAIReportDetail = async (reportId: number) => {
+  try {
+    const res = await axios.get(`${apiSurveyEndpoint}/get-ai-by-id/${reportId}`);
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tải kết quả phân tích AI.');
+    throw err;
+  }
+};
+
+const importExcelQuestions = async (file: File) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await axios.post(`${apiSurveyEndpoint}/import-excel-questions`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể import file Excel.');
+    throw err;
+  }
+};
+
+const pagingSurveyLog = async (query: IQuerySurveyLog) => {
+  try {
+    const res = await axios.get(`${apiSurveyEndpoint}/paging-log`, { params: query });
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tải danh sách nhật ký.');
+    throw err;
+  }
+};
+
 export const SurveyService = {
   pagingRequest,
   getRequestById,
@@ -257,5 +306,9 @@ export const SurveyService = {
   submitSurvey,
   generateReport,
   pagingReport,
-  getReportDetail
+  getReportDetail,
+  analyzeWithAI,
+  getAIReportDetail,
+  importExcelQuestions,
+  pagingSurveyLog
 };

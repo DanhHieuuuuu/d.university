@@ -4,12 +4,12 @@ import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, UserOutl
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiCaNhan, resetStatusKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
 import { createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
+import { getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk'; // Import thunk lấy từ DB
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { getAllUser } from '@redux/feature/userSlice';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
-import { LIST_CONG_THUC } from '@/constants/kpi/kpiFormula.const';
 import { LOAI_KET_QUA_OPTIONS } from '@/constants/kpi/loaiCongThuc.enum';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 import UserSelect, { UserOption } from '@components/bthanh-custom/userSelect';
@@ -26,6 +26,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm<any>();
   const [title, setTitle] = useState<string>('KPI Cá nhân');
+  const { listCongThuc } = useAppSelector((state) => state.kpiState);
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiCaNhan);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
@@ -33,14 +34,14 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const userStatus = useAppSelector((state) => state.userState.status);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
   const watchIdPhongBan = Form.useWatch('idPhongBan', form);
-  const selectedLoaiKpi = Form.useWatch('loaiKPI', form);
 
   const congThucOptions = useMemo(() => {
-    if (!selectedLoaiKpi) return [];
-    return LIST_CONG_THUC
-      .filter((ct) => ct.loaiKpiApDung.includes(selectedLoaiKpi))
-      .map((ct) => ({ value: ct.id, label: ct.congThuc }));
-  }, [selectedLoaiKpi]);
+    return listCongThuc.data.map((ct) => ({ 
+      value: ct.id, 
+      label: ct.tenCongThuc 
+    }));
+  }, [listCongThuc.data]);
+
   const userOptions: UserOption[] = useMemo(() => {
     return (users || [])
       .filter(u => !watchIdPhongBan || u.idPhongBan === watchIdPhongBan)
@@ -61,21 +62,25 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
     if (isModalOpen) {
       setTitle(isView ? 'Xem thông tin KPI Cá nhân' : isUpdate ? 'Cập nhật KPI Cá nhân' : 'Thêm mới KPI Cá nhân');
       dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
+    
+      if (listCongThuc.data.length === 0) {
+        dispatch(getListKpiCongThuc({})); 
+      }
     }
-  }, [isModalOpen, isUpdate, isView, dispatch]);
+  }, [isModalOpen, isUpdate, isView, dispatch, listCongThuc.data.length]);
 
   useEffect(() => {
     if (!$selected.data || users.length === 0 || !isModalOpen) return;
     const selectedData = $selected.data;
     const nhanSuOption = selectedData.idNhanSu ? userOptions.find((u) => u.value === selectedData.idNhanSu) : undefined;
-    const congThucMatched = LIST_CONG_THUC.find((x) => x.congThuc === selectedData.congThuc);
 
     form.setFieldsValue({
       ...selectedData,
-      idNhanSu: nhanSuOption,
+      idNhanSu: selectedData.idNhanSu,
+      idPhongBan: selectedData.idPhongBan, 
       loaiKPI: selectedData.loaiKpi,
-      idCongThuc: congThucMatched?.id,
-      congThucTinh: congThucMatched?.congThuc,
+      idCongThuc: selectedData.idCongThuc,
+      congThucTinh: selectedData.congThuc,
       namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
     });
   }, [$selected.data, users, isModalOpen, userOptions, form]);
@@ -174,7 +179,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Select
               placeholder="Chọn loại"
               options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
-              onChange={() => form.setFieldsValue({ idCongThuc: undefined, congThucTinh: undefined })}
             />
           </Form.Item>
 
@@ -184,12 +188,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Form.Item label="Công thức tính" name="idCongThuc" rules={[{ required: true }]}>
             <Select
-              placeholder={selectedLoaiKpi ? 'Chọn công thức' : 'Chọn Loại KPI trước'}
+              placeholder="Chọn công thức từ hệ thống"
               options={congThucOptions}
-              disabled={!selectedLoaiKpi}
+              loading={listCongThuc.status === ReduxStatus.LOADING}
               onChange={(value) => {
-                const selected = LIST_CONG_THUC.find(x => x.id === value);
-                form.setFieldsValue({ congThucTinh: selected?.congThuc });
+                const selected = listCongThuc.data.find(x => x.id === value);
+                form.setFieldsValue({ congThucTinh: selected?.tenCongThuc });
               }}
             />
           </Form.Item>
@@ -198,6 +202,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Select placeholder="Chọn loại kết quả" options={LOAI_KET_QUA_OPTIONS} />
           </Form.Item>
 
+          {/* Trường ẩn để gửi tên công thức lên BE nếu BE vẫn yêu cầu cả text */}
           <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
 
           <Divider className="col-span-2 my-2" />
