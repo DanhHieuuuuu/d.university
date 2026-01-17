@@ -4,7 +4,9 @@ import {
   IQueryMySurvey,
   ISubmitSurvey,
   ICreateSurvey,
-  IUpdateSurvey
+  IUpdateSurvey,
+  IQuerySurveyLog,
+  IViewSurveyLog
 } from '@models/survey/survey.model';
 import { IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
@@ -260,7 +262,7 @@ const importExcelQuestions = async (file: File) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     const res = await axios.post(`${apiSurveyEndpoint}/import-excel-questions`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -273,6 +275,15 @@ const importExcelQuestions = async (file: File) => {
   }
 };
 
+const pagingSurveyLog = async (query: IQuerySurveyLog) => {
+  try {
+    const res = await axios.get(`${apiSurveyEndpoint}/paging-log`, { params: query });
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tải danh sách nhật ký.');
+    throw err;
+  }
+};
 
 export const SurveyService = {
   pagingRequest,
@@ -298,5 +309,6 @@ export const SurveyService = {
   getReportDetail,
   analyzeWithAI,
   getAIReportDetail,
-  importExcelQuestions
+  importExcelQuestions,
+  pagingSurveyLog
 };

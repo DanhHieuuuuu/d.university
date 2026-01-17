@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ReduxStatus } from '@redux/const';
 import { CRUD } from '@models/common/common';
 import { IViewRequest } from '@models/survey/request.model';
-import { IViewSurvey, IStartSurveyResponse, ISurveyResult } from '@models/survey/survey.model';
+import { IViewSurvey, IStartSurveyResponse, ISurveyResult, IViewSurveyLog } from '@models/survey/survey.model';
 import { IReportItem, IReportDetail } from '@models/survey/report.model';
 import * as thunks from './surveyThunk';
 
@@ -22,6 +22,9 @@ interface SurveyState {
     result: ISurveyResult | null; // Kết quả sau khi nộp
     status: ReduxStatus; // Trạng thái load đề/nộp bài
     saveDraftStatus: ReduxStatus; // Trạng thái lưu nháp (để hiện loading nhỏ)
+  };
+  surveyLog: {
+    $list: { status: ReduxStatus; data: IViewSurveyLog[]; total: number };
   };
 }
 
@@ -64,6 +67,9 @@ const initialState: SurveyState = {
     result: null,
     status: ReduxStatus.IDLE,
     saveDraftStatus: ReduxStatus.IDLE
+  },
+  surveyLog: {
+    $list: { status: ReduxStatus.IDLE, data: [], total: 0 }
   }
 };
 
@@ -361,6 +367,19 @@ const surveySlice = createSlice({
       })
       .addCase(thunks.getAIReportDetail.rejected, (state) => {
         state.aiReport.detail.status = ReduxStatus.FAILURE;
+      })
+
+      // 5. SURVEY LOG
+      .addCase(thunks.getPagingSurveyLog.pending, (state) => {
+        state.surveyLog.$list.status = ReduxStatus.LOADING;
+      })
+      .addCase(thunks.getPagingSurveyLog.fulfilled, (state, action) => {
+        state.surveyLog.$list.status = ReduxStatus.SUCCESS;
+        state.surveyLog.$list.data = action.payload?.items || [];
+        state.surveyLog.$list.total = action.payload?.totalItem || 0;
+      })
+      .addCase(thunks.getPagingSurveyLog.rejected, (state) => {
+        state.surveyLog.$list.status = ReduxStatus.FAILURE;
       });
   }
 });

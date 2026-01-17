@@ -88,6 +88,8 @@
         public const string SurveyButtonReportGenerate = $"{PermissionPrefixKeys.Button}survey_report_generate";
         public const string SurveyButtonAIReportGenerate = $"{PermissionPrefixKeys.Button}survey_ai_report_generate";
 
+        public const string SurveyMenuLogging = $"{PermissionPrefixKeys.Menu}survey_logging";
+
         #endregion
     }
 }

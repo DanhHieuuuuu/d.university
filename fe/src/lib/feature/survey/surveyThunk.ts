@@ -1,7 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { SurveyService } from '@services/survey.service';
 import { IQueryRequest, ICreateRequest, IUpdateRequest, IRejectRequest } from '@models/survey/request.model';
-import { IQuerySurvey, IQueryMySurvey, ISubmitSurvey, IUpdateSurvey } from '@models/survey/survey.model';
+import {
+  IQuerySurvey,
+  IQueryMySurvey,
+  ISubmitSurvey,
+  IUpdateSurvey,
+  IQuerySurveyLog
+} from '@models/survey/survey.model';
 import { IQueryReport } from '@models/survey/report.model';
 
 export const getPagingRequest = createAsyncThunk(
@@ -259,6 +265,18 @@ export const importExcelQuestions = createAsyncThunk(
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err?.response?.data || 'Import Excel thất bại');
+    }
+  }
+);
+
+export const getPagingSurveyLog = createAsyncThunk(
+  'survey/paging-log',
+  async (payload: IQuerySurveyLog, { rejectWithValue }) => {
+    try {
+      const res = await SurveyService.pagingSurveyLog(payload);
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err);
     }
   }
 );

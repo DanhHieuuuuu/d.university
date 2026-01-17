@@ -122,3 +122,23 @@ export interface ISurveyResult {
   totalQuestions: number;
   submitTime: string | Date;
 }
+
+// Survey Log Models
+export type IQuerySurveyLog = IQueryPaging & {
+  loaiHanhDong?: string;
+  tuNgay?: string | Date;
+  denNgay?: string | Date;
+};
+
+export interface IViewSurveyLog {
+  id: number;
+  idNguoiThaoTac?: number;
+  tenNguoiThaoTac?: string;
+  loaiHanhDong: string;
+  moTa: string;
+  tenBang: string;
+  idDoiTuong: string;
+  duLieuCu?: string;
+  duLieuMoi?: string;
+  createdAt: string | Date;
+}

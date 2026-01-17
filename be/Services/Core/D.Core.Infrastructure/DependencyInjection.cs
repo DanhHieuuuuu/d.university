@@ -18,6 +18,7 @@ using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.Core.Infrastructure.Services.Kpi.Implements;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.Core.Infrastructure.Services.SinhVien.Implements;
+using D.Core.Infrastructure.Services.Survey;
 using D.Core.Infrastructure.Services.Survey.AI.Abstracts;
 using D.Core.Infrastructure.Services.Survey.AI.Implement;
 using D.Core.Infrastructure.Services.Survey.Report.Abstracts;
@@ -59,6 +60,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<ISurveyService, SurveyService>()
                 .AddScoped<IReportSurveyService, ReportSurveyService>()
                 .AddScoped<IAISurveyService, AISurveyService>()
+                .AddHostedService<AutoSurveyStatusService>()
             #endregion
                 .AddScoped<IFileService, FileService>()
             #region Kpi

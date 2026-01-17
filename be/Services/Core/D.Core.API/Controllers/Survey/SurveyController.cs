@@ -1,14 +1,15 @@
-﻿using D.ControllerBase;
+﻿using d.Shared.Permission;
+using d.Shared.Permission.Permission;
+using D.ControllerBase;
 using D.Core.Application.Command.Survey;
+using D.Core.Domain.Dtos.Survey.AI;
+using D.Core.Domain.Dtos.Survey.Log;
 using D.Core.Domain.Dtos.Survey.Report;
 using D.Core.Domain.Dtos.Survey.Request;
 using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
-using D.Core.Domain.Dtos.Survey.AI;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using d.Shared.Permission;
-using d.Shared.Permission.Permission;
 
 namespace D.Core.API.Controllers.Survey
 {
@@ -488,6 +489,24 @@ namespace D.Core.API.Controllers.Survey
             catch (Exception ex)
             {
                 return BadRequest(new ResponseAPI(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách nhật ký hoạt động khảo sát (Paging)
+        /// </summary>
+        [PermissionFilter(PermissionCoreKeys.SurveyMenuLogging)]
+        [HttpGet("paging-log")]
+        public async Task<ResponseAPI> PagingLog([FromQuery] FilterSurveyLogDto query)
+        {
+            try
+            {
+                var result = await _mediator.Send(query);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
             }
         }
 

@@ -55,7 +55,7 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
             var stats = new ReportStatisticsDto();
 
-            // Get all responses for submitted submissions, excluding soft-deleted ones
+            // Get all responses exclude deleted
             var submissionIds = submissions.Select(s => s.Id).ToList();
             var allResponses = await _unitOfWork.iKsSurveySubmissionAnswerRepository.TableNoTracking
                 .Where(r => submissionIds.Contains(r.IdPhienLamBai) && !r.Deleted)
@@ -357,14 +357,12 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
             var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
 
-            var fullDescription = $"{description}. Thực hiện bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
-
             var log = new KsSurveyLog
             {
                 IdNguoiThaoTac = userId,
                 TenNguoiThaoTac = userName,
                 LoaiHanhDong = actionType,
-                MoTa = fullDescription,
+                MoTa = description,
                 TenBang = nameof(KsSurveyReport),
                 IdDoiTuong = targetId,
                 DuLieuCu = oldValue,

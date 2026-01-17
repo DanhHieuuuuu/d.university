@@ -57,4 +57,6 @@ export class PermissionCoreConst {
   public static readonly SurveyMenuReport = `${PermissionCoreConst.Menu}survey_report`;
   public static readonly SurveyButtonReportGenerate = `${PermissionCoreConst.Button}survey_report_generate`;
   public static readonly SurveyButtonAIReportGenerate = `${PermissionCoreConst.Button}survey_ai_report_generate`;
+
+  public static readonly SurveyMenuLogging = `${PermissionCoreConst.Menu}survey_logging`;
 }

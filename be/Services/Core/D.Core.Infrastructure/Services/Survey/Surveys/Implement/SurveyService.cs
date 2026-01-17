@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using d.Shared.Permission.Auth;
+using D.Core.Domain.Dtos.Survey.Log;
+using D.Core.Domain.Dtos.Survey.Logging;
 using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
 using D.Core.Domain.Entities.Survey;
@@ -181,14 +183,12 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
 
-            var fullDescription = $"{description}. Thực hiện bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
-
             var log = new KsSurveyLog
             {
                 IdNguoiThaoTac = userId,
                 TenNguoiThaoTac = userName,
                 LoaiHanhDong = actionType,
-                MoTa = fullDescription,
+                MoTa = description,
                 TenBang = nameof(KsSurvey),
                 IdDoiTuong = targetId,
                 DuLieuCu = oldValue,
@@ -524,14 +524,14 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             foreach (var item in newAnswers)
             {
-                // Delete existing answers for this question first
+                // Delete existing answers
                 var existingForQuestion = existingAnswers.Where(x => x.IdCauHoi == item.QuestionId).ToList();
                 foreach (var existing in existingForQuestion)
                 {
                     _unitOfWork.iKsSurveySubmissionAnswerRepository.Delete(existing);
                 }
 
-                // Handle multiple choice (type 2) - create multiple records
+                // Handle multiple choice (type 2) - multiple records
                 if (item.SelectedAnswerIds != null && item.SelectedAnswerIds.Any())
                 {
                     foreach (var answerId in item.SelectedAnswerIds)
@@ -561,6 +561,59 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             }
         }
 
+        public PageResultDto<LogSurveyResponseDto> LogPaging(FilterSurveyLogDto dto)
+        {
+            _logger.LogInformation($"{nameof(LogPaging)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+            var query = _unitOfWork.iKsSurveyLogRepository.TableNoTracking.AsQueryable();
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                query = query.Where(x =>
+                    (x.TenNguoiThaoTac != null && x.TenNguoiThaoTac.Contains(dto.Keyword)) ||
+                    x.MoTa.Contains(dto.Keyword));
+            }
+            if (!string.IsNullOrEmpty(dto.LoaiHanhDong))
+            {
+                query = query.Where(x => x.LoaiHanhDong == dto.LoaiHanhDong);
+            }
+
+            if (dto.TuNgay.HasValue)
+            {
+                query = query.Where(x => x.CreatedDate >= dto.TuNgay.Value);
+            }
+            if (dto.DenNgay.HasValue)
+            {
+                var endOfDay = dto.DenNgay.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(x => x.CreatedDate <= endOfDay);
+            }
+
+            query = query.OrderByDescending(x => x.CreatedDate);
+
+            var totalCount = query.Count();
+            var items = query
+                .Skip((dto.PageIndex - 1) * dto.PageSize)
+                .Take(dto.PageSize)
+                .Select(x => new LogSurveyResponseDto
+                {
+                    Id = x.Id,
+                    IdNguoiThaoTac = x.IdNguoiThaoTac,
+                    TenNguoiThaoTac = x.TenNguoiThaoTac,
+                    LoaiHanhDong = x.LoaiHanhDong,
+                    MoTa = x.MoTa,
+                    TenBang = x.TenBang,
+                    IdDoiTuong = x.IdDoiTuong,
+                    DuLieuCu = x.DuLieuCu,
+                    DuLieuMoi = x.DuLieuMoi,
+                    CreatedAt = x.CreatedDate
+                })
+                .ToList();
+
+            return new PageResultDto<LogSurveyResponseDto>
+            {
+                Items = items,
+                TotalItem = totalCount
+            };
+        }
+
         private async Task LogSubmissionActivityAsync(int submissionId, string action, string note)
         {
             try
@@ -579,6 +632,108 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             {
                 _logger.LogError(ex, "Lỗi ghi log bài làm");
             }
+        }
+
+        public async Task ProcessAutoStatusUpdateAsync()
+        {
+            _logger.LogInformation("Processing auto survey status update");
+
+            var now = DateTime.Now;
+
+            // Get surveys update
+            var surveys = await _unitOfWork.iKsSurveyRepository.Table
+                .Where(s => !s.Deleted &&
+                           (s.Status == SurveyStatus.Close || s.Status == SurveyStatus.Open))
+                .ToListAsync();
+            int openedCount = 0;
+            int closedCount = 0;
+            foreach (var survey in surveys)
+            {
+                try
+                {
+                    bool statusChanged = false;
+                    var oldStatus = survey.Status;
+
+                    // OPEN: Survey is closed & current time >= start time
+                    if (survey.Status == SurveyStatus.Close &&
+                        survey.ThoiGianBatDau <= now &&
+                        survey.ThoiGianKetThuc > now)
+                    {
+                        survey.Status = SurveyStatus.Open;
+                        survey.ModifiedDate = DateTime.Now;
+                        survey.ModifiedBy = "SYSTEM";
+                        statusChanged = true;
+                        openedCount++;
+
+                        // Log
+                        await LogActionAsSystemAsync(
+                            survey.MaKhaoSat,
+                            "Open",
+                            "Tự động mở khảo sát theo lịch",
+                            oldStatus.ToString(),
+                            SurveyStatus.Open.ToString()
+                        );
+
+                        _logger.LogInformation($"Auto-opened survey: {survey.MaKhaoSat}");
+                    }
+                    // CLOSE: Survey is open & current time >= end time
+                    else if (survey.Status == SurveyStatus.Open &&
+                             survey.ThoiGianKetThuc <= now)
+                    {
+                        survey.Status = SurveyStatus.Close;
+                        survey.ModifiedDate = DateTime.Now;
+                        survey.ModifiedBy = "SYSTEM";
+                        statusChanged = true;
+                        closedCount++;
+
+                        // Log
+                        await LogActionAsSystemAsync(
+                            survey.MaKhaoSat,
+                            "Close",
+                            "Tự động đóng khảo sát theo lịch",
+                            oldStatus.ToString(),
+                            SurveyStatus.Close.ToString()
+                        );
+
+                        _logger.LogInformation($"Auto-closed survey: {survey.MaKhaoSat}");
+                    }
+
+                    if (statusChanged)
+                    {
+                        _unitOfWork.iKsSurveyRepository.Update(survey);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error auto-updating survey {survey.MaKhaoSat}");
+                }
+            }
+            if (openedCount > 0 || closedCount > 0)
+            {
+                await _unitOfWork.SaveChangesAsync();
+                _logger.LogInformation($"Auto status update completed: Opened {openedCount}, Closed {closedCount}");
+            }
+            else
+            {
+                _logger.LogInformation("No surveys need update now");
+            }
+        }
+
+        private async Task LogActionAsSystemAsync(string targetId, string actionType, string description, string? oldValue = null, string? newValue = null)
+        {
+            var log = new KsSurveyLog
+            {
+                IdNguoiThaoTac = null,       
+                TenNguoiThaoTac = "SYSTEM",
+                LoaiHanhDong = actionType,
+                MoTa = description,
+                TenBang = nameof(KsSurvey),
+                IdDoiTuong = targetId,
+                DuLieuCu = oldValue,
+                DuLieuMoi = newValue,
+                CreatedDate = DateTime.Now
+            };
+            await _unitOfWork.iKsSurveyLogRepository.AddAsync(log);
         }
 
     }

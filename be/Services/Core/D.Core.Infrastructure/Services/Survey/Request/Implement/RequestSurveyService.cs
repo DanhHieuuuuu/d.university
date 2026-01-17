@@ -268,14 +268,12 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
             var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
 
-            var fullDescription = $"{description}. Thực hiện bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
-
             var log = new KsSurveyLog
             {
                 IdNguoiThaoTac = userId,
                 TenNguoiThaoTac = userName,
                 LoaiHanhDong = actionType,
-                MoTa = fullDescription,
+                MoTa = description,
                 TenBang = nameof(KsSurveyRequest),
                 IdDoiTuong = targetId,
                 DuLieuCu = oldValue,
