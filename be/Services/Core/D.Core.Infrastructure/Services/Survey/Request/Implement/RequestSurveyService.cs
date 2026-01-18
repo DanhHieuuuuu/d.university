@@ -110,6 +110,9 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
             var entity = await _unitOfWork.iKsSurveyRequestRepository.GetDetailWithNavigationsForUpdateAsync(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "chỉnh sửa");
+
             if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)
                 throw new Exception("Chỉ được chỉnh sửa khi phiếu ở trạng thái Nháp hoặc bị Từ chối.");
 
@@ -183,6 +186,9 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             var entity =  _unitOfWork.iKsSurveyRequestRepository.FindById(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "xóa");
+
             if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)
                 throw new Exception("Chỉ được xóa phiếu Nháp hoặc phiếu bị Từ chối.");
 
@@ -208,6 +214,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "gửi duyệt");
 
             if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)          
                 throw new Exception("Chỉ được gửi duyệt khi phiếu ở trạng thái Nháp hoặc đã bị Từ chối.");      
@@ -237,6 +245,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "hủy gửi duyệt");
 
             if (entity.TrangThai != RequestStatus.Pending)
                 throw new Exception("Chỉ có thể hủy gửi duyệt khi phiếu đang ở trạng thái Chờ duyệt.");
@@ -282,6 +292,19 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
             };
 
             await _unitOfWork.iKsSurveyLogRepository.AddAsync(log);
+        }
+
+        private void CheckOwnership(KsSurveyRequest entity, string actionName)
+        {
+            var currentUserId = CommonUntil.GetCurrentUserId(_httpContextAccessor).ToString();
+
+            if (entity.CreatedBy != currentUserId)
+            {
+                throw new UnauthorizedAccessException(
+                    $"Bạn không có quyền {actionName} cho yêu cầu này. " +
+                    $"Chỉ người tạo yêu cầu mới có quyền thực hiện hành động này."
+                );
+            }
         }
 
         public async Task ApproveRequestAsync(int id)
