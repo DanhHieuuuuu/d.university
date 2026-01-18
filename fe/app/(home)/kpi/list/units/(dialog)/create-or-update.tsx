@@ -184,7 +184,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <TeamOutlined /> ĐƠN VỊ THỰC HIỆN
           </div>
 
-          <Form.Item label="Đơn vị chủ trì" name="idDonVi" className="col-span-2" rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}>
+          <Form.Item name="idDonVi" className="col-span-2" rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}>
             <Select
               options={phongBanByKpiRole.$list.data.map((pb) => ({
                 value: pb.id,

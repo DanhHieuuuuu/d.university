@@ -8,6 +8,7 @@ import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUp
 import { IQueryKpiLogStatus, KpiLogStatusResponse } from '@models/kpi/kpi-log.model';
 import { IAskKpiChatCommand } from '@models/kpi/kpi-chat.model';
 import { IQueryKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
+import { IQueryKpiScoreBoard } from '@models/kpi/kpi-scoreboard.model';
 
 export const getAllKpiCaNhan = createAsyncThunk('kpi/list-canhan', async (payload?: IQueryKpiCaNhan) => {
     try {
@@ -506,6 +507,20 @@ export const getListKpiCongThuc = createAsyncThunk(
       return data;
     } catch (err) {
       return rejectWithValue(err);
+    }
+  }
+);
+//Get ĐIểm
+export const getKpiScoreBoard = createAsyncThunk(
+  'kpi/getScoreBoard',
+  async (payload: IQueryKpiScoreBoard, { rejectWithValue }) => {
+    try {
+      const data = await KpiService.getKpiScoreBoard(payload);
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.response?.data || { message: 'Lấy bảng thành tích thất bại' }
+      );
     }
   }
 );
