@@ -42,10 +42,7 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({ isModalOpen, setIsModalOp
       const user = userList.find((u) => u.id === userId) ?? null;
       setUserData(user);
 
-      // Lấy danh sách role
-      dispatch(getListRole({ PageIndex: 0, PageSize: 1000, Keyword: '' }));
-
-      // Lấy role hiện tại của user
+      dispatch(getListRole({ PageIndex: 1, PageSize: 1000, Keyword: '' }));
       dispatch(getUserRolesByIdThunk(userId))
         .unwrap()
         .then((res) => {

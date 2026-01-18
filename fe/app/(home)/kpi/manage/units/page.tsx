@@ -368,7 +368,7 @@ const Page = () => {
                   </div>
 
                   <div className="flex flex-col items-center justify-center border-l border-gray-300 pl-4">
-                    <span className="text-sm text-gray-600 mb-1">Điểm tổng nhận được</span>
+                    <span className="text-sm text-gray-600 mb-1">Điểm cấp trên</span>
                     <span className="text-2xl font-bold text-green-600">
                       {summary?.tongCapTren?.toFixed(2) ?? 0}
                     </span>

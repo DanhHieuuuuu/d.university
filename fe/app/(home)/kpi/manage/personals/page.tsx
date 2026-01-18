@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Image, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
   SearchOutlined, SyncOutlined, EyeOutlined, FilterOutlined,
-  CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined
+  CheckCircleOutlined, EllipsisOutlined, SaveOutlined, UndoOutlined,
+  InfoCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -28,6 +29,7 @@ import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+import KpiReferenceTable from '@components/bthanh-custom/kpiComplianceTable';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -44,6 +46,7 @@ const Page = () => {
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ketQuaMap, setKetQuaMap] = useState<Record<number, number | undefined>>({});
+  const [isKpiComplianceTableOpen, setIsKpiComplianceTableOpen] = useState(false);
 
   const tableData = useMemo(() => {
     const sortedList = [...(list || [])].sort(
@@ -229,21 +232,20 @@ const Page = () => {
       width: 200,
       render: (val, record) => {
         if (record.rowType !== 'data') return { props: { colSpan: 0 } };
-
         if (record.loaiKpi === 3) {
           return (
-            <Image
-              width={100}
-              src="constants\kpi\tuanThu.png"
-              preview={{
-                mask: <div className="text-xs"><EyeOutlined /> Xem mốc trừ</div>,
-              }}
-              className="rounded border shadow-sm cursor-pointer"
-            />
+            <div
+              className="cursor-pointer font-semibold text-blue-600 hover:text-blue-900 underline items-center transition-colors"
+              onClick={() => setIsKpiComplianceTableOpen(true)}
+              title="Click để xem bảng tham chiếu"
+            >
+              <span>{val || 'Xem phụ lục'}</span>
+            </div>
           );
         }
-        return <span className="text-gray-500">{val}</span>;
-      },
+
+        return val;
+      }
     },
     {
       key: 'ketQuaThucTe',
@@ -457,13 +459,13 @@ const Page = () => {
                   </div>
 
                   <div className="flex flex-col items-center justify-center border-l border-r border-gray-300 px-4">
-                    <span className="text-sm text-gray-600 mb-1">Điểm tự đánh giá (Kết quả)</span>
+                    <span className="text-sm text-gray-600 mb-1">Điểm tự đánh giá</span>
                     <span className="text-2xl font-bold text-orange-600">
                       {summary?.tongTuDanhGia?.toFixed(2) ?? 0}
                     </span>
                   </div>
                   <div className="flex flex-col items-center justify-center">
-                    <span className="text-sm text-gray-600 mb-1">Điểm cấp trên chốt (Kết quả)</span>
+                    <span className="text-sm text-gray-600 mb-1">Điểm cấp trên</span>
                     <span className="text-2xl font-bold text-green-600">
                       {summary?.tongCapTren?.toFixed(2) ?? 0}
                     </span>
@@ -475,6 +477,16 @@ const Page = () => {
         </div>
         <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiCaNhanKeKhai(query)); dispatch(getListTrangThaiKpiCaNhan()); }} />
         <KpiAiChat />
+        <Modal
+          title={<span className="text-lg font-bold text-blue-700">PHỤ LỤC: KPIs KỶ LUẬT LAO ĐỘNG CÁ NHÂN</span>}
+          open={isKpiComplianceTableOpen}
+          onCancel={() => setIsKpiComplianceTableOpen(false)}
+          footer={[]}
+          width={1000}
+          style={{ top: 20 }}
+        >
+          <KpiReferenceTable />
+        </Modal>
       </Card>
     </div>
   );
