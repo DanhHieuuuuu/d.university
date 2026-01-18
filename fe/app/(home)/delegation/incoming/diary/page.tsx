@@ -57,7 +57,6 @@ const Page = () => {
 
   // Column cho logReceptionTime
   const receptionColumns: IColumn<ILogReceptionTime>[] = [
-    { key: 'stt', fixed: 'left', width: 60, title: 'STT', align: 'center', render: (_: any, __: any, index: number) => index + 1 },
     { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center',width:130 },
     { key: 'type', dataIndex: 'type', title: 'Loại', align: 'center' },
     { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 250 },
