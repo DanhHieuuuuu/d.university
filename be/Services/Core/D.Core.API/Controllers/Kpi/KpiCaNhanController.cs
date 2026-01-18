@@ -1,6 +1,7 @@
 ﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiCongThuc;
+using D.Core.Domain.Dtos.Kpi.KpiTinhDiem.D.Core.Domain.Dtos.Kpi.KpiTinhDiem;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -216,6 +217,25 @@ namespace D.Core.API.Controllers.Kpi
         /// <returns></returns>
         [HttpGet("kpi-congthuc/danh-sach")]
         public async Task<ResponseAPI> GetAllKpiCongThuc([FromQuery] GetCongThucRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy bảng thành tích KPI (Dashboard)
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("kpi-tinhdiem/kpi-scoreboard")]
+        public async Task<ResponseAPI> GetScoreBoard([FromQuery] GetKpiScoreBoardDto dto)
         {
             try
             {

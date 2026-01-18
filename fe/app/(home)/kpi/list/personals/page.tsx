@@ -11,7 +11,8 @@ import {
   FilterOutlined,
   EllipsisOutlined,
   UndoOutlined,
-  SaveOutlined
+  SaveOutlined,
+  InfoCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -36,6 +37,7 @@ import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import KpiLogModal from '../../modal/KpiLogModal';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
+import KpiReferenceTable from '@components/bthanh-custom/kpiComplianceTable';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -60,6 +62,7 @@ const Page = () => {
   const [openLogModal, setOpenLogModal] = useState(false);
   const [selectedKpiLogId, setSelectedKpiLogId] = useState<number | null>(null);
   const [activeLoaiKpi, setActiveLoaiKpi] = useState<number>(KpiLoaiConst.CHUC_NANG);
+  const [isKpiComplianceTableOpen, setIsKpiComplianceTableOpen] = useState(false);
   const { data, total, status: logStatus } = useAppSelector(
     state => state.kpiState.kpiLog.$list
   );
@@ -161,7 +164,7 @@ const Page = () => {
   const cancelPrincipalApprovedSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
       validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
-      invalidMsg: 'Chỉ KPI "Hiệu trưởng đã chấm" mới được hủy',
+      invalidMsg: 'Chỉ KPI "Đã phê duyệt kết quả chấm" mới được hủy',
       confirmTitle: 'Hủy phê duyệt KPI',
       confirmMessage: 'Hủy phê duyệt các KPI đã chọn?',
       successMsg: 'Hủy phê duyệt chấm thành công',
@@ -262,13 +265,13 @@ const Page = () => {
     },
     {
       key: 'principalApprove',
-      label: 'Hiệu trưởng phê duyệt',
+      label: 'Phê duyệt kết quả chấm',
       icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
       onClick: () => requiredSelect(principalApprovedSelected),
     },
     {
       key: 'cancelPrincipalApprove',
-      label: 'Hiệu trưởng hủy duyệt',
+      label: 'Hủy phê duyệt kết quả chấm',
       icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
       onClick: () => requiredSelect(cancelPrincipalApprovedSelected),
     },
@@ -362,14 +365,19 @@ const Page = () => {
       dataIndex: 'congThuc',
       title: 'Công thức tính',
       width: 200,
+      render: (val, record) => {
+        if (record.loaiKpi === 3) {
+          return (
+            <div className="cursor-pointer font-semibold text-blue-600 hover:text-blue-900 underline items-center transition-colors"
+              onClick={() => setIsKpiComplianceTableOpen(true)}
+              title="Click để xem bảng tham chiếu"
+            >
+              <span>{val || 'Xem phụ lục'}</span>
+            </div>
+          );
+        }
+      }
     },
-    // {
-    //   key: 'loaiKpi',
-    //   dataIndex: 'loaiKpi',
-    //   title: 'Loại KPI',
-    //   width: 140,
-    //   render: (val) => KpiLoaiConst.getName(val)
-    // },
     {
       key: 'ketQuaThucTe',
       dataIndex: 'ketQuaThucTe',
@@ -498,7 +506,7 @@ const Page = () => {
             <Form.Item name="idNhanSu" noStyle>
               <Select
                 placeholder={watchIdPhongBan ? "Chọn nhân sự" : "Chọn nhân sự (Tất cả)"}
-                style={{ width: 320 }} 
+                style={{ width: 320 }}
                 allowClear
                 showSearch
                 optionFilterProp="label"
@@ -649,6 +657,16 @@ const Page = () => {
         loading={logStatus === ReduxStatus.LOADING}
       />
       <KpiAiChat />
+      <Modal
+        title={<span className="text-lg font-bold text-blue-700">PHỤ LỤC: KPIs KỶ LUẬT LAO ĐỘNG CÁ NHÂN</span>}
+        open={isKpiComplianceTableOpen}
+        onCancel={() => setIsKpiComplianceTableOpen(false)}
+        footer={[]}
+        width={1000}
+        style={{ top: 20 }}
+      >
+        <KpiReferenceTable />
+      </Modal>
 
     </Card>
   );
