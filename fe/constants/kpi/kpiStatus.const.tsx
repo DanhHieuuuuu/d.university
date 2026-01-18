@@ -32,7 +32,7 @@ export class KpiTrangThaiConst {
     { value: this.DA_GUI_CHAM, text: 'Đã gửi chấm', color: 'geekblue' },
     {
       value: this.HIEU_TRUONG_PHE_DUYET,
-      text: 'Hiệu trưởng phê duyệt',
+      text: 'Đã phê duyệt kết quả chấm',
       color: 'blue',
     },
   ] as { value: number; text: string; color: TagProps['color'] }[];

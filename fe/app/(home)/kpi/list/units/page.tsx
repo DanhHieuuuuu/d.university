@@ -143,7 +143,7 @@ const Page = () => {
   const cancelPrincipalApprovedSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
       validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
-      invalidMsg: 'Chỉ KPI "Hiệu trưởng đã chấm" mới được hủy',
+      invalidMsg: 'Chỉ KPI "Đã phê duyệt kết quả chấm" mới được hủy',
       confirmTitle: 'Hủy phê duyệt KPI',
       confirmMessage: 'Hủy phê duyệt các KPI đã chọn?',
       successMsg: 'Hủy phê duyệt chấm thành công',
@@ -225,8 +225,8 @@ const Page = () => {
     { key: 'score', label: 'Chấm KPI', icon: <EditOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(scoreSelected) },
     { key: 'cancelScore', label: 'Hủy kết quả chấm KPI', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelScoredSelected) },
     { key: 'syncKetQua', label: 'Đồng bộ kết quả thực tế', icon: <SyncOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(syncKetQuaThucTeToCapTren) },
-    { key: 'principalApprove', label: 'Hiệu trưởng phê duyệt', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(principalApprovedSelected) },
-    { key: 'cancelPrincipalApprove', label: 'Hiệu trưởng hủy duyệt', icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(cancelPrincipalApprovedSelected) },
+    { key: 'principalApprove', label: 'Phê duyệt kết quả chấm', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(principalApprovedSelected) },
+    { key: 'cancelPrincipalApprove', label: 'Hủy phê duyệt kết quả chấm', icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(cancelPrincipalApprovedSelected) },
   ];
 
   const filterContent = (
@@ -295,7 +295,7 @@ const Page = () => {
       render: (val, record) => {
         const value = ketQuaCapTrenMap[record.id] ?? val;
         return (
-          <KetQuaInput loaiKetQua={record.loaiKetQua} value={value} onChange={(v) => updateKetQuaCapTren(record.id, v)} editable={record.isActive === 0} />
+          <KetQuaInput loaiKetQua={record.loaiKetQua} value={value} onChange={(v) => updateKetQuaCapTren(record.id, v)} editable={record.isActive != 0} />
         );
       },
     },

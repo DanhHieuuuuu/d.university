@@ -1,4 +1,5 @@
 ﻿using D.ControllerBase;
+using D.Core.API.Logs;
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
@@ -14,13 +15,34 @@ namespace D.Core.API
     {
         public static void Main(string[] args)
         {
+            Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine($"Serilog Error: {msg}"));
+
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
+
+            // Local Seq + File
+            //Log.Logger = new LoggerConfiguration()
+            //    .ReadFrom.Configuration(configuration)
+            //    .Enrich.FromLogContext()
+            //    .Enrich.WithProperty("ServiceName", "CoreAPI")
+            //    .CreateLogger();
+
+            //  Axiom Cloud Logging
+            var axiomToken = Environment.GetEnvironmentVariable("AXIOM_TOKEN")
+                ?? configuration["Axiom:Token"];
+            var axiomDataset = configuration["Axiom:Dataset"];
+            var axiomUrl = $"{configuration["Axiom:ApiUrl"]}/{axiomDataset}/ingest";
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("ServiceName", "CoreAPI")
+                .Enrich.WithProperty("ServiceName", "CoreAPI") // Hoặc AuthAPI
+                .WriteTo.Http(
+                    requestUri: axiomUrl,
+                    queueLimitBytes: null,
+                    batchFormatter: new AxiomBatchFormatter(),
+                    httpClient: new AxiomHttpClient(axiomToken)
+                )
                 .CreateLogger();
 
             try

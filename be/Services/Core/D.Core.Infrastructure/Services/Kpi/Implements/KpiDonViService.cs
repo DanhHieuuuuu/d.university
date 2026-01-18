@@ -103,7 +103,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             });
         }
 
-        // 1. Hàm Kê khai cho Trưởng đơn vị
         public PageResultDto<KpiDonViDto> FindPagingKeKhai(FilterKpiDonViKeKhaiDto dto)
         {
             _logger.LogInformation($"{nameof(FindPagingKeKhai)} => dto = {JsonSerializer.Serialize(dto)}");
@@ -119,6 +118,14 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             if (!donViIdsQuanLy.Any())
             {
                 return new PageResultDto<KpiDonViDto> { Items = new List<KpiDonViDto>(), TotalItem = 0 };
+            }
+
+            foreach (var dviId in donViIdsQuanLy)
+            {
+                if (dviId.HasValue)
+                {
+                    EnsureKpiDonViKyLuatExist(dviId.Value).Wait();
+                }
             }
 
             var donvis = _unitOfWork.iDmPhongBanRepository.TableNoTracking.ToDictionary(x => x.Id, x => x.TenPhongBan);
@@ -255,7 +262,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 CapTrenDanhGia = kpi.CapTrenDanhGia,
                 IdCongThuc = kpi.IdCongThuc,
                 LoaiKetQua = kpi.LoaiKetQua,
-                IsActive = kpi.TrangThai == KpiStatus.Evaluated ? 0 : isActive,
+                IsActive = kpi.TrangThai == KpiStatus.Evaluated || kpi.TrangThai == KpiStatus.Assigned || kpi.TrangThai == KpiStatus.NeedEdit || kpi.TrangThai == KpiStatus.Declared ? isActive : 0,
             }).ToList();
 
             return new PageResultDto<KpiDonViDto> { Items = resultItems, TotalItem = totalCount, Summary = summaryDto };
@@ -451,7 +458,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.DiemKpi = item.DiemKpi;
                         if (kpi.LoaiKpi == 3)
                         {
-                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                            kpi.DiemKpi = TinhDiemKPI.GetDiemTruTuanThuDonVi(kpi.Kpi, kpi.KetQuaThucTe.Value);
                         }
                         else
                         {
@@ -490,7 +497,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         public void UpdateKpiDonVi(UpdateKpiDonViDto dto)
         {
             _logger.LogInformation($"{nameof(UpdateKpiDonVi)} dto={JsonSerializer.Serialize(dto)}");
-            // Tìm KPI cập nhật
             var kpi = _unitOfWork.iKpiDonViRepository.TableNoTracking.FirstOrDefault(x => x.Id == dto.Id && !x.Deleted);
 
             if (kpi == null)
@@ -498,7 +504,6 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 throw new Exception($"Không tìm thấy KPI cá nhân với Id={dto.Id}");
             }
             var oldStatus = kpi.TrangThai;
-            // Cập nhật thông tin
             kpi.Kpi = dto.Kpi;
             kpi.MucTieu = dto.MucTieu;
             kpi.TrongSo = dto.TrongSo;
@@ -578,7 +583,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.DiemKpiCapTren = item.DiemKpiCapTren;
                         if (kpi.LoaiKpi == 3)
                         {
-                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                            kpi.DiemKpiCapTren = TinhDiemKPI.GetDiemTruTuanThuDonVi(kpi.Kpi, kpi.CapTrenDanhGia.Value);
                         }
                         else
                         {
@@ -720,6 +725,74 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     Channel = NotificationChannel.Realtime
                 });
             }
+        }
+
+        private async Task EnsureKpiDonViKyLuatExist(int idDonVi)
+        {
+            var hasData = await _unitOfWork.iKpiDonViRepository.TableNoTracking
+                .AnyAsync(x => x.IdDonVi == idDonVi
+                            && x.LoaiKpi == 3
+                            && x.Kpi.Contains("thời gian làm việc")
+                            && !x.Deleted);
+
+            if (!hasData)
+            {
+                await CreateTemplateKpiDonVi(idDonVi);
+            }
+        }
+
+        private async Task CreateTemplateKpiDonVi(int idDonVi)
+        {
+            var kpis = new List<KpiDonVi>
+            {
+                CreateTemplateItem(idDonVi, "2026",
+                    "Giá trị trung bình của đơn vị tại tiêu chí vi phạm về thời gian làm việc",
+                    "<= 5%",
+                    "Nếu tỷ lệ vi phạm > 5% -> Cứ mỗi 1% vượt quá, trừ 2% điểm KPI"),
+                
+                CreateTemplateItem(idDonVi, "2026",
+                    "Giá trị trung bình của đơn vị tại tiêu chí vi phạm về quy định chấm công",
+                    "<= 5%",
+                    "Nếu tỷ lệ vi phạm > 5% -> Cứ mỗi 1% vượt quá, trừ 2% điểm KPI"),
+                CreateTemplateItem(idDonVi, "2026",
+                    "Giá trị trung bình của đơn vị tại tiêu chí vi phạm tuân thủ về trật tự và tác phong làm việc",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI"),
+
+                CreateTemplateItem(idDonVi, "2026",
+                    "Giá trị trung bình của đơn vị tại tiêu chí vi phạm quy tắc ứng xử (với sinh viên/ đồng nghiệp/ khách)",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI"),
+                CreateTemplateItem(idDonVi, "2026",
+                    "Giá trị trung bình của đơn vị tại tiêu chí vi phạm quy định sử dụng đồng phục, thẻ nhân viên",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI"),
+                CreateTemplateItem(idDonVi,"2026",
+                    "Giá trị trung bình của đơn vị tại tiêu chí vi phạm quy trình nghiệp vụ",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI")
+            };
+
+            await _unitOfWork.iKpiDonViRepository.AddRangeAsync(kpis);
+            await _unitOfWork.iKpiDonViRepository.SaveChangeAsync();
+        }
+
+        private KpiDonVi CreateTemplateItem(int idDonVi, string namHoc, string name, string mucTieu, string congThuc)
+        {
+            return new KpiDonVi
+            {
+                IdDonVi = idDonVi,
+                NamHoc = namHoc,
+                LoaiKpi = 3,
+                Kpi = name,
+                MucTieu = mucTieu,
+                TrongSo = "0",
+                CongThucTinh = congThuc,
+                LoaiKetQua = "PERCENT",
+                TrangThai = KpiStatus.Assigned,
+                CreatedDate = DateTime.Now,
+                Deleted = false
+            };
         }
     }
 }

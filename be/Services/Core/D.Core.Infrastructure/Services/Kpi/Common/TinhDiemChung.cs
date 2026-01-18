@@ -70,6 +70,38 @@ namespace D.Core.Infrastructure.Services.Kpi.Common
                 return ketQua >= 4 ? 30 : (ketQua == 3 ? 10 : (ketQua == 2 ? 5 : (ketQua == 1 ? 2 : 0)));
             return 0;
         }
+
+        public static decimal GetDiemTruTuanThuDonVi(string? tenKpi, decimal tyLeViPhamThucTe)
+        {
+            if (string.IsNullOrEmpty(tenKpi)) return 0;
+            var name = tenKpi.ToLower().Trim();
+
+            // Mục tiêu <= 5%, Trừ 2% cho mỗi 1% vượt
+            if (name.Contains("thời gian làm việc") || name.Contains("chấm công"))
+            {
+                // Nếu nhỏ hơn hoặc bằng 5% thì không bị trừ
+                if (tyLeViPhamThucTe <= 5) return 0;
+
+                // Công thức: (Thực tế - 5) * 2
+                return (tyLeViPhamThucTe - 5) * 2;
+            }
+
+            // Mục tiêu <= 2%, Trừ 5% cho mỗi 1% vượt
+            if (name.Contains("trật tự") ||
+                name.Contains("ứng xử") ||
+                name.Contains("đồng phục") ||
+                name.Contains("thẻ nhân viên") ||
+                name.Contains("quy trình nghiệp vụ"))
+            {
+                // Nếu nhỏ hơn hoặc bằng 2% thì không bị trừ
+                if (tyLeViPhamThucTe <= 2) return 0;
+
+                // Công thức: (Thực tế - 2) * 5
+                return (tyLeViPhamThucTe - 2) * 5;
+            }
+
+            return 0;
+        }
         public static decimal TinhDiemChung(
             object? ketQua,
             string? mucTieu,

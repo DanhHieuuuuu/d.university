@@ -30,10 +30,12 @@ import {
     getKpiLogStatus,
     askKpiAi,
     getListKpiCongThuc,
+    getKpiScoreBoard,
 } from './kpiThunk';
 import { IKpiTruongSummary, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import { KpiLogStatusDto } from '@models/kpi/kpi-log.model';
 import { IViewKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
+import { IKpiScoreBoardResponse } from '@models/kpi/kpi-scoreboard.model';
 
 
 interface MetaList<T> {
@@ -65,6 +67,10 @@ interface KpiState {
         status: ReduxStatus;
         answer: string | null;
         history: { role: 'user' | 'ai'; content: string }[];
+    };
+    kpiScoreBoard: {
+        status: ReduxStatus;
+        data: IKpiScoreBoardResponse | null;
     };
     listCongThuc: MetaList<IViewKpiCongThuc>;
     meta: {
@@ -125,6 +131,10 @@ const initialState: KpiState = {
         status: ReduxStatus.IDLE,
         answer: null,
         history: [],
+    },
+    kpiScoreBoard: {
+        status: ReduxStatus.IDLE,
+        data: null
     },
     listCongThuc: { status: ReduxStatus.IDLE, data: [] },
     meta: {
@@ -221,6 +231,11 @@ const kpiSlice = createSlice({
         },
         addMessageToHistory: (state, action: PayloadAction<{ role: 'user' | 'ai'; content: string }>) => {
             state.kpiChat.history.push(action.payload);
+        },
+        //điểm 
+        resetKpiScoreBoard: (state) => {
+            state.kpiScoreBoard.status = ReduxStatus.IDLE;
+            state.kpiScoreBoard.data = null;
         }
     },
     extraReducers: (buidler) => {
@@ -579,6 +594,18 @@ const kpiSlice = createSlice({
             })
             .addCase(getListKpiCongThuc.rejected, (state) => {
                 state.listCongThuc.status = ReduxStatus.FAILURE;
+            })
+            // Kpi ScoreBoard
+            .addCase(getKpiScoreBoard.pending, (state) => {
+                state.kpiScoreBoard.status = ReduxStatus.LOADING;
+            })
+            .addCase(getKpiScoreBoard.fulfilled, (state, action) => {
+                state.kpiScoreBoard.status = ReduxStatus.SUCCESS;
+                state.kpiScoreBoard.data = action.payload;
+            })
+            .addCase(getKpiScoreBoard.rejected, (state) => {
+                state.kpiScoreBoard.status = ReduxStatus.FAILURE;
+                state.kpiScoreBoard.data = null;
             });
     }
 });
@@ -598,6 +625,7 @@ export const {
     clearSeletedKpiRole,
     setSelectedKpiRole,
     resetStatusKpiRole,
+    resetKpiScoreBoard,
     resetChat,
     addMessageToHistory,
 } = kpiSlice.actions;

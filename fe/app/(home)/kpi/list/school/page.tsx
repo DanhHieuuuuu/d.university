@@ -81,33 +81,6 @@ const Page = () => {
     cb();
   };
 
-  const approveSelected = () => {
-    const ids = selectedRowKeys.map(Number);
-    const kpiToApprove = list.filter(
-      (item) => ids.includes(item.id) && item.trangThai === KpiTrangThaiConst.DE_XUAT
-    );
-
-    if (kpiToApprove.length === 0) {
-      toast.error('Chỉ có KPI đang ở trạng thái "Đề xuất" mới được phê duyệt.');
-      return;
-    }
-
-    Modal.confirm({
-      title: 'Phê duyệt hàng loạt',
-      content: `Xác nhận phê duyệt ${kpiToApprove.length} KPI đã chọn?`,
-      okText: 'Duyệt',
-      onOk: async () => {
-        try {
-          await dispatch(updateTrangThaiKpiTruong({ ids, trangThai: KpiTrangThaiConst.PHE_DUYET })).unwrap();
-          toast.success('Phê duyệt thành công!');
-          setSelectedRowKeys([]);
-          dispatch(getAllKpiTruong(query));
-        } catch {
-          toast.error('Phê duyệt thất bại!');
-        }
-      }
-    });
-  };
 
   const scoreSelected = () => {
     if (!selectedRowKeys.length) {
@@ -144,6 +117,36 @@ const Page = () => {
       nextStatus: KpiTrangThaiConst.DA_GUI_CHAM,
       updateAction: updateTrangThaiKpiTruong,
       afterSuccess: () => { setSelectedRowKeys([]); dispatch(getAllKpiTruong(query)); },
+    });
+
+  const principalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DA_CHAM],
+      invalidMsg: 'Chỉ có KPI đang ở trạng thái "Đã chấm" mới được phê duyệt.',
+      confirmTitle: 'Phê duyệt kết quả chấm',
+      confirmMessage: 'Xác nhận phê duyệt các KPI đã chọn?',
+      successMsg: 'Phê duyệt thành công',
+      nextStatus: KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET,
+      updateAction: updateTrangThaiKpiTruong,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiTruong(query));
+      },
+    });
+
+  const cancelPrincipalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
+      invalidMsg: 'Chỉ KPI "Đã phê duyệt kết quả chấm" mới được hủy',
+      confirmTitle: 'Hủy phê duyệt',
+      confirmMessage: 'Hủy phê duyệt các KPI đã chọn?',
+      successMsg: 'Hủy phê duyệt thành công',
+      nextStatus: KpiTrangThaiConst.DA_CHAM,
+      updateAction: updateTrangThaiKpiTruong,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiTruong(query));
+      },
     });
 
   const updateKetQuaCapTren = (id: number, value?: number) => {
@@ -187,10 +190,13 @@ const Page = () => {
   };
 
   const bulkActionItems: MenuProps['items'] = [
-    { key: 'cancelScore', label: 'Hủy kết quả chấm KPI', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelScoredSelected) },
     { key: 'score', label: 'Chấm KPI', icon: <EditOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(scoreSelected) },
-    { key: 'SYNC', label: 'Đồng bộ kết quả thực tế', icon: <EditOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(syncKetQuaThucTeToCapTren) },
+    { key: 'cancelScore', label: 'Hủy kết quả chấm KPI', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelScoredSelected) },
+    { key: 'syncKetQua', label: 'Đồng bộ kết quả thực tế', icon: <SyncOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(syncKetQuaThucTeToCapTren) },
+    { key: 'principalApprove', label: 'Phê duyệt', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(principalApprovedSelected) },
+    { key: 'cancelPrincipalApprove', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(cancelPrincipalApprovedSelected) },
   ];
+
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => { onFilterChange({ Keyword: value }); }, 500);
 
   const filterContent = (
