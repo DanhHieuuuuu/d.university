@@ -4,7 +4,10 @@ import { Form, FormProps, Input, Modal, TreeSelect } from 'antd';
 import { IUpdateRolePermission } from '@models/role';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getDetailRole, resetStatusRole, updateRolePermisison } from '@redux/feature/roleConfigSlice';
-import { buildParentMap, collectAncestors, extractLeafPermissions } from '@utils/permisson.utils';
+import {
+  extractLeafPermissions,
+  normalizePermissionIds
+} from '@utils/permisson.utils';
 
 type RolePermissionModalProps = {
   isModalOpen: boolean;
@@ -38,6 +41,7 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
       });
   }, [props.isModalOpen, selected.id, dispatch, form]);
 
+  // chuyển đổi data phù hợp với TreeSelect AntD
   const treeData = useMemo(() => {
     const transform = (items: any[]): any[] =>
       items.map((item) => ({
@@ -50,11 +54,6 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
     return permissionTree?.length ? transform(permissionTree) : [];
   }, [permissionTree]);
 
-  const parentMap = useMemo(() => {
-    if (!permissionTree?.length) return new Map<number, number>();
-    return buildParentMap(permissionTree);
-  }, [permissionTree]);
-
   const handleCloseModal = () => {
     dispatch(resetStatusRole());
     form.resetFields();
@@ -64,19 +63,12 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
   const handleSubmit: FormProps<IUpdateRolePermission>['onFinish'] = async (values) => {
     if (!selected.id) return;
 
-    const normalizedPermissionIds = new Set<number>();
-
-    values.permissionIds?.forEach((id) => {
-      normalizedPermissionIds.add(id);
-      collectAncestors(id, parentMap, normalizedPermissionIds);
-    });
+    const permissionIds = normalizePermissionIds(values.permissionIds, permissionTree);
 
     const body: IUpdateRolePermission = {
       roleId: selected.id,
-      permissionIds: Array.from(normalizedPermissionIds)
+      permissionIds
     };
-
-console.log(body);
 
     try {
       const res = await dispatch(updateRolePermisison(body)).unwrap();
