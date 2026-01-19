@@ -251,13 +251,13 @@ const Page = () => {
         isModalOpen={modalState.open}
         isUpdate={modalState.isUpdate}
         setIsModalOpen={(open) => setModalState((prev) => ({ ...prev, open }))}
-        refreshData={() => onFilterChange(query)}
+        refreshData={() => onFilterChange({ ...query })}
       />
 
       <RolePermissionModal
         isModalOpen={openPermission}
         setIsModalOpen={setOpenModalPermission}
-        refreshData={() => onFilterChange(query)}
+        refreshData={() => onFilterChange({ ...query })}
       />
     </div>
   );

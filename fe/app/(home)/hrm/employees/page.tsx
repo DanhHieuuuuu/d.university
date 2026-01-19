@@ -30,8 +30,8 @@ const Page = () => {
   const { phongBan } = useAppSelector((state) => state.danhmucState);
 
   // permission in page
-  const canUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
-  const canCreateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonCreateNhanSu);
+  const hasPermisisonUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
+  const hasPermissionCreateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonCreateNhanSu);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
@@ -95,7 +95,7 @@ const Page = () => {
       label: 'Sửa',
       tooltip: 'Sửa thông tin nhân sự',
       icon: <EditOutlined />,
-      hidden: () => !canUpdateNhanSu,
+      hidden: () => !hasPermisisonUpdateNhanSu,
       command: (record: IViewNhanSu) => onClickUpdate(record)
     }
     // {
@@ -164,7 +164,7 @@ const Page = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={onClickAdd}
-          hidden={!canCreateNhanSu}
+          hidden={!hasPermissionCreateNhanSu}
         >
           Thêm mới
         </Button>
