@@ -101,21 +101,25 @@ export const listMenuCore: IMenu[] = [
           {
             label: 'Kpi Role',
             routerLink: '/kpi/list/roles',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListRole],
             icon: <SafetyCertificateOutlined />
           },
           {
             label: 'Kpi cá nhân',
             routerLink: '/kpi/list/personals',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListPersonal],
             icon: <UserOutlined /> 
           },
           {
             label: 'Kpi đơn vị',
             routerLink: '/kpi/list/units',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListUnit],
             icon: <TeamOutlined />
           },
           {
             label: 'Kpi trường',
             routerLink: '/kpi/list/school',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListSchool],
             icon: <BankOutlined />
           }
         ]
@@ -129,16 +133,19 @@ export const listMenuCore: IMenu[] = [
           {
             label: 'Kê khai Kpi cá nhân',
             routerLink: '/kpi/manage/personals',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManagePersonal],
             icon: <UserOutlined />
           },
           {
             label: 'Kê khai Kpi đơn vị',
             routerLink: '/kpi/manage/units',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManageUnit],
             icon: <FileTextOutlined /> 
           },
           {
             label: 'Kê khai Kpi trường',
             routerLink: '/kpi/manage/school',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManageSchool],
             icon: <SolutionOutlined /> 
           },
           {

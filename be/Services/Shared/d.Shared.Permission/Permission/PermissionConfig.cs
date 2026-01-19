@@ -42,6 +42,7 @@ namespace d.Shared.Permission.Permission
             { PermissionCoreKeys.CoreMenuKpiList, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuKpiList, PermissionName = "Danh sách KPI", ParentKey = PermissionCoreKeys.CoreMenuKpi } },
             { PermissionCoreKeys.CoreMenuKpiManage, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuKpiManage, PermissionName = "Quản lý KPI", ParentKey = PermissionCoreKeys.CoreMenuKpi } },
 
+            { PermissionCoreKeys.CoreMenuKpiListRole, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuKpiListRole, PermissionName = "Danh sách KPI Role", ParentKey = PermissionCoreKeys.CoreMenuKpiList }},
             { PermissionCoreKeys.CoreMenuKpiListPersonal, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuKpiListPersonal, PermissionName = "Danh sách KPI cá nhân", ParentKey = PermissionCoreKeys.CoreMenuKpiList }},
             { PermissionCoreKeys.CoreMenuKpiListPersonalCreate, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuKpiListPersonalCreate, PermissionName = "Tạo KPI", ParentKey = PermissionCoreKeys.CoreMenuKpiListPersonal }},
             { PermissionCoreKeys.CoreMenuKpiListPersonalUpdate, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuKpiListPersonalUpdate, PermissionName = "Sửa KPI", ParentKey = PermissionCoreKeys.CoreMenuKpiListPersonal }},

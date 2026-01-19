@@ -460,23 +460,38 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             }
         }
 
-        public async Task<string> GetKpiTruongContextForAi()
+        public async Task<object> GetKpiTruongContextForAi()
         {
             var kpis = await _unitOfWork.iKpiTruongRepository.TableNoTracking
                 .Where(x => !x.Deleted).ToListAsync();
 
-            if (!kpis.Any()) return "### KPI Trường: Không có dữ liệu.";
+            if (!kpis.Any()) return null;
 
-            var sb = new StringBuilder();
-            sb.AppendLine("## [KPI CHIẾN LƯỢC CẤP TRƯỜNG]");
-            sb.AppendLine("| Lĩnh vực | Chiến lược | Tên KPI | Kết quả thực tế | Điểm được chấm |");
-            sb.AppendLine("| :--- | :--- | :--- | :---: | :---: |");
-
-            foreach (var k in kpis)
+            return kpis.Select(k =>
             {
-                sb.AppendLine($"| {k.LinhVuc ?? "Chung"} | {k.ChienLuoc ?? "N/A"} | {k.Kpi} | {k.KetQuaThucTe} | {k.DiemKpiCapTren} |");
-            }
-            return sb.ToString();
+                double.TryParse(k.TrongSo?.Replace("%", "").Trim(), out double ts);
+                int modifier = k.LoaiKpi == 3 ? -1 : 1;
+
+                return new
+                {
+                    NamHoc = k.NamHoc,
+                    LinhVuc = k.LinhVuc ?? "Chung",
+                    ChienLuoc = k.ChienLuoc ?? "N/A",
+                    TenKPI = k.Kpi,
+                    LoaiKPI = k.LoaiKpi switch
+                    {
+                        1 => "Chức năng",
+                        2 => "Mục tiêu",
+                        3 => "Tuân thủ",
+                        _ => "Khác"
+                    },
+                    MucTieu = k.MucTieu ?? "N/A",
+                    TrongSo = ts,
+                    KetQua = k.KetQuaThucTe ?? 0,
+                    Diem = (k.DiemKpiCapTren ?? 0) * modifier,
+                    CongThuc = k.CongThucTinh
+                };
+            }).ToList();
         }
         private async Task SendKpiStatusNotification(KpiTruong kpi, int newStatus, string? note)
         {

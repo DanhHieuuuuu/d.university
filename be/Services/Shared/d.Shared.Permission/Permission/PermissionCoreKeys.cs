@@ -42,6 +42,7 @@
 
         public const string CoreMenuKpiList = $"{PermissionPrefixKeys.Menu}kpi_list";
 
+        public const string CoreMenuKpiListRole = $"{PermissionPrefixKeys.Menu}kpi_list_role";
         public const string CoreMenuKpiListPersonal = $"{PermissionPrefixKeys.Menu}kpi_list_personal";
         public const string CoreMenuKpiListPersonalCreate = $"{PermissionPrefixKeys.Button}kpi_list_personal_create";
         public const string CoreMenuKpiListPersonalUpdate = $"{PermissionPrefixKeys.Button}kpi_list_personal_update";

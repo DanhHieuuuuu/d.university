@@ -646,38 +646,55 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             };
         }
 
-        public async Task<string> GetKpiDonViContextForAi(List<int>? allowedDonViIds)
+        public async Task<object> GetKpiDonViContextForAi(List<int>? allowedDonViIds)
         {
             var query = _unitOfWork.iKpiDonViRepository.TableNoTracking.Where(x => !x.Deleted);
             if (allowedDonViIds != null)
                 query = query.Where(x => x.IdDonVi.HasValue && allowedDonViIds.Contains(x.IdDonVi.Value));
 
             var kpis = await query.ToListAsync();
+            if (!kpis.Any()) return null;
+
             var donViDict = await _unitOfWork.iDmPhongBanRepository.TableNoTracking
                 .ToDictionaryAsync(x => x.Id, x => x.TenPhongBan);
 
-            if (!kpis.Any()) return "### KPI Đơn vị: Không có dữ liệu.";
-
-            var sb = new StringBuilder();
-            sb.AppendLine("## [BÁO CÁO KPI CẤP ĐƠN VỊ]");
-
-            var groupedByDonVi = kpis.GroupBy(x => x.IdDonVi);
-            foreach (var group in groupedByDonVi)
+            var result = kpis.GroupBy(x => x.IdDonVi).Select(group =>
             {
-                var tenDV = donViDict.GetValueOrDefault(group.Key ?? 0, "Đơn vị ẩn danh");
-                sb.AppendLine($"### Đơn vị: {tenDV}");
-                sb.AppendLine($"- **Tổng điểm đơn vị tự chấm:** {group.Sum(s => s.DiemKpi ?? 0)}");
-                sb.AppendLine("| KPI Đơn vị | Mục tiêu | Trọng số | Kết quả thực tế | Tự chấm | Công thức tính");
-                sb.AppendLine("| :--- | :--- | :---: | :---: | :---: |:---:|");
+                var tongDiemTuCham = group.Sum(s => (s.LoaiKpi == 3 ? -1 : 1) * (s.DiemKpi ?? 0));
+                var tongDiemCapTren = group.Sum(s => (s.LoaiKpi == 3 ? -1 : 1) * (s.DiemKpiCapTren  ?? 0));
 
-                foreach (var k in group)
+                return new
                 {
-                    double.TryParse(k.TrongSo, out double ts);
-                    sb.AppendLine($"| {k.Kpi} | {k.MucTieu} | {ts}% | {k.KetQuaThucTe} | {k.DiemKpi} | {k.CongThucTinh}");
-                }
-                sb.AppendLine();
-            }
-            return sb.ToString();
+                    IdDonVi = group.Key,
+                    TenDonVi = donViDict.GetValueOrDefault(group.Key ?? 0, "UnKnown"),
+                    TongDiemDonVi = tongDiemTuCham,
+                    TongDiemCapTren = tongDiemCapTren,
+                    DanhSachKPI = group.Select(k => {
+                        double.TryParse(k.TrongSo?.Replace("%", "").Trim(), out double ts);
+                        int modifier = k.LoaiKpi == 3 ? -1 : 1;
+
+                        return new
+                        {
+                            TenKPI = k.Kpi,
+                            LoaiKPI = k.LoaiKpi switch
+                            {
+                                1 => "Chiến lược",
+                                2 => "Mục tiêu",
+                                3 => "Tuân thủ (Điểm trừ)",
+                                _ => "Khác"
+                            },
+                            MucTieu = k.MucTieu ?? "N/A",
+                            TrongSo = ts,
+                            KetQua = k.KetQuaThucTe ?? 0,
+                            DiemTuCham = (k.DiemKpi ?? 0) * modifier,
+                            DiemCapTren = (k.CapTrenDanhGia ?? k.DiemKpiCapTren ?? 0) * modifier,
+                            CongThuc = k.CongThucTinh,
+                        };
+                    }).ToList()
+                };
+            }).ToList();
+
+            return result;
         }
 
         private async Task SendKpiStatusNotification(KpiDonVi kpi, int newStatus, string note)

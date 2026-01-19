@@ -4,7 +4,7 @@ import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, UserOutl
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiCaNhan, resetStatusKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
 import { createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
-import { getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk'; // Import thunk lấy từ DB
+import { getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk'; 
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
@@ -34,6 +34,17 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const userStatus = useAppSelector((state) => state.userState.status);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
   const watchIdPhongBan = Form.useWatch('idPhongBan', form);
+  const loaiKpiOptions = useMemo(() => {
+    return KpiLoaiConst.list
+      .filter((x) => {
+        if ([1, 2].includes(x.value)) return true;
+        if (x.value === 3) {
+          return isView || ($selected.data?.loaiKpi === 3);
+        }
+        return false;
+      })
+      .map((x) => ({ value: x.value, label: x.name }));
+  }, [isView, $selected.data]); 
 
   const congThucOptions = useMemo(() => {
     return listCongThuc.data.map((ct) => ({ 
@@ -72,8 +83,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   useEffect(() => {
     if (!$selected.data || users.length === 0 || !isModalOpen) return;
     const selectedData = $selected.data;
-    const nhanSuOption = selectedData.idNhanSu ? userOptions.find((u) => u.value === selectedData.idNhanSu) : undefined;
-
+    
     form.setFieldsValue({
       ...selectedData,
       idNhanSu: selectedData.idNhanSu,
@@ -175,10 +185,11 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
 
+          {/* 2. Sử dụng loaiKpiOptions đã được lọc */}
           <Form.Item label="Loại KPI" name="loaiKPI" rules={[{ required: true }]}>
             <Select
               placeholder="Chọn loại"
-              options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
+              options={loaiKpiOptions}
             />
           </Form.Item>
 
@@ -202,7 +213,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Select placeholder="Chọn loại kết quả" options={LOAI_KET_QUA_OPTIONS} />
           </Form.Item>
 
-          {/* Trường ẩn để gửi tên công thức lên BE nếu BE vẫn yêu cầu cả text */}
           <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
 
           <Divider className="col-span-2 my-2" />

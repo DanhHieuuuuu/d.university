@@ -30,6 +30,9 @@ import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 import KpiReferenceTable from '@components/bthanh-custom/kpiComplianceTable';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -142,8 +145,18 @@ const Page = () => {
     cb();
   };
   const bulkActionItems: MenuProps['items'] = [
-    { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
-    { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionSendDeclared) ? [{
+      key: 'send-approve',
+      label: 'Gửi duyệt',
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      onClick: () => requiredSelect(approveSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionCancelDeclared) ? [{
+      key: 'cancel-send-approve',
+      label: 'Hủy duyệt',
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(cancelApproveSelected)
+    }] : []),
   ];
 
   const filterContent = (
@@ -313,9 +326,9 @@ const Page = () => {
     },
   ];
 
-  const actions: IAction[] = [
-    { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
-  ];
+  // const actions: IAction[] = [
+  //   { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
+  // ];
 
   const rowSelection = {
     selectedRowKeys,
@@ -327,14 +340,7 @@ const Page = () => {
     <div className="space-y-4">
       <Card
         className="h-full"
-        title={
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
-            <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Kê khai KPI cá nhân
-            </span>
-          </div>
-        }
+        title="Kê khai KPI Cá nhân"
       >
         <Form form={form} layout="horizontal">
           <div className="flex items-center justify-between mb-6 gap-4">
@@ -345,14 +351,12 @@ const Page = () => {
                 allowClear
                 onChange={(e) => handleDebouncedSearch(e.target.value)}
                 className="max-w-[250px]"
-                size="large"
               />
               <Form.Item name="role" noStyle>
                 <Select
                   placeholder="Vị trí làm việc"
                   style={{ width: 180 }}
                   allowClear
-                  size="large"
                   loading={roleByUserStatus === ReduxStatus.LOADING}
                   options={Array.from(new Set(roleByUser?.map(r => r.role) || [])).map(role => ({
                     value: role,
@@ -362,7 +366,6 @@ const Page = () => {
                 />
               </Form.Item>
               <Button
-                size="large"
                 icon={<SyncOutlined />}
                 onClick={() => {
                   form.resetFields();
@@ -377,15 +380,15 @@ const Page = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                icon={<SaveOutlined />}
-                type="primary"
-                size="large"
-                onClick={handleSaveKetQua}
-                className="shadow-md hover:shadow-lg transition-shadow"
-              >
-                Lưu kết quả
-              </Button>
+              {useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionSaveScore) && (
+                <Button
+                  icon={<SaveOutlined />}
+                  type="primary"
+                  onClick={handleSaveKetQua}
+                >
+                  Lưu kết quả
+                </Button>
+              )}
               <Dropdown
                 menu={{ items: bulkActionItems }}
                 trigger={['click']}
@@ -429,7 +432,7 @@ const Page = () => {
             rowKey="id"
             columns={columns}
             dataSource={tableData}
-            listActions={actions}
+            // listActions={actions}
             pagination={false}
             rowSelection={{
               ...rowSelection,
@@ -492,4 +495,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuKpiManagePersonal);

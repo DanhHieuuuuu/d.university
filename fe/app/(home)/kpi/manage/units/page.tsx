@@ -29,6 +29,9 @@ import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import AssignKpiModal from '../../modal/AssignKpiModal';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+import { useIsGranted } from '@hooks/useIsGranted';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -93,7 +96,7 @@ const Page = () => {
 
   const proposeSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.TAO_MOI],
+      validStatus: [KpiTrangThaiConst.TAO_MOI || KpiTrangThaiConst.DA_CHINH_SUA],
       invalidMsg: 'Chỉ KPI "Tạo mới" mới được đề xuất',
       confirmTitle: 'Đề xuất KPI cho đơn vị',
       confirmMessage: 'Xác nhận đề xuất các KPI đã chọn?',
@@ -177,10 +180,30 @@ const Page = () => {
 
 
   const bulkActionItems: MenuProps['items'] = [
-    { key: 'propose', label: 'Đề xuất', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(proposeSelected) },
-    { key: 'cancelPropose', label: 'Hủy đề xuất', icon: <CheckCircleOutlined style={{ color: 'yellow' }} />, onClick: () => requiredSelect(cancelProposeSelected) },
-    { key: 'sendScore', label: 'Gửi chấm', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
-    { key: 'cancelScore', label: 'Hủy gửi chấm', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionPropose) ? [{ 
+      key: 'propose', 
+      label: 'Đề xuất', 
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, 
+      onClick: () => requiredSelect(proposeSelected) 
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionCancelPropose) ? [{  
+      key: 'cancelPropose', 
+      label: 'Hủy đề xuất', 
+      icon: <CheckCircleOutlined style={{ color: 'yellow' }} />, 
+      onClick: () => requiredSelect(cancelProposeSelected) 
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionSendDeclared) ? [{  
+      key: 'sendScore', 
+      label: 'Gửi chấm', 
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, 
+      onClick: () => requiredSelect(approveSelected) 
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionCancelDeclared) ? [{  
+      key: 'cancelScore', 
+      label: 'Hủy gửi chấm',
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />, 
+      onClick: () => requiredSelect(cancelApproveSelected) 
+    }] : []),
   ];
 
   const filterContent = (
@@ -272,7 +295,6 @@ const Page = () => {
       key: 'diemKpi', dataIndex: 'diemKpi', title: 'Điểm kê khai', width: 130,
       render: (val, record) => {
         if (record.rowType !== 'data') return { props: { colSpan: 0 } };
-        // Thêm màu đỏ cho KPI phạt
         return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
       },
     },
@@ -284,7 +306,6 @@ const Page = () => {
       key: 'diemKpiCapTren', dataIndex: 'diemKpiCapTren', title: 'Điểm cấp trên', width: 130,
       render: (val, record) => {
         if (record.rowType !== 'data') return { props: { colSpan: 0 } };
-        // Thêm màu đỏ cho KPI phạt
         return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
       },
     },
@@ -295,8 +316,22 @@ const Page = () => {
   ];
 
   const actions: IAction[] = [
-    { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
-    { label: 'Giao KPI', icon: <RobotFilled />, command: onClickAssign, hidden: r => r.rowType !== 'data' },
+    { 
+      label: 'Chi tiết', 
+      icon: <EyeOutlined />, command: onClickView, 
+      hidden: r => r.rowType !== 'data' 
+    },
+    {
+      label: 'Sửa', 
+      icon: <EyeOutlined />, command: onClickUpdate, 
+      hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data' 
+    },
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitAssign) ? [{ 
+      label: 'Giao KPI', 
+      icon: <RobotFilled />, 
+      command: onClickAssign, 
+      hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data' 
+    }] : []),
   ];
 
   const rowSelection = {
@@ -310,14 +345,7 @@ const Page = () => {
     <div className="space-y-4">
       <Card
         className="h-full"
-        title={
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
-            <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Kê khai KPI Đơn vị
-            </span>
-          </div>
-        }
+        title="Kê khai KPI Đơn vị"
         extra={
           <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} size="large" className="shadow-md hover:shadow-lg transition-shadow">
             Thêm mới
@@ -327,14 +355,22 @@ const Page = () => {
         <Form form={form} layout="horizontal">
           <div className="flex items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-2 flex-1">
-              <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" size="large" />
-              <Button size="large" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined }); setKetQuaMap({}); setSelectedRowKeys([]); }}>
+              <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" />
+              <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined }); setKetQuaMap({}); setSelectedRowKeys([]); }}>
                 Tải lại
               </Button>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button icon={<SaveOutlined />} type="primary" size="large" onClick={handleSaveKetQua} className="shadow-md hover:shadow-lg transition-shadow"> Lưu kết quả </Button>
+              {useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionSaveScore) && (
+                <Button
+                  icon={<SaveOutlined />}
+                  type="primary"
+                  onClick={handleSaveKetQua}
+                >
+                  Lưu kết quả
+                </Button>
+              )}
               <Dropdown menu={{ items: bulkActionItems }} trigger={['click']} disabled={selectedRowKeys.length === 0}>
                 <Button size="large" type={selectedRowKeys.length > 0 ? 'primary' : 'default'} icon={<EllipsisOutlined />} className={selectedRowKeys.length > 0 ? "shadow-md hover:shadow-lg transition-shadow" : ""}>
                   Thao tác {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
@@ -385,4 +421,4 @@ const Page = () => {
     </div>
   );
 };
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuKpiManageUnit);

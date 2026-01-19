@@ -21,6 +21,7 @@ export class PermissionCoreConst {
 
   public static readonly CoreMenuKpiList = `${PermissionCoreConst.Menu}kpi_list`;
 
+  public static readonly CoreMenuKpiListRole = `${PermissionCoreConst.Menu}kpi_list_role`;
   public static readonly CoreMenuKpiListPersonal = `${PermissionCoreConst.Menu}kpi_list_personal`;
   public static readonly CoreMenuKpiListPersonalCreate = `${PermissionCoreConst.Button}kpi_list_personal_create`;
   public static readonly CoreMenuKpiListPersonalUpdate = `${PermissionCoreConst.Button}kpi_list_personal_update`;

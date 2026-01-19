@@ -12,6 +12,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 
 namespace D.Core.Infrastructure.Services.Kpi.Implements
@@ -54,7 +55,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
         public async Task<string> GetKpiContextForChat(int userId)
         {
             var userRoles = await _unitOfWork.iKpiRoleRepository.TableNoTracking
-                                .Where(x => x.IdNhanSu == userId).ToListAsync();
+                                            .Where(x => x.IdNhanSu == userId).ToListAsync();
 
             bool isHieuTruong = userRoles.Any(r => r.Role == "HIEU_TRUONG" || r.Role == "CHU_TICH_HOI_DONG_TRUONG");
             var managerRoles = new[] { "PHO_HIEU_TRUONG", "TRUONG_DON_VI_CAP_2", "TRUONG_DON_VI_CAP_3" };
@@ -66,26 +67,40 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 .ToList();
 
             bool hasManagerRights = isHieuTruong || managedDonViIds.Any();
-            var fullContext = new StringBuilder();
-            fullContext.AppendLine("# BÁO CÁO DỮ LIỆU KPI QUẢN LÝ");
-            fullContext.AppendLine($" Thời gian: {DateTime.Now:HH:mm dd/MM/yyyy}");
-            fullContext.AppendLine("---");
+            object? dataTruong = null;
             if (isHieuTruong)
             {
-                fullContext.AppendLine(await _kpiTruongService.GetKpiTruongContextForAi());
-                fullContext.AppendLine("---");
+                dataTruong = await _kpiTruongService.GetKpiTruongContextForAi();
             }
 
+            object? dataDonVi = null;
             if (hasManagerRights)
             {
                 var queryDonViIds = isHieuTruong ? null : managedDonViIds;
-                fullContext.AppendLine(await _kpiDonViService.GetKpiDonViContextForAi(queryDonViIds));
-                fullContext.AppendLine("---");
+                dataDonVi = await _kpiDonViService.GetKpiDonViContextForAi(queryDonViIds);
             }
-            var allowedStaffIds = await _kpiCaNhanService.GetAllowedUserIds(userId);
-            fullContext.AppendLine(await _kpiCaNhanService.GetKpiCaNhanContextForAi(userId, allowedStaffIds));
 
-            return fullContext.ToString();
+            var allowedStaffIds = await _kpiCaNhanService.GetAllowedUserIds(userId);
+            var dataCaNhan = await _kpiCaNhanService.GetKpiCaNhanContextForAi(userId, allowedStaffIds);
+            var finalData = new
+            {
+                MetaData = new
+                {
+                    ThoiGianBaoCao = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
+                    UserYeuCau = userId
+                },
+                KpiCapTruong = dataTruong,
+                KpiCacDonVi = dataDonVi,
+                KpiCaNhan = dataCaNhan
+            };
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = false,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+
+            return JsonSerializer.Serialize(finalData, jsonOptions);
         }
 
         public async Task<string> AskKpiQuestion(string userQuery)
@@ -93,35 +108,50 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             try
             {
                 var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-                string kpiMarkdownContext = await GetKpiContextForChat(userId);
+                string kpiJsonContext = await GetKpiContextForChat(userId);
                 var requestBody = new
                 {
-                    inputs = new { kpi_data = kpiMarkdownContext },
+                    inputs = new Dictionary<string, object>
+            {
+                { "kpi_data", kpiJsonContext }
+            },
                     query = userQuery,
                     user = $"user_{userId}",
-                    response_mode = "blocking"
+                    response_mode = "blocking",
+                    conversation_id = ""
                 };
 
                 using var client = new HttpClient();
-                client.Timeout = TimeSpan.FromSeconds(120);
+                client.Timeout = TimeSpan.FromSeconds(10);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+                var jsonContent = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
 
-                var response = await client.PostAsJsonAsync(_baseUrl, requestBody);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(_baseUrl, content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<DifyChatResponse>();
                     return result?.Answer ?? "AI không có phản hồi.";
                 }
+
                 var errorCode = (int)response.StatusCode;
-                return errorCode == 429
-                    ? "Hệ thống AI đang bận (Quota), vui lòng thử lại sau."
-                    : $"Có lỗi xảy ra (Mã lỗi: {errorCode}).";
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError($"Dify API Error: {errorCode} - Content: {errorContent}");
+                _logger.LogError($"Payload sent: {jsonContent}"); 
+
+                if (errorCode == 429) return "Hệ thống quá tải, vui lòng thử lại sau.";
+                if (errorCode == 400 || errorCode == 404) return "Lỗi kết nối AI. Vui lòng liên hệ IT.";
+
+                return $"Lỗi hệ thống ({errorCode}).";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi nghiêm trọng khi gọi Dify Service");
-                return "Hệ thống bận, vui lòng thử lại sau.";
+                _logger.LogError(ex, "Exception calling Dify");
+                return "Đã xảy ra lỗi ngoại lệ.";
             }
         }
     }

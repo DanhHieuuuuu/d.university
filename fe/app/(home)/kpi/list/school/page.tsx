@@ -25,6 +25,9 @@ import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 import { ETableColumnType } from '@/constants/e-table.consts';
 import KpiLogModal from '../../modal/KpiLogModal';
 import { useDebouncedCallback } from '@hooks/useDebounce';
+import { useIsGranted } from '@hooks/useIsGranted';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -43,8 +46,6 @@ const Page = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ketQuaCapTrenMap, setKetQuaCapTrenMap] = useState<Record<number, number | undefined>>({});
   const [activeLoaiKpi, setActiveLoaiKpi] = useState<number>(KpiLoaiConst.CHUC_NANG);
-
-  // Log Modal state
   const [openLogModal, setOpenLogModal] = useState(false);
   const [selectedKpiLogId, setSelectedKpiLogId] = useState<number | null>(null);
   const { data: logData, status: logStatus } = useAppSelector(state => state.kpiState.kpiLog.$list);
@@ -190,11 +191,35 @@ const Page = () => {
   };
 
   const bulkActionItems: MenuProps['items'] = [
-    { key: 'score', label: 'Chấm KPI', icon: <EditOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(scoreSelected) },
-    { key: 'cancelScore', label: 'Hủy kết quả chấm KPI', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelScoredSelected) },
-    { key: 'syncKetQua', label: 'Đồng bộ kết quả thực tế', icon: <SyncOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(syncKetQuaThucTeToCapTren) },
-    { key: 'principalApprove', label: 'Phê duyệt', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(principalApprovedSelected) },
-    { key: 'cancelPrincipalApprove', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(cancelPrincipalApprovedSelected) },
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionScore) ? [{
+      key: 'score',
+      label: 'Chấm KPI',
+      icon: <EditOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(scoreSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionScore) ? [{
+      key: 'cancelScore',
+      label: 'Hủy kết quả chấm KPI',
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(cancelScoredSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSyncScore) ? [{
+      key: 'syncKetQua',
+      label: 'Đồng bộ kết quả thực tế',
+      icon: <SyncOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionPrincipalApprove) ? [{
+      key: 'principalApprove',
+      label: 'Phê duyệt', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(principalApprovedSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionPrincipalApprove) ? [{
+      key: 'cancelPrincipalApprove',
+      label: 'Hủy duyệt',
+      icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
+    }] : []),
   ];
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => { onFilterChange({ Keyword: value }); }, 500);
@@ -216,7 +241,6 @@ const Page = () => {
     </Form>
   );
 
-  // --- TABLE ACTIONS ---
   const onClickAdd = () => setModalMode('create');
   const onClickUpdate = (record: IViewKpiTruong) => { dispatch(setSelectedKpiTruong(record)); setModalMode('update'); };
   const onClickView = (record: IViewKpiTruong) => { dispatch(setSelectedKpiTruong(record)); setModalMode('view'); };
@@ -243,10 +267,29 @@ const Page = () => {
   };
 
   const actions: IAction[] = [
-    { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView },
-    { label: 'Sửa', icon: <EditOutlined />, command: onClickUpdate },
-    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete },
-    { label: 'Nhật ký trạng thái', icon: <EyeOutlined />, command: onClickViewLog }
+    {
+      label: 'Chi tiết',
+      icon: <EyeOutlined />,
+      command: onClickView
+    },
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolUpdate) ? [{
+      label: 'Sửa',
+      color: 'blue' as const,
+      icon: <EditOutlined />,
+      command: onClickUpdate
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolDelete) ? [{
+      label: 'Xóa',
+      color: 'red' as const,
+      icon: <DeleteOutlined />,
+      command: onClickDelete
+    }] : []),
+    {
+      label: 'Nhật ký trạng thái',
+      icon: <EyeOutlined />,
+      color: 'orange',
+      command: onClickViewLog
+    }
   ];
 
   const columns: IColumn<IViewKpiTruong>[] = [
@@ -299,7 +342,15 @@ const Page = () => {
             <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, namHoc: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button icon={<SaveOutlined />} type="primary" onClick={handleSaveKetQuaCapTren}> Lưu kết quả </Button>
+            {useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSaveScore) && (
+              <Button
+                icon={<SaveOutlined />}
+                type="primary"
+                onClick={handleSaveKetQuaCapTren}
+              >
+                Lưu kết quả
+              </Button>
+            )}
             <Dropdown menu={{ items: bulkActionItems }} trigger={['click']} disabled={selectedRowKeys.length === 0}>
               <Button type={selectedRowKeys.length > 0 ? 'primary' : 'default'} icon={<EllipsisOutlined />}> Thao tác {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`} </Button>
             </Dropdown>
@@ -357,4 +408,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuKpiListSchool);

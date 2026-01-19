@@ -26,6 +26,9 @@ import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import KpiLogModal from '../../modal/KpiLogModal';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -221,12 +224,42 @@ const Page = () => {
   };
 
   const bulkActionItems: MenuProps['items'] = [
-    { key: 'approve', label: 'Phê duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
-    { key: 'score', label: 'Chấm KPI', icon: <EditOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(scoreSelected) },
-    { key: 'cancelScore', label: 'Hủy kết quả chấm KPI', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelScoredSelected) },
-    { key: 'syncKetQua', label: 'Đồng bộ kết quả thực tế', icon: <SyncOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(syncKetQuaThucTeToCapTren) },
-    { key: 'principalApprove', label: 'Phê duyệt kết quả chấm', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(principalApprovedSelected) },
-    { key: 'cancelPrincipalApprove', label: 'Hủy phê duyệt kết quả chấm', icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />, onClick: () => requiredSelect(cancelPrincipalApprovedSelected) },
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitActionApprove) ? [{
+      key: 'approve',
+      label: 'Phê duyệt',
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      onClick: () => requiredSelect(approveSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitActionScore) ? [{
+      key: 'score',
+      label: 'Chấm KPI',
+      icon: <EditOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(scoreSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitActionScore) ? [{
+      key: 'cancelScore',
+      label: 'Hủy kết quả chấm KPI',
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(cancelScoredSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitActionSyncScore) ? [{
+      key: 'syncKetQua',
+      label: 'Đồng bộ kết quả thực tế',
+      icon: <SyncOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitActionPrincipalApprove) ? [{
+      key: 'principalApprove',
+      label: 'Phê duyệt kết quả chấm',
+      icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(principalApprovedSelected)
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitActionPrincipalApprove) ? [{
+      key: 'cancelPrincipalApprove',
+      label: 'Hủy phê duyệt kết quả chấm',
+      icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
+    }] : []),
   ];
 
   const filterContent = (
@@ -287,7 +320,6 @@ const Page = () => {
     { key: 'ketQuaThucTe', dataIndex: 'ketQuaThucTe', title: 'Kết quả thực tế', width: 180, render: (val, record) => formatKetQua(val, record.loaiKetQua) },
     {
       key: 'diemKpi', dataIndex: 'diemKpi', title: 'Điểm tự đánh giá', width: 130, align: 'center',
-      // Thêm màu cho điểm để dễ nhìn (KPI phạt màu đỏ)
       render: (val, record) => <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>
     },
     {
@@ -307,10 +339,31 @@ const Page = () => {
   ];
 
   const actions: IAction[] = [
-    { label: 'Chi tiết', tooltip: 'Xem thông tin', icon: <EyeOutlined />, command: onClickView },
-    { label: 'Sửa', tooltip: 'Sửa thông tin', icon: <EditOutlined />, command: onClickUpdate },
-    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete },
-    { label: 'Nhật ký trạng thái', icon: <EyeOutlined />, command: onClickViewLog }
+    {
+      label: 'Chi tiết',
+      tooltip: 'Xem thông tin',
+      icon: <EyeOutlined />,
+      command: onClickView,
+    },
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitUpdate) ? [{
+      label: 'Sửa',
+      tooltip: 'Sửa thông tin',
+      icon: <EditOutlined />,
+      color: 'blue' as const,
+      command: onClickUpdate,
+    }] : []),
+    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitDelete) ? [{
+      label: 'Xóa',
+      icon: <DeleteOutlined />,
+      color: 'red' as const,
+      command: onClickDelete
+    }] : []),
+    {
+      label: 'Nhật ký trạng thái',
+      icon: <EyeOutlined />,
+      color: 'orange' as const,
+      command: onClickViewLog
+    }
   ];
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => { onFilterChange({ Keyword: value }); }, 500);
@@ -351,7 +404,15 @@ const Page = () => {
             <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', idDonVi: undefined, loaiKpi: undefined, trangThai: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button icon={<SaveOutlined />} type="primary" onClick={handleSaveKetQuaCapTren}> Lưu kết quả </Button>
+            {useIsGranted(PermissionCoreConst.CoreMenuKpiListUnitActionSaveScore) && (
+              <Button
+                icon={<SaveOutlined />}
+                type="primary"
+                onClick={handleSaveKetQuaCapTren}
+              >
+                Lưu kết quả
+              </Button>
+            )}
             <Dropdown menu={{ items: bulkActionItems }} trigger={['click']} disabled={selectedRowKeys.length === 0}>
               <Button type={selectedRowKeys.length > 0 ? 'primary' : 'default'} icon={<EllipsisOutlined />}> Thao tác {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`} </Button>
             </Dropdown>
@@ -409,4 +470,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuKpiListUnit);

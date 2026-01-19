@@ -1,4 +1,5 @@
 export class KpiRoleConst {
+  static CHU_TICH_HOI_DONG_TRUONG = "CHU_TICH_HOI_DONG_TRUONG";
   static HIEU_TRUONG = "HIEU_TRUONG";
   static PHO_HIEU_TRUONG = "PHO_HIEU_TRUONG";
   static TRUONG_DON_VI_CAP_2 = "TRUONG_DON_VI_CAP_2";
@@ -6,6 +7,10 @@ export class KpiRoleConst {
   static GIANG_VIEN = "GIANG_VIEN";
 
   static list = [
+    {
+      value: this.CHU_TICH_HOI_DONG_TRUONG,
+      name: 'Chủ tịch hội đồng trường',
+    },
     {
       value: this.HIEU_TRUONG,
       name: 'Hiệu trưởng',

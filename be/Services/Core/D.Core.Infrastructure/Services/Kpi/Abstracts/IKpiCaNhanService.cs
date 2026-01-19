@@ -17,7 +17,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Abstracts
         int? GetKpiIsActive();
         List<GetAllNhanSuKiemNhiemResponseDto> GetAllNhanSuKiemNhiem(GetAllNhanSuKiemNhiemRequestDto dto);
         Task<List<int>> GetAllowedUserIds(int currentUserId);
-        Task<string> GetKpiCaNhanContextForAi(int userId, List<int> allowedUserIds);
+        Task<object> GetKpiCaNhanContextForAi(int userId, List<int> allowedUserIds);
 
     }
 }

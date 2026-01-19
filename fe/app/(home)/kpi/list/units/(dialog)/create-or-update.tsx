@@ -29,6 +29,17 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
   const { phongBanByKpiRole } = useAppSelector((state) => state.danhmucState);
+  const loaiKpiOptions = useMemo(() => {
+    return KpiLoaiConst.list
+      .filter((x) => {
+        if ([1, 2].includes(x.value)) return true;
+        if (x.value === 3) {
+          return isView || ($selected.data?.loaiKpi === 3);
+        }
+        return false;
+      })
+      .map((x) => ({ value: x.value, label: x.name }));
+  }, [isView, $selected.data]);
 
   const congThucOptions = useMemo(() => {
     return (listCongThuc?.data || []).map((ct: any) => ({
@@ -45,7 +56,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         dispatch(getListKpiCongThuc({}));
       }
     }
-  }, [isModalOpen, isUpdate, isView, dispatch]);
+  }, [isModalOpen, isUpdate, isView, dispatch, listCongThuc?.data.length]);
 
   useEffect(() => {
     if (!$selected.data || !isModalOpen) return;
@@ -58,7 +69,18 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       congThucTinh: selectedData.congThuc,
       namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
     });
-  }, [isModalOpen, $selected.data, form, listCongThuc.data, phongBanByKpiRole.$list.data]);
+  }, [isModalOpen, $selected.data, form]);
+  useEffect(() => {
+    if (isModalOpen) {
+      const currentCongThuc = form.getFieldValue('congThucTinh');
+      if (!currentCongThuc) {
+        form.setFieldsValue({
+          idCongThuc: null,
+          congThucTinh: 'Trừ điểm trực tiếp khi vi phạm (hoặc công thức mặc định)',
+        });
+      }
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
@@ -82,6 +104,8 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       idDonVi: values.idDonVi?.value ?? values.idDonVi,
       namHoc: values.namHoc ? values.namHoc.format('YYYY') : undefined,
       trongSo: values.trongSo?.toString() || '0',
+      // Nếu là loại 3 -> idCongThuc = null
+      idCongThuc: values.loaiKpi === 3 ? null : values.idCongThuc,
     };
 
     try {
@@ -154,7 +178,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           <Form.Item label="Loại KPI" name="loaiKpi" rules={[{ required: true }]}>
             <Select
               placeholder="Chọn loại"
-              options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
+              options={loaiKpiOptions}
             />
           </Form.Item>
 
@@ -173,6 +197,8 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
               }}
             />
           </Form.Item>
+
+          <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
 
           <Form.Item label="Loại kết quả" name="loaiKetQua" rules={[{ required: true }]}>
             <Select placeholder="Chọn loại kết quả" options={LOAI_KET_QUA_OPTIONS} />
@@ -196,7 +222,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
               placeholder="Tìm kiếm và chọn đơn vị thực hiện"
             />
           </Form.Item>
-          <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
         </div>
       </Form>
     </Modal>
