@@ -7,7 +7,7 @@ import { Menu, MenuProps } from 'antd';
 import { getMenuKeysFromPath, mapToAntdItems } from '@helpers/menu.helper';
 import { IMenu } from '@models/common/menu.model';
 import { useNavigate } from '@hooks/navigate';
-import { isGranted } from '@hooks/isGranted';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 type MenuPropsCustom = {
   data: IMenu[];
@@ -29,7 +29,7 @@ const AppMenu: React.FC<MenuPropsCustom> = ({ data }) => {
     navigateTo(e.key);
   };
 
-  const items = mapToAntdItems(data, isGranted);
+  const items = mapToAntdItems(data, useIsGranted);
 
   return (
     <Menu
