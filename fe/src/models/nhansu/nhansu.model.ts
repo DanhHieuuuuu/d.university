@@ -68,11 +68,11 @@ export type ICreateNhanSu = {
   nhomMau?: string;
   trinhDoHocVan?: string;
   trinhDoNgoaiNgu?: string;
-  tenHocVi?: string
+  tenHocVi?: string;
   tenChuyenNganhHocVi?: string;
-  tenHocHam?: string
+  tenHocHam?: string;
   tenChuyenNganhHocHam?: string;
-  ngayVaoDang?: Date
+  ngayVaoDang?: Date;
 };
 
 export type IUpdateNhanSu = {
@@ -105,4 +105,11 @@ export type IUpdateNhanSu = {
   tenHocHam?: string;
   tenChuyenNganhHocHam?: string;
   ngayVaoDang?: Date;
+};
+
+export type IViewThongKeNsTheoPhongBan = {
+  id: number;
+  stt?: number | null;
+  tenPhongBan: string | null;
+  soLuongNhanSu: number;
 };

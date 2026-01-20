@@ -200,6 +200,11 @@ namespace D.Core.API.Controllers.Hrm
             }
         }
 
+        /// <summary>
+        /// Danh sách hợp đồng
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpGet("contract/find")]
         public async Task<ResponseAPI> GetAllContract(NsHopDongRequestDto dto)
         {
@@ -214,5 +219,19 @@ namespace D.Core.API.Controllers.Hrm
             }
         }
 
+        [HttpGet("thongke-theo-phongban")]
+        public async Task<ResponseAPI> ThongKeNhanSuTheoPhongBanApi()
+        {
+            try
+            {
+                var dto = new ThongKeNhanSuTheoPhongBanRequestDto { };
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

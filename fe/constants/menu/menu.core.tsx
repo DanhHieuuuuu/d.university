@@ -24,7 +24,8 @@ import {
   UnorderedListOutlined,
   SafetyCertificateOutlined,
   SolutionOutlined,
-  CalculatorOutlined
+  CalculatorOutlined,
+  LineChartOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
@@ -45,6 +46,11 @@ export const listMenuCore: IMenu[] = [
         label: 'Danh sách nhân sự',
         routerLink: '/hrm/employees',
         icon: <UserOutlined />
+      },
+      {
+        label: 'Thống kê',
+        routerLink: '/hrm/statistical',
+        icon: <LineChartOutlined />
       },
       {
         label: 'Danh sách hợp đồng',

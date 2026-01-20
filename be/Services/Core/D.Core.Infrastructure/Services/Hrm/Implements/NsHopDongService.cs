@@ -86,8 +86,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                         IdChucVu = dto.IdChucVu,
                         IdPhongBan = dto.IdPhongBan,
                         IdToBoMon = dto.IdToBoMon,
-                        NgayBatDau = DateTime.Now,
-                        NgayKetThuc = null,
+                        NgayBatDau = dto.HopDongCoThoiHanTuNgay,
+                        NgayKetThuc = dto.HopDongCoThoiHanDenNgay,
                     }
                 );
 

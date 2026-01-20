@@ -565,6 +565,42 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             return result;
         }
 
+        public List<ThongKeNhanSuTheoPhongBanResponseDto> ThongKeNhanSuTheoPhongBan(ThongKeNhanSuTheoPhongBanRequestDto dto)
+        {
+            _logger.LogInformation($"Method {nameof(ThongKeNhanSuTheoPhongBan)} called.");
+
+            var query =
+                from pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                join a in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                    on pb.Id equals a.HienTaiPhongBan into nsGroup
+                from a in nsGroup
+                    .Where(x =>
+                        x.DaVeHuu != true &&
+                        x.IsThoiViec != true &&
+                        x.DaChamDutHopDong != true
+                    )
+                    .DefaultIfEmpty()
+                group a by new
+                {
+                    pb.Id,
+                    pb.STT,
+                    pb.TenPhongBan
+                } into g
+                orderby g.Key.STT
+                select new ThongKeNhanSuTheoPhongBanResponseDto
+                {
+                    Id = g.Key.Id,
+                    STT = g.Key.STT,
+                    TenPhongBan = g.Key.TenPhongBan,
+                    SoLuongNhanSu = g.Count(x => x != null)
+                };
+
+            var result = query.ToList();
+
+            //result = _mapper.Map<ThongKeNhanSuDto>(query);
+            return result;
+        }
+
         #endregion
 
         #region Private helpers
