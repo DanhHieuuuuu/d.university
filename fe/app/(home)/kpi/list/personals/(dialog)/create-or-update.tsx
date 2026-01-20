@@ -4,7 +4,7 @@ import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, UserOutl
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiCaNhan, resetStatusKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
 import { createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
-import { getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk'; 
+import { getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
@@ -44,12 +44,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         return false;
       })
       .map((x) => ({ value: x.value, label: x.name }));
-  }, [isView, $selected.data]); 
+  }, [isView, $selected.data]);
 
   const congThucOptions = useMemo(() => {
-    return listCongThuc.data.map((ct) => ({ 
-      value: ct.id, 
-      label: ct.tenCongThuc 
+    return listCongThuc.data.map((ct) => ({
+      value: ct.id,
+      label: ct.tenCongThuc
     }));
   }, [listCongThuc.data]);
 
@@ -73,9 +73,9 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
     if (isModalOpen) {
       setTitle(isView ? 'Xem thông tin KPI Cá nhân' : isUpdate ? 'Cập nhật KPI Cá nhân' : 'Thêm mới KPI Cá nhân');
       dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
-    
+
       if (listCongThuc.data.length === 0) {
-        dispatch(getListKpiCongThuc({})); 
+        dispatch(getListKpiCongThuc({}));
       }
     }
   }, [isModalOpen, isUpdate, isView, dispatch, listCongThuc.data.length]);
@@ -83,11 +83,11 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   useEffect(() => {
     if (!$selected.data || users.length === 0 || !isModalOpen) return;
     const selectedData = $selected.data;
-    
+
     form.setFieldsValue({
       ...selectedData,
       idNhanSu: selectedData.idNhanSu,
-      idPhongBan: selectedData.idPhongBan, 
+      idPhongBan: selectedData.idPhongBan,
       loaiKPI: selectedData.loaiKpi,
       idCongThuc: selectedData.idCongThuc,
       congThucTinh: selectedData.congThuc,
@@ -229,8 +229,9 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             />
           </Form.Item>
 
-          <Form.Item label="Nhân sự cụ thể" name="idNhanSu" rules={[{ required: true }]}>
+          <Form.Item label="Nhân sự cụ thể" name="idNhanSu" rules={[{ required: true }]} help={!watchIdPhongBan ? "Vui lòng chọn Đơn vị / Phòng ban trước" : undefined}>
             <UserSelect
+              disabled={!watchIdPhongBan}
               options={userOptions}
               loading={userStatus === ReduxStatus.LOADING}
               onChange={(value) => {

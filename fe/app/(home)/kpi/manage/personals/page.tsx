@@ -28,11 +28,11 @@ import '@styles/kpi/table.kpi.scss'
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KpiRoleConst } from '@/constants/kpi/kpiRole.const';
-import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 import KpiReferenceTable from '@components/bthanh-custom/kpiComplianceTable';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { useIsGranted } from '@hooks/useIsGranted';
+import { ca } from 'date-fns/locale';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -42,6 +42,10 @@ const Page = () => {
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.caNhan);
   const { data: roleByUser, status: roleByUserStatus } = useAppSelector((state) => state.kpiState.meta.role.caNhan);
+
+  const canSendDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionSendDeclared);
+  const canCancelDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionCancelDeclared);
+  const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionSaveScore);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
@@ -145,13 +149,13 @@ const Page = () => {
     cb();
   };
   const bulkActionItems: MenuProps['items'] = [
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionSendDeclared) ? [{
+    ...(canSendDeclared ? [{
       key: 'send-approve',
       label: 'Gửi duyệt',
       icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
       onClick: () => requiredSelect(approveSelected)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionCancelDeclared) ? [{
+    ...(canCancelDeclared ? [{
       key: 'cancel-send-approve',
       label: 'Hủy duyệt',
       icon: <UndoOutlined style={{ color: '#1890ff' }} />,
@@ -380,7 +384,7 @@ const Page = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              {useIsGranted(PermissionCoreConst.CoreMenuKpiManagePersonalActionSaveScore) && (
+              {canSaveScore && (
                 <Button
                   icon={<SaveOutlined />}
                   type="primary"
@@ -479,7 +483,6 @@ const Page = () => {
           />
         </div>
         <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiCaNhanKeKhai(query)); dispatch(getListTrangThaiKpiCaNhan()); }} />
-        <KpiAiChat />
         <Modal
           title={<span className="text-lg font-bold text-blue-700">PHỤ LỤC: KPIs KỶ LUẬT LAO ĐỘNG CÁ NHÂN</span>}
           open={isKpiComplianceTableOpen}
