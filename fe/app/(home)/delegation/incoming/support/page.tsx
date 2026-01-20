@@ -78,12 +78,15 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      command: (record: IDepartmentSupport) => onClickView(record)
+      command: (record: IDepartmentSupport) => onClickView(record),
+      permission: PermissionCoreConst.CoreButtonViewDepartment,
+      
     },
     {
       label: 'Thêm nhân viên',
       icon: <UserAddOutlined />,
-      command: (record: IDepartmentSupport) => onClickCreateStaff(record)
+      command: (record: IDepartmentSupport) => onClickCreateStaff(record),
+      permission: PermissionCoreConst.CoreButtonCreateSupporterDepartment,
     }
   ];
   const onClickCreateStaff = (data: IDepartmentSupport) => {
@@ -141,7 +144,10 @@ const Page = () => {
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input placeholder="Nhập tên đoàn vào…" onChange={(e) => handleSearch(e)} />
+            <Input 
+              data-permission={PermissionCoreConst.CoreButtonSearchDepartment} 
+              placeholder="Nhập tên đoàn vào…" 
+              onChange={(e) => handleSearch(e)} />
           </Form.Item>
           <Button
             color="default"
@@ -163,6 +169,7 @@ const Page = () => {
         dataSource={listDepartmentSupport}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+        data-permission={PermissionCoreConst.CoreTableDepartment}
       />
       <CreateDepartmentSupportModal
         isModalOpen={isModalOpen}
@@ -174,4 +181,4 @@ const Page = () => {
   );
 };
 
-export default withAuthGuard(Page, PermissionCoreConst.CoreMenuDelegation);
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuDepartment);

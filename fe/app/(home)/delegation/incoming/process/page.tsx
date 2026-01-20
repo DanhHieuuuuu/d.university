@@ -8,6 +8,7 @@ import {
   DeploymentUnitOutlined,
   EditOutlined,
   EyeOutlined,
+  FileWordOutlined,
   PlayCircleOutlined,
   PlusOutlined,
   SearchOutlined,
@@ -40,6 +41,7 @@ import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
 import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 import { useRouter } from 'next/navigation';
+import { exportBaoCaoDoanVao } from '@helpers/delegation/action.helper';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -125,25 +127,36 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      command: (record: IViewGuestGroup) => onClickView(record)
+      command: (record: IViewGuestGroup) => onClickView(record),
+      permission: PermissionCoreConst.CoreButtonViewXuLyDoanVao,
     },
     {
       label: 'Báo cáo kết quả',
       icon: <CheckOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
-      command: (record: IViewGuestGroup) => onClickBaoCao(record)
+      command: (record: IViewGuestGroup) => onClickBaoCao(record),
+      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao,
+    },
+    {
+      label: 'Xuất báo cáo',
+      icon: <FileWordOutlined/>,
+      hidden: (r) => r.status !== DelegationStatusConst.DONE,
+      command: (record: IViewGuestGroup) => onExport(record),
+      permission: PermissionCoreConst.CoreButtonUpdateDoanVao,
     },
     {
       label: 'Phê duyệt',
       icon: <CheckOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
-      command: (record: IViewGuestGroup) => onClickPheDuyet(record)
+      // hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
+      command: (record: IViewGuestGroup) => onClickPheDuyet(record),
+      permission: PermissionCoreConst.CoreButtonPheDuyetXuLyDoanVao,
     },
     {
       label: 'Tiếp đoàn',
       icon: <DeploymentUnitOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET || !r.receptionTimes?.length,
-      command: (record: IViewGuestGroup) => onClickTiepDoan(record)
+      command: (record: IViewGuestGroup) => onClickTiepDoan(record),
+      permission: PermissionCoreConst.CoreButtonTiepDoanXuLyDoanVao,
     }
   ];
 
@@ -223,6 +236,9 @@ const Page = () => {
       }
     });
   };
+  const onExport = (record: IViewGuestGroup) => {
+      exportBaoCaoDoanVao(record);
+  };
 
   return (
     <Card
@@ -238,6 +254,7 @@ const Page = () => {
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
             <Select
+              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
               showSearch
               allowClear
               placeholder="Chọn phòng ban phụ trách"
@@ -252,6 +269,7 @@ const Page = () => {
           </Form.Item>
           <Form.Item name="status" className="!mb-0 w-[200px]">
             <Select
+              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
               placeholder="Chọn trạng thái"
               allowClear
               options={listStatus.map((st: any) => ({
@@ -263,7 +281,10 @@ const Page = () => {
           </Form.Item>
 
           <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input placeholder="Nhập tên đoàn vào…" onChange={(e) => handleSearch(e)} />
+            <Input 
+              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao} 
+              placeholder="Nhập tên đoàn vào…" 
+              onChange={(e) => handleSearch(e)} />
           </Form.Item>
           <Button
             color="default"
@@ -273,6 +294,7 @@ const Page = () => {
               form.resetFields();
               resetFilter();
             }}
+            data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
           >
             Tải lại
           </Button>
@@ -287,9 +309,10 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
         scroll={{x: 'max-content', y: 'calc(100vh - 420px)'}}
+        data-permission={PermissionCoreConst.CoreButtonTableXuLyDoanVao}
       />
     </Card>
   );
 };
 
-export default withAuthGuard(Page, PermissionCoreConst.CoreMenuDelegation);
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuXuLyDoanVao);

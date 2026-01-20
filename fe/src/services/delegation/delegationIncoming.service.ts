@@ -1,16 +1,19 @@
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
 import {
+  BaoCaoDoanVao,
   ICreateDepartment,
   ICreateDoanVao,
   ICreatePrepare,
   ICreateReceptionTime,
   ICreateReceptionTimeList,
   ICreateSupporter,
+  IDateOption,
   IDepartmentSupport,
   IDetailDelegationIncoming,
   ILogStatus,
   IReceptionTime,
+  IStatistical,
   IUpdateDepartmentSupport,
   IUpdateDoanVao,
   IUpdatePrepare,
@@ -19,7 +22,7 @@ import {
   IUpdateStatus,
   IViewGuestGroup
 } from '@models/delegation/delegation.model';
-import { IResponseItem, IResponseList } from '@models/common/response.model';
+import { IResponseArray, IResponseItem, IResponseList } from '@models/common/response.model';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 
@@ -311,6 +314,42 @@ const updatePrepare = async (body: IUpdatePrepare) => {
     return Promise.reject(err);
   }
 };
+
+const baoCaoDoanVao = async (payload: BaoCaoDoanVao) => {
+  try {
+    const res = await axios.post(`${apiDelegationEndpoint}/bao_cao_doan_vao`,payload, {
+      responseType: 'blob'
+    });
+    return Promise.resolve(res);
+  } catch (err) {
+    processApiMsgError(err, 'Không tải được báo cáo');
+    return Promise.reject(err);
+  }
+};
+
+const getStatistical = async () => {
+  try {
+    const res = await axios.get(
+      `${apiDelegationEndpoint}/statistical`
+    );
+    const data: IResponseItem<IStatistical> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+const getListCreatedDate = async () => {
+  try {
+    const res = await axios.get(`${apiDelegationEndpoint}/get-created-dates`);
+
+    const data: IResponseArray<IDateOption> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
 export const DelegationIncomingService = {
   paging,
   getListPhongBan,
@@ -336,5 +375,8 @@ export const DelegationIncomingService = {
   updateDepartmentSupport,
   getByIdDepartmentSupport,
   createPrepare,
-  updatePrepare
+  updatePrepare,
+  baoCaoDoanVao,
+  getStatistical,
+  getListCreatedDate
 };

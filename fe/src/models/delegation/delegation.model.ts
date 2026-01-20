@@ -80,8 +80,14 @@ export type IQuerySupporter = IQueryPaging & {
 export type IQueryDepartmentSupport = IQueryPaging & {
   departmentSupportId?: number;
 };
-export type IQueryLogStatus = IQueryPaging & {};
-export type IQueryLogReceptionTime = IQueryPaging & {};
+export type IQueryLogStatus = IQueryPaging & {
+  CreateDate?: string;
+  CreatedByName?: string;
+};
+export type IQueryLogReceptionTime = IQueryPaging & {
+  CreateDate?: string;
+  CreatedByName?: string;
+};
 export type ICreateDoanVao = {
   code: string;
   name: string;
@@ -183,4 +189,21 @@ export interface ICreatePrepare {
 }
 export interface IUpdatePrepare {
   items: IPrepare[];
+}
+export interface BaoCaoDoanVao {
+  listId: number[];
+  isExportAll: boolean;
+}
+
+export interface IStatistical {
+  totalAll: number,
+  byStatus: IStatisticalStatus[]
+}
+export interface IStatisticalStatus{
+  status:number,
+  total: number
+}
+export interface IDateOption {
+  label: string;
+  value: string;
 }

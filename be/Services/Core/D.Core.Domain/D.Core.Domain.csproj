@@ -19,6 +19,7 @@
 	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Library\D.InfrastructureBase\D.InfrastructureBase.csproj" />
+    <ProjectReference Include="..\..\..\Library\D.Untils\D.Untils\D.Untils.csproj" />
   </ItemGroup>
 
 </Project>

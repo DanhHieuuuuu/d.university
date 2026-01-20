@@ -41,18 +41,32 @@
         public const string CoreButtonUpdateDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_update";
         public const string CoreButtonDeleteDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_delete";
         public const string CoreButtonViewDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_view";
+        public const string CoreButtonCreateTimeDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_create_time";
+        public const string CoreButtonDeXuatDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_dexuat";
+        public const string CoreButtonSearchDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_search";
+        public const string CoreTableListDoanVao = $"{PermissionPrefixKeys.Table}dio_danhsach_table_list";
+
 
         public const string CoreMenuXuLyDoanVao = $"{PermissionPrefixKeys.Menu}dio_xuly";
         public const string CoreButtonCreateXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_create";
         public const string CoreButtonUpdateXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_update";
         public const string CoreButtonDeleteXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_delete";
         public const string CoreButtonViewXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_view";
-              
+        public const string CoreButtonBaoCaoXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_baocao";
+        public const string CoreButtonPheDuyetXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_pheduyet";
+        public const string CoreButtonTiepDoanXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_tiepdoan";
+        public const string CoreButtonSearchXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_search";
+        public const string CoreButtonTableXuLyDoanVao = $"{PermissionPrefixKeys.Table}dio_xuly_table";
+
         public const string CoreMenuDepartment = $"{PermissionPrefixKeys.Menu}dio_department";
         public const string CoreButtonCreateDepartment = $"{PermissionPrefixKeys.Button}dio_department_create";
         public const string CoreButtonUpdateDepartment = $"{PermissionPrefixKeys.Button}dio_department_update";
         public const string CoreButtonDeleteDepartment = $"{PermissionPrefixKeys.Button}dio_department_delete";
         public const string CoreButtonViewDepartment = $"{PermissionPrefixKeys.Button}dio_department_view";
+        public const string CoreButtonSearchDepartment = $"{PermissionPrefixKeys.Button}dio_department_search";
+        public const string CoreButtonCreateSupporterDepartment = $"{PermissionPrefixKeys.Button}dio_department_create_support";
+        public const string CoreTableDepartment = $"{PermissionPrefixKeys.Table}dio_department_table";
+
 
         public const string CoreMenuLog = $"{PermissionPrefixKeys.Menu}dio_log";
         public const string CoreTableLog = $"{PermissionPrefixKeys.Table}dio_log_table";

@@ -1,4 +1,5 @@
-﻿using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
+﻿using D.Core.Domain.Dtos.Delegation.Incoming;
+using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.DomainBase.Dto;
 using System;
@@ -19,9 +20,9 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
         void DeleteDoanVao(int id);
         Task<PageDelegationIncomingResultDto> GetByIdDelegationIncoming(int id);
         List<ViewNhanSuResponseDto> GetAllNhanSu(ViewNhanSuRequestDto dto);
-
-
-
+        Task<byte[]> ExportDelegationIncomingReport();
         Task NextStatus(UpdateStatusRequestDto dto);
+        ExportFileDto ExportGiayDoanVao(ExportGiayDoanVaoDto dto);
+        StatisticalResultDto GetStatistical();
     }
 }
