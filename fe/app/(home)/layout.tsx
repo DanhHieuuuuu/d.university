@@ -27,21 +27,21 @@ const Index = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getAllChucVu());
+    dispatch(getAllChucVu({ PageIndex: 1, PageSize: 1000 }));
     dispatch(getAllDanToc());
     dispatch(getAllGioiTinh());
     dispatch(getAllLoaiHopDong());
     dispatch(getAllLoaiPhongBan());
-    dispatch(getAllPhongBan());
+    dispatch(getAllPhongBan({ PageIndex: 1, PageSize: 1000 }));
     dispatch(getAllQuanHeGiaDinh());
     dispatch(getAllQuocTich());
-    dispatch(getAllToBoMon());
+    dispatch(getAllToBoMon({ PageIndex: 1, PageSize: 1000 }));
     dispatch(getAllTonGiao());
   }, []);
 
   return (
     <Layout hasSider style={{ height: '100vh' }}>
-      <NotificationRealtime/>
+      <NotificationRealtime />
       <MenuComponent />
       <Layout style={{ background: '#F5F5F5' }}>
         <AppHeader />

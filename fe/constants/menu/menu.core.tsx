@@ -49,12 +49,12 @@ export const listMenuCore: IMenu[] = [
       {
         label: 'Danh sách hợp đồng',
         routerLink: '/hrm/contracts',
-        icon: <ApartmentOutlined />
+        icon: <SolutionOutlined />
       },
       {
         label: 'Danh sách quyết định',
         routerLink: '/hrm/decisions',
-        icon: <ApartmentOutlined />
+        icon: <ProfileOutlined />
       }
     ]
   },
@@ -96,7 +96,7 @@ export const listMenuCore: IMenu[] = [
         label: 'Danh sách KPI',
         routerLink: '/kpi/list',
         permissionKeys: [PermissionCoreConst.CoreMenuKpiList],
-        icon: <UnorderedListOutlined />, 
+        icon: <UnorderedListOutlined />,
         items: [
           {
             label: 'Kpi Role',
@@ -108,7 +108,7 @@ export const listMenuCore: IMenu[] = [
             label: 'Kpi cá nhân',
             routerLink: '/kpi/list/personals',
             permissionKeys: [PermissionCoreConst.CoreMenuKpiListPersonal],
-            icon: <UserOutlined /> 
+            icon: <UserOutlined />
           },
           {
             label: 'Kpi đơn vị',
@@ -140,19 +140,19 @@ export const listMenuCore: IMenu[] = [
             label: 'Kê khai Kpi đơn vị',
             routerLink: '/kpi/manage/units',
             permissionKeys: [PermissionCoreConst.CoreMenuKpiManageUnit],
-            icon: <FileTextOutlined /> 
+            icon: <FileTextOutlined />
           },
           {
             label: 'Kê khai Kpi trường',
             routerLink: '/kpi/manage/school',
             permissionKeys: [PermissionCoreConst.CoreMenuKpiManageSchool],
-            icon: <SolutionOutlined /> 
+            icon: <SolutionOutlined />
           },
           {
             label: 'Điểm KPI',
             routerLink: '/kpi/manage/scoreboard',
             icon: <CalculatorOutlined />
-          },
+          }
         ]
       }
     ]
@@ -229,12 +229,12 @@ export const listMenuCore: IMenu[] = [
       {
         label: 'Danh sách yêu cầu',
         routerLink: '/survey/manage/request',
-        icon: <InboxOutlined />,
+        icon: <InboxOutlined />
       },
       {
         label: 'Quản lý yêu cầu',
         routerLink: '/survey/manage/request-manage',
-        icon: <InboxOutlined />,
+        icon: <InboxOutlined />
       },
       {
         label: 'Danh sách khảo sát',

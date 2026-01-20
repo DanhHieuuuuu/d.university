@@ -173,11 +173,11 @@ const Page = ({ params }: { params: { id: string } }) => {
             <div className="grid grid-cols-4 gap-4">
               <div className="field">
                 <p className="label">Học hàm:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{nhansu.tenHocHam}</p>
               </div>
               <div className="field">
                 <p className="label">Chuyên ngành học hàm:</p>
-                <p className="value">{nhansu.chuyenNganhHocHam}</p>
+                <p className="value">{nhansu.tenChuyenNganhHocHam}</p>
               </div>
               <div className="field">
                 <p className="label">Học vị:</p>
@@ -185,11 +185,11 @@ const Page = ({ params }: { params: { id: string } }) => {
               </div>
               <div className="field">
                 <p className="label">Chuyên ngành học vị:</p>
-                <p className="value">{nhansu.chuyenNganhHocVi}</p>
+                <p className="value">{nhansu.tenChuyenNganhHocVi}</p>
               </div>
               <div className="field">
-                <p className="label">Lý luận chính trị:</p>
-                <p className="value">{nhansu.trinhDoChinhTri}</p>
+                <p className="label">Chức vụ hiện tại:</p>
+                <p className="value">{nhansu.tenChucVu}</p>
               </div>
               <div className="field">
                 <p className="label">Quản lý nhà nước:</p>
@@ -200,8 +200,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <p className="value">{nhansu.trinhDoNgoaiNgu}</p>
               </div>
               <div className="field">
-                <p className="label">Tin học:</p>
-                <p className="value">{nhansu.trinhDoTinHoc}</p>
+                <p className="label">Giáo dục phổ thông:</p>
+                <p className="value">{nhansu.trinhDoHocVan}</p>
               </div>
               <div className="field">
                 <p className="label">Ngày vào ĐCS Việt Nam:</p>

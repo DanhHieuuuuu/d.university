@@ -427,7 +427,15 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 nhansu.ChieuCao = dto.ChieuCao;
                 nhansu.CanNang = dto.CanNang;
                 nhansu.NhomMau = dto.NhomMau?.ToUpper();
-                nhansu.NgayCapNhatSk = DateTime.Now;
+                nhansu.NgayCapNhatSk = dto.ChieuCao.HasValue ? DateTime.Now : nhansu.NgayCapNhatSk;
+                nhansu.NgayVaoDang = dto.NgayVaoDang;
+                nhansu.TrinhDoHocVan = dto.TrinhDoHocVan;
+                nhansu.TrinhDoNgoaiNgu = dto.TrinhDoNgoaiNgu;
+                nhansu.TenHocVi = dto.TenHocVi;
+                nhansu.TenChuyenNganhHocVi = dto.TenChuyenNganhHocVi;
+                nhansu.TenHocHam = dto.TenHocHam;
+                nhansu.TenChuyenNganhHocHam = dto.TenChuyenNganhHocHam;
+
 
                 _unitOfWork.iNsNhanSuRepository.Update(nhansu);
                 _unitOfWork.iNsNhanSuRepository.SaveChange();
