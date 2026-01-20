@@ -38,7 +38,11 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
-  const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
+  const { data: trangThaiTruong, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
+
+  const canSendDeclared= useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSendDeclared);
+  const canCancelDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionCancelDeclared);
+  const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSaveScore);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
@@ -141,13 +145,13 @@ const Page = () => {
     cb();
   };
   const bulkActionItems: MenuProps['items'] = [
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSendDeclared) ? [{ 
+    ...(canSendDeclared ? [{ 
       key: 'send-approve', 
       label: 'Gửi duyệt', 
       icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, 
       onClick: () => requiredSelect(approveSelected) 
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionCancelDeclared) ? [{ 
+    ...(canCancelDeclared ? [{ 
       key: 'cancel-send-approve', 
       label: 'Hủy duyệt', 
       icon: <UndoOutlined style={{ color: '#1890ff' }} />, 
@@ -161,7 +165,7 @@ const Page = () => {
         <Select allowClear placeholder="Chọn loại KPI" options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))} />
       </Form.Item>
       <Form.Item label="Trạng thái" name="trangThai">
-        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiCaNhan} />
+        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiTruong} />
       </Form.Item>
     </Form>
   );
@@ -361,7 +365,7 @@ const Page = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              {useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSaveScore) && (
+              {canSaveScore && (
                 <Button
                   icon={<SaveOutlined />}
                   type="primary"

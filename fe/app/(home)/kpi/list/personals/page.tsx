@@ -50,6 +50,13 @@ const Page = () => {
   const { processUpdateStatus } = useKpiStatusAction();
   const watchIdPhongBan = Form.useWatch('idPhongBan', form);
 
+  const canScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionScore);
+  const canSyncScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionSyncScore);
+  const canPrincipalApprove = useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionPrincipalApprove);
+  const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionSaveScore);
+  const canUpdate = useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalUpdate);
+  const canDelete = useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalDelete);
+
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiCaNhan.$list);
   const { list: listNhanSu } = useAppSelector((state) => state.userState.byKpiRole);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
@@ -249,31 +256,31 @@ const Page = () => {
     loaiSummary?.capTren ?? summary?.tongCapTren ?? 0;
 
   const bulkActionItems: MenuProps['items'] = [
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionScore) ? [{
+    ...(canScore ? [{
       key: 'score',
       label: 'Chấm KPI',
       icon: <EditOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(scoreSelected),
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionScore) ? [{
+    ...(canScore ? [{
       key: 'cancelScore',
       label: 'Hủy kết quả chấm KPI',
       icon: <UndoOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(cancelScoredSelected),
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionSyncScore) ? [{
+    ...(canSyncScore ? [{
       key: 'syncKetQua',
       label: 'Đồng bộ kết quả thực tế',
       icon: <SyncOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(syncKetQuaThucTeToCapTren),
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionPrincipalApprove) ? [{
+    ...(canPrincipalApprove ? [{
       key: 'principalApprove',
       label: 'Phê duyệt kết quả chấm',
       icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
       onClick: () => requiredSelect(principalApprovedSelected),
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionPrincipalApprove) ? [{
+    ...(canPrincipalApprove ? [{
       key: 'cancelPrincipalApprove',
       label: 'Hủy phê duyệt kết quả chấm',
       icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
@@ -431,18 +438,20 @@ const Page = () => {
       icon: <EyeOutlined />,
       command: onClickView
     },
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalUpdate) ? [{
+    {
       label: 'Sửa',
-      color: 'blue' as const,
+      color: 'blue',
       icon: <EditOutlined />,
+      hidden: () => !canUpdate,
       command: onClickUpdate
-    }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalDelete) ? [{
+    },
+    {
       label: 'Xóa',
-      color: 'red' as const,
+      color: 'red',
       icon: <DeleteOutlined />,
+      hidden: () => !canDelete,
       command: onClickDelete
-    }] : []),
+    },
     {
       label: 'Nhật ký trạng thái',
       icon: <EyeOutlined />,
@@ -522,6 +531,7 @@ const Page = () => {
             </Form.Item>
             <Form.Item name="idNhanSu" noStyle>
               <Select
+                disabled={!watchIdPhongBan}
                 placeholder={watchIdPhongBan ? "Chọn nhân sự" : "Chọn nhân sự (Tất cả)"}
                 style={{ width: 320 }}
                 allowClear
@@ -560,7 +570,7 @@ const Page = () => {
 
 
           <div className="flex items-center gap-2">
-            {useIsGranted(PermissionCoreConst.CoreMenuKpiListPersonalActionSaveScore) && (
+            {canSaveScore && (
               <Button
                 icon={<SaveOutlined />}
                 type="primary"

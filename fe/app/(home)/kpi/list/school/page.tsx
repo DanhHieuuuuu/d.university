@@ -35,6 +35,13 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
 
+  const canScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionScore);
+  const canSyncScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSyncScore);
+  const canPrincipalApprove = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionPrincipalApprove);
+  const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSaveScore);
+  const canUpdate = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolUpdate);
+  const canDelete = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolDelete);
+
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
   const { data: trangThaiTruong, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
   const { data: namHocTruong, status: namHocStatus } = useAppSelector((state) => state.kpiState.meta.namHoc.truong);
@@ -191,30 +198,30 @@ const Page = () => {
   };
 
   const bulkActionItems: MenuProps['items'] = [
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionScore) ? [{
+    ...(canScore ? [{
       key: 'score',
       label: 'Chấm KPI',
       icon: <EditOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(scoreSelected)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionScore) ? [{
+    ...(canScore ? [{
       key: 'cancelScore',
       label: 'Hủy kết quả chấm KPI',
       icon: <UndoOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(cancelScoredSelected)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSyncScore) ? [{
+    ...(canSyncScore ? [{
       key: 'syncKetQua',
       label: 'Đồng bộ kết quả thực tế',
       icon: <SyncOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionPrincipalApprove) ? [{
+    ...(canPrincipalApprove ? [{
       key: 'principalApprove',
       label: 'Phê duyệt', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
       onClick: () => requiredSelect(principalApprovedSelected)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionPrincipalApprove) ? [{
+    ...(canPrincipalApprove ? [{
       key: 'cancelPrincipalApprove',
       label: 'Hủy duyệt',
       icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
@@ -272,18 +279,20 @@ const Page = () => {
       icon: <EyeOutlined />,
       command: onClickView
     },
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolUpdate) ? [{
+    {
       label: 'Sửa',
-      color: 'blue' as const,
+      color: 'blue',
+      hidden: () => !canUpdate,
       icon: <EditOutlined />,
       command: onClickUpdate
-    }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolDelete) ? [{
+    },
+  {
       label: 'Xóa',
-      color: 'red' as const,
+      color: 'red',
+      hidden: () => !canDelete,
       icon: <DeleteOutlined />,
       command: onClickDelete
-    }] : []),
+    },
     {
       label: 'Nhật ký trạng thái',
       icon: <EyeOutlined />,
@@ -342,7 +351,7 @@ const Page = () => {
             <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, namHoc: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
           </div>
           <div className="flex items-center gap-2">
-            {useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSaveScore) && (
+            {canSaveScore && (
               <Button
                 icon={<SaveOutlined />}
                 type="primary"

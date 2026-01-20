@@ -43,6 +43,13 @@ const Page = () => {
   const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.donVi);
   const { data: namHocDonVi, status: namHocStatus } = useAppSelector((state) => state.kpiState.meta.namHoc.donVi);
 
+  const canPropose = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionPropose);
+  const canCancelPropose = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionCancelPropose);
+  const canSendDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionSendDeclared);
+  const canCancelDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionCancelDeclared);
+  const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionSaveScore);
+  const canAssign = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitAssign);
+
   const [nhanSuDaGiao, setNhanSuDaGiao] = useState<NhanSuDaGiaoDto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
@@ -180,29 +187,29 @@ const Page = () => {
 
 
   const bulkActionItems: MenuProps['items'] = [
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionPropose) ? [{ 
-      key: 'propose', 
-      label: 'Đề xuất', 
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, 
-      onClick: () => requiredSelect(proposeSelected) 
+    ...(canPropose ? [{
+      key: 'propose',
+      label: 'Đề xuất',
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      onClick: () => requiredSelect(proposeSelected)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionCancelPropose) ? [{  
-      key: 'cancelPropose', 
-      label: 'Hủy đề xuất', 
-      icon: <CheckCircleOutlined style={{ color: 'yellow' }} />, 
-      onClick: () => requiredSelect(cancelProposeSelected) 
+    ...(canCancelPropose ? [{
+      key: 'cancelPropose',
+      label: 'Hủy đề xuất',
+      icon: <CheckCircleOutlined style={{ color: 'yellow' }} />,
+      onClick: () => requiredSelect(cancelProposeSelected)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionSendDeclared) ? [{  
-      key: 'sendScore', 
-      label: 'Gửi chấm', 
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, 
-      onClick: () => requiredSelect(approveSelected) 
+    ...(canSendDeclared ? [{
+      key: 'sendScore',
+      label: 'Gửi chấm',
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      onClick: () => requiredSelect(approveSelected)
     }] : []),
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionCancelDeclared) ? [{  
-      key: 'cancelScore', 
+    ...(canCancelDeclared ? [{
+      key: 'cancelScore',
       label: 'Hủy gửi chấm',
-      icon: <UndoOutlined style={{ color: '#1890ff' }} />, 
-      onClick: () => requiredSelect(cancelApproveSelected) 
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(cancelApproveSelected)
     }] : []),
   ];
 
@@ -316,21 +323,21 @@ const Page = () => {
   ];
 
   const actions: IAction[] = [
-    { 
-      label: 'Chi tiết', 
-      icon: <EyeOutlined />, command: onClickView, 
-      hidden: r => r.rowType !== 'data' 
+    {
+      label: 'Chi tiết',
+      icon: <EyeOutlined />, command: onClickView,
+      hidden: r => r.rowType !== 'data'
     },
     {
-      label: 'Sửa', 
-      icon: <EyeOutlined />, command: onClickUpdate, 
-      hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data' 
+      label: 'Sửa',
+      icon: <EyeOutlined />, command: onClickUpdate,
+      hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data'
     },
-    ...(useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitAssign) ? [{ 
-      label: 'Giao KPI', 
-      icon: <RobotFilled />, 
-      command: onClickAssign, 
-      hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data' 
+    ...(canAssign ? [{
+      label: 'Giao KPI',
+      icon: <RobotFilled />,
+      command: onClickAssign,
+      hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data'
     }] : []),
   ];
 
@@ -362,7 +369,7 @@ const Page = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              {useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionSaveScore) && (
+              {canSaveScore && (
                 <Button
                   icon={<SaveOutlined />}
                   type="primary"
