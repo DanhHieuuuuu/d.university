@@ -3610,6 +3610,9 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("NgayVaoDang")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("NguyenQuan")
                         .HasColumnType("nvarchar(max)");
 
@@ -3647,6 +3650,18 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("Ten")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TenChuyenNganhHocHam")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenChuyenNganhHocVi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenHocHam")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenHocVi")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("TenNganHang1")
                         .HasColumnType("nvarchar(max)");
 
@@ -3655,6 +3670,12 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<int?>("TonGiao")
                         .HasColumnType("int");
+
+                    b.Property<string>("TrinhDoHocVan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TrinhDoNgoaiNgu")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
