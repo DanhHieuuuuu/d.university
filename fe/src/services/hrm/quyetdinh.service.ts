@@ -1,10 +1,9 @@
-import { IQueryQuyetDinh, IViewQuyetDinh } from '@models/nhansu/quyetdinh.model';
-import { IResponseList } from '@models/common/response.model';
-import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
+import { processApiMsgError } from '@utils/index';
+import { IResponseItem, IResponseList } from '@models/common/response.model';
+import { IDetailQuyetDinh, IQueryQuyetDinh, IViewQuyetDinh } from '@models/nhansu/quyetdinh.model';
 
 const apiDecisionEndpoint = 'decision';
-
 
 const findPaging = async (query: IQueryQuyetDinh) => {
   try {
@@ -22,4 +21,16 @@ const findPaging = async (query: IQueryQuyetDinh) => {
   }
 };
 
-export const NsDecisionService = { findPaging };
+const findById = async (id: number) => {
+  try {
+    const res = await axios.get(`${apiDecisionEndpoint}/${id}`);
+
+    const data: IResponseItem<IDetailQuyetDinh> = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+export const NsDecisionService = { findPaging, findById };

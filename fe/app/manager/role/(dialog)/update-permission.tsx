@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { Form, FormProps, Input, Modal, TreeSelect } from 'antd';
 import { IUpdateRolePermission } from '@models/role';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getDetailRole, resetStatusRole, updateRolePermisison } from '@redux/feature/roleConfigSlice';
+import {
+  extractLeafPermissions,
+  normalizePermissionIds
+} from '@utils/permisson.utils';
 
 type RolePermissionModalProps = {
   isModalOpen: boolean;
@@ -16,50 +20,54 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const { selected, permissionTree } = useAppSelector((state) => state.roleConfigState);
 
-  const [treeData, setTreeData] = useState<any[]>([]);
-
   useEffect(() => {
-    const fetchData = async () => {
-      if (props.isModalOpen && selected.id) {
-        initPermission();
-        await dispatch(getDetailRole(selected.id))
-          .unwrap()
-          .then((res) => {
-            form.setFieldsValue(res);
-          })
-          .catch(() => toast.error('Không thể tải thông tin nhóm quyền'));
-      } else {
-        form.resetFields();
-      }
-    };
+    if (!props.isModalOpen || !selected.id) {
+      form.resetFields();
+      return;
+    }
 
-    fetchData();
-  }, [props.isModalOpen]);
+    dispatch(getDetailRole(selected.id))
+      .unwrap()
+      .then((res) => {
+        const leafPermissionIds = extractLeafPermissions(res.permissionIds, permissionTree);
 
-  const transformToTreeData = (items: any[]): any[] => {
-    return items.map((item) => ({
-      title: item.label,
-      value: item.id,
-      key: item.id,
-      children: item.children && item.children.length > 0 ? transformToTreeData(item.children) : undefined
-    }));
-  };
+        form.setFieldsValue({
+          ...res,
+          permissionIds: leafPermissionIds
+        });
+      })
+      .catch(() => {
+        toast.error('Không thể tải thông tin nhóm quyền');
+      });
+  }, [props.isModalOpen, selected.id, dispatch, form]);
 
-  const initPermission = () => {
-    const transformed = transformToTreeData(permissionTree);
-    setTreeData(transformed);
-  };
+  // chuyển đổi data phù hợp với TreeSelect AntD
+  const treeData = useMemo(() => {
+    const transform = (items: any[]): any[] =>
+      items.map((item) => ({
+        title: item.label,
+        value: item.id,
+        key: item.id,
+        children: item.children?.length ? transform(item.children) : undefined
+      }));
 
-  const onCloseModal = () => {
+    return permissionTree?.length ? transform(permissionTree) : [];
+  }, [permissionTree]);
+
+  const handleCloseModal = () => {
     dispatch(resetStatusRole());
     form.resetFields();
     props.setIsModalOpen(false);
   };
 
   const handleSubmit: FormProps<IUpdateRolePermission>['onFinish'] = async (values) => {
+    if (!selected.id) return;
+
+    const permissionIds = normalizePermissionIds(values.permissionIds, permissionTree);
+
     const body: IUpdateRolePermission = {
-      roleId: selected.id!,
-      permissionIds: values.permissionIds
+      roleId: selected.id,
+      permissionIds
     };
 
     try {
@@ -69,7 +77,7 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
       }
 
       props.refreshData();
-      onCloseModal();
+      handleCloseModal();
     } catch (error: any) {
       toast.error(error?.message || `Không thể cập nhật quyền cho nhóm ${selected.data?.name}`);
     }
@@ -81,7 +89,7 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
       className="app-modal"
       width={700}
       open={props.isModalOpen}
-      onCancel={() => props.setIsModalOpen(false)}
+      onCancel={handleCloseModal}
       onOk={() => form.submit()}
       okText="Lưu"
       cancelText="Hủy"
@@ -94,8 +102,9 @@ const RolePermissionModal: React.FC<RolePermissionModalProps> = (props) => {
           <TreeSelect
             treeLine
             treeCheckable
-            treeDefaultExpandAll
-            showCheckedStrategy={TreeSelect.SHOW_ALL}
+            allowClear
+            maxTagCount="responsive"
+            showCheckedStrategy={TreeSelect.SHOW_PARENT}
             placeholder="Chọn quyền"
             treeData={treeData}
             style={{ width: '100%' }}

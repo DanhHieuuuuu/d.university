@@ -9,6 +9,7 @@ import { IViewNhanSu } from '@models/nhansu/nhansu.model';
 import {  IQueryKpiLogStatus } from '@models/kpi/kpi-log.model';
 import { IAskKpiChatCommand } from '@models/kpi/kpi-chat.model';
 import { IQueryKpiCongThuc, IViewKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
+import { IKpiScoreBoardResponse, IQueryKpiScoreBoard } from '@models/kpi/kpi-scoreboard.model';
 
 const apiDanhMucEndpoint = 'kpi';
 const apiKpiTruongEndpoint = `${apiDanhMucEndpoint}/kpi-truong`;
@@ -18,6 +19,7 @@ const apiKpiRoleEndpoint = `${apiDanhMucEndpoint}/kpi-role`;
 const apiKpiLogEndpoint = `${apiDanhMucEndpoint}/kpi-log`;
 const apiKPiChatEndPoint = `${apiDanhMucEndpoint}/kpi-chat`;
 const apiKpiCongThucEndpoint = `${apiDanhMucEndpoint}/kpi-congthuc`;
+const apiKpiScoreBoardEndpoint = `${apiDanhMucEndpoint}/kpi-tinhdiem`;
 //Kpi Cá nhân
 const getListKpiCaNhan = async (query?: IQueryKpiCaNhan) => {
   try {
@@ -612,6 +614,23 @@ const getListKpiCongThuc = async (query?: IQueryKpiCongThuc) => {
   }
 };
 
+const getKpiScoreBoard = async (query: IQueryKpiScoreBoard) => {
+  try {
+    const res = await axios.get(`${apiKpiScoreBoardEndpoint}/kpi-scoreboard`, {
+      params: {
+        ...query
+      }
+    });
+    if (res.data?.code !== 200) {
+      return Promise.reject(res.data?.message || 'Lỗi lấy bảng điểm');
+    }
+    const data: IKpiScoreBoardResponse = res.data.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
 export const KpiService = {
   getListKpiCaNhan,
   getListKpiCaNhanKeKhai,
@@ -651,4 +670,5 @@ export const KpiService = {
   getKpiLogs,
   askKpiAi,
   getListKpiCongThuc,
+  getKpiScoreBoard,
 };

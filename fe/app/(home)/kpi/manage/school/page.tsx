@@ -28,6 +28,9 @@ import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import PositionModal from './(dialog)/create-or-update copy';
 import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { useIsGranted } from '@hooks/useIsGranted';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -35,7 +38,11 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
-  const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
+  const { data: trangThaiTruong, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
+
+  const canSendDeclared= useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSendDeclared);
+  const canCancelDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionCancelDeclared);
+  const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSaveScore);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsModalUpdate] = useState(false);
@@ -138,8 +145,18 @@ const Page = () => {
     cb();
   };
   const bulkActionItems: MenuProps['items'] = [
-    { key: 'approve', label: 'Gửi duyệt', icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, onClick: () => requiredSelect(approveSelected) },
-    { key: 'score', label: 'Hủy duyệt', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelApproveSelected) },
+    ...(canSendDeclared ? [{ 
+      key: 'send-approve', 
+      label: 'Gửi duyệt', 
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, 
+      onClick: () => requiredSelect(approveSelected) 
+    }] : []),
+    ...(canCancelDeclared ? [{ 
+      key: 'cancel-send-approve', 
+      label: 'Hủy duyệt', 
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />, 
+      onClick: () => requiredSelect(cancelApproveSelected) 
+    }] : []),
   ];
 
   const filterContent = (
@@ -148,7 +165,7 @@ const Page = () => {
         <Select allowClear placeholder="Chọn loại KPI" options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))} />
       </Form.Item>
       <Form.Item label="Trạng thái" name="trangThai">
-        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiCaNhan} />
+        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiTruong} />
       </Form.Item>
     </Form>
   );
@@ -260,7 +277,6 @@ const Page = () => {
       width: 130,
       render: (val, record) => {
         if (record.rowType !== 'data') return { props: { colSpan: 0 } };
-        // Thêm màu đỏ cho KPI phạt
         return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
       },
     },
@@ -281,7 +297,6 @@ const Page = () => {
       width: 130,
       render: (val, record) => {
         if (record.rowType !== 'data') return { props: { colSpan: 0 } };
-        // Thêm màu đỏ cho KPI phạt
         return <span className={record.loaiKpi === 3 ? "text-red-500" : ""}>{record.loaiKpi === 3 && val ? `-${val}` : val}</span>;
       },
     },
@@ -313,20 +328,12 @@ const Page = () => {
     <div className="space-y-4">
       <Card
         className="h-full"
-        title={
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
-            <span className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Kê khai KPI trường
-            </span>
-          </div>
-        }
+        title="Kê khai KPI Trường"
         extra={
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={onClickAdd}
-            size="large"
             className="shadow-md hover:shadow-lg transition-shadow"
           >
             Thêm mới
@@ -342,10 +349,8 @@ const Page = () => {
                 allowClear
                 onChange={(e) => handleDebouncedSearch(e.target.value)}
                 className="max-w-[250px]"
-                size="large"
               />
               <Button
-                size="large"
                 icon={<SyncOutlined />}
                 onClick={() => {
                   form.resetFields();
@@ -360,15 +365,15 @@ const Page = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                icon={<SaveOutlined />}
-                type="primary"
-                size="large"
-                onClick={handleSaveKetQua}
-                className="shadow-md hover:shadow-lg transition-shadow"
-              >
-                Lưu kết quả
-              </Button>
+              {canSaveScore && (
+                <Button
+                  icon={<SaveOutlined />}
+                  type="primary"
+                  onClick={handleSaveKetQua}
+                >
+                  Lưu kết quả
+                </Button>
+              )}
               <Dropdown
                 menu={{ items: bulkActionItems }}
                 trigger={['click']}
@@ -430,7 +435,7 @@ const Page = () => {
                   </div>
 
                   <div className="flex flex-col items-center justify-center border-l border-gray-300 pl-4">
-                    <span className="text-sm text-gray-600 mb-1">Điểm tổng nhận được</span>
+                    <span className="text-sm text-gray-600 mb-1">Điểm cấp trên</span>
                     <span className="text-2xl font-bold text-green-600">
                       {summary?.tongCapTren?.toFixed(2) ?? 0}
                     </span>
@@ -447,4 +452,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuKpiManageSchool);

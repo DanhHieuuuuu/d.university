@@ -706,6 +706,185 @@ namespace D.Core.Domain.Migrations
                         });
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.DaoTao.DtQuyDinhThangDiem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DiemChu")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DiemHe4")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DiemSoMax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DiemSoMin")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Mota")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TrangThai")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DtQuyDinhThangDiem", "dt");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A+",
+                            DiemHe4 = 4.0m,
+                            DiemSoMax = 10.0m,
+                            DiemSoMin = 9.0m,
+                            Mota = "Xuất sắc",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A",
+                            DiemHe4 = 3.7m,
+                            DiemSoMax = 8.9m,
+                            DiemSoMin = 8.5m,
+                            Mota = "Giỏi",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B+",
+                            DiemHe4 = 3.5m,
+                            DiemSoMax = 8.4m,
+                            DiemSoMin = 8.0m,
+                            Mota = "Khá giỏi",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B",
+                            DiemHe4 = 3.0m,
+                            DiemSoMax = 7.9m,
+                            DiemSoMin = 7.0m,
+                            Mota = "Khá",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "C+",
+                            DiemHe4 = 2.5m,
+                            DiemSoMax = 6.9m,
+                            DiemSoMin = 6.5m,
+                            Mota = "Trung bình khá",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "C",
+                            DiemHe4 = 2.0m,
+                            DiemSoMax = 6.4m,
+                            DiemSoMin = 5.5m,
+                            Mota = "Trung bình",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "D+",
+                            DiemHe4 = 1.5m,
+                            DiemSoMax = 5.4m,
+                            DiemSoMin = 5.0m,
+                            Mota = "Yếu",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "D",
+                            DiemHe4 = 1.0m,
+                            DiemSoMax = 4.9m,
+                            DiemSoMin = 4.0m,
+                            Mota = "Kém",
+                            TrangThai = true
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "F",
+                            DiemHe4 = 0.0m,
+                            DiemSoMax = 3.9m,
+                            DiemSoMin = 0.0m,
+                            Mota = "Không đạt",
+                            TrangThai = true
+                        });
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.Delegation.Incoming.DelegationIncoming", b =>
                 {
                     b.Property<int>("Id")
@@ -3431,6 +3610,9 @@ namespace D.Core.Domain.Migrations
                     b.Property<DateTime?>("NgaySinh")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("NgayVaoDang")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("NguyenQuan")
                         .HasColumnType("nvarchar(max)");
 
@@ -3468,6 +3650,18 @@ namespace D.Core.Domain.Migrations
                     b.Property<string>("Ten")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TenChuyenNganhHocHam")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenChuyenNganhHocVi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenHocHam")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenHocVi")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("TenNganHang1")
                         .HasColumnType("nvarchar(max)");
 
@@ -3476,6 +3670,12 @@ namespace D.Core.Domain.Migrations
 
                     b.Property<int?>("TonGiao")
                         .HasColumnType("int");
+
+                    b.Property<string>("TrinhDoHocVan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TrinhDoNgoaiNgu")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -4299,6 +4499,739 @@ namespace D.Core.Domain.Migrations
                     b.ToTable("KpiTruong", "kpi");
                 });
 
+            modelBuilder.Entity("D.Core.Domain.Entities.SinhVien.SvDiemMonHoc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DiemChu")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DiemCuoiKy")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DiemHe4")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DiemQuaTrinh")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DiemTongKet")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("GhiChu")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HocKy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("KetQua")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LanHoc")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MonHocId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NamHoc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SinhVienId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SvDiemMonHoc", "sv");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 100,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B",
+                            DiemCuoiKy = 8.0m,
+                            DiemHe4 = 3.0m,
+                            DiemQuaTrinh = 7.5m,
+                            DiemTongKet = 7.8m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 4,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 100
+                        },
+                        new
+                        {
+                            Id = 101,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A",
+                            DiemCuoiKy = 8.5m,
+                            DiemHe4 = 3.7m,
+                            DiemQuaTrinh = 9.0m,
+                            DiemTongKet = 8.7m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 100
+                        },
+                        new
+                        {
+                            Id = 102,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B+",
+                            DiemCuoiKy = 8.0m,
+                            DiemHe4 = 3.5m,
+                            DiemQuaTrinh = 8.5m,
+                            DiemTongKet = 8.2m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 100
+                        },
+                        new
+                        {
+                            Id = 103,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A",
+                            DiemCuoiKy = 9.0m,
+                            DiemHe4 = 3.7m,
+                            DiemQuaTrinh = 8.5m,
+                            DiemTongKet = 8.8m,
+                            GhiChu = "",
+                            HocKy = 2,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 3,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 100
+                        },
+                        new
+                        {
+                            Id = 104,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A+",
+                            DiemCuoiKy = 9.5m,
+                            DiemHe4 = 4.0m,
+                            DiemQuaTrinh = 9.0m,
+                            DiemTongKet = 9.3m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 4,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 101
+                        },
+                        new
+                        {
+                            Id = 105,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B+",
+                            DiemCuoiKy = 8.5m,
+                            DiemHe4 = 3.5m,
+                            DiemQuaTrinh = 8.0m,
+                            DiemTongKet = 8.3m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 101
+                        },
+                        new
+                        {
+                            Id = 106,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A+",
+                            DiemCuoiKy = 9.0m,
+                            DiemHe4 = 4.0m,
+                            DiemQuaTrinh = 9.5m,
+                            DiemTongKet = 9.2m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 101
+                        },
+                        new
+                        {
+                            Id = 107,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A+",
+                            DiemCuoiKy = 9.5m,
+                            DiemHe4 = 4.0m,
+                            DiemQuaTrinh = 9.5m,
+                            DiemTongKet = 9.5m,
+                            GhiChu = "",
+                            HocKy = 2,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 3,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 101
+                        },
+                        new
+                        {
+                            Id = 108,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "C",
+                            DiemCuoiKy = 5.5m,
+                            DiemHe4 = 2.0m,
+                            DiemQuaTrinh = 6.0m,
+                            DiemTongKet = 5.7m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 4,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 102
+                        },
+                        new
+                        {
+                            Id = 109,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B",
+                            DiemCuoiKy = 8.0m,
+                            DiemHe4 = 3.0m,
+                            DiemQuaTrinh = 7.5m,
+                            DiemTongKet = 7.8m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 102
+                        },
+                        new
+                        {
+                            Id = 110,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "C+",
+                            DiemCuoiKy = 7.0m,
+                            DiemHe4 = 2.5m,
+                            DiemQuaTrinh = 6.5m,
+                            DiemTongKet = 6.8m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 102
+                        },
+                        new
+                        {
+                            Id = 111,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B",
+                            DiemCuoiKy = 7.5m,
+                            DiemHe4 = 2.8m,
+                            DiemQuaTrinh = 7.0m,
+                            DiemTongKet = 7.3m,
+                            GhiChu = "",
+                            HocKy = 2,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 3,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 102
+                        },
+                        new
+                        {
+                            Id = 112,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B+",
+                            DiemCuoiKy = 8.0m,
+                            DiemHe4 = 3.5m,
+                            DiemQuaTrinh = 8.5m,
+                            DiemTongKet = 8.2m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 4,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 103
+                        },
+                        new
+                        {
+                            Id = 113,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A+",
+                            DiemCuoiKy = 9.0m,
+                            DiemHe4 = 4.0m,
+                            DiemQuaTrinh = 9.5m,
+                            DiemTongKet = 9.2m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 103
+                        },
+                        new
+                        {
+                            Id = 114,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B+",
+                            DiemCuoiKy = 8.5m,
+                            DiemHe4 = 3.5m,
+                            DiemQuaTrinh = 8.0m,
+                            DiemTongKet = 8.3m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 103
+                        },
+                        new
+                        {
+                            Id = 115,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "A+",
+                            DiemCuoiKy = 9.5m,
+                            DiemHe4 = 4.0m,
+                            DiemQuaTrinh = 9.0m,
+                            DiemTongKet = 9.3m,
+                            GhiChu = "",
+                            HocKy = 2,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 3,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 103
+                        },
+                        new
+                        {
+                            Id = 116,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B",
+                            DiemCuoiKy = 7.5m,
+                            DiemHe4 = 2.8m,
+                            DiemQuaTrinh = 7.0m,
+                            DiemTongKet = 7.3m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 4,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 104
+                        },
+                        new
+                        {
+                            Id = 117,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B+",
+                            DiemCuoiKy = 8.5m,
+                            DiemHe4 = 3.5m,
+                            DiemQuaTrinh = 8.0m,
+                            DiemTongKet = 8.3m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 104
+                        },
+                        new
+                        {
+                            Id = 118,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B",
+                            DiemCuoiKy = 7.0m,
+                            DiemHe4 = 2.8m,
+                            DiemQuaTrinh = 7.5m,
+                            DiemTongKet = 7.2m,
+                            GhiChu = "",
+                            HocKy = 1,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 104
+                        },
+                        new
+                        {
+                            Id = 119,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemChu = "B",
+                            DiemCuoiKy = 8.0m,
+                            DiemHe4 = 3.0m,
+                            DiemQuaTrinh = 7.5m,
+                            DiemTongKet = 7.8m,
+                            GhiChu = "",
+                            HocKy = 2,
+                            KetQua = "Đạt",
+                            LanHoc = 1,
+                            MonHocId = 3,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 104
+                        });
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.SinhVien.SvKetQuaHocKy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DiemRenLuyen")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DiemTrungBinhHocKy")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DiemTrungBinhTinhLuy")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("GpaTichLy")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("HocKy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NamHoc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SinhVienId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoTinChiDat")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoTinChiNo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoTinChiTichLuy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("XepLoaiHocKy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("XepLoaiRenLuyen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SvKetQuaHocKy", "sv");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 100,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 85,
+                            DiemTrungBinhHocKy = 8.23m,
+                            DiemTrungBinhTinhLuy = 8.23m,
+                            GpaTichLy = 3.4m,
+                            HocKy = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 100,
+                            SoTinChiDat = 10,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 10,
+                            XepLoaiHocKy = "Giỏi",
+                            XepLoaiRenLuyen = "Tốt"
+                        },
+                        new
+                        {
+                            Id = 101,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 88,
+                            DiemTrungBinhHocKy = 8.8m,
+                            DiemTrungBinhTinhLuy = 8.52m,
+                            GpaTichLy = 3.55m,
+                            HocKy = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 100,
+                            SoTinChiDat = 3,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocKy = "Giỏi",
+                            XepLoaiRenLuyen = "Tốt"
+                        },
+                        new
+                        {
+                            Id = 102,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 92,
+                            DiemTrungBinhHocKy = 8.93m,
+                            DiemTrungBinhTinhLuy = 8.93m,
+                            GpaTichLy = 3.83m,
+                            HocKy = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 101,
+                            SoTinChiDat = 10,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 10,
+                            XepLoaiHocKy = "Giỏi",
+                            XepLoaiRenLuyen = "Xuất sắc"
+                        },
+                        new
+                        {
+                            Id = 103,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 95,
+                            DiemTrungBinhHocKy = 9.5m,
+                            DiemTrungBinhTinhLuy = 9.07m,
+                            GpaTichLy = 3.87m,
+                            HocKy = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 101,
+                            SoTinChiDat = 3,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocKy = "Xuất sắc",
+                            XepLoaiRenLuyen = "Xuất sắc"
+                        },
+                        new
+                        {
+                            Id = 104,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 72,
+                            DiemTrungBinhHocKy = 6.77m,
+                            DiemTrungBinhTinhLuy = 6.77m,
+                            GpaTichLy = 2.5m,
+                            HocKy = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 102,
+                            SoTinChiDat = 10,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 10,
+                            XepLoaiHocKy = "Trung bình khá",
+                            XepLoaiRenLuyen = "Khá"
+                        },
+                        new
+                        {
+                            Id = 105,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 75,
+                            DiemTrungBinhHocKy = 7.3m,
+                            DiemTrungBinhTinhLuy = 6.89m,
+                            GpaTichLy = 2.57m,
+                            HocKy = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 102,
+                            SoTinChiDat = 3,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocKy = "Khá",
+                            XepLoaiRenLuyen = "Khá"
+                        },
+                        new
+                        {
+                            Id = 106,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 84,
+                            DiemTrungBinhHocKy = 8.57m,
+                            DiemTrungBinhTinhLuy = 8.57m,
+                            GpaTichLy = 3.67m,
+                            HocKy = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 103,
+                            SoTinChiDat = 10,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 10,
+                            XepLoaiHocKy = "Giỏi",
+                            XepLoaiRenLuyen = "Tốt"
+                        },
+                        new
+                        {
+                            Id = 107,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 86,
+                            DiemTrungBinhHocKy = 9.3m,
+                            DiemTrungBinhTinhLuy = 8.74m,
+                            GpaTichLy = 3.75m,
+                            HocKy = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 103,
+                            SoTinChiDat = 3,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocKy = "Xuất sắc",
+                            XepLoaiRenLuyen = "Tốt"
+                        },
+                        new
+                        {
+                            Id = 108,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 76,
+                            DiemTrungBinhHocKy = 7.6m,
+                            DiemTrungBinhTinhLuy = 7.6m,
+                            GpaTichLy = 3.03m,
+                            HocKy = 1,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 104,
+                            SoTinChiDat = 10,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 10,
+                            XepLoaiHocKy = "Khá",
+                            XepLoaiRenLuyen = "Khá"
+                        },
+                        new
+                        {
+                            Id = 109,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            DiemRenLuyen = 78,
+                            DiemTrungBinhHocKy = 7.8m,
+                            DiemTrungBinhTinhLuy = 7.65m,
+                            GpaTichLy = 3.05m,
+                            HocKy = 2,
+                            NamHoc = "2023-2024",
+                            SinhVienId = 104,
+                            SoTinChiDat = 3,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocKy = "Khá",
+                            XepLoaiRenLuyen = "Khá"
+                        });
+                });
+
             modelBuilder.Entity("D.Core.Domain.Entities.SinhVien.SvSinhVien", b =>
                 {
                     b.Property<int>("Id")
@@ -4406,6 +5339,311 @@ namespace D.Core.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SvSinhVien", "sv");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 100,
+                            ChuyenNganh = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DanToc = 1,
+                            Deleted = false,
+                            Email = "nguyenvanan2004@gmail.com",
+                            Email2 = "an.nv@student.duniversity.edu.vn",
+                            GioiTinh = 1,
+                            HoDem = "Nguyễn Văn",
+                            Khoa = 1,
+                            KhoaHoc = 1,
+                            Mssv = "SV2023001",
+                            Nganh = 1,
+                            NgaySinh = new DateTime(2004, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            NguyenQuan = "Quận Thanh Xuân, Hà Nội",
+                            NoiOHienTai = "Số 123, Đường Nguyễn Trãi, Quận Thanh Xuân, Hà Nội",
+                            NoiSinh = "Hà Nội",
+                            QuocTich = 1,
+                            SoCccd = "001204012345",
+                            SoDienThoai = "0901234567",
+                            Ten = "An",
+                            TonGiao = 1,
+                            TrangThaiHoc = 1
+                        },
+                        new
+                        {
+                            Id = 101,
+                            ChuyenNganh = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DanToc = 1,
+                            Deleted = false,
+                            Email = "tranthibich2004@gmail.com",
+                            Email2 = "bich.tt@student.duniversity.edu.vn",
+                            GioiTinh = 2,
+                            HoDem = "Trần Thị",
+                            Khoa = 1,
+                            KhoaHoc = 1,
+                            Mssv = "SV2023002",
+                            Nganh = 1,
+                            NgaySinh = new DateTime(2004, 8, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            NguyenQuan = "Quận Ngô Quyền, Hải Phòng",
+                            NoiOHienTai = "Số 45, Đường Lê Lợi, Quận Cầu Giấy, Hà Nội",
+                            NoiSinh = "Hải Phòng",
+                            QuocTich = 1,
+                            SoCccd = "001204023456",
+                            SoDienThoai = "0912345678",
+                            Ten = "Bích",
+                            TonGiao = 2,
+                            TrangThaiHoc = 1
+                        },
+                        new
+                        {
+                            Id = 102,
+                            ChuyenNganh = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DanToc = 1,
+                            Deleted = false,
+                            Email = "leminhcuong2004@gmail.com",
+                            Email2 = "cuong.lm@student.duniversity.edu.vn",
+                            GioiTinh = 1,
+                            HoDem = "Lê Minh",
+                            Khoa = 1,
+                            KhoaHoc = 1,
+                            Mssv = "SV2023003",
+                            Nganh = 1,
+                            NgaySinh = new DateTime(2004, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            NguyenQuan = "Quận Hải Châu, Đà Nẵng",
+                            NoiOHienTai = "Số 78, Đường Trần Duy Hưng, Quận Cầu Giấy, Hà Nội",
+                            NoiSinh = "Đà Nẵng",
+                            QuocTich = 1,
+                            SoCccd = "001204034567",
+                            SoDienThoai = "0923456789",
+                            Ten = "Cường",
+                            TonGiao = 1,
+                            TrangThaiHoc = 1
+                        },
+                        new
+                        {
+                            Id = 103,
+                            ChuyenNganh = 1,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DanToc = 1,
+                            Deleted = false,
+                            Email = "phamthudung2004@gmail.com",
+                            Email2 = "dung.pt@student.duniversity.edu.vn",
+                            GioiTinh = 2,
+                            HoDem = "Phạm Thu",
+                            Khoa = 1,
+                            KhoaHoc = 1,
+                            Mssv = "SV2023004",
+                            Nganh = 1,
+                            NgaySinh = new DateTime(2004, 11, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            NguyenQuan = "TP Bắc Ninh, Bắc Ninh",
+                            NoiOHienTai = "Số 22, Đường Xuân Thủy, Quận Cầu Giấy, Hà Nội",
+                            NoiSinh = "Bắc Ninh",
+                            QuocTich = 1,
+                            SoCccd = "001204045678",
+                            SoDienThoai = "0934567890",
+                            Ten = "Dung",
+                            TonGiao = 3,
+                            TrangThaiHoc = 1
+                        },
+                        new
+                        {
+                            Id = 104,
+                            ChuyenNganh = 2,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DanToc = 1,
+                            Deleted = false,
+                            Email = "hoangvanem2004@gmail.com",
+                            Email2 = "em.hv@student.duniversity.edu.vn",
+                            GioiTinh = 1,
+                            HoDem = "Hoàng Văn",
+                            Khoa = 1,
+                            KhoaHoc = 1,
+                            Mssv = "SV2023005",
+                            Nganh = 1,
+                            NgaySinh = new DateTime(2004, 7, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            NguyenQuan = "TP Nam Định, Nam Định",
+                            NoiOHienTai = "Số 55, Đường Phạm Văn Đồng, Quận Bắc Từ Liêm, Hà Nội",
+                            NoiSinh = "Nam Định",
+                            QuocTich = 1,
+                            SoCccd = "001204056789",
+                            SoDienThoai = "0945678901",
+                            Ten = "Em",
+                            TonGiao = 1,
+                            TrangThaiHoc = 1
+                        });
+                });
+
+            modelBuilder.Entity("D.Core.Domain.Entities.SinhVien.SvThongTinHocVu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("CanhBaoHocVu")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("GpaHienTai")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("GpaTBTichLuy")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("HocKyHienTai")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LyDoCanhBao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MucCanhBao")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NamHocHienTai")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SinhVienId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoTinChiNo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoTinChiTichLuy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("XepLoaiHocLuc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SvThongTinHocVu", "sv");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 100,
+                            CanhBaoHocVu = false,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            GpaHienTai = 3.55m,
+                            GpaTBTichLuy = 3.55m,
+                            HocKyHienTai = 2,
+                            LyDoCanhBao = "",
+                            MucCanhBao = 0,
+                            NamHocHienTai = "2023-2024",
+                            SinhVienId = 100,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocLuc = "Giỏi"
+                        },
+                        new
+                        {
+                            Id = 101,
+                            CanhBaoHocVu = false,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            GpaHienTai = 3.87m,
+                            GpaTBTichLuy = 3.87m,
+                            HocKyHienTai = 2,
+                            LyDoCanhBao = "",
+                            MucCanhBao = 0,
+                            NamHocHienTai = "2023-2024",
+                            SinhVienId = 101,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocLuc = "Giỏi"
+                        },
+                        new
+                        {
+                            Id = 102,
+                            CanhBaoHocVu = false,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            GpaHienTai = 2.57m,
+                            GpaTBTichLuy = 2.57m,
+                            HocKyHienTai = 2,
+                            LyDoCanhBao = "",
+                            MucCanhBao = 0,
+                            NamHocHienTai = "2023-2024",
+                            SinhVienId = 102,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocLuc = "Trung bình khá"
+                        },
+                        new
+                        {
+                            Id = 103,
+                            CanhBaoHocVu = false,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            GpaHienTai = 3.75m,
+                            GpaTBTichLuy = 3.75m,
+                            HocKyHienTai = 2,
+                            LyDoCanhBao = "",
+                            MucCanhBao = 0,
+                            NamHocHienTai = "2023-2024",
+                            SinhVienId = 103,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocLuc = "Giỏi"
+                        },
+                        new
+                        {
+                            Id = 104,
+                            CanhBaoHocVu = false,
+                            CreatedBy = "root",
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deleted = false,
+                            GpaHienTai = 3.05m,
+                            GpaTBTichLuy = 3.05m,
+                            HocKyHienTai = 2,
+                            LyDoCanhBao = "",
+                            MucCanhBao = 0,
+                            NamHocHienTai = "2023-2024",
+                            SinhVienId = 104,
+                            SoTinChiNo = 0,
+                            SoTinChiTichLuy = 13,
+                            XepLoaiHocLuc = "Khá"
+                        });
                 });
 
             modelBuilder.Entity("D.Core.Domain.Entities.Survey.KsAIResponse", b =>

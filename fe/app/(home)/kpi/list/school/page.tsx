@@ -25,12 +25,22 @@ import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 import { ETableColumnType } from '@/constants/e-table.consts';
 import KpiLogModal from '../../modal/KpiLogModal';
 import { useDebouncedCallback } from '@hooks/useDebounce';
+import { useIsGranted } from '@hooks/useIsGranted';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const Page = () => {
   const [form] = Form.useForm();
   const [filterForm] = Form.useForm();
   const dispatch = useAppDispatch();
   const { processUpdateStatus } = useKpiStatusAction();
+
+  const canScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionScore);
+  const canSyncScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSyncScore);
+  const canPrincipalApprove = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionPrincipalApprove);
+  const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolActionSaveScore);
+  const canUpdate = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolUpdate);
+  const canDelete = useIsGranted(PermissionCoreConst.CoreMenuKpiListSchoolDelete);
 
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
   const { data: trangThaiTruong, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
@@ -43,8 +53,6 @@ const Page = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ketQuaCapTrenMap, setKetQuaCapTrenMap] = useState<Record<number, number | undefined>>({});
   const [activeLoaiKpi, setActiveLoaiKpi] = useState<number>(KpiLoaiConst.CHUC_NANG);
-
-  // Log Modal state
   const [openLogModal, setOpenLogModal] = useState(false);
   const [selectedKpiLogId, setSelectedKpiLogId] = useState<number | null>(null);
   const { data: logData, status: logStatus } = useAppSelector(state => state.kpiState.kpiLog.$list);
@@ -81,33 +89,6 @@ const Page = () => {
     cb();
   };
 
-  const approveSelected = () => {
-    const ids = selectedRowKeys.map(Number);
-    const kpiToApprove = list.filter(
-      (item) => ids.includes(item.id) && item.trangThai === KpiTrangThaiConst.DE_XUAT
-    );
-
-    if (kpiToApprove.length === 0) {
-      toast.error('Chỉ có KPI đang ở trạng thái "Đề xuất" mới được phê duyệt.');
-      return;
-    }
-
-    Modal.confirm({
-      title: 'Phê duyệt hàng loạt',
-      content: `Xác nhận phê duyệt ${kpiToApprove.length} KPI đã chọn?`,
-      okText: 'Duyệt',
-      onOk: async () => {
-        try {
-          await dispatch(updateTrangThaiKpiTruong({ ids, trangThai: KpiTrangThaiConst.PHE_DUYET })).unwrap();
-          toast.success('Phê duyệt thành công!');
-          setSelectedRowKeys([]);
-          dispatch(getAllKpiTruong(query));
-        } catch {
-          toast.error('Phê duyệt thất bại!');
-        }
-      }
-    });
-  };
 
   const scoreSelected = () => {
     if (!selectedRowKeys.length) {
@@ -144,6 +125,36 @@ const Page = () => {
       nextStatus: KpiTrangThaiConst.DA_GUI_CHAM,
       updateAction: updateTrangThaiKpiTruong,
       afterSuccess: () => { setSelectedRowKeys([]); dispatch(getAllKpiTruong(query)); },
+    });
+
+  const principalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DA_CHAM],
+      invalidMsg: 'Chỉ có KPI đang ở trạng thái "Đã chấm" mới được phê duyệt.',
+      confirmTitle: 'Phê duyệt kết quả chấm',
+      confirmMessage: 'Xác nhận phê duyệt các KPI đã chọn?',
+      successMsg: 'Phê duyệt thành công',
+      nextStatus: KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET,
+      updateAction: updateTrangThaiKpiTruong,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiTruong(query));
+      },
+    });
+
+  const cancelPrincipalApprovedSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
+      invalidMsg: 'Chỉ KPI "Đã phê duyệt kết quả chấm" mới được hủy',
+      confirmTitle: 'Hủy phê duyệt',
+      confirmMessage: 'Hủy phê duyệt các KPI đã chọn?',
+      successMsg: 'Hủy phê duyệt thành công',
+      nextStatus: KpiTrangThaiConst.DA_CHAM,
+      updateAction: updateTrangThaiKpiTruong,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiTruong(query));
+      },
     });
 
   const updateKetQuaCapTren = (id: number, value?: number) => {
@@ -187,10 +198,37 @@ const Page = () => {
   };
 
   const bulkActionItems: MenuProps['items'] = [
-    { key: 'cancelScore', label: 'Hủy kết quả chấm KPI', icon: <UndoOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(cancelScoredSelected) },
-    { key: 'score', label: 'Chấm KPI', icon: <EditOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(scoreSelected) },
-    { key: 'SYNC', label: 'Đồng bộ kết quả thực tế', icon: <EditOutlined style={{ color: '#1890ff' }} />, onClick: () => requiredSelect(syncKetQuaThucTeToCapTren) },
+    ...(canScore ? [{
+      key: 'score',
+      label: 'Chấm KPI',
+      icon: <EditOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(scoreSelected)
+    }] : []),
+    ...(canScore ? [{
+      key: 'cancelScore',
+      label: 'Hủy kết quả chấm KPI',
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(cancelScoredSelected)
+    }] : []),
+    ...(canSyncScore ? [{
+      key: 'syncKetQua',
+      label: 'Đồng bộ kết quả thực tế',
+      icon: <SyncOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
+    }] : []),
+    ...(canPrincipalApprove ? [{
+      key: 'principalApprove',
+      label: 'Phê duyệt', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(principalApprovedSelected)
+    }] : []),
+    ...(canPrincipalApprove ? [{
+      key: 'cancelPrincipalApprove',
+      label: 'Hủy duyệt',
+      icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+      onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
+    }] : []),
   ];
+
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => { onFilterChange({ Keyword: value }); }, 500);
 
   const filterContent = (
@@ -210,7 +248,6 @@ const Page = () => {
     </Form>
   );
 
-  // --- TABLE ACTIONS ---
   const onClickAdd = () => setModalMode('create');
   const onClickUpdate = (record: IViewKpiTruong) => { dispatch(setSelectedKpiTruong(record)); setModalMode('update'); };
   const onClickView = (record: IViewKpiTruong) => { dispatch(setSelectedKpiTruong(record)); setModalMode('view'); };
@@ -237,10 +274,31 @@ const Page = () => {
   };
 
   const actions: IAction[] = [
-    { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView },
-    { label: 'Sửa', icon: <EditOutlined />, command: onClickUpdate },
-    { label: 'Xóa', color: 'red', icon: <DeleteOutlined />, command: onClickDelete },
-    { label: 'Nhật ký trạng thái', icon: <EyeOutlined />, command: onClickViewLog }
+    {
+      label: 'Chi tiết',
+      icon: <EyeOutlined />,
+      command: onClickView
+    },
+    {
+      label: 'Sửa',
+      color: 'blue',
+      hidden: () => !canUpdate,
+      icon: <EditOutlined />,
+      command: onClickUpdate
+    },
+  {
+      label: 'Xóa',
+      color: 'red',
+      hidden: () => !canDelete,
+      icon: <DeleteOutlined />,
+      command: onClickDelete
+    },
+    {
+      label: 'Nhật ký trạng thái',
+      icon: <EyeOutlined />,
+      color: 'orange',
+      command: onClickViewLog
+    }
   ];
 
   const columns: IColumn<IViewKpiTruong>[] = [
@@ -293,7 +351,15 @@ const Page = () => {
             <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, namHoc: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button icon={<SaveOutlined />} type="primary" onClick={handleSaveKetQuaCapTren}> Lưu kết quả </Button>
+            {canSaveScore && (
+              <Button
+                icon={<SaveOutlined />}
+                type="primary"
+                onClick={handleSaveKetQuaCapTren}
+              >
+                Lưu kết quả
+              </Button>
+            )}
             <Dropdown menu={{ items: bulkActionItems }} trigger={['click']} disabled={selectedRowKeys.length === 0}>
               <Button type={selectedRowKeys.length > 0 ? 'primary' : 'default'} icon={<EllipsisOutlined />}> Thao tác {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`} </Button>
             </Dropdown>
@@ -351,4 +417,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuKpiListSchool);

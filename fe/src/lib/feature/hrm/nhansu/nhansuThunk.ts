@@ -44,19 +44,22 @@ export const getHoSoNhanSu = createAsyncThunk('nhansu/ho-so', async (idNhanSu: n
   }
 });
 
-export const createNhanSuThunk = createAsyncThunk('nhansu/create', async (payload: ICreateNhanSu, { rejectWithValue }) => {
-  try {
-    const res = await NhanSuService.createNhanSu(payload);
+export const createNhanSuThunk = createAsyncThunk(
+  'nhansu/create',
+  async (payload: ICreateNhanSu, { rejectWithValue }) => {
+    try {
+      const res = await NhanSuService.createNhanSu(payload);
 
-    return res.data;
-  } catch (error: any) {
-    return rejectWithValue({
-      message: error.message,
-      code: error.code,
-      response: error.response?.data
-    });
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
   }
-});
+);
 
 export const updateNhanSuThunk = createAsyncThunk(
   'nhansu/update',
@@ -83,7 +86,7 @@ export const findNhanSuBySdtThunk = createAsyncThunk(
 
       return (res.data.items ?? []).map((ns: IViewNhanSu) => ({
         label: `${ns.hoTen} - ${ns.soDienThoai}`,
-        value: ns.idNhanSu,
+        value: ns.idNhanSu
       }));
     } catch (error: any) {
       return rejectWithValue({
@@ -94,3 +97,17 @@ export const findNhanSuBySdtThunk = createAsyncThunk(
     }
   }
 );
+
+export const thongKeNhanSuTheoPhongBanThunk = createAsyncThunk('nhansu/thongke-pb', async (_, { rejectWithValue }) => {
+  try {
+    const res = await NhanSuService.thongKeNsTheoPhongBan();
+
+    return res.data;
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
+  }
+});

@@ -29,5 +29,14 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public decimal? ChieuCao { get; set; }
         public decimal? CanNang { get; set; }
         public string? NhomMau { get; set; }
+
+        // Thông tin học vấn
+        public string? TrinhDoHocVan { get; set; }
+        public string? TrinhDoNgoaiNgu { get; set; }
+        public string? TenHocVi { get; set; }
+        public string? TenChuyenNganhHocVi { get; set; }
+        public string? TenHocHam { get; set; }
+        public string? TenChuyenNganhHocHam { get; set; }
+        public DateTime? NgayVaoDang { get; set; }
     }
 }

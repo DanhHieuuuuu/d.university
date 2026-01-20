@@ -30,9 +30,15 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   const loaiKpiOptions = useMemo(() => {
     return KpiLoaiConst.list
-      .filter(x => x.value === 1 || x.value === 2)
-      .map(x => ({ value: x.value, label: x.name }));
-  }, []);
+      .filter((x) => {
+        if ([1, 2].includes(x.value)) return true;
+        if (x.value === 3) {
+          return isView || ($selected.data?.loaiKpi === 3);
+        }
+        return false;
+      })
+      .map((x) => ({ value: x.value, label: x.name }));
+  }, [isView, $selected.data]); 
 
   const congThucOptions = useMemo(() => {
     return (listCongThuc?.data || []).map((ct: any) => ({

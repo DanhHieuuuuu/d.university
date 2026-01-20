@@ -2,13 +2,7 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Select } from 'antd';
-import {
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  SearchOutlined,
-  SyncOutlined
-} from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
 import { useNavigate } from '@hooks/navigate';
 
 import { ReduxStatus } from '@redux/const';
@@ -23,6 +17,7 @@ import { formatDateView } from '@utils/index';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { useIsGranted } from '@hooks/useIsGranted';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import CreateNhanSuModal from './(dialog)/create-or-update-ns';
@@ -33,6 +28,10 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem } = useAppSelector((state) => state.nhanSuState);
   const { phongBan } = useAppSelector((state) => state.danhmucState);
+
+  // permission in page
+  const hasPermisisonUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
+  const hasPermissionCreateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonCreateNhanSu);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
@@ -96,8 +95,9 @@ const Page = () => {
       label: 'Sửa',
       tooltip: 'Sửa thông tin nhân sự',
       icon: <EditOutlined />,
+      hidden: () => !hasPermisisonUpdateNhanSu,
       command: (record: IViewNhanSu) => onClickUpdate(record)
-    },
+    }
     // {
     //   label: 'Xóa',
     //   color: 'red',
@@ -160,7 +160,12 @@ const Page = () => {
       title="Danh sách nhân sự"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={onClickAdd}
+          hidden={!hasPermissionCreateNhanSu}
+        >
           Thêm mới
         </Button>
       }

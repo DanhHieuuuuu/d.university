@@ -77,27 +77,66 @@
 
         #region Kpi
         public const string CoreMenuKpi = $"{PermissionPrefixKeys.Menu}kpi";
+
         public const string CoreMenuKpiList = $"{PermissionPrefixKeys.Menu}kpi_list";
+
+        public const string CoreMenuKpiListRole = $"{PermissionPrefixKeys.Menu}kpi_list_role";
         public const string CoreMenuKpiListPersonal = $"{PermissionPrefixKeys.Menu}kpi_list_personal";
         public const string CoreMenuKpiListPersonalCreate = $"{PermissionPrefixKeys.Button}kpi_list_personal_create";
         public const string CoreMenuKpiListPersonalUpdate = $"{PermissionPrefixKeys.Button}kpi_list_personal_update";
         public const string CoreMenuKpiListPersonalDelete = $"{PermissionPrefixKeys.Button}kpi_list_personal_delete";
         public const string CoreMenuKpiListPersonalAction = $"{PermissionPrefixKeys.Button}kpi_list_personal_action";
         public const string CoreMenuKpiListPersonalActionScore = $"{PermissionPrefixKeys.Button}kpi_list_personal_action_score";
+        public const string CoreMenuKpiListPersonalActionSyncScore = $"{PermissionPrefixKeys.Button}kpi_list_personal_action_sync_score";
+        public const string CoreMenuKpiListPersonalActionSaveScore = $"{PermissionPrefixKeys.Button}kpi_list_personal_action_save_score";
         public const string CoreMenuKpiListPersonalActionPrincipalApprove = $"{PermissionPrefixKeys.Button}kpi_list_personal_action_principal_approve";
 
         public const string CoreMenuKpiListUnit = $"{PermissionPrefixKeys.Menu}kpi_list_unit";
         public const string CoreMenuKpiListUnitCreate = $"{PermissionPrefixKeys.Button}kpi_list_unit_create";
         public const string CoreMenuKpiListUnitUpdate = $"{PermissionPrefixKeys.Button}kpi_list_unit_update";
         public const string CoreMenuKpiListUnitDelete = $"{PermissionPrefixKeys.Button}kpi_list_unit_delete";
+        public const string CoreMenuKpiListUnitAction = $"{PermissionPrefixKeys.Button}kpi_list_unit_action";
+        public const string CoreMenuKpiListUnitActionApprove = $"{PermissionPrefixKeys.Button}kpi_list_unit_action_approve";
+        public const string CoreMenuKpiListUnitActionScore = $"{PermissionPrefixKeys.Button}kpi_list_unit_action_score";
+        public const string CoreMenuKpiListUnitActionSyncScore = $"{PermissionPrefixKeys.Button}kpi_list_unit_action_sync_score";
+        public const string CoreMenuKpiListUnitActionSaveScore = $"{PermissionPrefixKeys.Button}kpi_list_unit_action_save_score";
+        public const string CoreMenuKpiListUnitActionPrincipalApprove = $"{PermissionPrefixKeys.Button}kpi_list_unit_action_principal_approve";
+
         public const string CoreMenuKpiListSchool = $"{PermissionPrefixKeys.Menu}kpi_list_school";
         public const string CoreMenuKpiListSchoolCreate = $"{PermissionPrefixKeys.Button}kpi_list_school_create";
         public const string CoreMenuKpiListSchoolUpdate = $"{PermissionPrefixKeys.Button}kpi_list_school_update";
         public const string CoreMenuKpiListSchoolDelete = $"{PermissionPrefixKeys.Button}kpi_list_school_delete";
+        public const string CoreMenuKpiListSchoolAction = $"{PermissionPrefixKeys.Button}kpi_list_school_action";
+        public const string CoreMenuKpiListSchoolActionScore = $"{PermissionPrefixKeys.Button}kpi_list_school_action_score";
+        public const string CoreMenuKpiListSchoolActionSyncScore = $"{PermissionPrefixKeys.Button}kpi_list_school_action_sync_score";
+        public const string CoreMenuKpiListSchoolActionSaveScore = $"{PermissionPrefixKeys.Button}kpi_list_school_action_save_score";
+        public const string CoreMenuKpiListSchoolActionPrincipalApprove = $"{PermissionPrefixKeys.Button}kpi_list_school_action_principal_approve";
+
         public const string CoreMenuKpiManage = $"{PermissionPrefixKeys.Menu}kpi_manage";
+
         public const string CoreMenuKpiManagePersonal = $"{PermissionPrefixKeys.Menu}kpi_manage_personal";
+        public const string CoreMenuKpiManagePersonalActionSaveScore = $"{PermissionPrefixKeys.Button}kpi_manage_personal_action_save_score";
+        public const string CoreMenuKpiManagePersonalAction = $"{PermissionPrefixKeys.Button}kpi_manage_personal_action";
+        public const string CoreMenuKpiManagePersonalActionSendDeclared = $"{PermissionPrefixKeys.Button}kpi_manage_personal_action_send_declared";
+        public const string CoreMenuKpiManagePersonalActionCancelDeclared = $"{PermissionPrefixKeys.Button}kpi_manage_personal_action_cancel_declared";
+
+
         public const string CoreMenuKpiManageUnit = $"{PermissionPrefixKeys.Menu}kpi_manage_unit";
+        public const string CoreMenuKpiManageUnitCreate = $"{PermissionPrefixKeys.Button}kpi_manage_unit_create";
+        public const string CoreMenuKpiManageUnitActionSaveScore = $"{PermissionPrefixKeys.Button}kpi_manage_unit_action_save_score";
+        public const string CoreMenuKpiManageUnitAssign = $"{PermissionPrefixKeys.Button}kpi_manage_unit_assign";
+        public const string CoreMenuKpiManageUnitAction = $"{PermissionPrefixKeys.Button}kpi_manage_unit_action";
+        public const string CoreMenuKpiManageUnitActionPropose = $"{PermissionPrefixKeys.Button}kpi_manage_unit_action_propose";
+        public const string CoreMenuKpiManageUnitActionCancelPropose = $"{PermissionPrefixKeys.Button}kpi_manage_unit_action_cancel_propose";
+        public const string CoreMenuKpiManageUnitActionSendDeclared = $"{PermissionPrefixKeys.Button}kpi_manage_unit_action_send_declared";
+        public const string CoreMenuKpiManageUnitActionCancelDeclared = $"{PermissionPrefixKeys.Button}kpi_manage_unit_action_cancel_declared";
+
         public const string CoreMenuKpiManageSchool = $"{PermissionPrefixKeys.Menu}kpi_manage_school";
+        public const string CoreMenuKpiManageSchoolActionSaveScore = $"{PermissionPrefixKeys.Button}kpi_manage_school_action_save_score";
+        public const string CoreMenuKpiManageSchoolAssign = $"{PermissionPrefixKeys.Button}kpi_manage_school_assign";
+        public const string CoreMenuKpiManageSchoolAction = $"{PermissionPrefixKeys.Button}kpi_manage_school_action";
+        public const string CoreMenuKpiManageSchoolActionSendDeclared = $"{PermissionPrefixKeys.Button}kpi_manage_school_action_send_declared";
+        public const string CoreMenuKpiManageSchoolActionCancelDeclared = $"{PermissionPrefixKeys.Button}kpi_manage_school_action_cancel_declared";
         #endregion
 
         #region Survey - Khảo sát

@@ -173,12 +173,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             };
         }
 
-        public PageResultDto<NsNhanSuByKpiRoleResponseDto> GetAllNhanSuByKpiRole(
-            NsNhanSuByKpiRoleRequestDto dto
-        )
+        public PageResultDto<NsNhanSuByKpiRoleResponseDto> GetAllNhanSuByKpiRole(NsNhanSuByKpiRoleRequestDto dto)
         {
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-
             var userRoles = _unitOfWork
                 .iKpiRoleRepository.TableNoTracking.Where(x => x.IdNhanSu == userId)
                 .ToList();
@@ -186,18 +183,10 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var isHieuTruong = userRoles.Any(x => x.Role == "HIEU_TRUONG");
 
             var donViIds = userRoles
-                .Where(x =>
-                    (
-                        x.Role.StartsWith("TRUONG_DON_VI_CAP_2")
-                        || x.Role.StartsWith("TRUONG_DON_VI_CAP_3")
-                    ) && x.IdDonVi.HasValue
-                )
-                .Select(x => x.IdDonVi!.Value)
-                .Distinct()
-                .ToList();
+                .Where(x =>(x.Role.StartsWith("TRUONG_DON_VI_CAP_2")|| x.Role.StartsWith("TRUONG_DON_VI_CAP_3")) && x.IdDonVi.HasValue)
+                .Select(x => x.IdDonVi!.Value).Distinct().ToList();
 
             List<int> allowedNhanSuIds;
-
             if (isHieuTruong)
             {
                 allowedNhanSuIds = _unitOfWork
@@ -209,9 +198,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             else
             {
                 allowedNhanSuIds = _unitOfWork
-                    .iKpiRoleRepository.TableNoTracking.Where(r =>
-                        r.IdDonVi.HasValue && donViIds.Contains(r.IdDonVi.Value)
-                    )
+                    .iKpiRoleRepository.TableNoTracking.Where(r => r.IdDonVi.HasValue && donViIds.Contains(r.IdDonVi.Value))
                     .Select(r => r.IdNhanSu)
                     .Distinct()
                     .ToList();
@@ -220,9 +207,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             if (dto.IdPhongBan.HasValue)
             {
                 allowedNhanSuIds = _unitOfWork
-                    .iKpiRoleRepository.TableNoTracking.Where(r =>
-                        r.IdDonVi == dto.IdPhongBan.Value && allowedNhanSuIds.Contains(r.IdNhanSu)
-                    )
+                    .iKpiRoleRepository.TableNoTracking.Where(r => r.IdDonVi == dto.IdPhongBan.Value && allowedNhanSuIds.Contains(r.IdNhanSu))
                     .Select(r => r.IdNhanSu)
                     .Distinct()
                     .ToList();
@@ -238,18 +223,17 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
 
             var items = _unitOfWork
-                .iNsNhanSuRepository.TableNoTracking.Where(x =>
-                    !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id)
-                )
+                .iNsNhanSuRepository.TableNoTracking.Where(x => !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id))
                 .OrderBy(x => x.Id)
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
                 .ToList();
 
-            if (!isHieuTruong && donViIds.Any())
-            {
-                items = items.Where(x => x.Id != userId).ToList();
-            }
+            //if (!isHieuTruong && donViIds.Any())
+            //{
+            //    items = items.Where(x => x.Id != userId).ToList();
+            //}
+            items = items.Where(x => x.Id != userId).ToList();
 
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
@@ -264,12 +248,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
 
             var kpiRolesDict = _unitOfWork
-                .iKpiRoleRepository.TableNoTracking.Where(r =>
-                    items.Select(i => i.Id).Contains(r.IdNhanSu) && r.IdDonVi.HasValue
-                )
-                .ToList()
-                .GroupBy(r => r.IdNhanSu)
-                .ToDictionary(g => g.Key, g => g.ToList());
+                .iKpiRoleRepository.TableNoTracking.Where(r =>items.Select(i => i.Id).Contains(r.IdNhanSu) && r.IdDonVi.HasValue)
+                .ToList().GroupBy(r => r.IdNhanSu).ToDictionary(g => g.Key, g => g.ToList());
 
             var allDonViIds = kpiRolesDict
                 .Values.SelectMany(v => v.Select(r => r.IdDonVi!.Value))
@@ -427,7 +407,15 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 nhansu.ChieuCao = dto.ChieuCao;
                 nhansu.CanNang = dto.CanNang;
                 nhansu.NhomMau = dto.NhomMau?.ToUpper();
-                nhansu.NgayCapNhatSk = DateTime.Now;
+                nhansu.NgayCapNhatSk = dto.ChieuCao.HasValue ? DateTime.Now : nhansu.NgayCapNhatSk;
+                nhansu.NgayVaoDang = dto.NgayVaoDang;
+                nhansu.TrinhDoHocVan = dto.TrinhDoHocVan;
+                nhansu.TrinhDoNgoaiNgu = dto.TrinhDoNgoaiNgu;
+                nhansu.TenHocVi = dto.TenHocVi;
+                nhansu.TenChuyenNganhHocVi = dto.TenChuyenNganhHocVi;
+                nhansu.TenHocHam = dto.TenHocHam;
+                nhansu.TenChuyenNganhHocHam = dto.TenChuyenNganhHocHam;
+
 
                 _unitOfWork.iNsNhanSuRepository.Update(nhansu);
                 _unitOfWork.iNsNhanSuRepository.SaveChange();
@@ -554,6 +542,42 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             result.ThongTinGiaDinh = GetThongTinGiaDinh(idNhanSu);
             result.QuaTrinhCongTac = GetQuaTrinhCongTac(idNhanSu);
 
+            return result;
+        }
+
+        public List<ThongKeNhanSuTheoPhongBanResponseDto> ThongKeNhanSuTheoPhongBan(ThongKeNhanSuTheoPhongBanRequestDto dto)
+        {
+            _logger.LogInformation($"Method {nameof(ThongKeNhanSuTheoPhongBan)} called.");
+
+            var query =
+                from pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                join a in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                    on pb.Id equals a.HienTaiPhongBan into nsGroup
+                from a in nsGroup
+                    .Where(x =>
+                        x.DaVeHuu != true &&
+                        x.IsThoiViec != true &&
+                        x.DaChamDutHopDong != true
+                    )
+                    .DefaultIfEmpty()
+                group a by new
+                {
+                    pb.Id,
+                    pb.STT,
+                    pb.TenPhongBan
+                } into g
+                orderby g.Key.STT
+                select new ThongKeNhanSuTheoPhongBanResponseDto
+                {
+                    Id = g.Key.Id,
+                    STT = g.Key.STT,
+                    TenPhongBan = g.Key.TenPhongBan,
+                    SoLuongNhanSu = g.Count(x => x != null)
+                };
+
+            var result = query.ToList();
+
+            //result = _mapper.Map<ThongKeNhanSuDto>(query);
             return result;
         }
 

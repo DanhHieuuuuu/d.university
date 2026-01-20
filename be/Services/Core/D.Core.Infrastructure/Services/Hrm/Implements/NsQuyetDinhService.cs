@@ -1,17 +1,16 @@
-﻿
+﻿using System.Text.Json;
 using AutoMapper;
 using D.Constants.Core.Hrm;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Hrm.QuyetDinh;
 using D.Core.Domain.Entities.Hrm.NhanSu;
 using D.Core.Infrastructure.Services.Hrm.Abstracts;
+using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using d.Shared.Permission.Error;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using D.DomainBase.Dto;
-using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -32,7 +31,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         public NsQuyetDinh TaoQuyetDinh(CreateNsQuyetDinhDto dto)
         {
-            _logger.LogInformation($"Method {nameof(TaoQuyetDinh)} called. Dto: {JsonSerializer.Serialize(dto)}");
+            _logger.LogInformation(
+                $"Method {nameof(TaoQuyetDinh)} called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
 
             var currentId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var nhansu = _unitOfWork.iNsNhanSuRepository.FindById(currentId);
@@ -68,7 +69,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         public void PheDuyetQuyetDinh(int idQuyetDinh)
         {
-            _logger.LogInformation($"Method {nameof(PheDuyetQuyetDinh)} called. IdQuyetDinh: {idQuyetDinh}");
+            _logger.LogInformation(
+                $"Method {nameof(PheDuyetQuyetDinh)} called. IdQuyetDinh: {idQuyetDinh}"
+            );
 
             var currentId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var nhansu = _unitOfWork.iNsNhanSuRepository.FindById(currentId);
@@ -107,7 +110,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
         public void TuChoiQuyetDinh(int idQuyetDinh, string reason)
         {
-            _logger.LogInformation($"Method {nameof(TuChoiQuyetDinh)} called. IdQuyetDinh: {idQuyetDinh}, Reason: {reason}");
+            _logger.LogInformation(
+                $"Method {nameof(TuChoiQuyetDinh)} called. IdQuyetDinh: {idQuyetDinh}, Reason: {reason}"
+            );
 
             var currentId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var nhansu = _unitOfWork.iNsNhanSuRepository.FindById(currentId);
@@ -151,24 +156,34 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
         }
 
-        public PageResultDto<NsQuyetDinhResponseDto> FindPagingNsQuyetDinh(NsQuyetDinhRequestDto dto)
+        public PageResultDto<NsQuyetDinhResponseDto> FindPagingNsQuyetDinh(
+            NsQuyetDinhRequestDto dto
+        )
         {
-            _logger.LogInformation($"Method {nameof(FindPagingNsQuyetDinh)} called. Dto: {JsonSerializer.Serialize(dto)}");
+            _logger.LogInformation(
+                $"Method {nameof(FindPagingNsQuyetDinh)} called. Dto: {JsonSerializer.Serialize(dto)}"
+            );
 
-
-            var query = from qd in _unitOfWork.iNsQuyetDinhRepository.TableNoTracking
-                        join ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                        on qd.IdNhanSu equals ns.Id
-                        select new { QuyetDinh = qd, NhanSu = ns };
+            var query =
+                from qd in _unitOfWork.iNsQuyetDinhRepository.TableNoTracking
+                join ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                    on qd.IdNhanSu equals ns.Id
+                select new { QuyetDinh = qd, NhanSu = ns };
 
             // Filter
             if (!string.IsNullOrEmpty(dto.Keyword))
             {
-                query = query.Where(x => x.QuyetDinh.NoiDungTomTat!.ToLower().Contains(dto.Keyword.ToLower()));
+                query = query.Where(x =>
+                    x.QuyetDinh.NoiDungTomTat!.ToLower().Contains(dto.Keyword.ToLower())
+                );
             }
-            if (dto.TrangThai != null)
+            if (dto.TrangThai.HasValue)
             {
                 query = query.Where(x => x.QuyetDinh.Status == dto.TrangThai);
+            }
+            if (dto.LoaiQuyetDinh.HasValue)
+            {
+                query = query.Where(x => x.QuyetDinh.LoaiQuyetDinh == dto.LoaiQuyetDinh);
             }
 
             var totalCount = query.Count();
@@ -189,7 +204,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     Status = x.QuyetDinh.Status,
                     LoaiQuyetDinh = x.QuyetDinh.LoaiQuyetDinh,
                     NgayHieuLuc = x.QuyetDinh.NgayHieuLuc,
-                    NoiDungTomTat = x.QuyetDinh.NoiDungTomTat
+                    NoiDungTomTat = x.QuyetDinh.NoiDungTomTat,
                 })
                 .ToList();
 
@@ -198,6 +213,54 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 Items = result,
                 TotalItem = totalCount,
             };
+        }
+
+        public NsQuyetDinhFindByIdResponseDto FindById(int idQuyetDinh)
+        {
+            _logger.LogInformation($"Method {nameof(FindById)} called. Id: {idQuyetDinh}");
+
+            var result = (
+                from qd in _unitOfWork.iNsQuyetDinhRepository.TableNoTracking
+                join ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                    on qd.IdNhanSu equals ns.Id
+                where qd.Id == idQuyetDinh
+                select new NsQuyetDinhFindByIdResponseDto
+                {
+                    Id = idQuyetDinh,
+                    IdNhanSu = qd.IdNhanSu,
+                    MaNhanSu = ns.MaNhanSu,
+                    HoTen = ns.HoDem + " " + ns.Ten,
+                    Status = qd.Status,
+                    LoaiQuyetDinh = qd.LoaiQuyetDinh,
+                    NgayHieuLuc = qd.NgayHieuLuc,
+                    NoiDungTomTat = qd.NoiDungTomTat,
+                }
+            ).FirstOrDefault();
+
+            if (result == null)
+                throw new UserFriendlyException(
+                    ErrorCodeConstant.CodeNotFound,
+                    $"Không tìm thấy quyết định có Id {idQuyetDinh}"
+                );
+
+            var historyQuery = _unitOfWork
+                .iNsQuyetDinhLogRepository.TableNoTracking.Where(log =>
+                    log.IdQuyetDinh == idQuyetDinh
+                )
+                .Select(x => new NsQuyetDinhLogResponseDto
+                {
+                    Id = x.Id,
+                    IdQuyetDinh = idQuyetDinh,
+                    OldStatus = x.OldStatus,
+                    NewStatus = x.NewStatus,
+                    Description = x.Description,
+                    CreatedDate = x.CreatedDate
+                })
+                .ToList();
+
+            result.History = historyQuery;
+
+            return result;
         }
     }
 }

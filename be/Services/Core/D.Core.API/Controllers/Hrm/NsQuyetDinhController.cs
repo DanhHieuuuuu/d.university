@@ -11,7 +11,8 @@ namespace D.Core.API.Controllers.Hrm
     {
         private IMediator _mediator;
 
-        public NsQuyetDinhController(IMediator mediator) : base(mediator)
+        public NsQuyetDinhController(IMediator mediator)
+            : base(mediator)
         {
             _mediator = mediator;
         }
@@ -21,6 +22,26 @@ namespace D.Core.API.Controllers.Hrm
         {
             try
             {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Chi tiết quyết định
+        /// </summary>
+        /// <param name="idQuyetDinh"></param>
+        /// <returns></returns>
+        [HttpGet("{idQuyetDinh}")]
+        public async Task<ResponseAPI> ChiTietQuyetDinh([FromRoute] int idQuyetDinh)
+        {
+            try
+            {
+                var dto = new NsQuyetDinhFindByIdRequestDto { Id = idQuyetDinh };
                 var result = await _mediator.Send(dto);
                 return new(result);
             }

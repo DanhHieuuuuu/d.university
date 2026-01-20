@@ -15,6 +15,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public NsNhanSuResponseDto FindByMaNsSdt(FindByMaNsSdtDto dto);
         public NsNhanSuFindByIdResponseDto FindById(int idNhanSu);
         public NsNhanSuHoSoChiTietResponseDto HoSoChiTietNhanSu(int idNhanSu);
-
+        public List<ThongKeNhanSuTheoPhongBanResponseDto> ThongKeNhanSuTheoPhongBan(ThongKeNhanSuTheoPhongBanRequestDto dto);
     }
 }

@@ -94,6 +94,9 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             _logger.LogInformation($"{nameof(GetAllKpiTruong)} => dto = {JsonSerializer.Serialize(dto)}");
 
             var isActive = _kpiCaNhanService.GetKpiIsActive();
+
+            EnsureKpiTruongKyLuatExist().Wait();
+
             var queryBase = _unitOfWork.iKpiTruongRepository.TableNoTracking
                 .Where(kpi => !kpi.Deleted
                     && (string.IsNullOrEmpty(dto.Keyword) || kpi.Kpi!.ToLower().Contains(dto.Keyword.ToLower().Trim()))
@@ -149,7 +152,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     DiemKpi = kpi.DiemKpi,
                     CongThuc = kpi.CongThucTinh,
                     IdCongThuc = kpi.IdCongThuc,
-                    IsActive = (kpi.TrangThai == KpiStatus.Evaluating || kpi.TrangThai == KpiStatus.NeedEdit || kpi.TrangThai == KpiStatus.Declared) ? isActive : 0,
+                    IsActive = (kpi.TrangThai == KpiStatus.Assigned || kpi.TrangThai == KpiStatus.NeedEdit || kpi.TrangThai == KpiStatus.Declared) ? isActive : 0,
                 })
                 .ToList();
 
@@ -294,7 +297,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.TrangThai = KpiStatus.Declared;
                         if (kpi.LoaiKpi == 3)
                         {
-                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                            kpi.DiemKpi = TinhDiemKPI.GetDiemTruTuanThuDonVi(kpi.Kpi, kpi.KetQuaThucTe.Value);
                         }
                         else
                         {
@@ -423,7 +426,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.TrangThai = KpiStatus.Evaluated;
                         if (kpi.LoaiKpi == 3)
                         {
-                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.Kpi, kpi.KetQuaThucTe.Value);
+                            kpi.DiemKpiCapTren = TinhDiemKPI.GetDiemTruTuanThuDonVi(kpi.Kpi, kpi.CapTrenDanhGia.Value);
                         }
                         else
                         {
@@ -457,23 +460,38 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             }
         }
 
-        public async Task<string> GetKpiTruongContextForAi()
+        public async Task<object> GetKpiTruongContextForAi()
         {
             var kpis = await _unitOfWork.iKpiTruongRepository.TableNoTracking
                 .Where(x => !x.Deleted).ToListAsync();
 
-            if (!kpis.Any()) return "### KPI Trường: Không có dữ liệu.";
+            if (!kpis.Any()) return null;
 
-            var sb = new StringBuilder();
-            sb.AppendLine("## [KPI CHIẾN LƯỢC CẤP TRƯỜNG]");
-            sb.AppendLine("| Lĩnh vực | Chiến lược | Tên KPI | Kết quả thực tế | Điểm được chấm |");
-            sb.AppendLine("| :--- | :--- | :--- | :---: | :---: |");
-
-            foreach (var k in kpis)
+            return kpis.Select(k =>
             {
-                sb.AppendLine($"| {k.LinhVuc ?? "Chung"} | {k.ChienLuoc ?? "N/A"} | {k.Kpi} | {k.KetQuaThucTe} | {k.DiemKpiCapTren} |");
-            }
-            return sb.ToString();
+                double.TryParse(k.TrongSo?.Replace("%", "").Trim(), out double ts);
+                int modifier = k.LoaiKpi == 3 ? -1 : 1;
+
+                return new
+                {
+                    NamHoc = k.NamHoc,
+                    LinhVuc = k.LinhVuc ?? "Chung",
+                    ChienLuoc = k.ChienLuoc ?? "N/A",
+                    TenKPI = k.Kpi,
+                    LoaiKPI = k.LoaiKpi switch
+                    {
+                        1 => "Chức năng",
+                        2 => "Mục tiêu",
+                        3 => "Tuân thủ",
+                        _ => "Khác"
+                    },
+                    MucTieu = k.MucTieu ?? "N/A",
+                    TrongSo = ts,
+                    KetQua = k.KetQuaThucTe ?? 0,
+                    Diem = (k.DiemKpiCapTren ?? 0) * modifier,
+                    CongThuc = k.CongThucTinh
+                };
+            }).ToList();
         }
         private async Task SendKpiStatusNotification(KpiTruong kpi, int newStatus, string? note)
         {
@@ -512,6 +530,74 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     Channel = NotificationChannel.Realtime
                 });
             }
+        }
+
+        private async Task EnsureKpiTruongKyLuatExist()
+        {
+            var hasData = await _unitOfWork.iKpiTruongRepository.TableNoTracking
+                .AnyAsync(x =>  x.LoaiKpi == 3
+                            && x.Kpi.Contains("thời gian làm việc")
+                            && !x.Deleted);
+            if (!hasData)
+            {
+                await CreateTemplateKpiTruong();
+            }
+        }
+
+        private async Task CreateTemplateKpiTruong()
+        {
+            var kpis = new List<KpiTruong>
+            {
+                CreateTemplateItem("2026",
+                    "Tỷ lệ trung bình toàn trường về vi phạm thời gian làm việc",
+                    "<= 5%",
+                    "Nếu tỷ lệ vi phạm > 5% -> Cứ mỗi 1% vượt quá, trừ 2% điểm KPI"),
+
+                CreateTemplateItem("2026",
+                    "Tỷ lệ trung bình toàn trường về vi phạm quy định chấm công",
+                    "<= 5%",
+                    "Nếu tỷ lệ vi phạm > 5% -> Cứ mỗi 1% vượt quá, trừ 2% điểm KPI"),
+
+                CreateTemplateItem("2026",
+                    "Tỷ lệ trung bình toàn trường về vi phạm tuân thủ trật tự và tác phong làm việc",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI"),
+
+                CreateTemplateItem("2026",
+                    "Tỷ lệ trung bình toàn trường về vi phạm quy tắc ứng xử (với sinh viên/ đồng nghiệp/ khách)",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI"),
+
+                CreateTemplateItem("2026",
+                    "Tỷ lệ trung bình toàn trường về vi phạm quy định sử dụng đồng phục, thẻ nhân viên",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI"),
+
+                CreateTemplateItem("2026",
+                    "Tỷ lệ trung bình toàn trường về vi phạm quy trình nghiệp vụ",
+                    "<= 2%",
+                    "Nếu tỷ lệ vi phạm > 2% -> Cứ mỗi 1% vượt quá, trừ 5% điểm KPI")
+            };
+
+            await _unitOfWork.iKpiTruongRepository.AddRangeAsync(kpis);
+            await _unitOfWork.iKpiTruongRepository.SaveChangeAsync();
+        }
+
+        private KpiTruong CreateTemplateItem(string namHoc, string name, string mucTieu, string congThuc)
+        {
+            return new KpiTruong
+            {
+                NamHoc = namHoc,
+                LoaiKpi = 3,
+                Kpi = name,
+                MucTieu = mucTieu,
+                TrongSo = "0",
+                CongThucTinh = congThuc,
+                LoaiKetQua = "PERCENT",
+                TrangThai = KpiStatus.Assigned,
+                CreatedDate = DateTime.Now,
+                Deleted = false
+            };
         }
     }
 }

@@ -19,7 +19,13 @@ import {
   BarChartOutlined,
   FormOutlined,
   InboxOutlined,
-  UserOutlined
+  UserOutlined,
+  RiseOutlined,
+  UnorderedListOutlined,
+  SafetyCertificateOutlined,
+  SolutionOutlined,
+  CalculatorOutlined,
+  LineChartOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
@@ -42,14 +48,19 @@ export const listMenuCore: IMenu[] = [
         icon: <UserOutlined />
       },
       {
+        label: 'Thống kê',
+        routerLink: '/hrm/statistical',
+        icon: <LineChartOutlined />
+      },
+      {
         label: 'Danh sách hợp đồng',
         routerLink: '/hrm/contracts',
-        icon: <ApartmentOutlined />
+        icon: <SolutionOutlined />
       },
       {
         label: 'Danh sách quyết định',
         routerLink: '/hrm/decisions',
-        icon: <ApartmentOutlined />
+        icon: <ProfileOutlined />
       }
     ]
   },
@@ -84,55 +95,70 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'KPI',
     routerLink: '/kpi',
-    icon: <BarsOutlined />,
+    permissionKeys: [PermissionCoreConst.CoreMenuKpi],
+    icon: <RiseOutlined />,
     items: [
       {
         label: 'Danh sách KPI',
         routerLink: '/kpi/list',
-        icon: <ApartmentOutlined />,
+        permissionKeys: [PermissionCoreConst.CoreMenuKpiList],
+        icon: <UnorderedListOutlined />,
         items: [
           {
             label: 'Kpi Role',
             routerLink: '/kpi/list/roles',
-            icon: <PartitionOutlined />
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListRole],
+            icon: <SafetyCertificateOutlined />
           },
           {
             label: 'Kpi cá nhân',
             routerLink: '/kpi/list/personals',
-            icon: <PartitionOutlined />
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListPersonal],
+            icon: <UserOutlined />
           },
           {
             label: 'Kpi đơn vị',
             routerLink: '/kpi/list/units',
-            icon: <PartitionOutlined />
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListUnit],
+            icon: <TeamOutlined />
           },
           {
             label: 'Kpi trường',
             routerLink: '/kpi/list/school',
-            icon: <PartitionOutlined />
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListSchool],
+            icon: <BankOutlined />
           }
         ]
       },
       {
         label: 'Quản lý KPI',
         routerLink: '/kpi/manage',
-        icon: <PartitionOutlined />,
+        permissionKeys: [PermissionCoreConst.CoreMenuKpiManage],
+        icon: <FormOutlined />,
         items: [
           {
             label: 'Kê khai Kpi cá nhân',
             routerLink: '/kpi/manage/personals',
-            icon: <PartitionOutlined />
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManagePersonal],
+            icon: <UserOutlined />
           },
           {
             label: 'Kê khai Kpi đơn vị',
             routerLink: '/kpi/manage/units',
-            icon: <PartitionOutlined />
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManageUnit],
+            icon: <FileTextOutlined />
           },
           {
             label: 'Kê khai Kpi trường',
             routerLink: '/kpi/manage/school',
-            icon: <PartitionOutlined />
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManageSchool],
+            icon: <SolutionOutlined />
           },
+          {
+            label: 'Điểm KPI',
+            routerLink: '/kpi/manage/scoreboard',
+            icon: <CalculatorOutlined />
+          }
         ]
       }
     ]
@@ -214,12 +240,12 @@ export const listMenuCore: IMenu[] = [
       {
         label: 'Danh sách yêu cầu',
         routerLink: '/survey/manage/request',
-        icon: <InboxOutlined />,      
+        icon: <InboxOutlined />
       },
       {
         label: 'Quản lý yêu cầu',
         routerLink: '/survey/manage/request-manage',
-        icon: <InboxOutlined />,      
+        icon: <InboxOutlined />
       },
       {
         label: 'Danh sách khảo sát',

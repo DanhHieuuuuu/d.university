@@ -212,6 +212,17 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                 .Select(r => new { r.Role, r.IdDonVi, r.TiLe })
                 .ToListAsync();
 
+            await EnsureKpiCaNhanKyLuatExist(userId,  null);
+            var listDonViIds = userRoles
+                .Where(x => x.IdDonVi.HasValue)
+                .Select(x => x.IdDonVi.Value)
+                .Distinct()
+                .ToList();
+            foreach (var donViId in listDonViIds)
+            {
+                await EnsureKpiCaNhanKyLuatExist(userId, donViId);
+            }
+
             var phongBans = await _unitOfWork.iDmPhongBanRepository.TableNoTracking
                 .ToDictionaryAsync(x => x.Id, x => x.TenPhongBan);
             var queryBase = _unitOfWork.iKpiCaNhanRepository.TableNoTracking
@@ -479,7 +490,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                         kpi.Status = KpiStatus.Evaluated;
                         if (kpi.LoaiKPI == 3)
                         {
-                            kpi.DiemKpi = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.KPI, kpi.KetQuaThucTe.Value);
+                            kpi.DiemKpiCapTren = TinhDiemKPI.GetPhanTramTruTuanThu(kpi.KPI, kpi.CapTrenDanhGia.Value);
                         }
                         else
                         {
@@ -638,41 +649,55 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             return allowedUserIds.ToList();
         }
 
-        public async Task<string> GetKpiCaNhanContextForAi(int userId, List<int> allowedUserIds)
+        public async Task<object> GetKpiCaNhanContextForAi(int userId, List<int> allowedUserIds)
         {
             var kpis = await _unitOfWork.iKpiCaNhanRepository.TableNoTracking
                 .Where(x => !x.Deleted && allowedUserIds.Contains(x.IdNhanSu))
                 .ToListAsync();
 
-            if (!kpis.Any()) return "### KPI Cá nhân: Không có dữ liệu.";
-
+            if (!kpis.Any()) return null;
             var nhanSuIds = kpis.Select(x => x.IdNhanSu).Distinct().ToList();
             var nhanSuDict = await _unitOfWork.iNsNhanSuRepository.TableNoTracking
                 .Where(ns => nhanSuIds.Contains(ns.Id))
                 .ToDictionaryAsync(x => x.Id, x => (x.HoDem + " " + x.Ten).Trim());
-
-            var sb = new StringBuilder();
-            sb.AppendLine("## [BÁO CÁO KPI CÁ NHÂN NHÂN VIÊN]");
-
-            var groupedByNhanSu = kpis.GroupBy(x => x.IdNhanSu);
-            foreach (var group in groupedByNhanSu)
+            var result = kpis.GroupBy(x => x.IdNhanSu).Select(group =>
             {
-                var tenNV = nhanSuDict.GetValueOrDefault(group.Key, "Ẩn danh");
-                sb.AppendLine($"### Nhân sự: {tenNV}");
-                sb.AppendLine($"- **Tổng điểm tự chấm:** {group.Sum(s => s.DiemKpi ?? 0)}");
-                sb.AppendLine($"- **Tổng điểm cấp trên chấm:** {group.Sum(s => s.DiemKpiCapTren ?? 0)}");
-                sb.AppendLine("| Tên KPI | Loại | Trọng số | Tự chấm | Cấp trên chấm |");
-                sb.AppendLine("| :--- | :--- | :---: | :---: | :---: |");
+                var tongTuCham = group.Sum(s => (s.LoaiKPI == 3 ? -1 : 1) * (s.DiemKpi ?? 0));
+                var tongCapTren = group.Sum(s => (s.LoaiKPI == 3 ? -1 : 1) * (s.DiemKpiCapTren ?? 0));
 
-                foreach (var k in group)
+                return new
                 {
-                    double.TryParse(k.TrongSo, out double ts);
-                    string loaiStr = k.LoaiKPI switch { 1 => "Chức năng", 2 => "Mục tiêu", 3 => "Tuân thủ", _ => "Khác" };
-                    sb.AppendLine($"| {k.KPI} | {loaiStr} | {ts}% | {k.DiemKpi} | {k.DiemKpiCapTren} |");
-                }
-                sb.AppendLine(); 
-            }
-            return sb.ToString();
+                    IdNhanSu = group.Key,
+                    HoTen = nhanSuDict.GetValueOrDefault(group.Key, "UnKnown"),
+                    TongDiemTuCham = tongTuCham,
+                    TongDiemCapTren = tongCapTren,
+                    ChiTietKPI = group.Select(k => {
+                        double.TryParse(k.TrongSo?.Replace("%", "").Trim(), out double ts);
+                        int modifier = k.LoaiKPI == 3 ? -1 : 1;
+
+                        return new
+                        {
+                            TenKPI = k.KPI,
+                            LoaiKPI = k.LoaiKPI switch
+                            {
+                                1 => "Chức năng",
+                                2 => "Mục tiêu",
+                                3 => "Tuân thủ",
+                                _ => "Khác"
+                            },
+                            MucTieu = k.MucTieu ?? "Chưa xác định",
+                            TrongSo = ts,
+                            KetQuaThucTe = k.KetQuaThucTe ?? 0,
+                            DiemTuCham = (k.DiemKpi ?? 0) * modifier,
+                            DiemCapTren = (k.CapTrenDanhGia ?? k.DiemKpiCapTren ?? 0) * modifier,
+                            CongThuc = k.CongThucTinh ?? "Không có công thức",
+                            ChucVu = k.Role ?? "N/A"
+                        };
+                    }).ToList()
+                };
+            }).ToList();
+
+            return result;
         }
 
         private async Task SendKpiStatusNotification(KpiCaNhan kpi, int newStatus, string? note)
@@ -723,6 +748,80 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     Channel = NotificationChannel.Realtime
                 });
             }
+        }
+        private async Task EnsureKpiCaNhanKyLuatExist(int userId,  int? idDonVi)
+        {
+            var userRoles = await _unitOfWork.iKpiRoleRepository.TableNoTracking
+                .Where(x => x.IdNhanSu == userId).ToListAsync();
+            if (userRoles.Any(r => r.Role == "CHU_TICH_HOI_DONG_TRUONG")) return;
+            if (userRoles.Any(r => r.Role == "HIEU_TRUONG")) return;
+            if (userRoles.Any(r => r.Role == "TRUONG_DON_VI_CAP_2")) return;
+            if (userRoles.Any(r => r.Role == "PHO_HIEU_TRUONG"))
+            {
+                var hasVpData = await _unitOfWork.iKpiCaNhanRepository.TableNoTracking
+                    .AnyAsync(x => x.IdNhanSu == userId
+                                && x.NamHoc == "2026"
+                                && x.LoaiKPI == 3
+                                && x.Role == "PHO_HIEU_TRUONG"
+                                && !x.Deleted);
+                if (!hasVpData)
+                {
+                    await CreateKpiData(userId, "PHO_HIEU_TRUONG", null);
+                }
+                return;
+            }
+            if (idDonVi.HasValue)
+            {
+                var roleAtUnit = userRoles.FirstOrDefault(x => x.IdDonVi == idDonVi.Value);
+                if (roleAtUnit == null) return;
+
+                var targetRole = roleAtUnit.Role;
+
+                var hasUnitData = await _unitOfWork.iKpiCaNhanRepository.TableNoTracking
+                    .AnyAsync(x => x.IdNhanSu == userId
+                                && x.LoaiKPI == 3
+                                && x.Role == targetRole
+                                && !x.Deleted);
+
+                if (!hasUnitData)
+                {
+                    await CreateKpiData(userId, targetRole, idDonVi.Value);
+                }
+            }
+        }
+
+        private async Task CreateKpiData(int userId, string role, int? idDonVi)
+        {
+            var kpis = new List<KpiCaNhan>
+            {
+                CreateTemplate(userId, "2026", role, idDonVi, "Vi phạm về thời gian làm việc"),
+                CreateTemplate(userId, "2026", role, idDonVi, "Vi phạm về quy định chấm công"),
+                CreateTemplate(userId, "2026", role, idDonVi, "Vi phạm tuân thủ về trật tự và tác phong làm việc"),
+                CreateTemplate(userId, "2026", role, idDonVi, "Vi phạm quy tắc ứng xử (với sinh viên/đồng nghiệp/khách)"),
+                CreateTemplate(userId, "2026", role, idDonVi, "Vi phạm quy định sử dụng đồng phục,thẻ, nhân viên"),
+                CreateTemplate(userId, "2026", role, idDonVi, "Vi phạm quy trình nghiệp vụ")
+            };
+
+            await _unitOfWork.iKpiCaNhanRepository.AddRangeAsync(kpis);
+            await _unitOfWork.iKpiCaNhanRepository.SaveChangeAsync();
+        }
+
+        private KpiCaNhan CreateTemplate(int userId, string namHoc, string role, int? idDonVi, string name)
+        {
+            return new KpiCaNhan
+            {
+                IdNhanSu = userId,
+                NamHoc = namHoc,
+                Role = role,
+                LoaiKPI = 3,
+                KPI = name,
+                MucTieu = "0%",
+                CongThucTinh = "Xem phụ lục",
+                LoaiKetQua = "NUMBER",
+                Status = KpiStatus.Assigned,
+                CreatedDate = DateTime.Now,
+                Deleted = false
+            };
         }
     }
 }

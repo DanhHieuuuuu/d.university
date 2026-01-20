@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { IViewNhanSu, IViewThongKeNsTheoPhongBan } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-import { getListNhanSu, getHoSoNhanSu, createNhanSuThunk, updateNhanSuThunk } from './nhansuThunk';
+import { getListNhanSu, getHoSoNhanSu, createNhanSuThunk, updateNhanSuThunk, thongKeNhanSuTheoPhongBanThunk } from './nhansuThunk';
 
 interface NhanSuState {
   status: ReduxStatus;
@@ -18,6 +18,10 @@ interface NhanSuState {
   };
   list: IViewNhanSu[];
   total: number;
+  $listThongKe: {
+    status: ReduxStatus;
+    data: IViewThongKeNsTheoPhongBan[]
+  }
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
@@ -33,7 +37,11 @@ const initialState: NhanSuState = {
     status: ReduxStatus.IDLE
   },
   list: [],
-  total: 0
+  total: 0,
+  $listThongKe: {
+    status: ReduxStatus.IDLE,
+    data: []
+  }
 };
 
 const nhanSuSlice = createSlice({
@@ -100,7 +108,18 @@ const nhanSuSlice = createSlice({
       })
       .addCase(updateNhanSuThunk.rejected, (state) => {
         state.$create.status = ReduxStatus.FAILURE;
-      });
+      })
+      .addCase(thongKeNhanSuTheoPhongBanThunk.pending, (state) => {
+        state.$listThongKe.status = ReduxStatus.LOADING;
+      })
+      .addCase(thongKeNhanSuTheoPhongBanThunk.fulfilled, (state, action) => {
+        state.$listThongKe.status = ReduxStatus.SUCCESS;
+        state.$listThongKe.data = action.payload ?? []
+      })
+      .addCase(thongKeNhanSuTheoPhongBanThunk.rejected, (state) => {
+        state.$listThongKe.status = ReduxStatus.FAILURE;
+      })
+      ;
   }
 });
 
