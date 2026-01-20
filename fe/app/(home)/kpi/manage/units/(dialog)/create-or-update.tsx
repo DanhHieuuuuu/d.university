@@ -24,12 +24,24 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const [form] = Form.useForm<any>();
   const [title, setTitle] = useState<string>('KPI Đơn vị');
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiDonVi);
-  const {listCongThuc } = useAppSelector((state) => state.kpiState);
+  const { listCongThuc } = useAppSelector((state) => state.kpiState);
   const sharedListCongThuc = useAppSelector((state) => (state.kpiState as any).listCongThuc);
 
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
   const { phongBanByKpiRole } = useAppSelector((state) => state.danhmucState);
+
+  const loaiKpiOptions = useMemo(() => {
+    return KpiLoaiConst.list
+      .filter((x) => {
+        if ([1, 2].includes(x.value)) return true;
+        if (x.value === 3) {
+          return isView || ($selected.data?.loaiKpi === 3);
+        }
+        return false;
+      })
+      .map((x) => ({ value: x.value, label: x.name }));
+  }, [isView, $selected.data]);
 
   const congThucOptions = useMemo(() => {
     return (sharedListCongThuc?.data || []).map((ct: any) => ({
@@ -54,8 +66,8 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
     form.setFieldsValue({
       ...selectedData,
-      idDonVi: selectedData.idDonVi, 
-      idCongThuc: selectedData.idCongThuc, 
+      idDonVi: selectedData.idDonVi,
+      idCongThuc: selectedData.idCongThuc,
       congThucTinh: selectedData.congThuc,
       namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
     });
@@ -100,7 +112,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   return (
     <Modal
-      title={<span className="text-xl font-bold text-blue-700">{title}</span>}
+      title={<span className="text-xl text-blue-700">{title}</span>}
       width={950}
       open={isModalOpen}
       onCancel={handleClose}
@@ -130,7 +142,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         requiredMark="optional"
       >
         <div className="grid grid-cols-2 gap-x-6">
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600">
             <InfoCircleOutlined /> THÔNG TIN KPI ĐƠN VỊ
           </div>
 
@@ -148,14 +160,14 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600">
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
 
           <Form.Item label="Loại KPI" name="loaiKpi" rules={[{ required: true }]}>
             <Select
               placeholder="Chọn loại"
-              options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
+              options={loaiKpiOptions}
             />
           </Form.Item>
 
@@ -181,7 +193,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600">
             <TeamOutlined /> ĐƠN VỊ THỰC HIỆN
           </div>
 

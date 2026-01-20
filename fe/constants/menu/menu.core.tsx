@@ -154,11 +154,11 @@ export const listMenuCore: IMenu[] = [
             permissionKeys: [PermissionCoreConst.CoreMenuKpiManageSchool],
             icon: <SolutionOutlined />
           },
-          {
-            label: 'Điểm KPI',
-            routerLink: '/kpi/manage/scoreboard',
-            icon: <CalculatorOutlined />
-          }
+          // {
+          //   label: 'Điểm KPI',
+          //   routerLink: '/kpi/manage/scoreboard',
+          //   icon: <CalculatorOutlined />
+          // }
         ]
       }
     ]

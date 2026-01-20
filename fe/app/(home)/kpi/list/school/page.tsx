@@ -348,7 +348,7 @@ const Page = () => {
         <div className="flex items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-2 flex-1">
             <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" />
-            <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, namHoc: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
+            <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: activeLoaiKpi, trangThai: undefined, namHoc: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
           </div>
           <div className="flex items-center gap-2">
             {canSaveScore && (
@@ -389,7 +389,7 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
         rowSelection={{ ...rowSelection, fixed: 'left' }}
-        scroll={{ x: 'max-content', y: 'calc(96vh - 420px)' }}
+        scroll={{ x: 'max-content', y: 'calc(96vh - 400px)' }}
         footer={() => (
           <div className="flex justify-end gap-8">
             <div>

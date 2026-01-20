@@ -133,13 +133,14 @@ export const updateKetQuaCapTrenKpiCaNhan = createAsyncThunk(
 );
 
 //Kpi Don Vi
-export const getAllKpiDonVi = createAsyncThunk('kpi/list-donvi', async (payload?: IQueryKpiDonVi) => {
+export const getAllKpiDonVi = createAsyncThunk(
+  'kpi/list-donvi', async (payload: IQueryKpiDonVi | undefined, { rejectWithValue }) => {
     try {
         const res = await KpiService.getListKpiDonVi(payload);
-        console.log('res', res);
         return res.data;
     } catch (error: any) {
         console.error(error);
+        return rejectWithValue(error?.response?.data || 'Có lỗi xảy ra');
     }
 });
 

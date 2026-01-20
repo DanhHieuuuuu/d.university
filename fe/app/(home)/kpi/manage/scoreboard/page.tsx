@@ -46,11 +46,9 @@ const KpiScoreBoardPage = () => {
                 }
             }
         });
-
         if (tableWrapperRef.current) {
             observer.observe(tableWrapperRef.current);
         }
-
         return () => observer.disconnect();
     }, []);
     const renderScoreBadge = (score: number | undefined, isFinalized: boolean) => {
@@ -107,7 +105,7 @@ const KpiScoreBoardPage = () => {
         const isUnitMode = data?.viewMode === 'UNIT';
 
         if (data?.viewMode === 'PERSONAL') {
-            return <div className="flex items-center justify-center h-full text-gray-400 italic">Bạn không có quyền xem danh sách đơn vị.</div>;
+            return;
         }
 
         const schoolColumns: ColumnsType<IUnitScore> = [
@@ -185,7 +183,7 @@ const KpiScoreBoardPage = () => {
                     value={namHoc}
                     onChange={setNamHoc}
                     style={{ width: 120 }}
-                    options={[{ value: '2026', label: '2026' }, { value: '2025', label: '2025' }]}
+                    options={[{ value: '2026', label: '2026' }]}
                 />
                 <Button icon={<SyncOutlined />} onClick={fetchData}>Tải lại</Button>
             </div>

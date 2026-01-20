@@ -1,18 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Tabs, Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag, Table } from 'antd';
+import { Tabs, Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tag } from 'antd';
 import {
-  PlusOutlined,
-  SearchOutlined,
-  SyncOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  FilterOutlined,
-  EllipsisOutlined,
-  UndoOutlined,
-  SaveOutlined,
-  InfoCircleOutlined
+  PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
+  EyeOutlined, FilterOutlined, EllipsisOutlined, UndoOutlined, SaveOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -41,7 +32,6 @@ import KpiReferenceTable from '@components/bthanh-custom/kpiComplianceTable';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { useIsGranted } from '@hooks/useIsGranted';
-import { colors } from '@styles/colors';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -74,7 +64,7 @@ const Page = () => {
   const [selectedKpiLogId, setSelectedKpiLogId] = useState<number | null>(null);
   const [activeLoaiKpi, setActiveLoaiKpi] = useState<number>(KpiLoaiConst.CHUC_NANG);
   const [isKpiComplianceTableOpen, setIsKpiComplianceTableOpen] = useState(false);
-  const { data, total, status: logStatus } = useAppSelector(
+  const { data: logData, status: logStatus } = useAppSelector(
     state => state.kpiState.kpiLog.$list
   );
 
@@ -89,8 +79,6 @@ const Page = () => {
     dispatch(getListTrangThaiKpiCaNhan());
   }, [dispatch]);
 
-
-
   const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
     initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '', loaiKpi: KpiLoaiConst.CHUC_NANG, },
@@ -104,6 +92,27 @@ const Page = () => {
     dispatch(getAllUserByKpiRole({ IdPhongBan: value, PageIndex: 1, PageSize: 2000 }));
   };
 
+  const getDataSourceForAction = async () => {
+    if (selectedRowKeys.length > list.length) {
+      const loadingMsg = toast.loading('Đang xử lý dữ liệu tất cả các trang...');
+      try {
+        const result = await dispatch(getAllKpiCaNhan({
+          ...query,
+          PageIndex: 1,
+          PageSize: totalItem || 9999
+        })).unwrap();
+        
+        toast.dismiss(loadingMsg);
+        return result?.items || [];
+      } catch {
+        toast.dismiss(loadingMsg);
+        toast.error('Lỗi tải dữ liệu');
+        return [];
+      }
+    }
+    return list;
+  };
+
   const scoreSelected = () => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
@@ -115,7 +124,7 @@ const Page = () => {
         kpi.trangThai == KpiTrangThaiConst.DA_GUI_CHAM
     );
 
-    if (!validItems.length) {
+    if (selectedRowKeys.length <= list.length && !validItems.length) {
       toast.warning('Chỉ KPI đang ở trạng thái "Đã gửi chấm" mới được chấm');
       return;
     }
@@ -133,7 +142,6 @@ const Page = () => {
       ).unwrap();
 
       toast.success('Chấm KPI thành công');
-
       setOpenChamModal(false);
       setSelectedRowKeys([]);
       dispatch(getAllKpiCaNhan(query));
@@ -142,8 +150,9 @@ const Page = () => {
     }
   };
 
-  const cancelScoredSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
+  const cancelScoredSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
       validStatus: [KpiTrangThaiConst.DA_CHAM],
       invalidMsg: 'Chỉ KPI "Đã chấm" mới được hủy',
       confirmTitle: 'Hủy gửi chấm KPI',
@@ -156,9 +165,11 @@ const Page = () => {
         dispatch(getAllKpiCaNhan(query));
       },
     });
+  };
 
-  const principalApprovedSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
+  const principalApprovedSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
       validStatus: [KpiTrangThaiConst.DA_CHAM],
       invalidMsg: 'Chỉ có KPI đang ở trạng thái "Đã chấm" mới được phê duyệt.',
       confirmTitle: 'Phê duyệt KPI',
@@ -171,9 +182,11 @@ const Page = () => {
         dispatch(getAllKpiCaNhan(query));
       },
     });
+  };
 
-  const cancelPrincipalApprovedSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
+  const cancelPrincipalApprovedSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
       validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
       invalidMsg: 'Chỉ KPI "Đã phê duyệt kết quả chấm" mới được hủy',
       confirmTitle: 'Hủy phê duyệt KPI',
@@ -186,7 +199,7 @@ const Page = () => {
         dispatch(getAllKpiCaNhan(query));
       },
     });
-
+  };
 
   const updateKetQuaCapTren = (id: number, value?: number) => {
     setKetQuaCapTrenMap(prev => ({
@@ -195,21 +208,23 @@ const Page = () => {
     }));
   };
 
-  const syncKetQuaThucTeToCapTren = () => {
+  const syncKetQuaThucTeToCapTren = async () => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
       return;
-    }
+    } 
+    const sourceData = await getDataSourceForAction();
     const newMap = { ...ketQuaCapTrenMap };
-    list
-      .filter(item => selectedRowKeys.includes(item.id))
-      .forEach(item => {
-        if (item.ketQuaThucTe !== null && item.ketQuaThucTe !== undefined) {
-          newMap[item.id] = item.ketQuaThucTe;
-        }
-      });
+    let count = 0;
+    sourceData.forEach(item => {
+      if (selectedRowKeys.includes(item.id) && item.ketQuaThucTe !== null && item.ketQuaThucTe !== undefined) {
+        newMap[item.id] = item.ketQuaThucTe;
+        count++;
+      }
+    });
+
     setKetQuaCapTrenMap(newMap);
-    toast.success('Đã đồng bộ kết quả thực tế');
+    toast.success(`Đã đồng bộ kết quả thực tế cho ${count} KPI`);
   };
 
   const handleSaveKetQuaCapTren = async () => {
@@ -237,6 +252,7 @@ const Page = () => {
       toast.error('Lưu kết quả thất bại');
     }
   };
+
   const requiredSelect = (cb: () => void) => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
@@ -409,7 +425,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQuaCapTren(record.id, v)}
-            editable={record.isActive === 0}
+            editable={record.isActive != 0}
           />
         );
       },
@@ -559,7 +575,7 @@ const Page = () => {
                 form.resetFields();
                 filterForm.resetFields();
                 setKetQuaCapTrenMap({});
-                onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: undefined, trangThai: undefined });
+                onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: activeLoaiKpi, trangThai: undefined });
                 setSelectedRowKeys([]);
               }}
             >
@@ -640,7 +656,7 @@ const Page = () => {
           ...rowSelection,
           fixed: 'left',
         }}
-        scroll={{ x: 'max-content', y: 'calc(96vh - 420px)' }}
+        scroll={{ x: 'max-content', y: 'calc(96vh - 400px)' }}
         footer={() => (
           <div className="flex justify-end gap-8">
             <div>
@@ -681,7 +697,7 @@ const Page = () => {
       <KpiLogModal
         open={openLogModal}
         onCancel={() => setOpenLogModal(false)}
-        data={data}
+        data={logData}
         loading={logStatus === ReduxStatus.LOADING}
       />
       <KpiAiChat />

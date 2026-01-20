@@ -104,7 +104,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       idDonVi: values.idDonVi?.value ?? values.idDonVi,
       namHoc: values.namHoc ? values.namHoc.format('YYYY') : undefined,
       trongSo: values.trongSo?.toString() || '0',
-      // Nếu là loại 3 -> idCongThuc = null
       idCongThuc: values.loaiKpi === 3 ? null : values.idCongThuc,
     };
 
@@ -123,7 +122,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   return (
     <Modal
-      title={<span className="text-xl font-bold text-blue-700">{title}</span>}
+      title={<span className="text-xl text-blue-700">{title}</span>}
       width={950}
       open={isModalOpen}
       onCancel={handleClose}
@@ -153,7 +152,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         requiredMark="optional"
       >
         <div className="grid grid-cols-2 gap-x-6">
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600">
             <InfoCircleOutlined /> THÔNG TIN KPI ĐƠN VỊ
           </div>
 
@@ -171,7 +170,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600">
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
 
@@ -206,7 +205,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600">
             <TeamOutlined /> ĐƠN VỊ THỰC HIỆN
           </div>
 

@@ -28,7 +28,6 @@ import { IQueryKpiDonVi, IViewKpiDonVi, NhanSuDaGiaoDto } from '@models/kpi/kpi-
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import AssignKpiModal from '../../modal/AssignKpiModal';
-import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 import { useIsGranted } from '@hooks/useIsGranted';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
@@ -270,7 +269,7 @@ const Page = () => {
           return {
             children: (
               <div style={{ fontSize: 15, fontWeight: 600, textAlign: 'left' }}>
-                TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{record.trongSo}%</span>
+                TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{Number(record.trongSo || 0).toFixed(2)}%</span>
               </div>
             ),
             props: { colSpan: columns.length },
@@ -363,7 +362,7 @@ const Page = () => {
           <div className="flex items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-2 flex-1">
               <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" />
-              <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined }); setKetQuaMap({}); setSelectedRowKeys([]); }}>
+              <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, PageIndex: 1 }); setKetQuaMap({}); setSelectedRowKeys([]); }}>
                 Tải lại
               </Button>
             </div>
@@ -396,10 +395,11 @@ const Page = () => {
             rowKey="id"
             columns={columns}
             dataSource={tableData}
+            isGroupedTable={true}
             listActions={actions}
             pagination={false}
             rowSelection={{ ...rowSelection, fixed: 'left' }}
-            scroll={{ x: 'max-content', y: 'calc(100vh - 520px)' }}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 400px)' }}
             footer={() => (
               <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -423,7 +423,6 @@ const Page = () => {
         </div>
         <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiDonViKeKhai(query)); dispatch(getListTrangThaiKpiDonVi()); }} />
         <AssignKpiModal open={openAssignModal} onClose={() => setOpenAssignModal(false)} kpiId={selectedKpiDonVi?.id ?? undefined} donViId={selectedKpiDonVi?.data?.idDonVi ?? undefined} />
-        <KpiAiChat />
       </Card>
     </div>
   );

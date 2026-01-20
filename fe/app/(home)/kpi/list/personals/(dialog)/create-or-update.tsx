@@ -133,7 +133,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   return (
     <Modal
-      title={<span className="text-xl font-bold text-blue-700">{title}</span>}
+      title={<span className="text-xl text-blue-700">{title}</span>}
       width={950}
       open={isModalOpen}
       onCancel={handleClose}
@@ -163,7 +163,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         requiredMark="optional"
       >
         <div className="grid grid-cols-2 gap-x-6">
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600">
             <InfoCircleOutlined /> THÔNG TIN CHỈ SỐ KPI
           </div>
 
@@ -181,7 +181,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600">
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
 
@@ -216,7 +216,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
 
           <Divider className="col-span-2 my-2" />
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600">
             <UserOutlined /> NHÂN SỰ THỰC HIỆN
           </div>
 

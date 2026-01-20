@@ -17,6 +17,8 @@ const AppMenu: React.FC<MenuPropsCustom> = ({ data }) => {
   const pathname = usePathname();
   const { navigateTo } = useNavigate();
 
+  const userPermissions = useAppSelector((state) => state.authState.permissions) || [];
+
   const { selectedKeys, openKeys: initOpenKeys } = getMenuKeysFromPath(data, pathname);
   const [openKeys, setOpenKeys] = useState<string[]>(initOpenKeys);
 
@@ -29,14 +31,10 @@ const AppMenu: React.FC<MenuPropsCustom> = ({ data }) => {
     navigateTo(e.key);
   };
 
-  const userPermisisons = useAppSelector((state) => state.authState.permissions) || [];
-  const permissionSet = new Set(userPermisisons);
-  
-  const validatePermision = (permisisonKey: string): boolean => {
-    return permissionSet.has(permisisonKey);
+  const validatePermission = (permissionKey: string) => {
+    return userPermissions.includes(permissionKey);
   };
-
-  const items = mapToAntdItems(data, validatePermision);
+  const items = mapToAntdItems(data, validatePermission);
 
   return (
     <Menu
