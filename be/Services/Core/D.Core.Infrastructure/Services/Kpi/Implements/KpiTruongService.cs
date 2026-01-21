@@ -152,7 +152,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     DiemKpi = kpi.DiemKpi,
                     CongThuc = kpi.CongThucTinh,
                     IdCongThuc = kpi.IdCongThuc,
-                    IsActive = (kpi.TrangThai == KpiStatus.Create  || kpi.TrangThai == KpiStatus.Assigned || kpi.TrangThai == KpiStatus.NeedEdit || kpi.TrangThai == KpiStatus.Declared) ? isActive : 0,
+                    IsActive = ( kpi.TrangThai == KpiStatus.Assigned || kpi.TrangThai == KpiStatus.NeedEdit || kpi.TrangThai == KpiStatus.Declared) ? isActive : 0,
                 })
                 .ToList();
 

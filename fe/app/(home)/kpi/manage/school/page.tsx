@@ -40,7 +40,7 @@ const Page = () => {
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiTruong.$list);
   const { data: trangThaiTruong, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.truong);
 
-  const canSendDeclared= useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSendDeclared);
+  const canSendDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSendDeclared);
   const canCancelDeclared = useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionCancelDeclared);
   const canSaveScore = useIsGranted(PermissionCoreConst.CoreMenuKpiManageSchoolActionSaveScore);
 
@@ -79,11 +79,26 @@ const Page = () => {
   const approveSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
       validStatus: [KpiTrangThaiConst.DA_KE_KHAI],
-      invalidMsg: 'Chỉ KPI "Đã kê khai" mới được gửi duyệt',
-      confirmTitle: 'Gửi duyệt KPI',
-      confirmMessage: 'Xác nhận gửi duyệt các KPI đã chọn?',
-      successMsg: 'Gửi duyệt thành công',
+      invalidMsg: 'Chỉ KPI "Đã kê khai" mới được Gửi chấm',
+      confirmTitle: 'Gửi chấm KPI',
+      confirmMessage: 'Xác nhận Gửi chấm các KPI đã chọn?',
+      successMsg: 'Gửi chấm thành công',
       nextStatus: KpiTrangThaiConst.DA_GUI_CHAM,
+      updateAction: updateTrangThaiKpiTruong,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiTruong(query));
+      },
+    });
+
+  const proposeSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.TAO_MOI],
+      invalidMsg: 'Chỉ KPI "Tạo mới" mới được đề xuất',
+      confirmTitle: 'Đề xuất KPI',
+      confirmMessage: 'Xác nhận đề xuất các KPI đã chọn?',
+      successMsg: 'Đề xuất thành công',
+      nextStatus: KpiTrangThaiConst.DE_XUAT,
       updateAction: updateTrangThaiKpiTruong,
       afterSuccess: () => {
         setSelectedRowKeys([]);
@@ -102,10 +117,10 @@ const Page = () => {
   const cancelApproveSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
       validStatus: [KpiTrangThaiConst.DA_GUI_CHAM],
-      invalidMsg: 'Chỉ KPI "Đã gửi chấm" mới được hủy duyệt',
-      confirmTitle: 'Hủy gửi duyệt KPI',
-      confirmMessage: 'Xác nhận hủy gửi duyệt các KPI đã chọn?',
-      successMsg: 'Hủy duyệt thành công',
+      invalidMsg: 'Chỉ KPI "Đã gửi chấm" mới được Hủy gửi chấm',
+      confirmTitle: 'Hủy Gửi chấm KPI',
+      confirmMessage: 'Xác nhận hủy Gửi chấm các KPI đã chọn?',
+      successMsg: 'Hủy gửi chấm thành công',
       nextStatus: KpiTrangThaiConst.DA_KE_KHAI,
       updateAction: updateTrangThaiKpiTruong,
       afterSuccess: () => {
@@ -145,17 +160,23 @@ const Page = () => {
     cb();
   };
   const bulkActionItems: MenuProps['items'] = [
-    ...(canSendDeclared ? [{ 
-      key: 'send-approve', 
-      label: 'Gửi duyệt', 
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />, 
-      onClick: () => requiredSelect(approveSelected) 
+    {
+      key: 'propose',
+      label: 'Đề xuất',
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      onClick: () => requiredSelect(proposeSelected)
+    },
+    ...(canSendDeclared ? [{
+      key: 'send-approve',
+      label: 'Gửi chấm',
+      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+      onClick: () => requiredSelect(approveSelected)
     }] : []),
-    ...(canCancelDeclared ? [{ 
-      key: 'cancel-send-approve', 
-      label: 'Hủy duyệt', 
-      icon: <UndoOutlined style={{ color: '#1890ff' }} />, 
-      onClick: () => requiredSelect(cancelApproveSelected) 
+    ...(canCancelDeclared ? [{
+      key: 'cancel-send-approve',
+      label: 'Hủy gửi chấm',
+      icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(cancelApproveSelected)
     }] : []),
   ];
 
