@@ -102,7 +102,7 @@ const Page = () => {
 
   const proposeSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.TAO_MOI || KpiTrangThaiConst.DA_CHINH_SUA],
+      validStatus: [KpiTrangThaiConst.TAO_MOI, KpiTrangThaiConst.DA_CHINH_SUA],
       invalidMsg: 'Chỉ KPI "Tạo mới" mới được đề xuất',
       confirmTitle: 'Đề xuất KPI cho đơn vị',
       confirmMessage: 'Xác nhận đề xuất các KPI đã chọn?',
@@ -232,7 +232,7 @@ const Page = () => {
   );
 
   const onClickAdd = () => { setIsModalView(false); setIsModalUpdate(false); setIsModalOpen(true); };
-  const onClickUpdate = (record: IViewKpiDonVi) => { dispatch(setSelectedKpiDonVi(record)); setIsModalUpdate(true); setIsModalOpen(true); };
+  const onClickUpdate = (record: IViewKpiDonVi) => { dispatch(setSelectedKpiDonVi(record)); setIsModalUpdate(true); setIsModalOpen(true); setIsModalView(false); };
   const onClickView = (record: IViewKpiDonVi) => { dispatch(setSelectedKpiDonVi(record)); setIsModalView(true); setIsModalOpen(true); };
   const onClickAssign = (record: IViewKpiDonVi) => {
     dispatch(setSelectedKpiDonVi(record));
@@ -329,7 +329,9 @@ const Page = () => {
     },
     {
       label: 'Sửa',
-      icon: <EyeOutlined />, command: onClickUpdate,
+      icon: <EyeOutlined />,
+      color: 'blue',
+      command: onClickUpdate,
       hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data'
     },
     ...(canAssign ? [{

@@ -172,7 +172,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
 
             var query =
                 from kpi in _unitOfWork.iKpiTruongRepository.TableNoTracking
-                where !kpi.Deleted
+                where !kpi.Deleted && kpi.LoaiKpi != 3
                 select new GetListKpiTruongResponseDto
                 {
                     Id = kpi.Id,

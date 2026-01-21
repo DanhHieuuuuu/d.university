@@ -16,6 +16,7 @@ export type IViewKpiDonVi = {
   trongSo: number,
   donVi: string,
   idDonVi?: number,
+  idKpiTruong?: number,
   loaiKpi: number,
   namHoc: string,
   trangThai: number,
