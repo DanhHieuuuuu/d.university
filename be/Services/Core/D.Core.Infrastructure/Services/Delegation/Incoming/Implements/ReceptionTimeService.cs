@@ -118,7 +118,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
  
             var delegationId = dtos.First().DelegationIncomingId; 
  
-            var dbItems = _unitOfWork.iReceptionTimeRepository. 
+            var dbItems = _unitOfWork.iReceptionTimeRepository.Table
                 .Where(x => x.DelegationIncomingId == delegationId && !x.Deleted) 
                 .ToList(); 
  
