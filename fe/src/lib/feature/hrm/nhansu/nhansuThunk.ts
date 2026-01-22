@@ -111,3 +111,20 @@ export const thongKeNhanSuTheoPhongBanThunk = createAsyncThunk('nhansu/thongke-p
     });
   }
 });
+
+export const semanticSearchThunk = createAsyncThunk(
+  'nhansu/search',
+  async (body: IQueryNhanSu, { rejectWithValue }) => {
+    try {
+      const res = await NhanSuService.semanticSearch(body);
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);

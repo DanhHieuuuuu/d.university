@@ -362,6 +362,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 nhansu.Atm2 = dto.Atm2;
                 nhansu.HienTaiChucVu = dto.HienTaiChucVu;
                 nhansu.HienTaiPhongBan = dto.HienTaiPhongBan;
+                nhansu.DaChamDutHopDong = dto.DaChamDutHopDong;
+                nhansu.IsThoiViec = dto.IsThoiViec;
 
                 _unitOfWork.iNsNhanSuRepository.Update(nhansu);
                 _unitOfWork.iNsNhanSuRepository.SaveChange();

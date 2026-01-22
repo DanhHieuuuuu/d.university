@@ -1,7 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IViewNhanSu, IViewThongKeNsTheoPhongBan } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-import { getListNhanSu, getHoSoNhanSu, createNhanSuThunk, updateNhanSuThunk, thongKeNhanSuTheoPhongBanThunk } from './nhansuThunk';
+import {
+  getListNhanSu,
+  getHoSoNhanSu,
+  createNhanSuThunk,
+  updateNhanSuThunk,
+  thongKeNhanSuTheoPhongBanThunk,
+  semanticSearchThunk
+} from './nhansuThunk';
 
 interface NhanSuState {
   status: ReduxStatus;
@@ -20,8 +27,8 @@ interface NhanSuState {
   total: number;
   $listThongKe: {
     status: ReduxStatus;
-    data: IViewThongKeNsTheoPhongBan[]
-  }
+    data: IViewThongKeNsTheoPhongBan[];
+  };
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
@@ -114,12 +121,22 @@ const nhanSuSlice = createSlice({
       })
       .addCase(thongKeNhanSuTheoPhongBanThunk.fulfilled, (state, action) => {
         state.$listThongKe.status = ReduxStatus.SUCCESS;
-        state.$listThongKe.data = action.payload ?? []
+        state.$listThongKe.data = action.payload ?? [];
       })
       .addCase(thongKeNhanSuTheoPhongBanThunk.rejected, (state) => {
         state.$listThongKe.status = ReduxStatus.FAILURE;
       })
-      ;
+      .addCase(semanticSearchThunk.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(semanticSearchThunk.fulfilled, (state, action: PayloadAction<IViewNhanSu[]>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.list = action.payload || [];
+        state.total = action.payload?.length ?? 0;
+      })
+      .addCase(semanticSearchThunk.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      });
   }
 });
 

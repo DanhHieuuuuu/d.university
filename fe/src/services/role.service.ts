@@ -79,7 +79,7 @@ const deleteRole = async (roleId: number) => {
     const res = await authApi.delete(`${apiRoleEndpoint}/${roleId}`);
     return Promise.resolve(res.data);
   } catch (err) {
-    processApiMsgError(err, 'Không thể cập nhật role');
+    processApiMsgError(err, 'Không thể xóa role');
     return Promise.reject(err);
   }
 };
@@ -111,7 +111,7 @@ const getMyPermission = async () => {
     const data: IResponseItem<string[]> = res.data;
     return Promise.resolve(data);
   } catch (err) {
-    processApiMsgError(err, 'Không thể cập nhật role');
+    processApiMsgError(err, 'Không lấy được my-permisison');
     return Promise.reject(err);
   }
 };
