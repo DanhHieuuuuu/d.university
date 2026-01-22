@@ -93,6 +93,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
                     await UpdateExpiredRecordsAsync(uow, notificationService);
+                    await UpdateExpiredContractsAsync(uow, notificationService);
+                    _logger.LogInformation($"Auto update expired contracts.");
 
                     //var expiredList = await uow.iReceptionTimeRepository.TableNoTracking.Where(x => x.Date > now.Date);
 
@@ -111,6 +113,55 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 // chạy mỗi 1 tiếng
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
+        }
+
+        public async Task UpdateExpiredContractsAsync(
+            ServiceUnitOfWork uow,
+            INotificationService notificationService)
+        {
+            var now = DateTime.Now;
+            var one_month_ago = now.AddDays(-30);
+
+            var contracts = await uow.iNsHopDongRepository.Table
+                .Where(d => d.HopDongCoThoiHanDenNgay.HasValue)
+                .ToListAsync();
+
+            foreach (var hd in contracts)
+            {
+                var endDateTime = hd.HopDongCoThoiHanDenNgay;
+                var nhansu = await uow.iNsNhanSuRepository.Table.FirstOrDefaultAsync(x => x.Id == hd.IdNhanSu);
+
+                if (nhansu == null) 
+                    continue;
+                if (nhansu.IdHopDong != hd.Id)
+                    continue;
+
+                // Sắp hết hạn (trước 30 ngày)
+                if (endDateTime <= one_month_ago)
+                {
+                    await notificationService.SendAsync(new NotificationMessage
+                    {
+                        Receiver = new Receiver
+                        {
+                            UserId = hd.IdNhanSu
+                        },
+                        Title = "Hợp đồng sắp hết hạn",
+                        Content = $"Hợp đồng làm việc của bạn sẽ hết hạn vào {endDateTime:dd/MM/yyyy - HH:mm}.",
+                        AltContent =
+                            $"Hợp đồng làm việc với {nhansu.HoDem + " " + nhansu.Ten} sẽ đến hạn lúc {endDateTime:dd/MM/yyyy - HH:mm}.",
+                        Channel = NotificationChannel.Realtime
+                    });
+                }
+
+                // Đã hết hạn
+                if (endDateTime <= now)
+                {
+                    nhansu.IsThoiViec = true;
+                    nhansu.DaChamDutHopDong = true;                    
+                }
+            }
+
+            await uow.SaveChangesAsync();
         }
     }
 }
