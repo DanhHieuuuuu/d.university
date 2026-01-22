@@ -3,7 +3,8 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tabs, Tag } from 'antd';
 import {
   PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
-  EyeOutlined, CheckCircleOutlined, EllipsisOutlined, FilterOutlined, UndoOutlined, SaveOutlined
+  EyeOutlined, CheckCircleOutlined, EllipsisOutlined, FilterOutlined, UndoOutlined, SaveOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -173,6 +174,21 @@ const Page = () => {
       },
     });
 
+  const rejectSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DE_XUAT],
+      invalidMsg: 'Chỉ KPI "Đề xuất" mới có thể từ chối',
+      confirmTitle: 'Từ chối đề xuất',
+      confirmMessage: 'Xác nhận từ chối các KPI đã chọn?',
+      successMsg: 'Từ chối thành công',
+      nextStatus: KpiTrangThaiConst.TU_CHOI,
+      updateAction: updateTrangThaiKpiTruong,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiTruong(query));
+      },
+    });
+
   const updateKetQuaCapTren = (id: number, value?: number) => {
     setKetQuaCapTrenMap(prev => ({ ...prev, [id]: value }));
   };
@@ -219,6 +235,12 @@ const Page = () => {
       label: 'Phê duyệt đề xuất',
       icon: <EditOutlined style={{ color: '#1890ff' }} />,
       onClick: () => requiredSelect(approveSelected)
+    }] : []),
+    ...(canScore ? [{
+      key: 'reject',
+      label: 'Từ chối đề xuất',
+      icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
+      onClick: () => requiredSelect(rejectSelected)
     }] : []),
     ...(canScore ? [{
       key: 'score',
@@ -340,7 +362,7 @@ const Page = () => {
       key: 'capTrenDanhGia', dataIndex: 'capTrenDanhGia', title: 'Cấp trên đánh giá', width: 200,
       render: (val, record) => {
         const value = ketQuaCapTrenMap[record.id] ?? val;
-        return <KetQuaInput loaiKetQua={record.loaiKetQua} value={value} onChange={(v) => updateKetQuaCapTren(record.id, v) } editable={record.isActive !== 0} />;
+        return <KetQuaInput loaiKetQua={record.loaiKetQua} value={value} onChange={(v) => updateKetQuaCapTren(record.id, v)} editable={record.isActive !== 0} />;
       }
     },
     {

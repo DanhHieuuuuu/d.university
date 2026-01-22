@@ -93,8 +93,8 @@ const Page = () => {
 
   const proposeSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.TAO_MOI],
-      invalidMsg: 'Chỉ KPI "Tạo mới" mới được đề xuất',
+      validStatus: [KpiTrangThaiConst.TAO_MOI, KpiTrangThaiConst.DA_CHINH_SUA],
+      invalidMsg: 'Chỉ KPI "Tạo mới" hoặc "Đã chỉnh sửa" mới được đề xuất',
       confirmTitle: 'Đề xuất KPI',
       confirmMessage: 'Xác nhận đề xuất các KPI đã chọn?',
       successMsg: 'Đề xuất thành công',
@@ -336,6 +336,18 @@ const Page = () => {
 
   const actions: IAction[] = [
     { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
+    {
+      label: 'Sửa',
+      color: 'blue',
+      icon: <EditOutlined />,
+      command: onClickUpdate
+    },
+    {
+      label: 'Xóa',
+      color: 'red',
+      icon: <DeleteOutlined />,
+      command: onClickDelete
+    },
   ];
 
   const rowSelection = {
