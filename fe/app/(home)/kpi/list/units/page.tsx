@@ -3,7 +3,8 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Dropdown, Form, Input, MenuProps, Modal, Popover, Select, Tabs, Tag } from 'antd';
 import {
   PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, DeleteOutlined,
-  EyeOutlined, CheckCircleOutlined, EllipsisOutlined, FilterOutlined, UndoOutlined, SaveOutlined
+  EyeOutlined, CheckCircleOutlined, EllipsisOutlined, FilterOutlined, UndoOutlined, SaveOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -220,7 +221,22 @@ const Page = () => {
       },
     });
   };
-
+  const rejectSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
+      validStatus: [KpiTrangThaiConst.DE_XUAT, KpiTrangThaiConst.TAO_MOI, KpiTrangThaiConst.DA_CHINH_SUA],
+      invalidMsg: 'Chỉ KPI đang ở trạng thái "Đề xuất" mới có thể từ chối',
+      confirmTitle: 'Từ chối KPI',
+      confirmMessage: 'Xác nhận từ chối các KPI đã chọn? Người dùng sẽ phải chỉnh sửa lại.',
+      successMsg: 'Từ chối thành công',
+      nextStatus: KpiTrangThaiConst.TU_CHOI,
+      updateAction: updateTrangThaiKpiDonVi,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiDonVi(query));
+      },
+    });
+  };
   const updateKetQuaCapTren = (id: number, value?: number) => {
     setKetQuaCapTrenMap(prev => ({ ...prev, [id]: value }));
   };
@@ -272,6 +288,12 @@ const Page = () => {
       label: 'Phê duyệt',
       icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
       onClick: () => requiredSelect(approveSelected)
+    }] : []),
+    ...(canApprove ? [{
+      key: 'reject',
+      label: 'Từ chối phê duyệt',
+      icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
+      onClick: () => requiredSelect(rejectSelected) // Bạn tạo thêm 1 state openRejectModal
     }] : []),
     ...(canScore ? [{
       key: 'score',

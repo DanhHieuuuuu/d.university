@@ -9,7 +9,7 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiDonVi } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiDonVi, getKpiDonViKeKhai, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, getListTrangThaiKpiDonVi, getNhanSuDaGiaoByKpiDonVi, giaoKpiDonVi, updateKetQuaThucTeKpiDonVi, updateTrangThaiKpiDonVi } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiDonVi, getKpiDonViKeKhai, getListKpiRoleByUser, getListNamHocKpiDonVi, getListTrangThaiKpiCaNhan, getListTrangThaiKpiDonVi, getNhanSuDaGiaoByKpiDonVi, giaoKpiDonVi, updateKetQuaThucTeKpiDonVi, updateTrangThaiKpiDonVi } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -39,7 +39,7 @@ const Page = () => {
   const { processUpdateStatus } = useKpiStatusAction();
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiDonVi.$list);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
-  const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.donVi);
+  const { data: trangThaiDonVi, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.donVi);
   const { data: namHocDonVi, status: namHocStatus } = useAppSelector((state) => state.kpiState.meta.namHoc.donVi);
 
   const canPropose = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionPropose);
@@ -79,7 +79,8 @@ const Page = () => {
 
   useEffect(() => {
     dispatch(getAllPhongBanByKpiRole({ PageIndex: 1, PageSize: 1000 }));
-    dispatch(getListTrangThaiKpiCaNhan());
+    dispatch(getListTrangThaiKpiDonVi());
+    dispatch(getListNamHocKpiDonVi());
     dispatch(getListKpiRoleByUser());
     dispatch(getAllUserByKpiRole({ PageIndex: 1, PageSize: 1000 }));
   }, [dispatch]);
@@ -226,7 +227,7 @@ const Page = () => {
         />
       </Form.Item>
       <Form.Item label="Trạng thái" name="trangThai">
-        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiCaNhan} />
+        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiDonVi} />
       </Form.Item>
     </Form>
   );
@@ -364,7 +365,22 @@ const Page = () => {
           <div className="flex items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-2 flex-1">
               <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" />
-              <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, PageIndex: 1 }); setKetQuaMap({}); setSelectedRowKeys([]); }}>
+              <Button icon={<SyncOutlined />} onClick={() => {
+                form.resetFields();
+                filterForm.resetFields();
+                const defaultQuery = {
+                  Keyword: '',
+                  loaiKpi: undefined,
+                  trangThai: undefined,
+                  PageIndex: 1,
+                  PageSize: 1000
+                };
+                onFilterChange(defaultQuery);
+                dispatch(getKpiDonViKeKhai(defaultQuery));
+
+                setKetQuaMap({});
+                setSelectedRowKeys([]);
+              }}>
                 Tải lại
               </Button>
             </div>
