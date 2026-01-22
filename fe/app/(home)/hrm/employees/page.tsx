@@ -3,12 +3,13 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Select } from 'antd';
 import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
+import { MicroIcon } from '@components/custom-icon';
 import { useNavigate } from '@hooks/navigate';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { resetStatusCreate, resetStatusUpdate, selectIdNhanSu } from '@redux/feature/hrm/nhansu/nhansuSlice';
-import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
+import { getHoSoNhanSu, getListNhanSu, semanticSearchThunk } from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
@@ -21,6 +22,9 @@ import { useIsGranted } from '@hooks/useIsGranted';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import CreateNhanSuModal from './(dialog)/create-or-update-ns';
+import VoiceSearchModal from '@components/common/VoiceSearch';
+
+type SearchMode = 'FILTER' | 'SEMANTIC';
 
 const Page = () => {
   const { navigateTo } = useNavigate();
@@ -36,6 +40,8 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [openVoice, setOpenVoice] = useState<boolean>(false);
+  const [searchMode, setSearchMode] = useState<SearchMode>('FILTER');
 
   const columns: IColumn<IViewNhanSu>[] = [
     {
@@ -114,8 +120,10 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getListNhanSu(newQuery));
-    },
+      if (searchMode === 'FILTER') {
+        dispatch(getListNhanSu(newQuery));
+      }
+    },  
     triggerFirstLoad: true
   });
 
@@ -132,6 +140,7 @@ const Page = () => {
   }, 500);
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchMode('FILTER');
     handleDebouncedSearch(event.target.value);
   };
 
@@ -160,12 +169,7 @@ const Page = () => {
       title="Danh sách nhân sự"
       className="h-full"
       extra={
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={onClickAdd}
-          hidden={!hasPermissionCreateNhanSu}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissionCreateNhanSu}>
           Thêm mới
         </Button>
       }
@@ -181,7 +185,10 @@ const Page = () => {
               options={phongBan.$list.data?.map((item) => {
                 return { label: item.tenPhongBan, value: item.id };
               })}
-              onChange={(val) => onFilterChange({ idPhongBan: val })}
+              onChange={(val) => {
+                setSearchMode('FILTER');
+                onFilterChange({ idPhongBan: val });
+              }}
             />
           </Form.Item>
         </div>
@@ -196,11 +203,19 @@ const Page = () => {
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
+                setSearchMode('FILTER');
                 resetFilter();
               }}
             >
               Tải lại
             </Button>
+            <Button
+              type="primary"
+              shape="circle"
+              aria-label="Nhấn để nỏi"
+              icon={<MicroIcon />}
+              onClick={() => setOpenVoice(true)}
+            ></Button>
           </div>
         </Form.Item>
       </Form>
@@ -219,6 +234,26 @@ const Page = () => {
         setIsModalOpen={setIsModalOpen}
         isUpdate={isUpdate}
         isView={isView}
+      />
+
+      <VoiceSearchModal
+        open={openVoice}
+        timeout={3000}
+        onClose={async (resultText) => {
+          if (resultText) {
+            setSearchMode('SEMANTIC');
+
+            await dispatch(
+              semanticSearchThunk({
+                PageIndex: pagination.current!,
+                PageSize: pagination.pageSize!,
+                Keyword: resultText
+              })
+            );
+          }
+
+          setOpenVoice(false);
+        }}
       />
     </Card>
   );

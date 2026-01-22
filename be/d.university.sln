@@ -45,6 +45,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.Notification", "Library\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.Constants", "Services\Shared\D.Constants\D.Constants.csproj", "{BD09ED69-0E7F-4AB5-8FC9-DD99795B0EB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.Embedding", "Library\D.Embedding\D.Embedding\D.Embedding.csproj", "{411706CF-4F0F-4E98-87FF-32AAC13180FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D.QdrantClient", "Library\D.QdrantClient\D.QdrantClient\D.QdrantClient.csproj", "{97DAC7F0-CF53-4031-98FD-2E416545E710}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +119,14 @@ Global
 		{BD09ED69-0E7F-4AB5-8FC9-DD99795B0EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD09ED69-0E7F-4AB5-8FC9-DD99795B0EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD09ED69-0E7F-4AB5-8FC9-DD99795B0EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{411706CF-4F0F-4E98-87FF-32AAC13180FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{411706CF-4F0F-4E98-87FF-32AAC13180FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{411706CF-4F0F-4E98-87FF-32AAC13180FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{411706CF-4F0F-4E98-87FF-32AAC13180FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97DAC7F0-CF53-4031-98FD-2E416545E710}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97DAC7F0-CF53-4031-98FD-2E416545E710}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97DAC7F0-CF53-4031-98FD-2E416545E710}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97DAC7F0-CF53-4031-98FD-2E416545E710}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -139,6 +151,8 @@ Global
 		{B2E2B27F-77B0-4783-883E-E8A888D1CD8B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{4CA3A58C-F0A4-4522-9705-8D421B8CCED0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{BD09ED69-0E7F-4AB5-8FC9-DD99795B0EB8} = {11FCE6AA-D287-48AE-B641-F0EA494DA0C4}
+		{411706CF-4F0F-4E98-87FF-32AAC13180FB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{97DAC7F0-CF53-4031-98FD-2E416545E710} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {138497AB-6F6C-4F69-B0B6-F8D5E72E2BB0}

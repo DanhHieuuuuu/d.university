@@ -6,6 +6,7 @@ using d.Shared.Permission.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using D.Core.Domain.Dtos.Hrm.HopDong;
+using D.Core.Domain.Dtos.Hrm.SemanticSearch;
 
 namespace D.Core.API.Controllers.Hrm
 {
@@ -219,6 +220,10 @@ namespace D.Core.API.Controllers.Hrm
             }
         }
 
+        /// <summary>
+        /// Thống kê nhân sự theo phòng ban
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("thongke-theo-phongban")]
         public async Task<ResponseAPI> ThongKeNhanSuTheoPhongBanApi()
         {
@@ -227,6 +232,44 @@ namespace D.Core.API.Controllers.Hrm
                 var dto = new ThongKeNhanSuTheoPhongBanRequestDto { };
                 var result = await _mediator.Send(dto);
                 return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tìm kiếm ngữ nghĩa
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("search")]
+        public async Task<ResponseAPI> SearchSemanticNhanSuApi(SearchSemanticRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Đồng bộ nhân sự vào Qdrant
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("sync")]
+        public async Task<ResponseAPI> FetchNhanSuQdrantApi()
+        {
+            try
+            {
+                var dto = new FetchNhanSuQdrantDto { };
+                await _mediator.Send(dto);
+                return new("Đã đồng bộ data với Qdrant");
             }
             catch (Exception ex)
             {

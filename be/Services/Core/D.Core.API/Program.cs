@@ -2,6 +2,8 @@
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
+using D.Embedding.Jina.Configs;
+using D.QdrantClient.Configs;
 using D.Notification.ApplicationService.Configs;
 using D.Notification.Infrastructure.Hubs;
 using D.S3Bucket.Configs;
@@ -43,6 +45,8 @@ namespace D.Core.API
                 builder.Services.AddMediatRServices();
                 builder.ConfigureCors();
                 builder.ConfigureS3();
+                builder.ConfigureJinaEmbedding();
+                builder.ConfigureQdrantClient();
 
                 var app = builder.Build();
 

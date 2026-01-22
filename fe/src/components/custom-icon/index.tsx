@@ -8,6 +8,7 @@ import StudentSvg from './student.icon';
 import BellSvg from './bell.icon';
 import DelegationSvg from './delegation.icon';
 import SuggestSvg from './suggest.icon';
+import MicroSvg from './micro.icon';
 
 type CustomIconComponentProps = GetProps<typeof Icon>;
 
@@ -17,5 +18,6 @@ const StudentIcon = (props: Partial<CustomIconComponentProps>) => <Icon componen
 const BellIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={BellSvg} {...props} />;
 const DelegationIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={DelegationSvg} {...props} />;
 const SuggestIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={SuggestSvg} {...props} />;
+const MicroIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={MicroSvg} {...props} />;
 
-export { KeyIcon, AdminIcon, StudentIcon, BellIcon, DelegationIcon, SuggestIcon };
+export { KeyIcon, AdminIcon, StudentIcon, BellIcon, DelegationIcon, SuggestIcon, MicroIcon };
