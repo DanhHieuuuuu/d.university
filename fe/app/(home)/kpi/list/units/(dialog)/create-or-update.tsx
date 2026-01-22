@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select, Divider } from 'antd';
-import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, ExperimentOutlined, TeamOutlined } from '@ant-design/icons';
+import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, ExperimentOutlined, TeamOutlined, LinkOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiDonVi, resetStatusKpiDonVi } from '@redux/feature/kpi/kpiSlice';
-import { createKpiDonVi, updateKpiDonVi, getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk';
+import { createKpiDonVi, updateKpiDonVi, getListKpiCongThuc, getAllListKpiTruong } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
@@ -25,10 +25,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const [title, setTitle] = useState<string>('KPI Đơn vị');
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiDonVi);
   const { listCongThuc } = useAppSelector((state) => state.kpiState);
-
+  const sharedListCongThuc = useAppSelector((state) => (state.kpiState as any).listCongThuc);
+  const { listAllKpiTruong } = useAppSelector((state) => state.kpiState);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
   const { phongBanByKpiRole } = useAppSelector((state) => state.danhmucState);
+
   const loaiKpiOptions = useMemo(() => {
     return KpiLoaiConst.list
       .filter((x) => {
@@ -42,21 +44,28 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   }, [isView, $selected.data]);
 
   const congThucOptions = useMemo(() => {
-    return (listCongThuc?.data || []).map((ct: any) => ({
+    return (sharedListCongThuc?.data || []).map((ct: any) => ({
       value: ct.id,
       label: ct.tenCongThuc,
     }));
-  }, [listCongThuc?.data]);
+  }, [sharedListCongThuc?.data]);
 
+  const kpiTruongOptions = useMemo(() => {
+    return (listAllKpiTruong?.data || []).map((item: any) => ({
+      value: item.id,
+      label: item.kpi,
+    }));
+  }, [listAllKpiTruong?.data]);
   useEffect(() => {
     if (isModalOpen) {
       setTitle(isView ? 'Xem thông tin KPI Đơn vị' : isUpdate ? 'Cập nhật KPI Đơn vị' : 'Thêm mới KPI Đơn vị');
       dispatch(getAllPhongBanByKpiRole({ PageIndex: 1, PageSize: 2000 }));
-      if (listCongThuc?.data.length === 0) {
+      if (sharedListCongThuc?.data.length === 0) {
         dispatch(getListKpiCongThuc({}));
       }
+      dispatch(getAllListKpiTruong());
     }
-  }, [isModalOpen, isUpdate, isView, dispatch, listCongThuc?.data.length]);
+  }, [isModalOpen, isUpdate, isView, dispatch]);
 
   useEffect(() => {
     if (!$selected.data || !isModalOpen) return;
@@ -67,20 +76,10 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       idDonVi: selectedData.idDonVi,
       idCongThuc: selectedData.idCongThuc,
       congThucTinh: selectedData.congThuc,
+      idKpiTruong: selectedData.idKpiTruong,
       namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
     });
-  }, [isModalOpen, $selected.data, form]);
-  useEffect(() => {
-    if (isModalOpen) {
-      const currentCongThuc = form.getFieldValue('congThucTinh');
-      if (!currentCongThuc) {
-        form.setFieldsValue({
-          idCongThuc: null,
-          congThucTinh: 'Trừ điểm trực tiếp khi vi phạm (hoặc công thức mặc định)',
-        });
-      }
-    }
-  }, [isModalOpen]);
+  }, [$selected.data, isModalOpen, form]);
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {
@@ -104,7 +103,6 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       idDonVi: values.idDonVi?.value ?? values.idDonVi,
       namHoc: values.namHoc ? values.namHoc.format('YYYY') : undefined,
       trongSo: values.trongSo?.toString() || '0',
-      idCongThuc: values.loaiKpi === 3 ? null : values.idCongThuc,
     };
 
     try {
@@ -155,6 +153,20 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600">
             <InfoCircleOutlined /> THÔNG TIN KPI ĐƠN VỊ
           </div>
+          <Form.Item
+            label={<span className="flex items-center gap-1"><LinkOutlined /> KPI Trường</span>}
+            name="idKpiTruong"
+            className="col-span-2"
+          >
+            <Select
+              placeholder="Chọn KPI Trường liên kết (nếu có)"
+              options={kpiTruongOptions}
+              loading={listAllKpiTruong?.status === ReduxStatus.LOADING}
+              showSearch
+              optionFilterProp="label"
+              allowClear
+            />
+          </Form.Item>
 
           <Form.Item label="Tên KPI" name="kpi" className="col-span-2" rules={[{ required: true, message: 'Nhập tên KPI' }]}>
             <Input.TextArea rows={2} placeholder="Nhập tên chỉ số KPI dành cho đơn vị" />
@@ -189,15 +201,13 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Select
               placeholder="Chọn công thức từ hệ thống"
               options={congThucOptions}
-              loading={listCongThuc?.status === ReduxStatus.LOADING}
+              loading={sharedListCongThuc?.status === ReduxStatus.LOADING}
               onChange={(value) => {
-                const selected = listCongThuc?.data.find((x: any) => x.id === value);
+                const selected = sharedListCongThuc?.data.find((x: any) => x.id === value);
                 form.setFieldsValue({ congThucTinh: selected?.tenCongThuc });
               }}
             />
           </Form.Item>
-
-          <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
 
           <Form.Item label="Loại kết quả" name="loaiKetQua" rules={[{ required: true }]}>
             <Select placeholder="Chọn loại kết quả" options={LOAI_KET_QUA_OPTIONS} />
@@ -221,6 +231,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
               placeholder="Tìm kiếm và chọn đơn vị thực hiện"
             />
           </Form.Item>
+          <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
         </div>
       </Form>
     </Modal>

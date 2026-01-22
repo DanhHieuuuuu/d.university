@@ -403,6 +403,18 @@ export const getListTrangThaiKpiTruong = createAsyncThunk(
         return await KpiService.getListTrangThaiKpiTruong();
     }
 );
+
+export const getAllListKpiTruong = createAsyncThunk(
+  'kpiTruong/getAllList',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await KpiService.getListAllKpiTruongApi();
+      return response;
+    } catch (err: any) {
+      return rejectWithValue(err);
+    }
+  }
+);
 //Kpi Role
 export const getAllKpiRole = createAsyncThunk('kpi-role/list', async (payload?: IQueryKpiRole) => {
     // async (payload?: IQueryKpiRole, { rejectWithValue }) => {

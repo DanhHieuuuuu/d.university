@@ -520,6 +520,18 @@ export const getListTrangThaiKpiTruong = async () => {
 };
 
 
+const getListAllKpiTruongApi = async () => {
+  try {
+    const res = await axios.get(`${apiKpiTruongEndpoint}/get-list-all`);
+    if (res.data?.code !== 200) {
+      return Promise.reject(res.data?.message);
+    }
+    return res.data.data; 
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
 // KPI Role
 const getListKpiRole = async (query?: IQueryKpiRole) => {
   try {
@@ -662,6 +674,7 @@ export const KpiService = {
   updateTrangThaiKpiTruong,
   updateKetQuaThucTeKpiTruong,
   updateKetQuaCapTrenKpiTruong,
+  getListAllKpiTruongApi,
   getListKpiRole,
   createKpiRole,
   updateKpiRole,
