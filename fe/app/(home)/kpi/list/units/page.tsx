@@ -86,6 +86,28 @@ const Page = () => {
     triggerFirstLoad: true
   });
 
+  const getDataSourceForAction = async () => {
+    if (selectedRowKeys.length > list.length) {
+      const loadingMsg = toast.loading('Đang xử lý dữ liệu tất cả các trang...');
+      try {
+        const result = await dispatch(getAllKpiDonVi({
+          ...query,
+          PageIndex: 1,
+          PageSize: totalItem || 9999
+        })).unwrap();
+
+        toast.dismiss(loadingMsg);
+        return result.items || [];
+
+      } catch {
+        toast.dismiss(loadingMsg);
+        toast.error('Lỗi tải dữ liệu');
+        return [];
+      }
+    }
+    return list;
+  };
+
   const scoreSelected = () => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
@@ -94,8 +116,7 @@ const Page = () => {
     const validItems = list.filter(
       kpi => selectedRowKeys.includes(kpi.id) && kpi.trangThai == KpiTrangThaiConst.DA_GUI_CHAM
     );
-
-    if (!validItems.length) {
+    if (selectedRowKeys.length <= list.length && !validItems.length) {
       toast.warning('Chỉ KPI đang ở trạng thái "Đã gửi chấm" mới được chấm');
       return;
     }
@@ -121,8 +142,9 @@ const Page = () => {
     }
   };
 
-  const cancelScoredSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
+  const cancelScoredSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
       validStatus: [KpiTrangThaiConst.DA_CHAM],
       invalidMsg: 'Chỉ KPI "Đã chấm" mới được hủy',
       confirmTitle: 'Hủy gửi chấm KPI',
@@ -135,9 +157,12 @@ const Page = () => {
         dispatch(getAllKpiDonVi(query));
       },
     });
+  };
 
-  const principalApprovedSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
+  const principalApprovedSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
       validStatus: [KpiTrangThaiConst.DA_CHAM],
       invalidMsg: 'Chỉ có KPI đang ở trạng thái "Đã chấm" mới được phê duyệt.',
       confirmTitle: 'Phê duyệt KPI',
@@ -150,9 +175,12 @@ const Page = () => {
         dispatch(getAllKpiDonVi(query));
       },
     });
+  };
 
-  const cancelPrincipalApprovedSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
+  const cancelPrincipalApprovedSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
       validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
       invalidMsg: 'Chỉ KPI "Đã phê duyệt kết quả chấm" mới được hủy',
       confirmTitle: 'Hủy phê duyệt KPI',
@@ -165,6 +193,7 @@ const Page = () => {
         dispatch(getAllKpiDonVi(query));
       },
     });
+  };
 
   const requiredSelect = (cb: () => void) => {
     if (!selectedRowKeys.length) {
@@ -174,8 +203,10 @@ const Page = () => {
     cb();
   };
 
-  const approveSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
+  const approveSelected = async () => {
+    const sourceData = await getDataSourceForAction();
+
+    processUpdateStatus(selectedRowKeys.map(Number), sourceData, {
       validStatus: [KpiTrangThaiConst.DE_XUAT, KpiTrangThaiConst.TAO_MOI, KpiTrangThaiConst.DA_CHINH_SUA],
       invalidMsg: 'Chỉ KPI "Đề xuất" mới được phê duyệt',
       confirmTitle: 'Phê duyệt KPI',
@@ -188,26 +219,30 @@ const Page = () => {
         dispatch(getAllKpiDonVi(query));
       },
     });
+  };
 
   const updateKetQuaCapTren = (id: number, value?: number) => {
     setKetQuaCapTrenMap(prev => ({ ...prev, [id]: value }));
   };
 
-  const syncKetQuaThucTeToCapTren = () => {
+  const syncKetQuaThucTeToCapTren = async () => {
     if (!selectedRowKeys.length) {
       toast.warning('Vui lòng chọn ít nhất một KPI');
       return;
     }
+
+    const sourceData = await getDataSourceForAction();
     const newMap = { ...ketQuaCapTrenMap };
-    list
-      .filter(item => selectedRowKeys.includes(item.id))
-      .forEach(item => {
-        if (item.ketQuaThucTe !== null && item.ketQuaThucTe !== undefined) {
-          newMap[item.id] = item.ketQuaThucTe;
-        }
-      });
+    let count = 0;
+    sourceData.forEach(item => {
+      if (selectedRowKeys.includes(item.id) && item.ketQuaThucTe !== null && item.ketQuaThucTe !== undefined) {
+        newMap[item.id] = item.ketQuaThucTe;
+        count++;
+      }
+    });
+
     setKetQuaCapTrenMap(newMap);
-    toast.success('Đã đồng bộ kết quả thực tế');
+    toast.success(`Đã đồng bộ kết quả thực tế cho ${count} KPI`);
   };
 
   const handleSaveKetQuaCapTren = async () => {
@@ -411,7 +446,7 @@ const Page = () => {
             <Form.Item name="idDonVi" noStyle>
               <Select placeholder="Tất cả đơn vị" style={{ width: 180 }} allowClear options={listPhongBan?.map(x => ({ value: x.id, label: x.tenPhongBan }))} onChange={(value) => { onFilterChange({ idDonVi: value }); }} />
             </Form.Item>
-            <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', idDonVi: undefined, loaiKpi: undefined, trangThai: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
+            <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', idDonVi: undefined, loaiKpi: activeLoaiKpi, trangThai: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
           </div>
           <div className="flex items-center gap-2">
             {canSaveScore && (
@@ -452,7 +487,7 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
         rowSelection={{ ...rowSelection, fixed: 'left' }}
-        scroll={{ x: 'max-content', y: 'calc(96vh - 420px)' }}
+        scroll={{ x: 'max-content', y: 'calc(96vh - 400px)' }}
         footer={() => (
           <div className="flex justify-end gap-8">
             <div>

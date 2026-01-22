@@ -28,6 +28,7 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { useIsGranted } from '@hooks/useIsGranted';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { approveRequestAction } from '@redux/feature/survey/surveyThunk';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -146,10 +147,25 @@ const Page = () => {
     processUpdateStatus(selectedRowKeys.map(Number), list, {
       validStatus: [KpiTrangThaiConst.HIEU_TRUONG_PHE_DUYET],
       invalidMsg: 'Chỉ KPI "Đã phê duyệt kết quả chấm" mới được hủy',
-      confirmTitle: 'Hủy phê duyệt',
+      confirmTitle: 'Hủy phê duyệt kết quả chấm',
       confirmMessage: 'Hủy phê duyệt các KPI đã chọn?',
       successMsg: 'Hủy phê duyệt thành công',
       nextStatus: KpiTrangThaiConst.DA_CHAM,
+      updateAction: updateTrangThaiKpiTruong,
+      afterSuccess: () => {
+        setSelectedRowKeys([]);
+        dispatch(getAllKpiTruong(query));
+      },
+    });
+
+  const approveSelected = () =>
+    processUpdateStatus(selectedRowKeys.map(Number), list, {
+      validStatus: [KpiTrangThaiConst.DE_XUAT],
+      invalidMsg: 'Chỉ KPI "Đề xuất" mới được phê duyệt',
+      confirmTitle: 'Phê duyệt',
+      confirmMessage: 'Phê duyệt các KPI đã chọn?',
+      successMsg: 'Phê duyệt thành công',
+      nextStatus: KpiTrangThaiConst.DUOC_GIAO,
       updateAction: updateTrangThaiKpiTruong,
       afterSuccess: () => {
         setSelectedRowKeys([]);
@@ -199,6 +215,12 @@ const Page = () => {
 
   const bulkActionItems: MenuProps['items'] = [
     ...(canScore ? [{
+      key: 'approve',
+      label: 'Phê duyệt đề xuất',
+      icon: <EditOutlined style={{ color: '#1890ff' }} />,
+      onClick: () => requiredSelect(approveSelected)
+    }] : []),
+    ...(canScore ? [{
       key: 'score',
       label: 'Chấm KPI',
       icon: <EditOutlined style={{ color: '#1890ff' }} />,
@@ -218,12 +240,12 @@ const Page = () => {
     }] : []),
     ...(canPrincipalApprove ? [{
       key: 'principalApprove',
-      label: 'Phê duyệt', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+      label: 'Phê duyệt kết quả chấm', icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
       onClick: () => requiredSelect(principalApprovedSelected)
     }] : []),
     ...(canPrincipalApprove ? [{
       key: 'cancelPrincipalApprove',
-      label: 'Hủy duyệt',
+      label: 'Hủy duyệt kết quả chấm',
       icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
       onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
     }] : []),
@@ -286,7 +308,7 @@ const Page = () => {
       icon: <EditOutlined />,
       command: onClickUpdate
     },
-  {
+    {
       label: 'Xóa',
       color: 'red',
       hidden: () => !canDelete,
@@ -318,7 +340,7 @@ const Page = () => {
       key: 'capTrenDanhGia', dataIndex: 'capTrenDanhGia', title: 'Cấp trên đánh giá', width: 200,
       render: (val, record) => {
         const value = ketQuaCapTrenMap[record.id] ?? val;
-        return <KetQuaInput loaiKetQua={record.loaiKetQua} value={value} onChange={(v) => updateKetQuaCapTren(record.id, v)} />;
+        return <KetQuaInput loaiKetQua={record.loaiKetQua} value={value} onChange={(v) => updateKetQuaCapTren(record.id, v) } editable={record.isActive !== 0} />;
       }
     },
     {
@@ -348,7 +370,7 @@ const Page = () => {
         <div className="flex items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-2 flex-1">
             <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" />
-            <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, namHoc: undefined }); setSelectedRowKeys([]); }}> Tải lại </Button>
+            <Button color="default" variant="filled" icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: activeLoaiKpi, trangThai: undefined, namHoc: undefined, PageIndex: 1 }); setSelectedRowKeys([]); }}> Tải lại </Button>
           </div>
           <div className="flex items-center gap-2">
             {canSaveScore && (
@@ -389,7 +411,7 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
         rowSelection={{ ...rowSelection, fixed: 'left' }}
-        scroll={{ x: 'max-content', y: 'calc(96vh - 420px)' }}
+        scroll={{ x: 'max-content', y: 'calc(96vh - 400px)' }}
         footer={() => (
           <div className="flex justify-end gap-8">
             <div>

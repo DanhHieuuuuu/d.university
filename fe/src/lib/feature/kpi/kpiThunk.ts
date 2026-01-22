@@ -133,13 +133,14 @@ export const updateKetQuaCapTrenKpiCaNhan = createAsyncThunk(
 );
 
 //Kpi Don Vi
-export const getAllKpiDonVi = createAsyncThunk('kpi/list-donvi', async (payload?: IQueryKpiDonVi) => {
+export const getAllKpiDonVi = createAsyncThunk(
+  'kpi/list-donvi', async (payload: IQueryKpiDonVi | undefined, { rejectWithValue }) => {
     try {
         const res = await KpiService.getListKpiDonVi(payload);
-        console.log('res', res);
         return res.data;
     } catch (error: any) {
         console.error(error);
+        return rejectWithValue(error?.response?.data || 'Có lỗi xảy ra');
     }
 });
 
@@ -401,6 +402,18 @@ export const getListTrangThaiKpiTruong = createAsyncThunk(
     async () => {
         return await KpiService.getListTrangThaiKpiTruong();
     }
+);
+
+export const getAllListKpiTruong = createAsyncThunk(
+  'kpiTruong/getAllList',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await KpiService.getListAllKpiTruongApi();
+      return response;
+    } catch (err: any) {
+      return rejectWithValue(err);
+    }
+  }
 );
 //Kpi Role
 export const getAllKpiRole = createAsyncThunk('kpi-role/list', async (payload?: IQueryKpiRole) => {

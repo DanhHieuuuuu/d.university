@@ -13,13 +13,28 @@ interface AppTableProps<T> extends TableProps<T> {
   listActions?: IAction[];
   rowSelection?: TableProps<T>['rowSelection'];
   height?: number;
+  isGroupedTable?: boolean;
 }
 
 const AppTable = <T extends object>(props: AppTableProps<T>) => {
   const [openConfig, setOpenConfig] = useState<boolean>(false);
   const [openActionIndex, setOpenActionIndex] = useState<number | null>(null);
-  const { columns, listActions, rowSelection, ...rest } = props;
+  const { columns, listActions, rowSelection, isGroupedTable, dataSource, ...rest } = props;
+  const sttMap = useMemo(() => {
+    if (!isGroupedTable || !dataSource) return null;
 
+    const map: Record<number, number> = {};
+    let count = 0;
+
+    dataSource.forEach((item: any, index: number) => {
+      if (!item.rowType || item.rowType === 'data') {
+        count++;
+        map[index] = count;
+      }
+    });
+
+    return map;
+  }, [dataSource, isGroupedTable]);
   const indexColumn: IColumn<T> = useMemo(
     () => ({
       key: '__index',
@@ -28,30 +43,29 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
       align: 'center',
       fixed: 'left',
       showOnConfig: false,
-      render: (_: any, __: T, index: number) => index + 1
+      render: (_: any, record: any, index: number) => {
+        if (isGroupedTable) {
+          if (record?.rowType && record.rowType !== 'data') {
+            return {
+              children: null,
+              props: { colSpan: 0 }
+            };
+          }
+          return sttMap ? sttMap[index] : index + 1;
+        }
+        return index + 1;
+      }
     }),
-    []
+    [isGroupedTable, sttMap]
   );
-
-  const openPopupConfig = () => {
-    setOpenConfig(true);
-  };
-
-  const closePopupConfig = () => {
-    setOpenConfig(false);
-  };
+  const openPopupConfig = () => { setOpenConfig(true); };
+  const closePopupConfig = () => { setOpenConfig(false); };
 
   const renderStatusColumn = useCallback((value: any, col: IColumn<T>, record?: T) => {
     if (!col.getTagInfo) return value;
-
     const info = col.getTagInfo(value, record);
     if (!info) return value;
-
-    return (
-      <Tag bordered={false} className={info.className} color={info.color}>
-        {info.label}
-      </Tag>
-    );
+    return <Tag bordered={false} className={info.className} color={info.color}>{info.label}</Tag>;
   }, []);
 
   const enhancedColumns: IColumn<T>[] = useMemo(() => {
@@ -64,11 +78,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
           render: col.render ? col.render : (value: any, record: T) => renderStatusColumn(value, col, record)
         };
       }
-
-      return {
-        ...col,
-        minWidth: col.minWidth ?? 100
-      };
+      return { ...col, minWidth: col.minWidth ?? 100 };
     });
   }, [columns]);
 
@@ -80,12 +90,10 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     fixed: 'right',
     onCell: (_record: T, index?: number) => {
       const rowStyle = typeof rest.onRow === 'function' ? rest.onRow(_record)?.style : undefined;
-
       return rowStyle ? { style: rowStyle } : {};
     },
     render: (_, record, index) => {
       if (!listActions?.length) return null;
-
       const actions = listActions
         .filter((act) => !act.hidden?.(record))
         .map((act, idx) => (
@@ -104,9 +112,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
             {act.label}
           </Button>
         ));
-
       if (!actions.length) return null;
-
       return (
         <Popover
           key={index}
@@ -148,6 +154,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
         columns={finalColumns}
         scroll={{ x: 'max-content', y: props.height ?? 370 }}
         rowSelection={rowSelection}
+        dataSource={dataSource}
         {...rest}
       />
 
