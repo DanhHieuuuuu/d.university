@@ -83,7 +83,7 @@ namespace D.Notification.ApplicationService.Implements.Email
                 client.CheckCertificateRevocation = false;
 
                 // Kết nối: MailKit tự động xử lý IPv4/IPv6 -> Fix lỗi Timeout/Unreachable
-                await client.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.StartTls);
+                await client.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.Auto);
 
                 // Đăng nhập
                 await client.AuthenticateAsync(_config.SenderEmail, _config.SenderPassword);
