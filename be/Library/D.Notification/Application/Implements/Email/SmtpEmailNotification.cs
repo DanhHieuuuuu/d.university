@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit; // <-- Thư viện mới thay cho MailMessage
 using System.Net;
-using System.Net.Mail;
 using System.Text.Json;
 
 namespace D.Notification.ApplicationService.Implements.Email
