@@ -32,4 +32,10 @@
     <ProjectReference Include="..\D.Auth.Infrastructure\D.Auth.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Template\newpassword.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
