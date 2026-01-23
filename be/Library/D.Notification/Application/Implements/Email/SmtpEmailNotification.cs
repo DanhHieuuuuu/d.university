@@ -11,7 +11,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using System.Net; // <--- Cần cái này để tra cứu DNS
+using System.Net; 
 using System.Text.Json;
 
 namespace D.Notification.ApplicationService.Implements.Email
@@ -106,7 +106,7 @@ namespace D.Notification.ApplicationService.Implements.Email
                 // Dùng Auto để nó tự thích nghi với cả Port 587 và 465
                 await client.ConnectAsync(hostToConnect, _config.Port, SecureSocketOptions.Auto);
 
-                await client.AuthenticateAsync(_config.SenderEmail, _config.SenderPassword);
+                await client.AuthenticateAsync("a0b9bb001@smtp-brevo.com", _config.SenderPassword);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
 
