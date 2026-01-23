@@ -6,12 +6,12 @@ using D.Notification.Domain.Exceptions;
 using D.Notification.Domain.Repositories;
 using D.Notification.Dtos;
 using MailKit;
-using MailKit.Net.Smtp; // <-- Thư viện mới
-using MailKit.Security; // <-- Thư viện mới
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MimeKit; // <-- Thư viện mới thay cho MailMessage
-using System.Net;
+using MimeKit;
+using System.Net; // <--- Cần cái này để tra cứu DNS
 using System.Text.Json;
 
 namespace D.Notification.ApplicationService.Implements.Email
@@ -39,7 +39,7 @@ namespace D.Notification.ApplicationService.Implements.Email
         public async Task SendEmailAsync(NotificationMessage dto)
         {
             _logger.LogInformation(
-                "SendEmailAsync (MailKit) called. Receiver: {Email}, Title: {Title}",
+                "SendEmailAsync (Force IPv4) called. Receiver: {Email}, Title: {Title}",
                 dto.Receiver.Email,
                 dto.Title
             );
@@ -47,7 +47,7 @@ namespace D.Notification.ApplicationService.Implements.Email
             if (string.IsNullOrWhiteSpace(dto.Receiver.Email))
                 throw new ArgumentException("Receiver email is empty");
 
-            // --- 1. TẠO EMAIL (Dùng MimeKit) ---
+            // --- 1. TẠO EMAIL ---
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(_config.DisplayName, _config.SenderEmail));
             message.To.Add(new MailboxAddress("", dto.Receiver.Email));
@@ -56,11 +56,11 @@ namespace D.Notification.ApplicationService.Implements.Email
             var bodyBuilder = new BodyBuilder
             {
                 HtmlBody = dto.Content,
-                TextBody = dto.AltContent // Fallback nếu client không đọc được HTML
+                TextBody = dto.AltContent
             };
             message.Body = bodyBuilder.ToMessageBody();
 
-            // --- 2. LƯU LOG VÀO DB (Giữ nguyên logic cũ) ---
+            // --- 2. LƯU LOG VÀO DB ---
             var notificationEntity = new NotiNotificationDetail
             {
                 Title = dto.Title,
@@ -73,61 +73,62 @@ namespace D.Notification.ApplicationService.Implements.Email
             await _notificationRepository.AddAsync(notificationEntity);
             await _notificationRepository.SaveChangesAsync();
 
-            // --- 3. GỬI MAIL (Dùng MailKit SmtpClient) ---
-            // Lưu ý: SmtpClient này là của MailKit.Net.Smtp, không phải System.Net.Mail
+            // --- 3. GỬI MAIL (FORCE IPv4) ---
             using var client = new SmtpClient();
 
             try
             {
-                // Bỏ qua kiểm tra chứng chỉ (Giúp chạy mượt trên Docker/Render nếu thiếu Root CA)
+                // [FIX 1] Bỏ qua lỗi SSL vì khi kết nối bằng IP, chứng chỉ sẽ không khớp domain
                 client.CheckCertificateRevocation = false;
+                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                // Kết nối: MailKit tự động xử lý IPv4/IPv6 -> Fix lỗi Timeout/Unreachable
-                await client.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.Auto);
+                // [FIX 2] Tự tìm IP IPv4 để tránh bị Render ép dùng IPv6 (Nguyên nhân gây Timeout)
+                string hostToConnect = _config.Host;
+                try
+                {
+                    // Lấy tất cả địa chỉ IP của smtp.gmail.com
+                    var ipAddresses = await Dns.GetHostAddressesAsync(_config.Host);
+                    // Chỉ lấy địa chỉ IPv4 (InterNetwork)
+                    var ipv4 = ipAddresses.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
 
-                // Đăng nhập
+                    if (ipv4 != null)
+                    {
+                        hostToConnect = ipv4.ToString();
+                        _logger.LogInformation("Resolved {Host} to IPv4: {IP}", _config.Host, hostToConnect);
+                    }
+                }
+                catch (Exception dnsEx)
+                {
+                    _logger.LogWarning("DNS lookup failed, using original host. Error: {Error}", dnsEx.Message);
+                }
+
+                // Kết nối vào IP IPv4 vừa tìm được
+                // Dùng Auto để nó tự thích nghi với cả Port 587 và 465
+                await client.ConnectAsync(hostToConnect, _config.Port, SecureSocketOptions.Auto);
+
                 await client.AuthenticateAsync(_config.SenderEmail, _config.SenderPassword);
-
-                // Gửi
                 await client.SendAsync(message);
-
-                // Ngắt kết nối sạch sẽ
                 await client.DisconnectAsync(true);
 
                 _logger.LogInformation("Email sent successfully to {Email}", dto.Receiver.Email);
                 await _notificationLogService.LogSuccessAsync(notificationEntity.Id, dto.Receiver.Email);
             }
-            // --- XỬ LÝ LỖI (Mapping sang Exception cũ của bạn) ---
             catch (Exception ex)
             {
-                _logger.LogError(ex, "MailKit Error while sending to {Email}", dto.Receiver.Email);
+                _logger.LogError(ex, "MailKit Error while sending to {Email}. Host: {Host}, Port: {Port}", dto.Receiver.Email, _config.Host, _config.Port);
 
-                // Mặc định là lỗi chung
                 var errorCode = NotificationErrorCode.SmtpError;
 
-                // Phân loại lỗi dựa trên Message của MailKit để gán code cho đúng
-                if (ex.Message.Contains("Authentication"))
-                {
-                    errorCode = NotificationErrorCode.SmtpAuthError;
-                }
-                else if (ex is ServiceNotConnectedException || ex.Message.Contains("Connect"))
-                {
-                    errorCode = NotificationErrorCode.SmtpTimeoutError; // Lỗi kết nối
-                }
-                else if (ex is CommandException)
-                {
-                    errorCode = NotificationErrorCode.SmtpSendError; // Lỗi lệnh gửi
-                }
+                if (ex.Message.Contains("Authentication")) errorCode = NotificationErrorCode.SmtpAuthError;
+                else if (ex is ServiceNotConnectedException || ex.Message.Contains("Connect") || ex is System.TimeoutException) errorCode = NotificationErrorCode.SmtpTimeoutError;
+                else if (ex is CommandException) errorCode = NotificationErrorCode.SmtpSendError;
 
                 await _notificationLogService.LogFailureAsync(notificationEntity.Id, dto.Receiver.Email, errorCode);
-
-                // Ném ra Exception nghiệp vụ để Controller bắt được
                 throw new NotificationException(errorCode, ex.Message);
             }
         }
     }
 }
-
 
 //COde cũ
 
