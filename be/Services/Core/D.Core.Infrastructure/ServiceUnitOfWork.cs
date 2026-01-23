@@ -45,10 +45,14 @@ namespace D.Core.Infrastructure
         private DtMonTienQuyetRepository _dtMonTienQuyetRepository;
         private DtChuongTrinhKhungRepository _dtChuongTrinhKhungRepository;
         private DtChuongTrinhKhungMonRepository _dtChuongTrinhKhungMonRepository;
+        private DtQuyDinhThangDiemRepository _dtQuyDinhThangDiemRepository;
 
         #endregion
 
         private SvSinhVienRepository _svSinhVienRepository;
+        private SvThongTinHocVuRepository _svThongTinHocVuRepository;
+        private SvKetQuaHocKyRepository _svKetQuaHocKyRepository;
+        private SvDiemMonHocRepository _svDiemMonHocRepository;
 
         private FileRepository _fileRepository;
 
@@ -414,6 +418,56 @@ namespace D.Core.Infrastructure
             }
         }
 
+        public IDtQuyDinhThangDiemRepository iDtQuyDinhThangDiemRepository
+        {
+            get
+            {
+                if (_dtQuyDinhThangDiemRepository == null)
+                {
+                    _dtQuyDinhThangDiemRepository = new DtQuyDinhThangDiemRepository(_dbContext, _httpContext);
+                }
+                return _dtQuyDinhThangDiemRepository;
+            }
+        }
+
+        #endregion
+
+        #region SinhVien
+        public ISvThongTinHocVuRepository iSvThongTinHocVuRepository
+        {
+            get
+            {
+                if (_svThongTinHocVuRepository == null)
+                {
+                    _svThongTinHocVuRepository = new SvThongTinHocVuRepository(_dbContext, _httpContext);
+                }
+                return _svThongTinHocVuRepository;
+            }
+        }
+
+        public ISvKetQuaHocKyRepository iSvKetQuaHocKyRepository
+        {
+            get
+            {
+                if (_svKetQuaHocKyRepository == null)
+                {
+                    _svKetQuaHocKyRepository = new SvKetQuaHocKyRepository(_dbContext, _httpContext);
+                }
+                return _svKetQuaHocKyRepository;
+            }
+        }
+
+        public ISvDiemMonHocRepository iSvDiemMonHocRepository
+        {
+            get
+            {
+                if (_svDiemMonHocRepository == null)
+                {
+                    _svDiemMonHocRepository = new SvDiemMonHocRepository(_dbContext, _httpContext);
+                }
+                return _svDiemMonHocRepository;
+            }
+        }
         #endregion
 
         public async Task<int> SaveChangesAsync()
