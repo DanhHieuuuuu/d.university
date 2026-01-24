@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace D.Notification.Infrastructure.Hubs
 {
+    [Authorize]
     public class NotificationHub : Hub
     {
         public override async Task OnConnectedAsync()
