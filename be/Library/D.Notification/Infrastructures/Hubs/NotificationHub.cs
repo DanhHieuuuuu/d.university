@@ -7,6 +7,7 @@ namespace D.Notification.Infrastructure.Hubs
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
+            Console.WriteLine("UserIdentifier = " + Context.UserIdentifier);
         }
 
         // Client gọi để join theo user

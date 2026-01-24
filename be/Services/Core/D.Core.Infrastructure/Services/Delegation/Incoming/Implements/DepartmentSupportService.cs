@@ -151,7 +151,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 .iDepartmentSupportRepository
                 .Table
                 .Include(x => x.Supporters)
-                .FirstOrDefault(x => x.DepartmentSupportId == dto.DepartmentSupportId);
+                .FirstOrDefault(x => x.Id == dto.Id );
 
             if (departmentSupport == null)
                 throw new Exception("Không tìm thấy Phòng ban hỗ trợ.");
@@ -221,7 +221,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 {
                     // đã có supporterId → gán và cập nhật
                     supporter.SupporterCode = item.SupporterCode;
-                    supporter.DepartmentSupportId = departmentSupport.DepartmentSupportId;
+                    supporter.DepartmentSupportId = departmentSupport.Id;
                     supporter.Deleted = false;
                 }
                 else
@@ -231,7 +231,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     {
                         SupporterId = item.SupporterId,
                         SupporterCode = item.SupporterCode,
-                        DepartmentSupportId = departmentSupport.DepartmentSupportId,
+                        DepartmentSupportId = departmentSupport.Id,
                         Deleted = false
                     };
 
@@ -243,6 +243,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             return new UpdateDepartmentSupportResponseDto
             {
+                Id = departmentSupport.Id,
                 DepartmentSupportId = departmentSupport.DepartmentSupportId,
                 DelegationIncomingId = departmentSupport.DelegationIncomingId,
                 Content = departmentSupport.Content,
@@ -276,7 +277,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             var result = new DetailDepartmentSupportResponseDto
             {
-                DepartmentSupportId = detail.Id,
+                Id = detail.Id,
+                DepartmentSupportId = detail.DepartmentSupportId,
                 DelegationIncomingId = detail.DelegationIncomingId,
 
                 DepartmentSupportName = phongBan?.TenPhongBan,

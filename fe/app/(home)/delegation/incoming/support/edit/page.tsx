@@ -59,6 +59,7 @@ const DepartmentSupport = () => {
   const onFinish = async (values: any) => {
     try {
       const payload: IUpdateDepartmentSupport = {
+        id: detail.id,
         departmentSupportId: detail.departmentSupportId,
         delegationIncomingId: detail.delegationIncomingId,
         content: values.content,

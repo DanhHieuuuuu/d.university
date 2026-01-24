@@ -170,6 +170,7 @@ export interface IUpdateStatus {
   action: string;
 }
 export interface IUpdateDepartmentSupport {
+  id: number;
   departmentSupportId: number;
   delegationIncomingId: number;
   content: string;
