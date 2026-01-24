@@ -6,25 +6,21 @@ export class KpiLoaiConst {
   static list = [
     {
       value: this.CHUC_NANG,
-      name: 'Chức năng',
+      name: 'Chức năng'
     },
     {
       value: this.MUC_TIEU,
-      name: 'Mục tiêu',
+      name: 'Mục tiêu'
     },
     {
       value: this.TUAN_THU,
-      name: 'Tuân thủ',
-    },
+      name: 'Tuân thủ'
+    }
   ];
 
   static getName(value?: number) {
-    return this.list.find(x => x.value === value)?.name ?? '';
+    return this.list.find((x) => x.value === value)?.name ?? '';
   }
 }
 
-export const KPI_ORDER = [
-  KpiLoaiConst.CHUC_NANG,
-  KpiLoaiConst.MUC_TIEU,
-  KpiLoaiConst.TUAN_THU,
-];
+export const KPI_ORDER = [KpiLoaiConst.CHUC_NANG, KpiLoaiConst.MUC_TIEU, KpiLoaiConst.TUAN_THU];

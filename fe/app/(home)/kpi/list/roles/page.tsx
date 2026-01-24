@@ -110,14 +110,14 @@ const Page = () => {
     {
       key: 'tiLe',
       dataIndex: 'tiLe',
-      title: 'Tỉ lệ',
+      title: 'Tỉ lệ'
     },
     {
       key: 'role',
       dataIndex: 'role',
       title: 'Chức vụ',
-      render: (value: string) => KpiRoleConst.getName(value),
-    },
+      render: (value: string) => KpiRoleConst.getName(value)
+    }
   ];
 
   const actions: IAction[] = [
@@ -151,9 +151,9 @@ const Page = () => {
   const rowSelection = {
     selectedRowKeys,
     preserveSelectedRowKeys: true,
-    onChange: (newSelectedRowKeys: React.Key[]) => {      
-      const currentPageIds = list?.map(item => item.id) || [];
-      const isUnselectingAllOnPage = currentPageIds.every(id => !newSelectedRowKeys.includes(id));
+    onChange: (newSelectedRowKeys: React.Key[]) => {
+      const currentPageIds = list?.map((item) => item.id) || [];
+      const isUnselectingAllOnPage = currentPageIds.every((id) => !newSelectedRowKeys.includes(id));
       if (isUnselectingAllOnPage && selectedRowKeys.length > list?.length) {
         setSelectedRowKeys([]);
       } else {
@@ -166,30 +166,32 @@ const Page = () => {
         text: 'Chọn 1 trang',
         onSelect: (changableRowKeys: React.Key[]) => {
           setSelectedRowKeys(changableRowKeys);
-        },
+        }
       },
       {
         key: 'all-pages',
         text: 'Chọn tất cả',
         onSelect: () => {
           handleSelectAllPages();
-        },
-      },
+        }
+      }
     ]
   };
 
   const handleSelectAllPages = async () => {
     try {
-      const allIds = await dispatch(getAllIdsKpiRole({
-        ...query,
-        PageIndex: 1,
-        PageSize: totalItem
-      })).unwrap();
+      const allIds = await dispatch(
+        getAllIdsKpiRole({
+          ...query,
+          PageIndex: 1,
+          PageSize: totalItem
+        })
+      ).unwrap();
 
       setSelectedRowKeys(allIds);
       toast.success(`Đã chọn tất cả ${allIds.length} bản ghi`);
     } catch (error) {
-      toast.error("Không thể chọn tất cả");
+      toast.error('Không thể chọn tất cả');
     }
   };
   return (
@@ -212,7 +214,7 @@ const Page = () => {
               optionFilterProp="label"
               options={KpiRoleConst.list.map((x) => ({
                 value: x.value,
-                label: x.name,
+                label: x.name
               }))}
               onChange={(value) => onFilterChange({ chucVu: value })}
             />
@@ -247,12 +249,7 @@ const Page = () => {
         rowSelection={rowSelection}
       />
 
-      <PositionModal
-        isModalOpen={isModalOpen}
-        isUpdate={isUpdate}
-        isView={isView}
-        setIsModalOpen={setIsModalOpen}
-      />
+      <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} />
       <KpiAiChat />
     </Card>
   );

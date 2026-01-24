@@ -177,9 +177,7 @@ const HomePage: React.FC = () => {
   return (
     <div style={{ padding: 24 }}>
       {/* Welcome Message */}
-      <p style={{ marginBottom: 24, fontSize: 28, fontWeight: 600 }}>
-        Chào mừng trở lại, {user?.ten || 'Admin'}! 👋
-      </p>
+      <p style={{ marginBottom: 24, fontSize: 28, fontWeight: 600 }}>Chào mừng trở lại, {user?.ten || 'Admin'}! 👋</p>
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>

@@ -8,27 +8,27 @@ export class requestStatusConst {
   static list = [
     {
       value: this.DRAFT,
-      name: 'Bản nháp',
+      name: 'Bản nháp'
     },
     {
       value: this.PENDING,
-      name: 'Chờ duyệt',
+      name: 'Chờ duyệt'
     },
     {
       value: this.APPROVED,
-      name: 'Đã duyệt',
+      name: 'Đã duyệt'
     },
     {
       value: this.REJECTED,
-      name: 'Từ chối',
+      name: 'Từ chối'
     },
     {
       value: this.CANCELED,
-      name: 'Hủy',
+      name: 'Hủy'
     }
   ];
 
   static getName(value?: number) {
-    return this.list.find(x => x.value == value)?.name ?? '';
+    return this.list.find((x) => x.value == value)?.name ?? '';
   }
 }

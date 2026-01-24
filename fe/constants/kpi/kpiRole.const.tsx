@@ -1,39 +1,39 @@
 export class KpiRoleConst {
-  static CHU_TICH_HOI_DONG_TRUONG = "CHU_TICH_HOI_DONG_TRUONG";
-  static HIEU_TRUONG = "HIEU_TRUONG";
-  static PHO_HIEU_TRUONG = "PHO_HIEU_TRUONG";
-  static TRUONG_DON_VI_CAP_2 = "TRUONG_DON_VI_CAP_2";
-  static CHUYEN_VIEN = "CHUYEN_VIEN";
-  static GIANG_VIEN = "GIANG_VIEN";
+  static CHU_TICH_HOI_DONG_TRUONG = 'CHU_TICH_HOI_DONG_TRUONG';
+  static HIEU_TRUONG = 'HIEU_TRUONG';
+  static PHO_HIEU_TRUONG = 'PHO_HIEU_TRUONG';
+  static TRUONG_DON_VI_CAP_2 = 'TRUONG_DON_VI_CAP_2';
+  static CHUYEN_VIEN = 'CHUYEN_VIEN';
+  static GIANG_VIEN = 'GIANG_VIEN';
 
   static list = [
     {
       value: this.CHU_TICH_HOI_DONG_TRUONG,
-      name: 'Chủ tịch hội đồng trường',
+      name: 'Chủ tịch hội đồng trường'
     },
     {
       value: this.HIEU_TRUONG,
-      name: 'Hiệu trưởng',
+      name: 'Hiệu trưởng'
     },
     {
       value: this.PHO_HIEU_TRUONG,
-      name: 'Phó hiệu trưởng',
+      name: 'Phó hiệu trưởng'
     },
     {
       value: this.TRUONG_DON_VI_CAP_2,
-      name: 'Trưởng đơn vị',
+      name: 'Trưởng đơn vị'
     },
     {
       value: this.CHUYEN_VIEN,
-      name: 'Chuyên viên',
+      name: 'Chuyên viên'
     },
     {
       value: this.GIANG_VIEN,
-      name: 'Giảng viên',
+      name: 'Giảng viên'
     }
   ];
 
   static getName(value?: string) {
-    return this.list.find(x => x.value == value)?.name ?? '';
+    return this.list.find((x) => x.value == value)?.name ?? '';
   }
 }

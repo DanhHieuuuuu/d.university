@@ -160,7 +160,10 @@ const Page = () => {
     {
       label: 'Thêm thời gian',
       icon: <PlusOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.TAO_MOI || r.status === DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
+      hidden: (r) =>
+        r.status == DelegationStatusConst.TAO_MOI ||
+        r.status === DelegationStatusConst.DONE ||
+        r.status == DelegationStatusConst.DA_HET_HAN,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
     },
     {

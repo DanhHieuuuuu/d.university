@@ -12,13 +12,7 @@ interface KpiLogModalProps {
 
 const KpiLogModal = ({ open, onCancel, data, loading }: KpiLogModalProps) => {
   return (
-    <Modal
-      open={open}
-      onCancel={onCancel}
-      footer={null}
-      width={1200}
-      title="Nhật ký KPI"
-    >
+    <Modal open={open} onCancel={onCancel} footer={null} width={1200} title="Nhật ký KPI">
       <Table
         rowKey="id"
         loading={loading}
@@ -36,7 +30,7 @@ const KpiLogModal = ({ open, onCancel, data, loading }: KpiLogModalProps) => {
             render: (value?: number) => {
               const status = KpiTrangThaiConst.get(value);
               return status ? <Tag color={status.color}>{status.text}</Tag> : '-';
-            },
+            }
           },
           {
             title: 'Trạng thái mới',
@@ -45,9 +39,9 @@ const KpiLogModal = ({ open, onCancel, data, loading }: KpiLogModalProps) => {
             render: (value?: number) => {
               const status = KpiTrangThaiConst.get(value);
               return status ? <Tag color={status.color}>{status.text}</Tag> : '-';
-            },
+            }
           },
-          { title: 'Lý do', dataIndex: 'reason' },
+          { title: 'Lý do', dataIndex: 'reason' }
         ]}
       />
     </Modal>

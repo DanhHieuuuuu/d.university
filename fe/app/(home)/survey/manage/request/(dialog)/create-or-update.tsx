@@ -44,7 +44,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
   const [activeTab, setActiveTab] = useState<string>('1');
   const [departments, setDepartments] = React.useState<IViewPhongBan[]>([]);
   const [faculties, setFaculties] = useState<IViewKhoa[]>([]);
-  
+
   const isEdit = !!request;
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
           ...request,
           thoiGianBatDau: dayjs(request.thoiGianBatDau),
           thoiGianKetThuc: dayjs(request.thoiGianKetThuc),
-          targets: (request.targets && request.targets.length > 0) ? request.targets : [{}],
+          targets: request.targets && request.targets.length > 0 ? request.targets : [{}],
           questions: request.questions || [],
           criterias: request.criterias || []
         });
@@ -92,21 +92,24 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
         })
         .catch((err: any) => {
           console.error('Lỗi khi lấy danh sách khoa:', err);
-        })
+        });
     }
   }, [isModalOpen, dispatch]);
 
   const handleSubmit = async (values: IRequestForm) => {
     if (!values.questions || values.questions.length < 1) {
       toast.error('Phải có ít nhất 1 câu hỏi');
-      setActiveTab('2'); 
+      setActiveTab('2');
       return;
     }
 
     for (let i = 0; i < values.questions.length; i++) {
       const question = values.questions[i];
       // Only validate answers for multiple choice questions (type 1 or 2), not essay (type 3)
-      if ((question.loaiCauHoi === 1 || question.loaiCauHoi === 2) && (!question.answers || question.answers.length < 2)) {
+      if (
+        (question.loaiCauHoi === 1 || question.loaiCauHoi === 2) &&
+        (!question.answers || question.answers.length < 2)
+      ) {
         toast.error(`Câu hỏi ${i + 1}: Câu hỏi trắc nghiệm phải có ít nhất 2 đáp án`);
         setActiveTab('2');
         return;
@@ -148,8 +151,17 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
   };
 
   const onFinishFailed = ({ errorFields }: any) => {
-    const tab1Fields = ['maYeuCau', 'tenKhaoSatYeuCau', 'moTa', 'thoiGianBatDau', 'thoiGianKetThuc', 'idPhongBan', 'targets', 'criterias'];
-    
+    const tab1Fields = [
+      'maYeuCau',
+      'tenKhaoSatYeuCau',
+      'moTa',
+      'thoiGianBatDau',
+      'thoiGianKetThuc',
+      'idPhongBan',
+      'targets',
+      'criterias'
+    ];
+
     const hasErrorInTab1 = errorFields.some((field: any) => {
       const fieldName = field.name[0];
       return tab1Fields.includes(fieldName) || fieldName === 'targets' || fieldName === 'criterias';
@@ -192,24 +204,20 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
         </Col>
       </Row>
 
-      <Form.Item
-        label="Mô tả"
-        name="moTa"
-        rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}
-      >
+      <Form.Item label="Mô tả" name="moTa" rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}>
         <TextArea rows={3} placeholder="Nhập mô tả khảo sát" disabled={isViewMode} />
       </Form.Item>
 
       {isViewMode && request?.lyDoTuChoi && (
         <Form.Item label="Lý do từ chối" name="lyDoTuChoi">
-          <TextArea 
-            rows={3} 
-            disabled 
-            style={{ 
-              backgroundColor: '#fff1f0', 
+          <TextArea
+            rows={3}
+            disabled
+            style={{
+              backgroundColor: '#fff1f0',
               borderColor: '#ffa39e',
               color: '#cf1322'
-            }} 
+            }}
           />
         </Form.Item>
       )}
@@ -247,11 +255,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
         </Col>
       </Row>
 
-      <Form.Item
-        label="Phòng ban"
-        name="idPhongBan"
-        rules={[{ required: true, message: 'Vui lòng chọn phòng ban' }]}
-      >
+      <Form.Item label="Phòng ban" name="idPhongBan" rules={[{ required: true, message: 'Vui lòng chọn phòng ban' }]}>
         <Select placeholder="Chọn phòng ban" allowClear disabled={isViewMode}>
           {departments.map((dept: any) => (
             <Option key={dept.idPhongBan} value={dept.idPhongBan}>
@@ -271,41 +275,42 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
             >
               <Select placeholder="Chọn loại đối tượng" disabled={isViewMode}>
                 <Option value={surveyStatusConst.ALL}>{surveyStatusConst.getName(surveyStatusConst.ALL)}</Option>
-                <Option value={surveyStatusConst.STUDENT}>{surveyStatusConst.getName(surveyStatusConst.STUDENT)}</Option>
-                <Option value={surveyStatusConst.LECTURER}>{surveyStatusConst.getName(surveyStatusConst.LECTURER)}</Option>
+                <Option value={surveyStatusConst.STUDENT}>
+                  {surveyStatusConst.getName(surveyStatusConst.STUDENT)}
+                </Option>
+                <Option value={surveyStatusConst.LECTURER}>
+                  {surveyStatusConst.getName(surveyStatusConst.LECTURER)}
+                </Option>
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item noStyle shouldUpdate={(prevValues, currentValues) =>
-              prevValues.targets?.[0]?.loaiDoiTuong !== currentValues.targets?.[0]?.loaiDoiTuong
-            }>
+            <Form.Item
+              noStyle
+              shouldUpdate={(prevValues, currentValues) =>
+                prevValues.targets?.[0]?.loaiDoiTuong !== currentValues.targets?.[0]?.loaiDoiTuong
+              }
+            >
               {({ getFieldValue }) => {
                 const targetType = getFieldValue(['targets', 0, 'loaiDoiTuong']);
                 return (
                   <Row gutter={16}>
                     {(targetType === surveyStatusConst.ALL || targetType === surveyStatusConst.STUDENT) && (
                       <Col span={12}>
-                        <Form.Item
-                          label="Khoa"
-                          name={['targets', 0, 'idKhoa']}
-                        >
+                        <Form.Item label="Khoa" name={['targets', 0, 'idKhoa']}>
                           <Select placeholder="Chọn khoa" allowClear disabled={isViewMode}>
                             {faculties.map((faculty: any) => (
                               <Option key={faculty.id} value={faculty.id}>
                                 {faculty.tenKhoa}
                               </Option>
                             ))}
-                          </Select>                         
+                          </Select>
                         </Form.Item>
                       </Col>
                     )}
                     {(targetType === surveyStatusConst.ALL || targetType === surveyStatusConst.LECTURER) && (
                       <Col span={12}>
-                        <Form.Item
-                          label="Phòng ban"
-                          name={['targets', 0, 'idPhongBan']}
-                        >
+                        <Form.Item label="Phòng ban" name={['targets', 0, 'idPhongBan']}>
                           <Select placeholder="Chọn phòng ban" allowClear disabled={isViewMode}>
                             {departments.map((dept: any) => (
                               <Option key={dept.idPhongBan} value={dept.idPhongBan}>
@@ -322,11 +327,8 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item
-              label="Mô tả"
-              name={['targets', 0, 'moTa']}
-            >
-              <Input placeholder="Mô tả đối tượng" disabled={isViewMode}/>
+            <Form.Item label="Mô tả" name={['targets', 0, 'moTa']}>
+              <Input placeholder="Mô tả đối tượng" disabled={isViewMode} />
             </Form.Item>
           </Col>
         </Row>
@@ -341,7 +343,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                   <Col span={6}>
                     <Form.Item
                       {...restField}
-                      label={index === 0 ? "Tên tiêu chí" : null}
+                      label={index === 0 ? 'Tên tiêu chí' : null}
                       name={[name, 'tenTieuChi']}
                       rules={[{ required: true, message: 'Nhập tên tiêu chí' }]}
                       style={{ marginBottom: 0 }}
@@ -350,14 +352,20 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                     </Form.Item>
                   </Col>
                   <Col span={4}>
-                    <Form.Item 
-                      {...restField} 
-                      label={index === 0 ? "Trọng số" : null} 
-                      name={[name, 'weight']} 
+                    <Form.Item
+                      {...restField}
+                      label={index === 0 ? 'Trọng số' : null}
+                      name={[name, 'weight']}
                       style={{ marginBottom: 0 }}
                       rules={[
                         { required: true, message: 'Nhập trọng số' },
-                        { type: 'number', min: 1, max: 10, message: 'Trọng số từ 1-10', transform: (value) => Number(value) }
+                        {
+                          type: 'number',
+                          min: 1,
+                          max: 10,
+                          message: 'Trọng số từ 1-10',
+                          transform: (value) => Number(value)
+                        }
                       ]}
                       tooltip="Trọng số càng lớn, mức độ đánh giá càng cao (1-10)"
                     >
@@ -365,18 +373,33 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                     </Form.Item>
                   </Col>
                   <Col span={6}>
-                    <Form.Item {...restField} label={index === 0 ? "Từ khóa" : null} name={[name, 'keyword']} style={{ marginBottom: 0 }}>
+                    <Form.Item
+                      {...restField}
+                      label={index === 0 ? 'Từ khóa' : null}
+                      name={[name, 'keyword']}
+                      style={{ marginBottom: 0 }}
+                    >
                       <Input placeholder="keyword " disabled={isViewMode} />
                     </Form.Item>
                   </Col>
                   <Col span={7}>
-                    <Form.Item {...restField} label={index === 0 ? "Mô tả" : null} name={[name, 'moTa']} style={{ marginBottom: 0 }}>
+                    <Form.Item
+                      {...restField}
+                      label={index === 0 ? 'Mô tả' : null}
+                      name={[name, 'moTa']}
+                      style={{ marginBottom: 0 }}
+                    >
                       <Input placeholder="Mô tả chi tiết" disabled={isViewMode} />
                     </Form.Item>
                   </Col>
                   <Col span={1}>
                     {!isViewMode && (
-                      <Button type="link" danger onClick={() => remove(name)} style={index === 0 ? { marginTop: 30 } : {}}>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => remove(name)}
+                        style={index === 0 ? { marginTop: 30 } : {}}
+                      >
                         Xóa
                       </Button>
                     )}
@@ -401,10 +424,10 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
         {(fields, { add, remove }) => (
           <>
             {fields.map(({ key, name, ...restField }) => (
-              <Card 
-                key={key} 
-                size="small" 
-                style={{ marginBottom: 16, backgroundColor: '#fafafa' }} 
+              <Card
+                key={key}
+                size="small"
+                style={{ marginBottom: 16, backgroundColor: '#fafafa' }}
                 title={`Câu hỏi ${name + 1}`}
                 extra={
                   !isViewMode && (
@@ -432,8 +455,8 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                       name={[name, 'loaiCauHoi']}
                       rules={[{ required: true, message: 'Chọn loại câu hỏi' }]}
                     >
-                      <Select 
-                        placeholder="Loại câu hỏi" 
+                      <Select
+                        placeholder="Loại câu hỏi"
                         disabled={isViewMode}
                         onChange={(value) => {
                           // Clear answers when switching to essay type
@@ -472,7 +495,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                 <Form.Item noStyle shouldUpdate>
                   {({ getFieldValue }) => {
                     const questionType = getFieldValue(['questions', name, 'loaiCauHoi']);
-                    
+
                     // Only show answers for type 1 (Trắc nghiệm) or type 2 (Chọn nhiều đáp án)
                     if (questionType === 3) {
                       return null; // Hide answers for essay questions
@@ -484,56 +507,82 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                           {(answerFields, { add: addAnswer, remove: removeAnswer }) => (
                             <>
                               {answerFields.map((answerField, index) => (
-                          <Row key={answerField.key} gutter={16} align="middle" style={{ marginBottom: 8 }}>
-                            <Col span={7}>
-                              <Form.Item
-                                {...answerField}
-                                label={index === 0 ? "Nội dung đáp án" : null}
-                                name={[answerField.name, 'noiDung']}
-                                rules={[{ required: true, message: 'Nhập nội dung' }]}
-                                style={{ marginBottom: 0 }}
-                              >
-                                <Input placeholder="Nội dung" disabled={isViewMode} />
-                              </Form.Item>
-                            </Col>
-                            <Col span={5}>
-                              <Form.Item {...answerField} label={index === 0 ? "Giá trị" : null} name={[answerField.name, 'value']} style={{ marginBottom: 0 }}>
-                                <Input type="number" placeholder="Số" disabled={isViewMode} />
-                              </Form.Item>
-                            </Col>
-                            {!isViewMode && (
-                              <Col span={5}>
-                                <Form.Item {...answerField} label={index === 0 ? "Thứ tự" : null} name={[answerField.name, 'thuTu']} style={{ marginBottom: 0 }}>
-                                  <Input type="number" placeholder="Thứ tự" disabled value={index + 1} />
-                                </Form.Item>
-                              </Col>
-                            )}
-                            <Col span={5}>
-                              <Form.Item {...answerField} label={index === 0 ? "Đáp án đúng" : null} name={[answerField.name, 'isCorrect']} valuePropName="checked" style={{ marginBottom: 0 }}>
-                                <Checkbox disabled={isViewMode}>Đúng</Checkbox>
-                              </Form.Item>
-                            </Col>
-                            <Col span={2}>
+                                <Row key={answerField.key} gutter={16} align="middle" style={{ marginBottom: 8 }}>
+                                  <Col span={7}>
+                                    <Form.Item
+                                      {...answerField}
+                                      label={index === 0 ? 'Nội dung đáp án' : null}
+                                      name={[answerField.name, 'noiDung']}
+                                      rules={[{ required: true, message: 'Nhập nội dung' }]}
+                                      style={{ marginBottom: 0 }}
+                                    >
+                                      <Input placeholder="Nội dung" disabled={isViewMode} />
+                                    </Form.Item>
+                                  </Col>
+                                  <Col span={5}>
+                                    <Form.Item
+                                      {...answerField}
+                                      label={index === 0 ? 'Giá trị' : null}
+                                      name={[answerField.name, 'value']}
+                                      style={{ marginBottom: 0 }}
+                                    >
+                                      <Input type="number" placeholder="Số" disabled={isViewMode} />
+                                    </Form.Item>
+                                  </Col>
+                                  {!isViewMode && (
+                                    <Col span={5}>
+                                      <Form.Item
+                                        {...answerField}
+                                        label={index === 0 ? 'Thứ tự' : null}
+                                        name={[answerField.name, 'thuTu']}
+                                        style={{ marginBottom: 0 }}
+                                      >
+                                        <Input type="number" placeholder="Thứ tự" disabled value={index + 1} />
+                                      </Form.Item>
+                                    </Col>
+                                  )}
+                                  <Col span={5}>
+                                    <Form.Item
+                                      {...answerField}
+                                      label={index === 0 ? 'Đáp án đúng' : null}
+                                      name={[answerField.name, 'isCorrect']}
+                                      valuePropName="checked"
+                                      style={{ marginBottom: 0 }}
+                                    >
+                                      <Checkbox disabled={isViewMode}>Đúng</Checkbox>
+                                    </Form.Item>
+                                  </Col>
+                                  <Col span={2}>
+                                    {!isViewMode && (
+                                      <Button
+                                        type="link"
+                                        danger
+                                        onClick={() => removeAnswer(answerField.name)}
+                                        style={index === 0 ? { marginTop: 30 } : {}}
+                                      >
+                                        X
+                                      </Button>
+                                    )}
+                                  </Col>
+                                </Row>
+                              ))}
                               {!isViewMode && (
-                                <Button type="link" danger onClick={() => removeAnswer(answerField.name)} style={index === 0 ? { marginTop: 30 } : {}}>
-                                  X
+                                <Button
+                                  type="dashed"
+                                  size="small"
+                                  onClick={() => addAnswer({ thuTu: answerFields.length + 1 })}
+                                  style={{ marginTop: 8 }}
+                                >
+                                  + Thêm đáp án
                                 </Button>
                               )}
-                            </Col>
-                          </Row>
-                        ))}
-                        {!isViewMode && (
-                          <Button type="dashed" size="small" onClick={() => addAnswer({ thuTu: answerFields.length + 1 })} style={{ marginTop: 8 }}>
-                            + Thêm đáp án
-                          </Button>
-                        )}
-                              </>
-                            )}
-                          </Form.List>
-                        </div>
-                      );
-                    }}
-                  </Form.Item>
+                            </>
+                          )}
+                        </Form.List>
+                      </div>
+                    );
+                  }}
+                </Form.Item>
               </Card>
             ))}
             {!isViewMode && (
@@ -552,14 +601,14 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
       key: '1',
       label: 'Thông tin chung & Tiêu chí',
       children: renderGeneralInfoTab(),
-      forceRender: true,
+      forceRender: true
     },
     {
       key: '2',
       label: 'Câu hỏi khảo sát',
       children: renderQuestionsTab(),
-      forceRender: true,
-    },
+      forceRender: true
+    }
   ];
 
   return (
@@ -582,12 +631,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
           criterias: [{}]
         }}
       >
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          items={items}
-          type="card"
-        />
+        <Tabs activeKey={activeTab} onChange={setActiveTab} items={items} type="card" />
 
         <div style={{ textAlign: 'right', marginTop: 16, borderTop: '1px solid #f0f0f0', paddingTop: 16 }}>
           <Space>

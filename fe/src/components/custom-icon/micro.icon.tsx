@@ -7,6 +7,6 @@ const MicroSvg = () => {
       />
     </svg>
   );
-}
- 
+};
+
 export default MicroSvg;

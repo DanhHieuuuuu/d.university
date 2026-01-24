@@ -92,7 +92,7 @@ const authSlice = createSlice({
       .addCase(refreshToken.rejected, (state) => {
         state.$login.loading = false;
       })
-      .addCase(myPermissionThunk.fulfilled, (state, action) => {        
+      .addCase(myPermissionThunk.fulfilled, (state, action) => {
         state.permissions = action.payload || [];
       });
   }

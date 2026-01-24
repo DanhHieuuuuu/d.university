@@ -2,11 +2,7 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Select } from 'antd';
-import {
-  PlusOutlined,
-  SearchOutlined,
-  SyncOutlined,
-  EyeOutlined} from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
@@ -98,8 +94,8 @@ const Page = () => {
       title: 'Mức lương',
       align: 'center',
       render: (val: number) => {
-        return <span>{formatCurrency(val)} đ</span>
-      } 
+        return <span>{formatCurrency(val)} đ</span>;
+      }
     },
     {
       key: 'ghiChu',
@@ -117,11 +113,11 @@ const Page = () => {
   ];
 
   useEffect(() => {
-      if (!isModalOpen) {
-        dispatch(resetStatusCreate());
-        dispatch(getListHopDong(query));
-      }
-    }, [isModalOpen]);
+    if (!isModalOpen) {
+      dispatch(resetStatusCreate());
+      dispatch(getListHopDong(query));
+    }
+  }, [isModalOpen]);
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ Keyword: value });

@@ -16,17 +16,19 @@ export const getListQuyetDinh = createAsyncThunk('quyetdinh/list', async (args: 
   }
 });
 
-export const getDetailQuyetDinhThunk = createAsyncThunk('quyetdinh/detail', async (args: number, { rejectWithValue }) => {
-  try {
-    const res = await NsDecisionService.findById(args);
+export const getDetailQuyetDinhThunk = createAsyncThunk(
+  'quyetdinh/detail',
+  async (args: number, { rejectWithValue }) => {
+    try {
+      const res = await NsDecisionService.findById(args);
 
-    return res.data;
-  } catch (error: any) {
-    return rejectWithValue({
-      message: error.message,
-      code: error.code,
-      response: error.response?.data
-    });
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
   }
-});
-
+);

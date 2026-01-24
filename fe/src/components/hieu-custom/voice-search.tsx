@@ -56,9 +56,7 @@ export default function VoiceSearch({ onResult }: VoiceSearchProps) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       alert('Trình duyệt không hỗ trợ Speech Recognition');
@@ -109,9 +107,7 @@ export default function VoiceSearch({ onResult }: VoiceSearchProps) {
           </div>
         </button>
 
-        <div className="voice-text">
-          {isListening ? 'Đang lắng nghe ...' : text}
-        </div>
+        <div className="voice-text">{isListening ? 'Đang lắng nghe ...' : text}</div>
       </div>
     </div>
   );

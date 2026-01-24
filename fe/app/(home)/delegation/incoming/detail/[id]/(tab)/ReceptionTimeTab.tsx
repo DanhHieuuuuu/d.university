@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect,forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, forwardRef, useImperativeHandle } from 'react';
 import dayjs from 'dayjs';
 import { Form, Input, InputNumber, DatePicker, TimePicker, Card, Button, Row, Col, FormInstance } from 'antd';
 import { IReceptionTime } from '@models/delegation/delegation.model';
@@ -14,7 +14,7 @@ type ReceptionTimeTabProps = {
   onUpdated?: () => void;
 };
 
-const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ data, isEdit = false, onUpdated }, ref) => {
+const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps>(({ data, isEdit = false, onUpdated }, ref) => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   useImperativeHandle(ref, () => form);
@@ -62,15 +62,14 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ dat
         await dispatch(updatePrepare(preparePayload)).unwrap();
       }
       onUpdated?.();
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   if (!data || data.length === 0) {
     return <div className="text-center text-gray-400">Không có thời gian tiếp đoàn</div>;
   }
 
-  return ( 
+  return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
       <Form.List name="items">
         {(fields, { remove }) => (
@@ -93,7 +92,6 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ dat
                     </Button>
                   )
                 }
-               
               >
                 <Form.Item name={[name, 'id']} hidden />
                 <Form.Item name={[name, 'delegationIncomingId']} hidden />
@@ -192,6 +190,5 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ dat
       </Form.List>
     </Form>
   );
-}
-)
+});
 export default ReceptionTimeTab;

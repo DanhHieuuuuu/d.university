@@ -6,9 +6,15 @@ const KpiReferenceTable = () => {
       <table className="min-w-full border-collapse border border-gray-300 text-sm">
         <thead>
           <tr className="bg-gray-100">
-            <th rowSpan={2} className="border border-gray-300 p-2 text-center font-bold">STT</th>
-            <th rowSpan={2} className="border border-gray-300 p-2 text-center font-bold min-w-[150px]">TIÊU CHÍ</th>
-            <th colSpan={5} className="border border-gray-300 p-2 text-center font-bold text-red-600">MỨC ĐỘ (Điểm trừ % KPI)</th>
+            <th rowSpan={2} className="border border-gray-300 p-2 text-center font-bold">
+              STT
+            </th>
+            <th rowSpan={2} className="min-w-[150px] border border-gray-300 p-2 text-center font-bold">
+              TIÊU CHÍ
+            </th>
+            <th colSpan={5} className="border border-gray-300 p-2 text-center font-bold text-red-600">
+              MỨC ĐỘ (Điểm trừ % KPI)
+            </th>
           </tr>
           <tr className="bg-gray-50">
             <th className="border border-gray-300 p-2 text-center font-semibold text-red-600">30%</th>
@@ -44,7 +50,7 @@ const KpiReferenceTable = () => {
             <td className="border border-gray-300 p-2 text-center">03 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">02 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">01 lần/năm</td>
-            <td className="border border-gray-300 p-2 text-center bg-gray-50">x</td>
+            <td className="border border-gray-300 bg-gray-50 p-2 text-center">x</td>
           </tr>
           <tr>
             <td className="border border-gray-300 p-2 text-center">4</td>
@@ -53,7 +59,7 @@ const KpiReferenceTable = () => {
             <td className="border border-gray-300 p-2 text-center">03 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">02 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">01 lần/năm</td>
-            <td className="border border-gray-300 p-2 text-center bg-gray-50">x</td>
+            <td className="border border-gray-300 bg-gray-50 p-2 text-center">x</td>
           </tr>
           <tr>
             <td className="border border-gray-300 p-2 text-center">5</td>
@@ -62,7 +68,7 @@ const KpiReferenceTable = () => {
             <td className="border border-gray-300 p-2 text-center">03 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">02 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">01 lần/năm</td>
-            <td className="border border-gray-300 p-2 text-center bg-gray-50">x</td>
+            <td className="border border-gray-300 bg-gray-50 p-2 text-center">x</td>
           </tr>
           <tr>
             <td className="border border-gray-300 p-2 text-center">6</td>
@@ -71,7 +77,7 @@ const KpiReferenceTable = () => {
             <td className="border border-gray-300 p-2 text-center">Kỷ luật bằng văn bản 01 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">Kỷ luật bằng lời nói 02 lần/năm</td>
             <td className="border border-gray-300 p-2 text-center">Kỷ luật bằng lời nói 01 lần/năm</td>
-            <td className="border border-gray-300 p-2 text-center bg-gray-50">x</td>
+            <td className="border border-gray-300 bg-gray-50 p-2 text-center">x</td>
           </tr>
         </tbody>
       </table>

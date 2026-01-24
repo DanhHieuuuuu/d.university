@@ -61,7 +61,6 @@ export class PermissionCoreConst {
   public static readonly CoreMenuKpiManagePersonalActionSendDeclared = `${PermissionCoreConst.Button}kpi_manage_personal_action_send_declared`;
   public static readonly CoreMenuKpiManagePersonalActionCancelDeclared = `${PermissionCoreConst.Button}kpi_manage_personal_action_cancel_declared`;
 
-
   public static readonly CoreMenuKpiManageUnit = `${PermissionCoreConst.Menu}kpi_manage_unit`;
   public static readonly CoreMenuKpiManageUnitCreate = `${PermissionCoreConst.Button}kpi_manage_unit_create`;
   public static readonly CoreMenuKpiManageUnitActionSaveScore = `${PermissionCoreConst.Button}kpi_manage_unit_action_save_score`;

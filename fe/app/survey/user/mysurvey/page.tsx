@@ -115,14 +115,11 @@ const Page = () => {
         }
       >
         {loading ? (
-          <div className="flex justify-center items-center py-20">
+          <div className="flex items-center justify-center py-20">
             <Spin size="large" tip="Đang tải danh sách khảo sát..." />
           </div>
         ) : surveys.length === 0 ? (
-          <Empty
-            description="Không có khảo sát nào"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          />
+          <Empty description="Không có khảo sát nào" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         ) : (
           <Row gutter={[16, 16]}>
             {surveys.map((survey) => (
@@ -145,19 +142,19 @@ const Page = () => {
                 >
                   <div className="space-y-3">
                     <div>
-                      <div className="text-xs text-gray-500 mb-1">Mã khảo sát</div>
+                      <div className="mb-1 text-xs text-gray-500">Mã khảo sát</div>
                       <div className="font-semibold text-blue-600">{survey.maKhaoSat}</div>
                     </div>
 
                     <div>
-                      <div className="text-xs text-gray-500 mb-1">Tên khảo sát</div>
-                      <div className="font-medium line-clamp-2" title={survey.tenKhaoSat}>
+                      <div className="mb-1 text-xs text-gray-500">Tên khảo sát</div>
+                      <div className="line-clamp-2 font-medium" title={survey.tenKhaoSat}>
                         {survey.tenKhaoSat}
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-xs text-gray-500 mb-1">Thời gian</div>
+                      <div className="mb-1 text-xs text-gray-500">Thời gian</div>
                       <div className="text-sm">
                         <div>Bắt đầu: {formatDateTimeView(survey.thoiGianBatDau)}</div>
                         <div>Kết thúc: {formatDateTimeView(survey.thoiGianKetThuc)}</div>
@@ -165,7 +162,7 @@ const Page = () => {
                     </div>
 
                     <div>
-                      <div className="text-xs text-gray-500 mb-1">Trạng thái</div>
+                      <div className="mb-1 text-xs text-gray-500">Trạng thái</div>
                       {getStatusTag(survey.status, survey.statusName)}
                     </div>
                   </div>
@@ -177,11 +174,7 @@ const Page = () => {
       </Card>
 
       {selectedSurveyId && (
-        <SurveyDetailDialog
-          surveyId={selectedSurveyId}
-          isOpen={isDialogOpen}
-          onClose={handleCloseDialog}
-        />
+        <SurveyDetailDialog surveyId={selectedSurveyId} isOpen={isDialogOpen} onClose={handleCloseDialog} />
       )}
     </div>
   );

@@ -15,12 +15,7 @@ type SurveyDetailModalProps = {
   onClose?: () => void;
 };
 
-const SurveyDetailModal: React.FC<SurveyDetailModalProps> = ({
-  isModalOpen,
-  setIsModalOpen,
-  survey,
-  onClose
-}) => {
+const SurveyDetailModal: React.FC<SurveyDetailModalProps> = ({ isModalOpen, setIsModalOpen, survey, onClose }) => {
   const [form] = Form.useForm();
   const [activeTab, setActiveTab] = useState('1');
 
@@ -34,7 +29,7 @@ const SurveyDetailModal: React.FC<SurveyDetailModalProps> = ({
         thoiGianBatDau: dayjs(detail.thoiGianBatDau),
         thoiGianKetThuc: dayjs(detail.thoiGianKetThuc),
         maYeuCauGoc: maYeuCauGoc,
-        questions: questionsData 
+        questions: questionsData
       });
       setActiveTab('1');
     }
@@ -94,87 +89,90 @@ const SurveyDetailModal: React.FC<SurveyDetailModalProps> = ({
   );
 
   const renderQuestions = () => (
-    <Card 
-        title="Nội dung câu hỏi" 
-        size="small" 
-        bordered={false} 
-        headStyle={{display: 'none'}}
-        bodyStyle={{ padding: 0, maxHeight: '500px', overflowY: 'auto' }}
+    <Card
+      title="Nội dung câu hỏi"
+      size="small"
+      bordered={false}
+      headStyle={{ display: 'none' }}
+      bodyStyle={{ padding: 0, maxHeight: '500px', overflowY: 'auto' }}
     >
-        <Form.List name="questions">
-            {(fields) => (
-                <div className='flex flex-col gap-4'>
-                    {fields.map(({ key, name, ...restField }) => (
-                        <Card 
-                            key={key} 
-                            size="small" 
-                            title={<span className='font-bold text-blue-600'>Câu hỏi {name + 1}</span>}
-                            className="bg-gray-50 border-gray-200"
-                        >
-                             <Row gutter={16}>
-                                <Col span={16}>
-                                    <Form.Item {...restField} name={[name, 'noiDung']} label="Nội dung" style={{marginBottom: 8}}>
-                                         <TextArea rows={2} disabled style={{ color: '#000', fontWeight: 500 }} />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <Form.Item {...restField} name={[name, 'loaiCauHoi']} label="Loại câu hỏi" style={{marginBottom: 8}}>
-                                         <Select disabled style={{ color: '#000' }}>
-                                            <Option value={1}>Trắc nghiệm</Option>
-                                            <Option value={2}>Chọn nhiều đáp án</Option>
-                                            <Option value={3}>Tự luận</Option>
-                                         </Select>
-                                    </Form.Item>
-                                </Col>
-                             </Row>
+      <Form.List name="questions">
+        {(fields) => (
+          <div className="flex flex-col gap-4">
+            {fields.map(({ key, name, ...restField }) => (
+              <Card
+                key={key}
+                size="small"
+                title={<span className="font-bold text-blue-600">Câu hỏi {name + 1}</span>}
+                className="border-gray-200 bg-gray-50"
+              >
+                <Row gutter={16}>
+                  <Col span={16}>
+                    <Form.Item {...restField} name={[name, 'noiDung']} label="Nội dung" style={{ marginBottom: 8 }}>
+                      <TextArea rows={2} disabled style={{ color: '#000', fontWeight: 500 }} />
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    <Form.Item
+                      {...restField}
+                      name={[name, 'loaiCauHoi']}
+                      label="Loại câu hỏi"
+                      style={{ marginBottom: 8 }}
+                    >
+                      <Select disabled style={{ color: '#000' }}>
+                        <Option value={1}>Trắc nghiệm</Option>
+                        <Option value={2}>Chọn nhiều đáp án</Option>
+                        <Option value={3}>Tự luận</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
 
-                             {/* Render Answers */}
-                             <div className="pl-4 border-l-2 border-blue-200 mt-2">
-                                <Form.List name={[name, 'answers']}>
-                                    {(answerFields) => (
-                                        <>
-                                            {answerFields.map((ans) => (
-                                                <Row key={ans.key} gutter={8} align="middle" className="mb-2">
-                                                    <Col span={1}>
-                                                         <Form.Item {...ans} name={[ans.name, 'isCorrect']} valuePropName="checked" noStyle>
-                                                            <Checkbox disabled />
-                                                         </Form.Item>
-                                                    </Col>
-                                                    <Col span={16}>
-                                                        <Form.Item {...ans} name={[ans.name, 'noiDung']} noStyle>
-                                                            <Input size="small" disabled className="bg-transparent border-none text-black" />
-                                                        </Form.Item>
-                                                    </Col>
-                                                    <Col span={7}>
-                                                         <Form.Item {...ans} name={[ans.name, 'value']} noStyle>
-                                                            <span className="text-xs text-gray-500 italic">
-                                                                (Điểm: {form.getFieldValue(['questions', name, 'answers', ans.name, 'value'])})
-                                                            </span>
-                                                         </Form.Item>
-                                                    </Col>
-                                                </Row>
-                                            ))}
-                                            {answerFields.length === 0 && (
-                                                <span className="text-gray-400 italic text-xs">Không có đáp án (Tự luận)</span>
-                                            )}
-                                        </>
-                                    )}
-                                </Form.List>
-                             </div>
-                        </Card>
-                    ))}
-                    {fields.length === 0 && (
-                        <div className="text-center py-8 text-gray-400">Chưa có dữ liệu câu hỏi</div>
+                {/* Render Answers */}
+                <div className="mt-2 border-l-2 border-blue-200 pl-4">
+                  <Form.List name={[name, 'answers']}>
+                    {(answerFields) => (
+                      <>
+                        {answerFields.map((ans) => (
+                          <Row key={ans.key} gutter={8} align="middle" className="mb-2">
+                            <Col span={1}>
+                              <Form.Item {...ans} name={[ans.name, 'isCorrect']} valuePropName="checked" noStyle>
+                                <Checkbox disabled />
+                              </Form.Item>
+                            </Col>
+                            <Col span={16}>
+                              <Form.Item {...ans} name={[ans.name, 'noiDung']} noStyle>
+                                <Input size="small" disabled className="border-none bg-transparent text-black" />
+                              </Form.Item>
+                            </Col>
+                            <Col span={7}>
+                              <Form.Item {...ans} name={[ans.name, 'value']} noStyle>
+                                <span className="text-xs italic text-gray-500">
+                                  (Điểm: {form.getFieldValue(['questions', name, 'answers', ans.name, 'value'])})
+                                </span>
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        ))}
+                        {answerFields.length === 0 && (
+                          <span className="text-xs italic text-gray-400">Không có đáp án (Tự luận)</span>
+                        )}
+                      </>
                     )}
+                  </Form.List>
                 </div>
-            )}
-        </Form.List>
+              </Card>
+            ))}
+            {fields.length === 0 && <div className="py-8 text-center text-gray-400">Chưa có dữ liệu câu hỏi</div>}
+          </div>
+        )}
+      </Form.List>
     </Card>
   );
 
   const items: TabsProps['items'] = [
     { key: '1', label: 'Thông tin chung', children: renderGeneralInfo() },
-    { key: '2', label: `Danh sách câu hỏi`, children: renderQuestions() },
+    { key: '2', label: `Danh sách câu hỏi`, children: renderQuestions() }
   ];
 
   return (

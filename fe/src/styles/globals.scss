@@ -106,7 +106,7 @@ html {
   .tag-approve {
     @extend .tag-status;
     background-color: #ffe0f0;
-    color: #d81b60;            
+    color: #d81b60;
   }
 }
 
@@ -141,8 +141,8 @@ html {
   }
   .tag-approve {
     @extend .tag-status;
-    background-color: rgba(216, 27, 96, 0.15); 
-    color: #f48fb1;                            
+    background-color: rgba(216, 27, 96, 0.15);
+    color: #f48fb1;
   }
 }
 .hover-box:hover {
@@ -152,7 +152,7 @@ html {
 
 .voice-fixed-wrapper {
   position: fixed;
-  bottom: 24px;        
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
@@ -161,10 +161,9 @@ html {
   justify-content: center;
   align-items: center;
 
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 .voice-fixed-wrapper * {
   pointer-events: auto;
 }
-

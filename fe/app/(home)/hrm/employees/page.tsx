@@ -23,6 +23,7 @@ import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import CreateNhanSuModal from './(dialog)/create-or-update-ns';
 import VoiceSearchModal from '@components/common/VoiceSearch';
+import CreateContractWithNhanSuModal from '../contracts/(dialog)/CreateContractWithNhanSuModal';
 
 type SearchMode = 'FILTER' | 'SEMANTIC';
 
@@ -40,6 +41,8 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [openContract, setOpenContract] = useState<boolean>(false);
+
   const [openVoice, setOpenVoice] = useState<boolean>(false);
   const [searchMode, setSearchMode] = useState<SearchMode>('FILTER');
 
@@ -123,7 +126,7 @@ const Page = () => {
       if (searchMode === 'FILTER') {
         dispatch(getListNhanSu(newQuery));
       }
-    },  
+    },
     triggerFirstLoad: true
   });
 
@@ -152,7 +155,6 @@ const Page = () => {
 
   const onClickView = (data: IViewNhanSu) => {
     dispatch(selectIdNhanSu(data.idNhanSu));
-    dispatch(getHoSoNhanSu(data.idNhanSu));
     navigateTo(`/hrm/employees/${data.idNhanSu}`);
   };
 
@@ -169,9 +171,14 @@ const Page = () => {
       title="Danh sách nhân sự"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissionCreateNhanSu}>
-          Thêm mới
-        </Button>
+        <div className="flex items-center justify-center gap-4">
+          <Button icon={<PlusOutlined />} onClick={() => setOpenContract(true)} hidden={false}>
+            Thêm mới cùng hợp đồng
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissionCreateNhanSu}>
+            Thêm mới
+          </Button>
+        </div>
       }
     >
       <Form form={form} layout="horizontal">
@@ -235,6 +242,8 @@ const Page = () => {
         isUpdate={isUpdate}
         isView={isView}
       />
+
+      <CreateContractWithNhanSuModal isModalOpen={openContract} setIsModalOpen={setOpenContract} />
 
       <VoiceSearchModal
         open={openVoice}

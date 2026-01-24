@@ -371,7 +371,7 @@ const delegationSlice = createSlice({
       })
       .addCase(createPrepare.rejected, (state) => {
         state.$create.status = ReduxStatus.FAILURE;
-      })
+      });
   }
 });
 
