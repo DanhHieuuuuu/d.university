@@ -325,7 +325,7 @@ const onClickPhanCong = (data: IDepartmentSupport) => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        scroll={{x: 'max-content', y: 'calc(100vh - 420px)'}}
+        scroll={{x: 'max-content', y: 'calc(100vh - 350px)'}}
         data-permission={PermissionCoreConst.CoreButtonTableXuLyDoanVao}
       />
       <CreateDepartmentSupportModal
