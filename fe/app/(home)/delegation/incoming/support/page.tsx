@@ -25,7 +25,6 @@ import { IDepartmentSupport, IQueryGuestGroup, ISupporter, IViewGuestGroup } fro
 import {
   deleteDoanVao,
   getListDelegationIncoming,
-  getListDepartmentSupport,
   getListGuestGroup,
   getListNhanSu,
   getListPhongBan,
@@ -39,11 +38,13 @@ import { toast } from 'react-toastify';
 import CreateDepartmentSupportModal from './(dialog)/create';
 import router from 'next/router';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { getListDepartmentSupport } from '@redux/feature/delegation/department/departmentThunk';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { status, total: totalItem, listDepartmentSupport } = useAppSelector((state) => state.delegationState);
+  const { status, total: totalItem } = useAppSelector((state) => state.delegationState);
+  const { list} = useAppSelector((state) => state.departmentState);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
@@ -166,7 +167,7 @@ const Page = () => {
         loading={status === ReduxStatus.LOADING}
         rowKey="id"
         columns={columns}
-        dataSource={listDepartmentSupport}
+        dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
         data-permission={PermissionCoreConst.CoreTableDepartment}

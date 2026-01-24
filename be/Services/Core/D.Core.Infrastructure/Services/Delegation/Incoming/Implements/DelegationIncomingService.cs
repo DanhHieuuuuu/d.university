@@ -557,7 +557,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 {
                     delegation.Status = DelegationStatus.Propose;
                 }
-                else if( dto.OldStatus == DelegationStatus.Propose)
+                else if( dto.OldStatus == DelegationStatus.Propose || dto.OldStatus == DelegationStatus.Edited)
                 {
                     delegation.Status = DelegationStatus.BGHApprove;
                 }
@@ -569,6 +569,14 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 {
                     delegation.Status = DelegationStatus.Done;
                 }
+                else if (dto.OldStatus == DelegationStatus.NeedEdit)
+                {
+                    delegation.Status = DelegationStatus.Edited;
+                }
+            }
+            else if(dto.Action == "supplement")
+            {
+                delegation.Status = DelegationStatus.NeedEdit;
             }
             else if(dto.Action == "cancel")
             {

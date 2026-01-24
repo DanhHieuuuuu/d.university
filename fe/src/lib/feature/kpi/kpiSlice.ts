@@ -31,8 +31,9 @@ import {
     askKpiAi,
     getListKpiCongThuc,
     getKpiScoreBoard,
+    getAllListKpiTruong,
 } from './kpiThunk';
-import { IKpiTruongSummary, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
+import { IKpiTruongSummary, IViewGetListKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
 import { KpiLogStatusDto } from '@models/kpi/kpi-log.model';
 import { IViewKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
 import { IKpiScoreBoardResponse } from '@models/kpi/kpi-scoreboard.model';
@@ -51,6 +52,7 @@ interface KpiState {
         };
     };
     kpiTruong: CRUD<IViewKpiTruong, IKpiTruongSummary>;
+    listAllKpiTruong: MetaList<IViewGetListKpiTruong>;
     kpiRole: CRUD<IViewKpiRole>;
     nhanSuDaGiao: {
         data: NhanSuDaGiaoDto[];
@@ -113,6 +115,7 @@ const initialState: KpiState = {
         $delete: { status: ReduxStatus.IDLE },
         $selected: { status: ReduxStatus.IDLE, id: null, data: null },
     },
+    listAllKpiTruong: { status: ReduxStatus.IDLE, data: [] },
     kpiRole: {
         $create: { status: ReduxStatus.IDLE },
         $list: { status: ReduxStatus.IDLE, data: [], total: 0 },
@@ -517,97 +520,106 @@ const kpiSlice = createSlice({
             .addCase(updateKetQuaCapTrenKpiTruong.rejected, (state) => {
                 state.kpiCaNhan.$update.status = ReduxStatus.FAILURE;
             })
-
+            .addCase(getAllListKpiTruong.pending, (state) => {
+                state.listAllKpiTruong.status = ReduxStatus.LOADING;
+            })
+            .addCase(getAllListKpiTruong.fulfilled, (state, action) => {
+                state.listAllKpiTruong.status = ReduxStatus.SUCCESS;
+                state.listAllKpiTruong.data = action.payload || [];
+            })
+            .addCase(getAllListKpiTruong.rejected, (state) => {
+                state.listAllKpiTruong.status = ReduxStatus.FAILURE;
+            })
             //Kpi Role
             .addCase(getAllKpiRole.pending, (state) => {
                 state.kpiRole.$list.status = ReduxStatus.LOADING;
             })
-            .addCase(getAllKpiRole.fulfilled, (state, action) => {
-                state.kpiRole.$list.status = ReduxStatus.SUCCESS;
-                state.kpiRole.$list.data = action.payload?.data.items || [];
-                state.kpiRole.$list.total = action.payload?.data.totalItem || 0;
-            })
-            .addCase(getAllKpiRole.rejected, (state) => {
-                state.kpiRole.$list.status = ReduxStatus.FAILURE;
-            })
-            .addCase(createKpiRole.pending, (state) => {
-                state.kpiRole.$create.status = ReduxStatus.LOADING;
-            })
-            .addCase(createKpiRole.fulfilled, (state) => {
-                state.kpiRole.$create.status = ReduxStatus.SUCCESS;
-            })
-            .addCase(createKpiRole.rejected, (state) => {
-                state.kpiRole.$create.status = ReduxStatus.FAILURE;
-            })
-            .addCase(updateKpiRole.pending, (state) => {
-                state.kpiRole.$update.status = ReduxStatus.LOADING;
-            })
-            .addCase(updateKpiRole.fulfilled, (state) => {
-                state.kpiRole.$update.status = ReduxStatus.SUCCESS;
-            })
-            .addCase(updateKpiRole.rejected, (state) => {
-                state.kpiRole.$update.status = ReduxStatus.FAILURE;
-            })
+        .addCase(getAllKpiRole.fulfilled, (state, action) => {
+            state.kpiRole.$list.status = ReduxStatus.SUCCESS;
+            state.kpiRole.$list.data = action.payload?.data.items || [];
+            state.kpiRole.$list.total = action.payload?.data.totalItem || 0;
+        })
+        .addCase(getAllKpiRole.rejected, (state) => {
+            state.kpiRole.$list.status = ReduxStatus.FAILURE;
+        })
+        .addCase(createKpiRole.pending, (state) => {
+            state.kpiRole.$create.status = ReduxStatus.LOADING;
+        })
+        .addCase(createKpiRole.fulfilled, (state) => {
+            state.kpiRole.$create.status = ReduxStatus.SUCCESS;
+        })
+        .addCase(createKpiRole.rejected, (state) => {
+            state.kpiRole.$create.status = ReduxStatus.FAILURE;
+        })
+        .addCase(updateKpiRole.pending, (state) => {
+            state.kpiRole.$update.status = ReduxStatus.LOADING;
+        })
+        .addCase(updateKpiRole.fulfilled, (state) => {
+            state.kpiRole.$update.status = ReduxStatus.SUCCESS;
+        })
+        .addCase(updateKpiRole.rejected, (state) => {
+            state.kpiRole.$update.status = ReduxStatus.FAILURE;
+        })
 
-            .addCase(deleteKpiRole.pending, (state) => {
-                state.kpiRole.$delete.status = ReduxStatus.LOADING;
-            })
-            .addCase(deleteKpiRole.fulfilled, (state) => {
-                state.kpiRole.$delete.status = ReduxStatus.SUCCESS;
-            })
-            .addCase(deleteKpiRole.rejected, (state) => {
-                state.kpiRole.$delete.status = ReduxStatus.FAILURE;
-            })
-            // KPI Log 
-            .addCase(getKpiLogStatus.pending, (state) => {
-                state.kpiLog.$list.status = ReduxStatus.LOADING;
-            })
-            .addCase(getKpiLogStatus.fulfilled, (state, action) => {
-                console.log('API LOG RESPONSE', action.payload);
-                console.log('ITEMS LENGTH', action.payload?.items?.length);
-                state.kpiLog.$list.status = ReduxStatus.SUCCESS;
-                state.kpiLog.$list.data = action.payload?.items ?? [];
-                state.kpiLog.$list.total = action.payload?.totalItem ?? 0;
-            })
-            .addCase(getKpiLogStatus.rejected, (state) => {
-                state.kpiLog.$list.status = ReduxStatus.FAILURE;
-            })
-            .addCase(askKpiAi.pending, (state) => {
-                state.kpiChat.status = ReduxStatus.LOADING;
-            })
-            .addCase(askKpiAi.fulfilled, (state, action) => {
-                state.kpiChat.status = ReduxStatus.SUCCESS;
-                state.kpiChat.answer = action.payload; // Payload là string 'answer' từ AI
-                state.kpiChat.history.push({ role: 'ai', content: action.payload });
-            })
-            .addCase(askKpiAi.rejected, (state) => {
-                state.kpiChat.status = ReduxStatus.FAILURE;
-                state.kpiChat.answer = "Xin lỗi, trợ lý AI đang gặp sự cố. Vui lòng thử lại sau.";
-            })
-            // Kpi Công Thức
-            .addCase(getListKpiCongThuc.pending, (state) => {
-                state.listCongThuc.status = ReduxStatus.LOADING;
-            })
-            .addCase(getListKpiCongThuc.fulfilled, (state, action) => {
-                state.listCongThuc.status = ReduxStatus.SUCCESS;
-                state.listCongThuc.data = action.payload || [];
-            })
-            .addCase(getListKpiCongThuc.rejected, (state) => {
-                state.listCongThuc.status = ReduxStatus.FAILURE;
-            })
-            // Kpi ScoreBoard
-            .addCase(getKpiScoreBoard.pending, (state) => {
-                state.kpiScoreBoard.status = ReduxStatus.LOADING;
-            })
-            .addCase(getKpiScoreBoard.fulfilled, (state, action) => {
-                state.kpiScoreBoard.status = ReduxStatus.SUCCESS;
-                state.kpiScoreBoard.data = action.payload;
-            })
-            .addCase(getKpiScoreBoard.rejected, (state) => {
-                state.kpiScoreBoard.status = ReduxStatus.FAILURE;
-                state.kpiScoreBoard.data = null;
-            });
-    }
+        .addCase(deleteKpiRole.pending, (state) => {
+            state.kpiRole.$delete.status = ReduxStatus.LOADING;
+        })
+        .addCase(deleteKpiRole.fulfilled, (state) => {
+            state.kpiRole.$delete.status = ReduxStatus.SUCCESS;
+        })
+        .addCase(deleteKpiRole.rejected, (state) => {
+            state.kpiRole.$delete.status = ReduxStatus.FAILURE;
+        })
+        // KPI Log 
+        .addCase(getKpiLogStatus.pending, (state) => {
+            state.kpiLog.$list.status = ReduxStatus.LOADING;
+        })
+        .addCase(getKpiLogStatus.fulfilled, (state, action) => {
+            console.log('API LOG RESPONSE', action.payload);
+            console.log('ITEMS LENGTH', action.payload?.items?.length);
+            state.kpiLog.$list.status = ReduxStatus.SUCCESS;
+            state.kpiLog.$list.data = action.payload?.items ?? [];
+            state.kpiLog.$list.total = action.payload?.totalItem ?? 0;
+        })
+        .addCase(getKpiLogStatus.rejected, (state) => {
+            state.kpiLog.$list.status = ReduxStatus.FAILURE;
+        })
+        .addCase(askKpiAi.pending, (state) => {
+            state.kpiChat.status = ReduxStatus.LOADING;
+        })
+        .addCase(askKpiAi.fulfilled, (state, action) => {
+            state.kpiChat.status = ReduxStatus.SUCCESS;
+            state.kpiChat.answer = action.payload; // Payload là string 'answer' từ AI
+            state.kpiChat.history.push({ role: 'ai', content: action.payload });
+        })
+        .addCase(askKpiAi.rejected, (state) => {
+            state.kpiChat.status = ReduxStatus.FAILURE;
+            state.kpiChat.answer = "Xin lỗi, trợ lý AI đang gặp sự cố. Vui lòng thử lại sau.";
+        })
+        // Kpi Công Thức
+        .addCase(getListKpiCongThuc.pending, (state) => {
+            state.listCongThuc.status = ReduxStatus.LOADING;
+        })
+        .addCase(getListKpiCongThuc.fulfilled, (state, action) => {
+            state.listCongThuc.status = ReduxStatus.SUCCESS;
+            state.listCongThuc.data = action.payload || [];
+        })
+        .addCase(getListKpiCongThuc.rejected, (state) => {
+            state.listCongThuc.status = ReduxStatus.FAILURE;
+        })
+        // Kpi ScoreBoard
+        .addCase(getKpiScoreBoard.pending, (state) => {
+            state.kpiScoreBoard.status = ReduxStatus.LOADING;
+        })
+        .addCase(getKpiScoreBoard.fulfilled, (state, action) => {
+            state.kpiScoreBoard.status = ReduxStatus.SUCCESS;
+            state.kpiScoreBoard.data = action.payload;
+        })
+        .addCase(getKpiScoreBoard.rejected, (state) => {
+            state.kpiScoreBoard.status = ReduxStatus.FAILURE;
+            state.kpiScoreBoard.data = null;
+        });
+}
 });
 
 const kpiReducer = kpiSlice.reducer;

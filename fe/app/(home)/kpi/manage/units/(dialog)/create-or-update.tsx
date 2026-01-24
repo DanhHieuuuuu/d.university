@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select, Divider } from 'antd';
-import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, ExperimentOutlined, TeamOutlined } from '@ant-design/icons';
+import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, ExperimentOutlined, TeamOutlined, LinkOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiDonVi, resetStatusKpiDonVi } from '@redux/feature/kpi/kpiSlice';
-import { createKpiDonVi, updateKpiDonVi, getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk';
+import { createKpiDonVi, updateKpiDonVi, getListKpiCongThuc, getAllListKpiTruong } from '@redux/feature/kpi/kpiThunk';
 import { ReduxStatus } from '@redux/const';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
@@ -24,12 +24,24 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const [form] = Form.useForm<any>();
   const [title, setTitle] = useState<string>('KPI Đơn vị');
   const { $selected, $create, $update } = useAppSelector((state) => state.kpiState.kpiDonVi);
-  const {listCongThuc } = useAppSelector((state) => state.kpiState);
+  const { listCongThuc } = useAppSelector((state) => state.kpiState);
   const sharedListCongThuc = useAppSelector((state) => (state.kpiState as any).listCongThuc);
-
+  const { listAllKpiTruong } = useAppSelector((state) => state.kpiState);
   const isSaving = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const { isModalOpen, isUpdate, isView, setIsModalOpen } = props;
   const { phongBanByKpiRole } = useAppSelector((state) => state.danhmucState);
+
+  const loaiKpiOptions = useMemo(() => {
+    return KpiLoaiConst.list
+      .filter((x) => {
+        if ([1, 2].includes(x.value)) return true;
+        if (x.value === 3) {
+          return isView || ($selected.data?.loaiKpi === 3);
+        }
+        return false;
+      })
+      .map((x) => ({ value: x.value, label: x.name }));
+  }, [isView, $selected.data]);
 
   const congThucOptions = useMemo(() => {
     return (sharedListCongThuc?.data || []).map((ct: any) => ({
@@ -38,6 +50,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
     }));
   }, [sharedListCongThuc?.data]);
 
+  const kpiTruongOptions = useMemo(() => {
+    return (listAllKpiTruong?.data || []).map((item: any) => ({
+        value: item.id,
+        label: item.kpi,
+    }));
+  }, [listAllKpiTruong?.data]);
   useEffect(() => {
     if (isModalOpen) {
       setTitle(isView ? 'Xem thông tin KPI Đơn vị' : isUpdate ? 'Cập nhật KPI Đơn vị' : 'Thêm mới KPI Đơn vị');
@@ -45,6 +63,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       if (sharedListCongThuc?.data.length === 0) {
         dispatch(getListKpiCongThuc({}));
       }
+      dispatch(getAllListKpiTruong());
     }
   }, [isModalOpen, isUpdate, isView, dispatch]);
 
@@ -54,9 +73,10 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
     form.setFieldsValue({
       ...selectedData,
-      idDonVi: selectedData.idDonVi, 
-      idCongThuc: selectedData.idCongThuc, 
+      idDonVi: selectedData.idDonVi,
+      idCongThuc: selectedData.idCongThuc,
       congThucTinh: selectedData.congThuc,
+      idKpiTruong: selectedData.idKpiTruong,
       namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
     });
   }, [$selected.data, isModalOpen, form]);
@@ -100,7 +120,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   return (
     <Modal
-      title={<span className="text-xl font-bold text-blue-700">{title}</span>}
+      title={<span className="text-xl text-blue-700">{title}</span>}
       width={950}
       open={isModalOpen}
       onCancel={handleClose}
@@ -130,9 +150,23 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         requiredMark="optional"
       >
         <div className="grid grid-cols-2 gap-x-6">
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600">
             <InfoCircleOutlined /> THÔNG TIN KPI ĐƠN VỊ
           </div>
+          <Form.Item 
+            label={<span className="flex items-center gap-1"><LinkOutlined /> KPI Trường</span>} 
+            name="idKpiTruong" 
+            className="col-span-2"
+          >
+            <Select
+              placeholder="Chọn KPI Trường liên kết (nếu có)"
+              options={kpiTruongOptions}
+              loading={listAllKpiTruong?.status === ReduxStatus.LOADING}
+              showSearch
+              optionFilterProp="label"
+              allowClear
+            />
+          </Form.Item>
 
           <Form.Item label="Tên KPI" name="kpi" className="col-span-2" rules={[{ required: true, message: 'Nhập tên KPI' }]}>
             <Input.TextArea rows={2} placeholder="Nhập tên chỉ số KPI dành cho đơn vị" />
@@ -148,14 +182,14 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600">
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
 
           <Form.Item label="Loại KPI" name="loaiKpi" rules={[{ required: true }]}>
             <Select
               placeholder="Chọn loại"
-              options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
+              options={loaiKpiOptions}
             />
           </Form.Item>
 
@@ -181,7 +215,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600 font-semibold">
+          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600">
             <TeamOutlined /> ĐƠN VỊ THỰC HIỆN
           </div>
 

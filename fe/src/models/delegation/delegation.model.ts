@@ -160,8 +160,8 @@ export type ICreateSupporter = {
 
 export type ICreateDepartment = {
   delegationIncomingId: number;
-  content: string;
-  departmentSupportId: number;
+  content?: string;
+  departmentSupportIds: number[];
 };
 
 export interface IUpdateStatus {

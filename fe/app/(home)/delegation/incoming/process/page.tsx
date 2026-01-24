@@ -13,7 +13,8 @@ import {
   PlusOutlined,
   SearchOutlined,
   SendOutlined,
-  SyncOutlined
+  SyncOutlined,
+  UserAddOutlined
 } from '@ant-design/icons';
 
 import { ReduxStatus } from '@redux/const';
@@ -26,9 +27,10 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { ICreateDepartment, IDepartmentSupport, IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
+  getListDelegationIncoming,
   getListGuestGroup,
   getListPhongBan,
   getListStatus,
@@ -39,9 +41,11 @@ import { ETableColumnType } from '@/constants/e-table.consts';
 import { DelegationStatusConst } from '../../../../../constants/core/delegation/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
-import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 import { useRouter } from 'next/navigation';
 import { exportBaoCaoDoanVao } from '@helpers/delegation/action.helper';
+import CreateDepartmentSupportModal from '../support/(dialog)/create';
+import { selectDelegationIncomingId, selectDepartmentSupport } from '@redux/feature/delegation/department/departmentSlice';
+import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -147,7 +151,7 @@ const Page = () => {
     {
       label: 'Phê duyệt',
       icon: <CheckOutlined />,
-      // hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
+      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
       command: (record: IViewGuestGroup) => onClickPheDuyet(record),
       permission: PermissionCoreConst.CoreButtonPheDuyetXuLyDoanVao,
     },
@@ -157,7 +161,14 @@ const Page = () => {
       hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET || !r.receptionTimes?.length,
       command: (record: IViewGuestGroup) => onClickTiepDoan(record),
       permission: PermissionCoreConst.CoreButtonTiepDoanXuLyDoanVao,
-    }
+    },
+    {
+      label: 'Phân công hỗ trợ',
+      icon: <UserAddOutlined/>,
+      // hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
+      command: (record: IDepartmentSupport) => onClickPhanCong(record),
+      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao,
+    },
   ];
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
@@ -179,6 +190,7 @@ const Page = () => {
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
       dispatch(getListStatus());
+      dispatch(getListDelegationIncoming());
     }
   }, [isModalOpen]);
 
@@ -189,7 +201,12 @@ const Page = () => {
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     handleDebouncedSearch(event.target.value);
   };
-
+const onClickPhanCong = (data: IDepartmentSupport) => {
+  dispatch(selectDelegationIncomingId(data.id));
+  setIsModalView(false);
+  setIsModalUpdate(false);
+  setIsModalOpen(true);
+};
   const onClickView = (data: IViewGuestGroup) => {
     router.push(`/delegation/incoming/detail/${data.id}`);
   };
@@ -215,7 +232,7 @@ const Page = () => {
       okText: 'Đồng ý',
       cancelText: 'Không đồng ý',
       okAction: 'upgrade',
-      cancelAction: 'cancel',
+      cancelAction: 'supplement',
       data,
       dispatch,
       onSuccess: () => {
@@ -310,6 +327,12 @@ const Page = () => {
         pagination={{ position: ['bottomRight'], ...pagination }}
         scroll={{x: 'max-content', y: 'calc(100vh - 420px)'}}
         data-permission={PermissionCoreConst.CoreButtonTableXuLyDoanVao}
+      />
+      <CreateDepartmentSupportModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        isUpdate={isUpdate}
+        isView={isView}
       />
     </Card>
   );

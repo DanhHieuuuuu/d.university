@@ -11,7 +11,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
 {
     public interface IDepartmentSupportService
     {
-        Task<CreateDepartmentSupportResponseDto> CreateDepartmentSupport(CreateDepartmentSupportRequestDto dto);
+        Task<List<CreateDepartmentSupportResponseDto>> CreateDepartmentSupport(CreateDepartmentSupportRequestDto dto);
         PageResultDto<PageDepartmentSupportResultDto> PagingDepartmentSupport(FilterDepartmentSupportDto dto);
         List<ViewDelegationIncomingResponseDto> GetAllDelegationIncoming(ViewDelegationIncomingRequestDto dto);
         Task<UpdateDepartmentSupportResponseDto> UpdateDepartmentSupport(UpdateDepartmentSupportRequestDto dto);

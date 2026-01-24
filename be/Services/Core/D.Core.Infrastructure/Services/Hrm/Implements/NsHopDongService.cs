@@ -77,6 +77,22 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
                 _decisionService.PheDuyetQuyetDinh(quyetDinhTuyenDung.Id);
 
+                if (dto.NgayBatDauThuViec.HasValue)
+                {
+                    _unitOfWork.iNsQuaTrinhCongTacRepository.Add(
+                        new NsQuaTrinhCongTac
+                        {
+                            IdQuyetDinh = quyetDinhTuyenDung.Id,
+                            IdNhanSu = dto.IdNhanSu,
+                            MaNhanSu = dto.MaNhanSu,
+                            IdChucVu = dto.IdChucVu,
+                            IdPhongBan = dto.IdPhongBan,
+                            IdToBoMon = dto.IdToBoMon,
+                            NgayBatDau = dto.NgayBatDauThuViec,
+                            NgayKetThuc = dto.NgayKetThucThuViec,                            
+                        });
+                }
+
                 _unitOfWork.iNsQuaTrinhCongTacRepository.Add(
                     new NsQuaTrinhCongTac
                     {
@@ -97,6 +113,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     {
                         IdNhanSu = dto.IdNhanSu,
                         MaNhanSu = dto.MaNhanSu,
+                        IdHopDong = newHd.Id,
                         MaSoThue = dto.MaSoThue,
                         TenNganHang1 = dto.TenNganHang1,
                         TenNganHang2 = dto.TenNganHang2,
@@ -104,6 +121,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                         Atm2 = dto.Atm2,
                         HienTaiChucVu = dto.IdChucVu,
                         HienTaiPhongBan = dto.IdPhongBan,
+                        DaChamDutHopDong = false,
+                        IsThoiViec = false
                     }
                 );
             }

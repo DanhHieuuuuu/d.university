@@ -9,7 +9,7 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedKpiDonVi } from '@redux/feature/kpi/kpiSlice';
-import { deleteKpiDonVi, getKpiDonViKeKhai, getListKpiRoleByUser, getListTrangThaiKpiCaNhan, getListTrangThaiKpiDonVi, getNhanSuDaGiaoByKpiDonVi, giaoKpiDonVi, updateKetQuaThucTeKpiDonVi, updateTrangThaiKpiDonVi } from '@redux/feature/kpi/kpiThunk';
+import { deleteKpiDonVi, getKpiDonViKeKhai, getListKpiRoleByUser, getListNamHocKpiDonVi, getListTrangThaiKpiCaNhan, getListTrangThaiKpiDonVi, getNhanSuDaGiaoByKpiDonVi, giaoKpiDonVi, updateKetQuaThucTeKpiDonVi, updateTrangThaiKpiDonVi } from '@redux/feature/kpi/kpiThunk';
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
@@ -28,7 +28,6 @@ import { IQueryKpiDonVi, IViewKpiDonVi, NhanSuDaGiaoDto } from '@models/kpi/kpi-
 import { KpiTrangThaiConst } from '@/constants/kpi/kpiStatus.const';
 import { KPI_ORDER, KpiLoaiConst } from '@/constants/kpi/kpiType.const';
 import AssignKpiModal from '../../modal/AssignKpiModal';
-import KpiAiChat from '@components/bthanh-custom/kpiChatAssist';
 import { useIsGranted } from '@hooks/useIsGranted';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
@@ -40,7 +39,7 @@ const Page = () => {
   const { processUpdateStatus } = useKpiStatusAction();
   const { data: list, status, total: totalItem, summary } = useAppSelector((state) => state.kpiState.kpiDonVi.$list);
   const { data: listPhongBan } = useAppSelector((state) => state.danhmucState.phongBanByKpiRole.$list);
-  const { data: trangThaiCaNhan, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.donVi);
+  const { data: trangThaiDonVi, status: trangThaiStatus } = useAppSelector((state) => state.kpiState.meta.trangThai.donVi);
   const { data: namHocDonVi, status: namHocStatus } = useAppSelector((state) => state.kpiState.meta.namHoc.donVi);
 
   const canPropose = useIsGranted(PermissionCoreConst.CoreMenuKpiManageUnitActionPropose);
@@ -80,7 +79,8 @@ const Page = () => {
 
   useEffect(() => {
     dispatch(getAllPhongBanByKpiRole({ PageIndex: 1, PageSize: 1000 }));
-    dispatch(getListTrangThaiKpiCaNhan());
+    dispatch(getListTrangThaiKpiDonVi());
+    dispatch(getListNamHocKpiDonVi());
     dispatch(getListKpiRoleByUser());
     dispatch(getAllUserByKpiRole({ PageIndex: 1, PageSize: 1000 }));
   }, [dispatch]);
@@ -103,7 +103,7 @@ const Page = () => {
 
   const proposeSelected = () =>
     processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.TAO_MOI || KpiTrangThaiConst.DA_CHINH_SUA],
+      validStatus: [KpiTrangThaiConst.TAO_MOI, KpiTrangThaiConst.DA_CHINH_SUA],
       invalidMsg: 'Chỉ KPI "Tạo mới" mới được đề xuất',
       confirmTitle: 'Đề xuất KPI cho đơn vị',
       confirmMessage: 'Xác nhận đề xuất các KPI đã chọn?',
@@ -227,13 +227,13 @@ const Page = () => {
         />
       </Form.Item>
       <Form.Item label="Trạng thái" name="trangThai">
-        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiCaNhan} />
+        <Select allowClear placeholder="Chọn trạng thái" loading={trangThaiStatus === ReduxStatus.LOADING} options={trangThaiDonVi} />
       </Form.Item>
     </Form>
   );
 
   const onClickAdd = () => { setIsModalView(false); setIsModalUpdate(false); setIsModalOpen(true); };
-  const onClickUpdate = (record: IViewKpiDonVi) => { dispatch(setSelectedKpiDonVi(record)); setIsModalUpdate(true); setIsModalOpen(true); };
+  const onClickUpdate = (record: IViewKpiDonVi) => { dispatch(setSelectedKpiDonVi(record)); setIsModalUpdate(true); setIsModalOpen(true); setIsModalView(false); };
   const onClickView = (record: IViewKpiDonVi) => { dispatch(setSelectedKpiDonVi(record)); setIsModalView(true); setIsModalOpen(true); };
   const onClickAssign = (record: IViewKpiDonVi) => {
     dispatch(setSelectedKpiDonVi(record));
@@ -270,7 +270,7 @@ const Page = () => {
           return {
             children: (
               <div style={{ fontSize: 15, fontWeight: 600, textAlign: 'left' }}>
-                TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{record.trongSo}%</span>
+                TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{Number(record.trongSo || 0).toFixed(2)}%</span>
               </div>
             ),
             props: { colSpan: columns.length },
@@ -330,7 +330,9 @@ const Page = () => {
     },
     {
       label: 'Sửa',
-      icon: <EyeOutlined />, command: onClickUpdate,
+      icon: <EyeOutlined />,
+      color: 'blue',
+      command: onClickUpdate,
       hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data'
     },
     ...(canAssign ? [{
@@ -363,7 +365,22 @@ const Page = () => {
           <div className="flex items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-2 flex-1">
               <Input placeholder="Tìm KPI..." prefix={<SearchOutlined />} allowClear onChange={(e) => handleDebouncedSearch(e.target.value)} className="max-w-[250px]" />
-              <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); filterForm.resetFields(); onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined }); setKetQuaMap({}); setSelectedRowKeys([]); }}>
+              <Button icon={<SyncOutlined />} onClick={() => {
+                form.resetFields();
+                filterForm.resetFields();
+                const defaultQuery = {
+                  Keyword: '',
+                  loaiKpi: undefined,
+                  trangThai: undefined,
+                  PageIndex: 1,
+                  PageSize: 1000
+                };
+                onFilterChange(defaultQuery);
+                dispatch(getKpiDonViKeKhai(defaultQuery));
+
+                setKetQuaMap({});
+                setSelectedRowKeys([]);
+              }}>
                 Tải lại
               </Button>
             </div>
@@ -396,10 +413,11 @@ const Page = () => {
             rowKey="id"
             columns={columns}
             dataSource={tableData}
+            isGroupedTable={true}
             listActions={actions}
             pagination={false}
             rowSelection={{ ...rowSelection, fixed: 'left' }}
-            scroll={{ x: 'max-content', y: 'calc(100vh - 520px)' }}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 400px)' }}
             footer={() => (
               <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -423,7 +441,6 @@ const Page = () => {
         </div>
         <PositionModal isModalOpen={isModalOpen} isUpdate={isUpdate} isView={isView} setIsModalOpen={setIsModalOpen} onSuccess={() => { dispatch(getKpiDonViKeKhai(query)); dispatch(getListTrangThaiKpiDonVi()); }} />
         <AssignKpiModal open={openAssignModal} onClose={() => setOpenAssignModal(false)} kpiId={selectedKpiDonVi?.id ?? undefined} donViId={selectedKpiDonVi?.data?.idDonVi ?? undefined} />
-        <KpiAiChat />
       </Card>
     </div>
   );

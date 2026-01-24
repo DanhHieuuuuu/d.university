@@ -39,36 +39,56 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             _notificationService = notificationService;
         }
 
-        public async Task<CreateDepartmentSupportResponseDto> CreateDepartmentSupport(CreateDepartmentSupportRequestDto dto)
+        public async Task<List<CreateDepartmentSupportResponseDto>> CreateDepartmentSupport(CreateDepartmentSupportRequestDto dto)
         {
-            _logger.LogInformation($"{nameof(CreateDepartmentSupport)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+            _logger.LogInformation(
+                $"{nameof(CreateDepartmentSupport)} method called, dto: {JsonSerializer.Serialize(dto)}."
+            );
 
-            //Kiểm tra departmentSupportId có tồn tại trong phòng ban 
-            var phongBanExist = await _unitOfWork.iDmPhongBanRepository
-                .TableNoTracking
-                .AnyAsync(x => x.Id == dto.DepartmentSupportId && !x.Deleted);
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-            if (!phongBanExist)
-                throw new Exception("Không tồn tại phòng ban này");
-            //Tạo DepartmentSupport
-            var newSupporter = _mapper.Map<DepartmentSupport>(dto);
-            _unitOfWork.iDepartmentSupportRepository.Add(newSupporter);
+
+            //Kiểm tra tất cả phòng ban có tồn tại không
+            var phongBanIds = dto.DepartmentSupportIds.Distinct().ToList();
+
+            var phongBanExistCount = await _unitOfWork.iDmPhongBanRepository
+                .TableNoTracking
+                .CountAsync(x => phongBanIds.Contains(x.Id) && !x.Deleted);
+
+            if (phongBanExistCount != phongBanIds.Count)
+                throw new Exception("Danh sách phòng ban hỗ trợ có phòng ban không tồn tại");
+
+            //Map danh sách entity
+            var newSupporters = phongBanIds.Select(id => new DepartmentSupport
+            {
+                DepartmentSupportId = id,
+                // map các field khác nếu có
+                CreatedBy = userId.ToString(),
+                CreatedDate = DateTime.Now,
+                Content = dto.Content,
+                DelegationIncomingId = dto.DelegationIncomingId
+            }).ToList();
+
+            //Add range
+            _unitOfWork.iDepartmentSupportRepository.AddRange(newSupporters);
             await _unitOfWork.SaveChangesAsync();
+
+            //Gửi thông báo
             await _notificationService.SendAsync(new NotificationMessage
             {
                 Receiver = new Receiver
                 {
-                    // Người nhận thông báo
                     UserId = userId,
                 },
                 Title = "Phân công hỗ trợ phòng ban",
-                Content = "Bạn vừa tạo mới hỗ trợ phòng ban.",
-                AltContent = $"Tạo mới phòng ban hỗ trợ (ID: {dto.DepartmentSupportId}).",
+                Content = "Bạn vừa tạo mới danh sách phòng ban hỗ trợ.",
+                AltContent = $"Tạo mới {newSupporters.Count} phòng ban hỗ trợ.",
                 Channel = NotificationChannel.Realtime
             });
-            return _mapper.Map<CreateDepartmentSupportResponseDto>(newSupporter);
 
+            // 5️⃣ Trả kết quả
+            return _mapper.Map<List<CreateDepartmentSupportResponseDto>>(newSupporters);
         }
+
         public PageResultDto<PageDepartmentSupportResultDto> PagingDepartmentSupport(FilterDepartmentSupportDto dto)
         {
             _logger.LogInformation($"{nameof(PagingDepartmentSupport)} method called, dto: {JsonSerializer.Serialize(dto)}.");
@@ -184,31 +204,41 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             // Update supporter
             foreach (var item in dto.Supporters)
             {
-                if (item.SupporterId > 0)
+                // check nhân sự có tồn tại không
+                var nhanSuExist = await _unitOfWork.iNsNhanSuRepository
+                    .TableNoTracking
+                    .AnyAsync(x => x.Id == item.SupporterId && !x.Deleted);
+
+                if (!nhanSuExist)
+                    throw new Exception($"Không tồn tại nhân sự ID = {item.SupporterId}");
+
+                // tìm supporter trong bảng Supporter
+                var supporter = await _unitOfWork.iSupporterRepository
+                    .Table
+                    .FirstOrDefaultAsync(x => x.SupporterId == item.SupporterId);
+
+                if (supporter != null)
                 {
-                    var supporter = departmentSupport.Supporters
-                        .FirstOrDefault(x => x.SupporterId == item.SupporterId);
-
-                    if (supporter != null)
-                    {
-                        supporter.SupporterCode = item.SupporterCode;
-                        supporter.Deleted = false;
-                    }
-                    else
-                    {
-                        var supporterNew = new Supporter
-                        {
-                            SupporterId = item.SupporterId,
-                            SupporterCode = item.SupporterCode,
-                            DepartmentSupportId = departmentSupport.DepartmentSupportId,
-                            Deleted = false
-                        };
-                        departmentSupport.Supporters.Add(supporterNew);
-                    }
+                    // đã có supporterId → gán và cập nhật
+                    supporter.SupporterCode = item.SupporterCode;
+                    supporter.DepartmentSupportId = departmentSupport.DepartmentSupportId;
+                    supporter.Deleted = false;
                 }
-         
-            }
+                else
+                {
+                    // Tạo mới supporter khi chưa có trong bảng supporter
+                    var supporterNew = new Supporter
+                    {
+                        SupporterId = item.SupporterId,
+                        SupporterCode = item.SupporterCode,
+                        DepartmentSupportId = departmentSupport.DepartmentSupportId,
+                        Deleted = false
+                    };
 
+                    _unitOfWork.iSupporterRepository.Add(supporterNew);
+                }
+            }
+            _unitOfWork.iDepartmentSupportRepository.Update(departmentSupport);
             await _unitOfWork.SaveChangesAsync();
 
             return new UpdateDepartmentSupportResponseDto

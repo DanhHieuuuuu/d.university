@@ -218,7 +218,7 @@ const Page = () => {
                 fontWeight: 600,
                 textAlign: 'left',
               }}>
-                TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{record.trongSo}%</span>
+                TỔNG TRỌNG SỐ: <span style={{ color: '#d46b08' }}>{Number(record.trongSo || 0).toFixed(2)}%</span>
               </div>
             ),
             props: { colSpan: columns.length },
@@ -374,7 +374,7 @@ const Page = () => {
                 onClick={() => {
                   form.resetFields();
                   filterForm.resetFields();
-                  onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: undefined, trangThai: undefined });
+                  onFilterChange({ Keyword: '', idPhongBan: undefined, idNhanSu: undefined, loaiKpi: undefined, trangThai: undefined , PageIndex: 1});
                   setKetQuaMap({});
                   setSelectedRowKeys([]);
                 }}
@@ -436,13 +436,13 @@ const Page = () => {
             rowKey="id"
             columns={columns}
             dataSource={tableData}
-            // listActions={actions}
+            isGroupedTable={true}
             pagination={false}
             rowSelection={{
               ...rowSelection,
               fixed: 'left',
             }}
-            scroll={{ x: 'max-content', y: 'calc(100vh - 520px)' }}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 400px)' }}
             footer={() => (
               <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-lg border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

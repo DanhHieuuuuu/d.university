@@ -11,7 +11,9 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
 	</ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Library\D.Embedding\D.Embedding\D.Embedding.csproj" />
     <ProjectReference Include="..\..\..\Library\D.InfrastructureBase\D.InfrastructureBase.csproj" />
+    <ProjectReference Include="..\..\..\Library\D.QdrantClient\D.QdrantClient\D.QdrantClient.csproj" />
     <ProjectReference Include="..\..\..\Library\D.S3Bucket\D.S3Bucket.csproj" />
     <ProjectReference Include="..\..\Shared\D.Constants\D.Constants.csproj" />
     <ProjectReference Include="..\..\Shared\d.Shared.Permission\d.Shared.Permission.csproj" />
