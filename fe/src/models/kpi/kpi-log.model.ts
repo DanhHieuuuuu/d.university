@@ -1,4 +1,4 @@
-import { IQueryPaging } from "@models/common/model.common";
+import { IQueryPaging } from '@models/common/model.common';
 
 export interface KpiLogStatusDto {
   id: number;
@@ -15,7 +15,7 @@ export interface KpiLogStatusDto {
 export type IQueryKpiLogStatus = IQueryPaging & {
   kpiId?: number;
   capKpi?: number;
-}
+};
 
 export interface KpiLogStatusResponse {
   items: KpiLogStatusDto[];

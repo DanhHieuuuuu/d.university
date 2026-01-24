@@ -72,7 +72,7 @@ const updateStatus = async (body: IUpdateRoleStatus) => {
     processApiMsgError(err, 'Không thể cập nhật trạng thái của role.');
     return Promise.reject(err);
   }
-}
+};
 
 const deleteRole = async (roleId: number) => {
   try {

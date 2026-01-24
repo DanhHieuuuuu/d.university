@@ -9,7 +9,7 @@ import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateHopDong } from '@models/nhansu/hopdong.model';
 import { clearSelected } from '@redux/feature/hrm/nhansu/nhansuSlice';
-import { JobTab, SalaryTab } from './(tab)';
+import { EducationTab, FamilyTab, JobTabWithoutIdNhanSu, PersonalTab, SalaryTab } from './(tab)';
 import { createHopDong } from '@redux/feature/hrm/hopdong/hopdongThunk';
 
 type ContractModalProps = {
@@ -17,16 +17,16 @@ type ContractModalProps = {
   setIsModalOpen: (value: boolean) => void;
 };
 
-const CreateContractModal: React.FC<ContractModalProps> = (props) => {
+const CreateContractWithNhanSuModal: React.FC<ContractModalProps> = (props) => {
   const dispatch = useAppDispatch();
   const { selected, $create } = useAppSelector((state) => state.hopdongState);
 
   const [form] = Form.useForm<ICreateHopDong>();
-  const [tabActive, setTabActive] = useState<string>('job');
+  const [tabActive, setTabActive] = useState<string>('personal');
 
   useEffect(() => {
     if (props.isModalOpen) {
-      setTabActive('job');
+      setTabActive('personal');
     }
 
     return () => {
@@ -36,9 +36,24 @@ const CreateContractModal: React.FC<ContractModalProps> = (props) => {
 
   const tabItems = [
     {
+      key: 'personal',
+      label: 'Thông tin cá nhân',
+      children: <PersonalTab />
+    },
+    {
+      key: 'family',
+      label: 'Thông tin gia đình',
+      children: <FamilyTab />
+    },
+    {
+      key: 'education',
+      label: 'Học vấn',
+      children: <EducationTab />
+    },
+    {
       key: 'job',
       label: 'Thông tin vị trí làm việc',
-      children: <JobTab />
+      children: <JobTabWithoutIdNhanSu />
     },
     {
       key: 'salary',
@@ -70,7 +85,8 @@ const CreateContractModal: React.FC<ContractModalProps> = (props) => {
 
   return (
     <Modal
-      title="Thêm hợp đồng mới"
+      loading={$create.status === ReduxStatus.LOADING}
+      title="Thêm nhân sự mới (cùng hợp đồng)"
       className="app-modal"
       width="80%"
       closable={{ 'aria-label': 'Custom Close Button' }}
@@ -89,7 +105,7 @@ const CreateContractModal: React.FC<ContractModalProps> = (props) => {
       )}
     >
       <Form
-        name="hopDong"
+        name="hopDongNhanSu"
         layout="vertical"
         form={form}
         onFinish={onFinish}
@@ -102,4 +118,4 @@ const CreateContractModal: React.FC<ContractModalProps> = (props) => {
   );
 };
 
-export default CreateContractModal;
+export default CreateContractWithNhanSuModal;

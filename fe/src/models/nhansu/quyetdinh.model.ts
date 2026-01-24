@@ -1,9 +1,9 @@
-import { IQueryPaging } from "@models/common/model.common";
+import { IQueryPaging } from '@models/common/model.common';
 
 export type IQueryQuyetDinh = IQueryPaging & {
   loaiQuyetDinh?: number;
   status?: number;
-}
+};
 
 export type ICreateQuyetDinh = {
   idNhanSu?: number | null;
@@ -11,12 +11,12 @@ export type ICreateQuyetDinh = {
   loaiQuyetDinh?: number | null;
   noiDungTomTat?: string | null;
   ngayHieuLuc?: Date | null;
-}
+};
 
 export type IUpdateQuyetDinh = {
   idQuyetDinh?: number | null;
   status?: number | null;
-}
+};
 
 export type IViewQuyetDinh = {
   id?: number | null;
@@ -48,4 +48,4 @@ export type IViewQuyetDinhLog = {
   newStatus: number | null;
   description: string | null;
   createdDate: Date | null;
-}
+};

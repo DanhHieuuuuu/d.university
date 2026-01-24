@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select, Divider } from 'antd';
-import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, ExperimentOutlined, BankOutlined } from '@ant-design/icons';
+import {
+  CloseOutlined,
+  PlusOutlined,
+  SaveOutlined,
+  InfoCircleOutlined,
+  ExperimentOutlined,
+  BankOutlined
+} from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiTruong, resetStatusKpiTruong } from '@redux/feature/kpi/kpiSlice';
 import { createKpiTruong, updateKpiTruong, getListKpiCongThuc } from '@redux/feature/kpi/kpiThunk';
@@ -33,17 +40,17 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       .filter((x) => {
         if ([1, 2].includes(x.value)) return true;
         if (x.value === 3) {
-          return isView || ($selected.data?.loaiKpi === 3);
+          return isView || $selected.data?.loaiKpi === 3;
         }
         return false;
       })
       .map((x) => ({ value: x.value, label: x.name }));
-  }, [isView, $selected.data]); 
+  }, [isView, $selected.data]);
 
   const congThucOptions = useMemo(() => {
     return (listCongThuc?.data || []).map((ct: any) => ({
       value: ct.id,
-      label: ct.tenCongThuc,
+      label: ct.tenCongThuc
     }));
   }, [listCongThuc?.data]);
 
@@ -62,9 +69,9 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
     form.setFieldsValue({
       ...selectedData,
-      idCongThuc: selectedData.idCongThuc, 
+      idCongThuc: selectedData.idCongThuc,
       congThucTinh: selectedData.congThuc,
-      namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
+      namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined
     });
   }, [$selected.data, isModalOpen, form, listCongThuc.data]);
 
@@ -88,7 +95,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
     const payload = {
       ...values,
       namHoc: values.namHoc.format('YYYY'),
-      trongSo: values.trongSo?.toString() || '0',
+      trongSo: values.trongSo?.toString() || '0'
     };
     try {
       if (isUpdate && $selected.data) {
@@ -111,7 +118,9 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       onCancel={handleClose}
       centered
       footer={[
-        <Button key="close" onClick={handleClose} icon={<CloseOutlined />}>Đóng</Button>,
+        <Button key="close" onClick={handleClose} icon={<CloseOutlined />}>
+          Đóng
+        </Button>,
         !isView && (
           <Button
             key="submit"
@@ -123,7 +132,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           >
             {isUpdate ? 'Lưu thay đổi' : 'Tạo mới'}
           </Button>
-        ),
+        )
       ]}
     >
       <Form
@@ -135,7 +144,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         requiredMark="optional"
       >
         <div className="grid grid-cols-2 gap-x-6">
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600">
+          <div className="col-span-2 mb-2 flex items-center gap-2 text-blue-600">
             <BankOutlined /> THÔNG TIN CHIẾN LƯỢC TRƯỜNG
           </div>
 
@@ -147,20 +156,25 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Input placeholder="Nhập mục tiêu chiến lược của trường" />
           </Form.Item>
 
-          <Form.Item label="Tên KPI" name="kpi" className="col-span-2" rules={[{ required: true, message: 'Nhập tên KPI' }]}>
+          <Form.Item
+            label="Tên KPI"
+            name="kpi"
+            className="col-span-2"
+            rules={[{ required: true, message: 'Nhập tên KPI' }]}
+          >
             <Input.TextArea rows={2} placeholder="Nhập tên chỉ số KPI cấp Trường" />
           </Form.Item>
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600">
+          <div className="col-span-2 mb-2 flex items-center gap-2 text-purple-600">
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
 
           <Form.Item label="Loại KPI" name="loaiKpi" rules={[{ required: true }]}>
-            <Select 
-              placeholder="Chọn loại" 
-              options={loaiKpiOptions} 
+            <Select
+              placeholder="Chọn loại"
+              options={loaiKpiOptions}
               onChange={() => form.setFieldsValue({ idCongThuc: undefined, congThucTinh: undefined })}
             />
           </Form.Item>
@@ -192,7 +206,9 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           <Form.Item label="Trọng số (%)" name="trongSo" rules={[{ required: true }]}>
             <InputNumber className="w-full" min={0} max={100} precision={2} placeholder="0.00" />
           </Form.Item>
-          <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
+          <Form.Item name="congThucTinh" hidden>
+            <Input />
+          </Form.Item>
         </div>
       </Form>
     </Modal>

@@ -1,10 +1,27 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag, Select, Modal } from 'antd';
-import { PlusOutlined, SearchOutlined, SyncOutlined, EditOutlined, CheckOutlined, CloseOutlined, EyeOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
+  EditOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  EyeOutlined,
+  ExclamationCircleOutlined
+} from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getPagingRequest, approveRequestAction, rejectRequestAction, submitRequestAction, cancelSubmitRequestAction, removeRequest, getRequestById } from '@redux/feature/survey/surveyThunk';
+import {
+  getPagingRequest,
+  approveRequestAction,
+  rejectRequestAction,
+  submitRequestAction,
+  cancelSubmitRequestAction,
+  removeRequest,
+  getRequestById
+} from '@redux/feature/survey/surveyThunk';
 import { resetRequestStatus, setSelectedRequest, clearSelectedRequest } from '@redux/feature/survey/surveySlice';
 
 import { IQueryRequest, IViewRequest } from '@models/survey/request.model';
@@ -83,7 +100,7 @@ const Page = () => {
           'Chờ duyệt': 'orange',
           'Đã duyệt': 'green',
           'Từ chối': 'red',
-          'Hủy': 'gray'
+          Hủy: 'gray'
         };
         return <Tag color={colors[statusName] || 'default'}>{statusName || 'Chưa có'}</Tag>;
       }
@@ -122,7 +139,8 @@ const Page = () => {
           toast.error('Không thể tải chi tiết yêu cầu');
         }
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
+      hidden: (record: IViewRequest) =>
+        record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
     },
     {
       label: 'Gửi duyệt',
@@ -139,7 +157,8 @@ const Page = () => {
             toast.error('Gửi duyệt thất bại');
           });
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
+      hidden: (record: IViewRequest) =>
+        record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
     },
     {
       label: 'Hủy gửi duyệt',
@@ -246,7 +265,8 @@ const Page = () => {
           }
         });
       },
-      hidden: (record: IViewRequest) => record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
+      hidden: (record: IViewRequest) =>
+        record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
     }
   ];
 

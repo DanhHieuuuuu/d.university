@@ -11,7 +11,7 @@ Tất cả các trang trong module **Đào tạo** đều có button "Xóa" như
 ## 🔧 Cần sửa (4 trang)
 
 1. **faculty/page.tsx** (Khoa)
-2. **specialization/page.tsx** (Chuyên ngành)  
+2. **specialization/page.tsx** (Chuyên ngành)
 3. **course/page.tsx** (Môn học)
 4. **prerequisiteCourse/page.tsx** (Môn học tiên quyết)
 
@@ -48,18 +48,19 @@ import {
 
 ### Bước 2: Import delete thunk
 
-| Trang | Import cần thêm |
-|-------|----------------|
-| **faculty** | `import { getAllKhoa, deleteKhoa } from '@redux/feature/dao-tao/khoaThunk';` |
-| **specialization** | `import { getAllChuyenNganh, deleteChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';` |
-| **course** | `import { getAllMonHoc, deleteMonHoc } from '@redux/feature/dao-tao/monHocThunk';` |
-| **prerequisiteCourse** | Chưa có delete thunk - cần tạo |
+| Trang                  | Import cần thêm                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| **faculty**            | `import { getAllKhoa, deleteKhoa } from '@redux/feature/dao-tao/khoaThunk';`                      |
+| **specialization**     | `import { getAllChuyenNganh, deleteChuyenNganh } from '@redux/feature/dao-tao/chuyenNganhThunk';` |
+| **course**             | `import { getAllMonHoc, deleteMonHoc } from '@redux/feature/dao-tao/monHocThunk';`                |
+| **prerequisiteCourse** | Chưa có delete thunk - cần tạo                                                                    |
 
 ### Bước 3: Thêm hàm handleDelete
 
 Thêm sau hàm `refreshData()`:
 
 #### Faculty (Khoa):
+
 ```typescript
 const handleDelete = (id: number, tenKhoa: string) => {
   Modal.confirm({
@@ -83,6 +84,7 @@ const handleDelete = (id: number, tenKhoa: string) => {
 ```
 
 #### Specialization (Chuyên ngành):
+
 ```typescript
 const handleDelete = (id: number, tenChuyenNganh: string) => {
   Modal.confirm({
@@ -106,6 +108,7 @@ const handleDelete = (id: number, tenChuyenNganh: string) => {
 ```
 
 #### Course (Môn học):
+
 ```typescript
 const handleDelete = (id: number, tenMonHoc: string) => {
   Modal.confirm({
@@ -133,6 +136,7 @@ const handleDelete = (id: number, tenMonHoc: string) => {
 Trong mảng `actions`, tìm action có `label: 'Xóa'` và sửa `command`:
 
 #### TRƯỚC:
+
 ```typescript
 {
   label: 'Xóa',
@@ -145,6 +149,7 @@ Trong mảng `actions`, tìm action có `label: 'Xóa'` và sửa `command`:
 ```
 
 #### SAU (Faculty):
+
 ```typescript
 {
   label: 'Xóa',
@@ -157,6 +162,7 @@ Trong mảng `actions`, tìm action có `label: 'Xóa'` và sửa `command`:
 ```
 
 #### SAU (Specialization):
+
 ```typescript
 {
   label: 'Xóa',
@@ -169,6 +175,7 @@ Trong mảng `actions`, tìm action có `label: 'Xóa'` và sửa `command`:
 ```
 
 #### SAU (Course):
+
 ```typescript
 {
   label: 'Xóa',

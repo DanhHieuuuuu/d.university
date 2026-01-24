@@ -5,4 +5,4 @@ export type IVIewNsQuaTrinhCongTac = {
   idPhongBan?: number;
   idToBoMon?: number;
   description?: string;
-}
+};

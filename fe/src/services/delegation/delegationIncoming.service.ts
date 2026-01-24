@@ -137,12 +137,14 @@ const getByIdDetailDelegation = async (delegationIncomingId: number) => {
 };
 const getByIdReceptionTime = async (delegationIncomingId: number) => {
   try {
-    const res = await axios.get(`${apiDelegationEndpoint}/get-reception-time-by-id?DelegationIncomingId=${delegationIncomingId}`);
+    const res = await axios.get(
+      `${apiDelegationEndpoint}/get-reception-time-by-id?DelegationIncomingId=${delegationIncomingId}`
+    );
     const data: IResponseItem<IReceptionTime[]> = res.data;
     return Promise.resolve(data);
   } catch (err) {
     processApiMsgError(err, '');
-    throw err
+    throw err;
   }
 };
 const downloadTemplateExcel = async () => {

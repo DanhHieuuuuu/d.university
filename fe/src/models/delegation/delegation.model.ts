@@ -179,10 +179,10 @@ export interface IUpdateDepartmentSupport {
   }[];
 }
 export interface ICreatePrepareItem {
-  name: string,
-  description: string,
-  money:number,
-  receptionTimeId:number
+  name: string;
+  description: string;
+  money: number;
+  receptionTimeId: number;
 }
 export interface ICreatePrepare {
   items: ICreatePrepareItem[];

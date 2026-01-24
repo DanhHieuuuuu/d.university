@@ -4,10 +4,7 @@ import { Form, FormProps, Input, Modal, TreeSelect } from 'antd';
 import { IUpdateRolePermission } from '@models/role';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getDetailRole, resetStatusRole, updateRolePermisison } from '@redux/feature/roleConfigSlice';
-import {
-  extractLeafPermissions,
-  normalizePermissionIds
-} from '@utils/permisson.utils';
+import { extractLeafPermissions, normalizePermissionIds } from '@utils/permisson.utils';
 
 type RolePermissionModalProps = {
   isModalOpen: boolean;

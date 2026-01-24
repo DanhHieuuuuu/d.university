@@ -1,12 +1,12 @@
-import { ICreateNhanSu } from '@models/nhansu/nhansu.model';
+import { ICreateHopDong } from '@models/nhansu/hopdong.model';
 import { DatePicker, Form, Input, Select } from 'antd';
 
 const EducationTab = () => {
-  const form = Form.useFormInstance<ICreateNhanSu>();
+  const form = Form.useFormInstance<ICreateHopDong>();
 
   return (
     <div className="grid grid-cols-2 gap-x-5">
-      <Form.Item<ICreateNhanSu> label="Trình độ giáo dục phổ thông" name="trinhDoHocVan">
+      <Form.Item<ICreateHopDong> label="Trình độ giáo dục phổ thông" name={['thongTinNhanSu', 'trinhDoHocVan']}>
         <Select
           allowClear
           options={[
@@ -20,22 +20,22 @@ const EducationTab = () => {
           ]}
         />
       </Form.Item>
-      <Form.Item<ICreateNhanSu> label="Trình độ ngoại ngữ" name="trinhDoNgoaiNgu">
+      <Form.Item<ICreateHopDong> label="Trình độ ngoại ngữ" name={['thongTinNhanSu', 'trinhDoNgoaiNgu']}>
         <Input placeholder="Tiếng Anh - B1, Tiếng Trung - HSK2, ..." />
       </Form.Item>
-      <Form.Item<ICreateNhanSu> label="Học vị" name="tenHocVi">
+      <Form.Item<ICreateHopDong> label="Học vị" name={['thongTinNhanSu', 'tenHocVi']}>
         <Input />
       </Form.Item>
-      <Form.Item<ICreateNhanSu> label="Chuyên ngành học vị" name="tenChuyenNganhHocVi">
+      <Form.Item<ICreateHopDong> label="Chuyên ngành học vị" name={['thongTinNhanSu', 'tenChuyenNganhHocVi']}>
         <Input />
       </Form.Item>
-      <Form.Item<ICreateNhanSu> label="Học hàm" name="tenHocHam">
+      <Form.Item<ICreateHopDong> label="Học hàm" name={['thongTinNhanSu', 'tenHocHam']}>
         <Input />
       </Form.Item>
-      <Form.Item<ICreateNhanSu> label="Chuyên ngành học hàm" name="tenChuyenNganhHocHam">
+      <Form.Item<ICreateHopDong> label="Chuyên ngành học hàm" name={['thongTinNhanSu', 'tenChuyenNganhHocHam']}>
         <Input />
       </Form.Item>
-      <Form.Item<ICreateNhanSu> label="Ngày vào Đảng Cộng sản Việt Nam" name="ngayVaoDang">
+      <Form.Item<ICreateHopDong> label="Ngày vào Đảng Cộng sản Việt Nam" name={['thongTinNhanSu', 'ngayVaoDang']}>
         <DatePicker allowClear format="DD/MM/YYYY" className="!w-full" />
       </Form.Item>
     </div>

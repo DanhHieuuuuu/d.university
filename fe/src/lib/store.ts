@@ -13,13 +13,11 @@ const createNoopStorage = () => {
     },
     removeItem(_key: string) {
       return Promise.resolve();
-    },
+    }
   };
 };
 
-const storage = typeof window !== 'undefined'
-  ? createWebStorage('local')
-  : createNoopStorage();
+const storage = typeof window !== 'undefined' ? createWebStorage('local') : createNoopStorage();
 import authReducer from './feature/auth/authSlice';
 import loadingReducer from './feature/loadingSlice';
 import nhanSuReducer from './feature/hrm/nhansu/nhansuSlice';

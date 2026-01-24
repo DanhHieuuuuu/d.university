@@ -1,10 +1,24 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag, Select, Tooltip, Modal } from 'antd';
-import { SearchOutlined, SyncOutlined, PlayCircleOutlined, StopOutlined, EyeOutlined, BarChartOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  SyncOutlined,
+  PlayCircleOutlined,
+  StopOutlined,
+  EyeOutlined,
+  BarChartOutlined,
+  ExclamationCircleOutlined
+} from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getPagingSurvey, openSurveyAction, closeSurveyAction, getSurveyById, generateReportAction } from '@redux/feature/survey/surveyThunk';
+import {
+  getPagingSurvey,
+  openSurveyAction,
+  closeSurveyAction,
+  getSurveyById,
+  generateReportAction
+} from '@redux/feature/survey/surveyThunk';
 import { setSelectedSurvey, clearSelectedSurvey } from '@redux/feature/survey/surveySlice';
 import { IQuerySurvey, IViewSurvey, ISurveyDetail } from '@models/survey/survey.model';
 import { surveyStatusConst } from '../../const/surveyStatus.const';
@@ -26,7 +40,7 @@ const Page = () => {
   const { data: list, status, total: totalItem } = $list;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [selectedSurvey, setSelectedSurveyState] = useState<ISurveyDetail | null>(null);
 
   const columns: IColumn<IViewSurvey>[] = [
@@ -34,13 +48,13 @@ const Page = () => {
       key: 'maKhaoSat',
       dataIndex: 'maKhaoSat',
       title: 'Mã khảo sát',
-      width: 120,
+      width: 120
     },
     {
       key: 'tenKhaoSat',
       dataIndex: 'tenKhaoSat',
       title: 'Tên khảo sát',
-      width: 250,
+      width: 250
     },
     {
       key: 'moTa',
@@ -48,13 +62,13 @@ const Page = () => {
       title: 'Mô tả',
       width: 200,
       ellipsis: {
-        showTitle: false,
+        showTitle: false
       },
       render: (address) => (
         <Tooltip placement="topLeft" title={address}>
           {address}
         </Tooltip>
-      ),
+      )
     },
     {
       key: 'thoiGianBatDau',
@@ -92,8 +106,8 @@ const Page = () => {
       icon: <EyeOutlined />,
       command: async (record: IViewSurvey) => {
         try {
-          const result = await dispatch(getSurveyById(record.id)).unwrap();       
-          setSelectedSurveyState(result as ISurveyDetail);       
+          const result = await dispatch(getSurveyById(record.id)).unwrap();
+          setSelectedSurveyState(result as ISurveyDetail);
           dispatch(setSelectedSurvey(result));
           setIsModalOpen(true);
         } catch (error: any) {
@@ -189,20 +203,34 @@ const Page = () => {
 
   return (
     <Card title="Quản lý khảo sát (Survey)" className="h-full">
-      <Form form={form} layout="vertical" className='mb-4'>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Form.Item label="Tìm kiếm" name="Keyword" style={{marginBottom: 0}}>
-            <Input placeholder="Mã/Tên khảo sát" onChange={(e) => handleDebouncedSearch(e.target.value)} prefix={<SearchOutlined />} />
+      <Form form={form} layout="vertical" className="mb-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <Form.Item label="Tìm kiếm" name="Keyword" style={{ marginBottom: 0 }}>
+            <Input
+              placeholder="Mã/Tên khảo sát"
+              onChange={(e) => handleDebouncedSearch(e.target.value)}
+              prefix={<SearchOutlined />}
+            />
           </Form.Item>
-          <Form.Item label="Trạng thái" name="status" style={{marginBottom: 0}}>
+          <Form.Item label="Trạng thái" name="status" style={{ marginBottom: 0 }}>
             <Select placeholder="Tất cả trạng thái" allowClear onChange={(val) => onFilterChange({ status: val })}>
               {surveyStatusConst.list.map((s) => (
-                <Option key={s.value} value={s.value}>{s.name}</Option>
+                <Option key={s.value} value={s.value}>
+                  {s.name}
+                </Option>
               ))}
             </Select>
           </Form.Item>
           <div className="flex items-end">
-             <Button icon={<SyncOutlined />} onClick={() => { form.resetFields(); resetFilter(); }}>Tải lại</Button>
+            <Button
+              icon={<SyncOutlined />}
+              onClick={() => {
+                form.resetFields();
+                resetFilter();
+              }}
+            >
+              Tải lại
+            </Button>
           </div>
         </div>
       </Form>
@@ -215,13 +243,13 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
-      
+
       <SurveyDetailModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         survey={selectedSurvey}
         onClose={() => {
-            dispatch(clearSelectedSurvey());
+          dispatch(clearSelectedSurvey());
         }}
       />
     </Card>

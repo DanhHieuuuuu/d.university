@@ -153,7 +153,7 @@ export const listMenuCore: IMenu[] = [
             routerLink: '/kpi/manage/school',
             permissionKeys: [PermissionCoreConst.CoreMenuKpiManageSchool],
             icon: <SolutionOutlined />
-          },
+          }
           // {
           //   label: 'Điểm KPI',
           //   routerLink: '/kpi/manage/scoreboard',

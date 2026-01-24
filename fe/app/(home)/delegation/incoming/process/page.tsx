@@ -78,7 +78,7 @@ const Page = () => {
       dataIndex: 'idPhongBan',
       title: 'Phòng ban phụ trách',
       align: 'center',
-      width:160,
+      width: 160,
       render: (value: number) => {
         const pb = listPhongBan.find((p: any) => p.idPhongBan === value);
         return pb ? pb.tenPhongBan : '';
@@ -88,22 +88,22 @@ const Page = () => {
       key: 'location',
       dataIndex: 'location',
       title: 'Địa điểm',
-      align:'center',
-      width:120
+      align: 'center',
+      width: 120
     },
     {
       key: 'idStaffReception',
       dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
       align: 'center',
-      width:160
+      width: 160
     },
     {
       key: 'totalPerson',
       dataIndex: 'totalPerson',
       title: 'Tổng số người',
       align: 'center',
-      width:120
+      width: 120
     },
     {
       key: 'phoneNumber',
@@ -115,7 +115,7 @@ const Page = () => {
       dataIndex: 'totalMoney',
       title: 'Tổng chi phí',
       align: 'left',
-      width:120
+      width: 120
     },
     {
       key: 'status',
@@ -291,7 +291,7 @@ const onClickPhanCong = (data: IDepartmentSupport) => {
               allowClear
               options={listStatus.map((st: any) => ({
                 value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, "label" ) ?? ''
+                label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
               }))}
               onChange={(value) => onFilterChange({ status: value })}
             />

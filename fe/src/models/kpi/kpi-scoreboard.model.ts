@@ -27,7 +27,7 @@ export interface IKpiScoreBoardResponse {
   myScore: IPersonalScore;
   schoolScore?: ISchoolScore;
   allUnits?: IUnitScore[];
-  
+
   currentUnitScore?: IUnitScore;
   staffScores?: IPersonalScore[];
 }

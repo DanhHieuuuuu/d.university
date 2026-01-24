@@ -38,9 +38,7 @@ const SurveyHeader = () => {
     }
   ];
 
-  const userDisplayName = user?.hoDem && user?.ten 
-    ? `${user.hoDem} ${user.ten}` 
-    : user?.ten || user?.mssv || 'User';
+  const userDisplayName = user?.hoDem && user?.ten ? `${user.hoDem} ${user.ten}` : user?.ten || user?.mssv || 'User';
 
   return (
     <Header
@@ -66,7 +64,7 @@ const SurveyHeader = () => {
         <div className="right-header flex items-center gap-4">
           <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
             <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white hover:bg-opacity-20">
-              <div 
+              <div
                 style={{
                   width: 40,
                   height: 40,
