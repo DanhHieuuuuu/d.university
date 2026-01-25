@@ -128,3 +128,27 @@ export const semanticSearchThunk = createAsyncThunk(
     }
   }
 );
+
+export const syncQdrantThunk = createAsyncThunk(
+  'nhansu/sync-qdrant',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await NhanSuService.syncQdrant();
+      
+      if (res.data?.status === 0 || res.data?.code >= 400) {
+        return rejectWithValue({
+          message: res.data.message,
+          code: res.data.code
+        });
+      }
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
+    }
+  }
+);

@@ -1,7 +1,8 @@
 'use client';
 
 import { ChangeEvent, useEffect, useState } from 'react';
-import { Button, Card, Form, Input, Select } from 'antd';
+import { toast } from 'react-toastify';
+import { Button, Card, Form, Input, Select, Tooltip } from 'antd';
 import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
 import { MicroIcon } from '@components/custom-icon';
 import { useNavigate } from '@hooks/navigate';
@@ -9,7 +10,12 @@ import { useNavigate } from '@hooks/navigate';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { resetStatusCreate, resetStatusUpdate, selectIdNhanSu } from '@redux/feature/hrm/nhansu/nhansuSlice';
-import { getHoSoNhanSu, getListNhanSu, semanticSearchThunk } from '@redux/feature/hrm/nhansu/nhansuThunk';
+import {
+  getHoSoNhanSu,
+  getListNhanSu,
+  semanticSearchThunk,
+  syncQdrantThunk
+} from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
@@ -33,6 +39,7 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const { list, status, total: totalItem } = useAppSelector((state) => state.nhanSuState);
   const { phongBan } = useAppSelector((state) => state.danhmucState);
+  const { status: syncStatus } = useAppSelector((state) => state.nhanSuState.$syncWithQdrant);
 
   // permission in page
   const hasPermisisonUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
@@ -107,12 +114,6 @@ const Page = () => {
       hidden: () => !hasPermisisonUpdateNhanSu,
       command: (record: IViewNhanSu) => onClickUpdate(record)
     }
-    // {
-    //   label: 'Xóa',
-    //   color: 'red',
-    //   icon: <DeleteOutlined />,
-    //   command: (record: IViewNhanSu) => console.log('delete', record)
-    // }
   ];
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryNhanSu>({
@@ -166,6 +167,19 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
+  const handleSync = async () => {
+    try {
+      const result = await dispatch(syncQdrantThunk()).unwrap();
+      if (result) {
+        toast.success(result?.data || 'Đồng bộ Qdrant thành công');
+      } else {
+        toast.error('Có lỗi phía server đã xảy ra, vui lòng kiểm tra và thử lại sau.');
+      }
+    } catch (error: any) {
+      toast.error(error?.message || 'Có lỗi xảy ra. Vui lòng thử lại sau.');
+    }
+  };
+
   return (
     <Card
       title="Danh sách nhân sự"
@@ -178,6 +192,16 @@ const Page = () => {
           <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissionCreateNhanSu}>
             Thêm mới
           </Button>
+          <Tooltip title="Đồng bộ với Qdrant">
+            <Button
+              hidden={false}
+              loading={syncStatus === ReduxStatus.LOADING}
+              color="danger"
+              variant="solid"
+              icon={<SyncOutlined />}
+              onClick={handleSync}
+            />
+          </Tooltip>
         </div>
       }
     >
