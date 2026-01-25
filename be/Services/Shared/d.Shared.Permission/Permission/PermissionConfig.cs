@@ -24,13 +24,28 @@ namespace d.Shared.Permission.Permission
             { PermissionCoreKeys.UserButtonAccountManagerUpdatePermission, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonAccountManagerUpdatePermission, PermissionName = "Cập nhật quyền", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
             { PermissionCoreKeys.UserButtonAccountManagerUpdate, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonAccountManagerUpdate, PermissionName = "Cập nhật tài khoản", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
             { PermissionCoreKeys.UserButtonAccountManagerLock, new CreatePermissionRequestDto {  PermissonKey = PermissionCoreKeys.UserButtonAccountManagerLock, PermissionName = "Khóa tài khoản", ParentKey = PermissionCoreKeys.UserMenuAccountManager } },
+            #endregion            
             #endregion
-            #endregion
+
             #region Hrm nhân sự
-            { PermissionCoreKeys.CoreMenuNhanSu, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreMenuNhanSu, PermissionName = "Quản lý nhân sự", ParentKey = null } },
-            { PermissionCoreKeys.CoreButtonCreateNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonCreateNhanSu, PermissionName = "Thêm nhân sự", ParentKey = PermissionCoreKeys.CoreMenuNhanSu } },
-            { PermissionCoreKeys.CoreButtonUpdateNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonUpdateNhanSu, PermissionName = "Cập nhật nhân sự", ParentKey = PermissionCoreKeys.CoreMenuNhanSu } },
-            { PermissionCoreKeys.CoreButtonDeleteNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonDeleteNhanSu, PermissionName = "Xóa nhân sự", ParentKey = PermissionCoreKeys.CoreMenuNhanSu } },
+            { PermissionCoreKeys.CoreMenuHrm, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreMenuHrm, PermissionName = "Quản lý nhân sự", ParentKey = null } },
+
+            { PermissionCoreKeys.CoreMenuHrmDanhSach, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreMenuHrmDanhSach, PermissionName = "Quản lý hồ sơ nhân sự", ParentKey = PermissionCoreKeys.CoreMenuHrm } },
+            { PermissionCoreKeys.CoreButtonSyncNhanSu, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreButtonSyncNhanSu, PermissionName = "Đồng bộ nhân sự với Qdrant", ParentKey = PermissionCoreKeys.CoreMenuHrmDanhSach } },
+            { PermissionCoreKeys.CoreButtonCreateNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonCreateNhanSu, PermissionName = "Thêm nhân sự", ParentKey = PermissionCoreKeys.CoreMenuHrmDanhSach } },
+            { PermissionCoreKeys.CoreButtonUpdateNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonUpdateNhanSu, PermissionName = "Cập nhật nhân sự", ParentKey = PermissionCoreKeys.CoreMenuHrmDanhSach } },
+            { PermissionCoreKeys.CoreButtonDeleteNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonDeleteNhanSu, PermissionName = "Xóa nhân sự", ParentKey = PermissionCoreKeys.CoreMenuHrmDanhSach } },
+            { PermissionCoreKeys.CoreButtonViewNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonViewNhanSu, PermissionName = "Xem hồ sơ nhân sự", ParentKey = PermissionCoreKeys.CoreMenuHrmDanhSach } },
+            // { PermissionCoreKeys.CoreButtonExportCVNhanSu, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonExportCVNhanSu, PermissionName = "Xuất mẫu hồ sơ nhân sự", ParentKey = PermissionCoreKeys.CoreButtonViewNhanSu } },
+
+            { PermissionCoreKeys.CoreMenuHrmContract, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreMenuHrmContract, PermissionName = "Quản lý hợp đồng tuyển dụng", ParentKey = PermissionCoreKeys.CoreMenuHrm } },
+            { PermissionCoreKeys.CoreTableHrmContract, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreTableHrmContract, PermissionName = "Xem danh sách các hợp đồng tuyển dụng", ParentKey = PermissionCoreKeys.CoreMenuHrmContract } },
+            { PermissionCoreKeys.CoreButtonCreateHrmContract, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreButtonCreateHrmContract, PermissionName = "Thêm mới hợp đồng", ParentKey = PermissionCoreKeys.CoreMenuHrmContract } },
+
+            { PermissionCoreKeys.CoreMenuHrmDecision, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreMenuHrmDecision, PermissionName = "Quản lý các quyết định", ParentKey = PermissionCoreKeys.CoreMenuHrm } },
+            // { PermissionCoreKeys.CoreButtonCreateHrmDecision, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreButtonCreateHrmDecision, PermissionName = "Tạo mới các quyết định", ParentKey = PermissionCoreKeys.CoreMenuHrmDecision } },
+            // { PermissionCoreKeys.CoreButtonUpdateHrmDecisionStatus, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.CoreButtonUpdateHrmDecisionStatus, PermissionName = "Phê duyệt / Từ chối các quyết định", ParentKey = PermissionCoreKeys.CoreMenuHrmDecision } },
+
             #endregion
 
             #region Delegation - đoàn vào / ra

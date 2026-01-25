@@ -236,18 +236,18 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
             #region log debugging - Log payload tìm được
 
-            //var options = new JsonSerializerOptions
-            //{
-            //    WriteIndented = true, // format đẹp
-            //};
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true, // format đẹp
+            };
 
-            //foreach (var ns in searchResults)
-            //{
-            //    var payloadJson = JsonSerializer.Serialize(ns.Payload, options);
-            //    _logger.LogInformation(
-            //        $"SearchSemanticAsync - Score: {ns.Score} - Kết quả tìm thấy:\n{payloadJson}"
-            //    );
-            //}
+            foreach (var ns in searchResults)
+            {
+                var payloadJson = JsonSerializer.Serialize(ns.Payload, options);
+                _logger.LogInformation(
+                    $"SearchSemanticAsync - Score: {ns.Score} - Kết quả tìm thấy:\n{payloadJson}"
+                );
+            }
 
             #endregion
 

@@ -8,10 +8,24 @@ export class PermissionCoreConst {
   public static readonly CoreMenuDashboard = `${PermissionCoreConst.Menu}core_dashboad`;
 
   //  Nhân sự
-  public static readonly CoreMenuNhanSu = `${PermissionCoreConst.Menu}hrm`;
+  public static readonly CoreMenuHrm = `${PermissionCoreConst.Menu}hrm`;
+
+  public static readonly CoreMenuHrmDanhSach = `${PermissionCoreConst.Menu}hrm_list`;
+  public static readonly CoreButtonSyncNhanSu = `${PermissionCoreConst.Button}hrm_sync_qdrant`;
   public static readonly CoreButtonCreateNhanSu = `${PermissionCoreConst.Button}hrm_create_nhansu`;
   public static readonly CoreButtonUpdateNhanSu = `${PermissionCoreConst.Button}hrm_update_nhansu`;
   public static readonly CoreButtonDeleteNhanSu = `${PermissionCoreConst.Button}hrm_delete_nhansu`;
+  public static readonly CoreButtonViewNhanSu = `${PermissionCoreConst.Button}hrm_view_nhansu`;
+  public static readonly CoreButtonExportCVNhanSu = `${PermissionCoreConst.Button}hrm_export_hoso_nhansu`;
+
+  public static readonly CoreMenuHrmContract = `${PermissionCoreConst.Menu}hrm_contracts`;
+  public static readonly CoreTableHrmContract = `${PermissionCoreConst.Table}hrm_contracts`;
+  public static readonly CoreButtonCreateHrmContract = `${PermissionCoreConst.Button}hrm_create_contract`;
+
+  public static readonly CoreMenuHrmDecision = `${PermissionCoreConst.Menu}hrm_decisions`;
+  public static readonly CoreButtonViewHrmDecision = `${PermissionCoreConst.Button}hrm_view_decision`;
+  public static readonly CoreButtonCreateHrmDecision = `${PermissionCoreConst.Button}hrm_create_decision`;
+  public static readonly CoreButtonUpdateHrmDecisionStatus = `${PermissionCoreConst.Button}hrm_update_status_decision`;
 
   // Đoàn vào / ra
   public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}dio`;
@@ -25,7 +39,7 @@ export class PermissionCoreConst {
   public static readonly CoreButtonDeXuatDoanVao = `${PermissionCoreConst.Button}dio_danhsach_dexuat`;
   public static readonly CoreButtonSearchDoanVao = `${PermissionCoreConst.Button}dio_danhsach_search`;
   public static readonly CoreTableListDoanVao = `${PermissionCoreConst.Table}dio_danhsach_table_list`;
-  
+
   public static readonly CoreMenuXuLyDoanVao = `${PermissionCoreConst.Menu}dio_xuly`;
   public static readonly CoreButtonCreateXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_create`;
   public static readonly CoreButtonUpdateXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_update`;
@@ -36,7 +50,6 @@ export class PermissionCoreConst {
   public static readonly CoreButtonTiepDoanXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_tiepdoan`;
   public static readonly CoreButtonSearchXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_search`;
   public static readonly CoreButtonTableXuLyDoanVao = `${PermissionCoreConst.Table}dio_xuly_table`;
-
 
   public static readonly CoreMenuDepartment = `${PermissionCoreConst.Menu}dio_department`;
   public static readonly CoreButtonCreateDepartment = `${PermissionCoreConst.Button}dio_department_create`;

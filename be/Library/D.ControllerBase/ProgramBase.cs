@@ -147,7 +147,7 @@ namespace D.ControllerBase
             {
                 connectionString = "localhost:6379";
             }
-            var redis = ConnectionMultiplexer.Connect(connectionString);
+            var redis = ConnectionMultiplexer.Connect("localhost:6379");
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 

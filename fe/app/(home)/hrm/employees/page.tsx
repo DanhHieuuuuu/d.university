@@ -42,8 +42,11 @@ const Page = () => {
   const { status: syncStatus } = useAppSelector((state) => state.nhanSuState.$syncWithQdrant);
 
   // permission in page
-  const hasPermisisonUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
+  const hasPermisisonSyncNhanSu= useIsGranted(PermissionCoreConst.CoreButtonSyncNhanSu);
   const hasPermissionCreateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonCreateNhanSu);
+  const hasPermisisonUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
+  const hasPermisisonViewNhanSu = useIsGranted(PermissionCoreConst.CoreButtonViewNhanSu)
+  const hasPermisisonCreateContract = useIsGranted(PermissionCoreConst.CoreButtonCreateHrmContract);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
@@ -105,6 +108,7 @@ const Page = () => {
     {
       label: 'Hồ sơ nhân sự',
       icon: <EyeOutlined />,
+      hidden: () => !hasPermisisonViewNhanSu,
       command: (record: IViewNhanSu) => onClickView(record)
     },
     {
@@ -186,7 +190,7 @@ const Page = () => {
       className="h-full"
       extra={
         <div className="flex items-center justify-center gap-4">
-          <Button icon={<PlusOutlined />} onClick={() => setOpenContract(true)} hidden={false}>
+          <Button icon={<PlusOutlined />} onClick={() => setOpenContract(true)} hidden={!hasPermisisonCreateContract}>
             Thêm mới cùng hợp đồng
           </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissionCreateNhanSu}>
@@ -194,7 +198,7 @@ const Page = () => {
           </Button>
           <Tooltip title="Đồng bộ với Qdrant">
             <Button
-              hidden={false}
+              hidden={!hasPermisisonSyncNhanSu}
               loading={syncStatus === ReduxStatus.LOADING}
               color="danger"
               variant="solid"
@@ -292,4 +296,4 @@ const Page = () => {
   );
 };
 
-export default withAuthGuard(Page, PermissionCoreConst.CoreMenuNhanSu);
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuHrmDanhSach);

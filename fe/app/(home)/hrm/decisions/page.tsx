@@ -14,6 +14,8 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
@@ -25,14 +27,19 @@ import { IQueryQuyetDinh, IViewQuyetDinh } from '@models/nhansu/quyetdinh.model'
 import { ETableColumnType } from '@/constants/e-table.consts';
 import { NsQuyetDinhTypeConst } from '@/constants/core/hrm/quyet-dinh-type.const';
 import { NsQuyetDinhStatusConst } from '@/constants/core/hrm/quyet-dinh-status.const';
+import { selectIdQuyetDinh } from '@redux/feature/hrm/quyetdinh/quyetdinhSlice';
+
 import CreateQuyetDinhModal from './(dialog)/create';
 import ViewQuyetDinhModal from './(dialog)/view';
-import { selectIdQuyetDinh } from '@redux/feature/hrm/quyetdinh/quyetdinhSlice';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { data, status, total: totalItem } = useAppSelector((state) => state.quyetdinhState.$list);
+
+  const hasPermissionCreateDecision = useIsGranted(PermissionCoreConst.CoreButtonCreateHrmDecision);
+  const hasPermissionViewDecision = useIsGranted(PermissionCoreConst.CoreButtonViewHrmDecision);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
@@ -114,6 +121,7 @@ const Page = () => {
       label: 'Xem',
       tooltip: 'Xem',
       icon: <EyeOutlined />,
+      hidden: () => !hasPermissionViewDecision,
       command: (record: IViewQuyetDinh) => onClickView(record.id!)
     },
     {
@@ -153,7 +161,7 @@ const Page = () => {
       title="Danh sách các quyết định"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+        <Button hidden={!hasPermissionCreateDecision} type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
           Thêm mới
         </Button>
       }
@@ -213,4 +221,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuHrmDecision);
