@@ -12,6 +12,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
     {
         PageResultDto<ViewReceptionTimeLogDto> FindLogReceptionTime(FindReceptionTimeLogDto dto);
         void InsertLogReceptionTime(InsertReceptionTimeLogDto dto);
+        List<DateOptionDto> GetAllCreatedDate();
 
     }
 }

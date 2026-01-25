@@ -8,6 +8,7 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class DetailDepartmentSupportResponseDto
     {
+        public int Id { get; set; }
         public int DepartmentSupportId { get; set; }
 
         public int DelegationIncomingId { get; set; }

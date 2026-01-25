@@ -436,7 +436,7 @@ const Page = () => {
   return (
     <div className="space-y-4">
       <Card
-        className="h-full"
+        className="h-full "
         title="Kê khai KPI Trường"
         extra={
           <Button

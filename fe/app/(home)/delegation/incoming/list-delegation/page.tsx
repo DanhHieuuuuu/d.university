@@ -8,6 +8,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  FileWordOutlined,
   PlusOutlined,
   SearchOutlined,
   SendOutlined,
@@ -39,8 +40,10 @@ import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import CreateDoanVaoModal from './(dialog)/create';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 import VoiceSearch from '../../../../../src/components/hieu-custom/voice-search';
+import { DelegationIncomingService } from '@/src/services/delegation/delegationIncoming.service';
+import { exportBaoCaoDoanVao } from '@helpers/delegation/action.helper';
+import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -141,20 +144,23 @@ const Page = () => {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
-      command: (record: IViewGuestGroup) => onClickView(record)
+      command: (record: IViewGuestGroup) => onClickView(record),
+      permission: PermissionCoreConst.CoreButtonViewDoanVao
     },
     {
       label: 'Chỉnh sửa',
       tooltip: 'Sửa danh sách đoàn vào',
       icon: <EditOutlined />,
       hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
-      command: (record: IViewGuestGroup) => onClickUpdate(record)
+      command: (record: IViewGuestGroup) => onClickUpdate(record),
+      permission: PermissionCoreConst.CoreButtonUpdateDoanVao
     },
     {
       label: 'Đề xuất',
       icon: <SendOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.TAO_MOI,
-      command: (record: IViewGuestGroup) => onClickUpdateStatus(record)
+      command: (record: IViewGuestGroup) => onClickUpdateStatus(record),
+      permission: PermissionCoreConst.CoreButtonDeXuatDoanVao
     },
 
     {
@@ -164,13 +170,22 @@ const Page = () => {
         r.status == DelegationStatusConst.TAO_MOI ||
         r.status === DelegationStatusConst.DONE ||
         r.status == DelegationStatusConst.DA_HET_HAN,
-      command: (record: IViewGuestGroup) => onClickCreateTime(record)
+      command: (record: IViewGuestGroup) => onClickCreateTime(record),
+      permission: PermissionCoreConst.CoreButtonCreateTimeDoanVao
+    },
+    {
+      label: 'Xuất báo cáo',
+      icon: <FileWordOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.DONE,
+      command: (record: IViewGuestGroup) => onExport(record),
+      permission: PermissionCoreConst.CoreButtonUpdateDoanVao
     },
     {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: (record: IViewGuestGroup) => onClickDelete(record)
+      command: (record: IViewGuestGroup) => onClickDelete(record),
+      permission: PermissionCoreConst.CoreButtonDeleteDoanVao
     }
   ];
 
@@ -260,13 +275,21 @@ const Page = () => {
       }
     });
   };
+  const onExport = (record: IViewGuestGroup) => {
+    exportBaoCaoDoanVao(record);
+  };
 
   return (
     <Card
       title="Danh sách Đoàn vào"
       className="min-h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={onClickAdd}
+          data-permission={PermissionCoreConst.CoreButtonCreateDoanVao}
+        >
           Thêm mới
         </Button>
       }
@@ -275,6 +298,7 @@ const Page = () => {
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
             <Select
+              data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
               showSearch
               allowClear
               placeholder="Chọn phòng ban phụ trách"
@@ -289,6 +313,7 @@ const Page = () => {
           </Form.Item>
           <Form.Item name="status" className="!mb-0 w-[200px]">
             <Select
+              data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
               placeholder="Chọn trạng thái"
               allowClear
               options={listStatus.map((st: any) => ({
@@ -300,7 +325,11 @@ const Page = () => {
           </Form.Item>
 
           <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input placeholder="Nhập tên đoàn vào…" onChange={(e) => handleSearch(e)} />
+            <Input
+              data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
+              placeholder="Nhập tên đoàn vào…"
+              onChange={(e) => handleSearch(e)}
+            />
           </Form.Item>
           <Button
             color="default"
@@ -312,6 +341,7 @@ const Page = () => {
               setVoiceData(null);
               dispatch(getListGuestGroup(query));
             }}
+            data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
           >
             Tải lại
           </Button>
@@ -320,6 +350,7 @@ const Page = () => {
             variant="filled"
             icon={<AudioOutlined />}
             onClick={() => setShowVoiceSearch((prev) => !prev)}
+            data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
           ></Button>
         </div>
       </Form>
@@ -336,7 +367,8 @@ const Page = () => {
         dataSource={voiceData?.length ? voiceData : list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        height={450}
+        height={370}
+        data-permission={PermissionCoreConst.CoreTableListDoanVao}
       />
 
       <CreateDoanVaoModal
@@ -349,4 +381,4 @@ const Page = () => {
   );
 };
 
-export default withAuthGuard(Page, PermissionCoreConst.CoreMenuDelegation);
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuListDoanVao);

@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
-    public class CreateDepartmentSupportRequestDto : ICommand<CreateDepartmentSupportResponseDto>
+    public class CreateDepartmentSupportRequestDto : ICommand <List<CreateDepartmentSupportResponseDto>>
     {
         public int DelegationIncomingId { get; set; }
-        public int DepartmentSupportId { get; set; }
+        public List<int> DepartmentSupportIds { get; set; }
         public string? Content { get; set; }
     }
 }

@@ -47,6 +47,7 @@ namespace D.Core.API
                 builder.ConfigureS3();
                 builder.ConfigureJinaEmbedding();
                 builder.ConfigureQdrantClient();
+                builder.ConfigureJwtAuthentication();
 
                 var app = builder.Build();
 
@@ -60,7 +61,6 @@ namespace D.Core.API
                     });
                 }
                 app.UseCors(ProgramBase.CorsPolicy);
-                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 app.UseSerilogRequestLogging();
 
                 app.UseAuthentication();
@@ -68,6 +68,7 @@ namespace D.Core.API
                 app.MapControllers();
                
 
+                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 Log.Information("Core started successfully.");
                 app.Run();
             }

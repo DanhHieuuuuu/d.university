@@ -1,5 +1,6 @@
 ﻿using D.DomainBase.Common;
 using D.DomainBase.Dto;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,9 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class FindReceptionTimeLogDto : FilterBaseDto, IQuery<PageResultDto<ViewReceptionTimeLogDto>>
     {
+        [FromQuery(Name = "CreatedByName")]
+        public string? CreatedByName { get; set; }
+        [FromQuery(Name = "CreateDate")]
+        public DateTime? CreateDate { get; set; }
     }
 }

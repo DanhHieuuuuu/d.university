@@ -67,7 +67,21 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(FindLogDelegationIncoming)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
-            var query = _unitOfWork.iLogStatusRepository.TableNoTracking.OrderByDescending(log => log.Id);
+            var query = _unitOfWork.iLogStatusRepository.TableNoTracking.AsQueryable();
+            // Lọc theo người tạo
+            if (!string.IsNullOrWhiteSpace(dto.CreatedByName))
+            {
+                query = query.Where(x =>
+                    x.CreatedByName != null &&
+                    x.CreatedByName.Contains(dto.CreatedByName));
+            }
+
+            // Lọc theo ngày tạo 
+            if (dto.CreateDate.HasValue)
+            {
+                var date = dto.CreateDate.Value.Date;
+                query = query.Where(x => x.CreatedDate.Date == date);
+            }
 
             var totalCount = query.Count();
 
