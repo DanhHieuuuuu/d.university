@@ -35,6 +35,13 @@ export type IViewNhanSu = {
   chieuCao?: number;
   canNang?: number;
   nhomMau?: string;
+  trinhDoHocVan?: string;
+  trinhDoNgoaiNgu?: string;
+  tenHocVi?: string;
+  tenChuyenNganhHocVi?: string;
+  tenHocHam?: string;
+  tenChuyenNganhHocHam?: string;
+  ngayVaoDang?: Date;
 };
 
 export type ICreateNhanSu = {
@@ -59,6 +66,13 @@ export type ICreateNhanSu = {
   chieuCao?: number;
   canNang?: number;
   nhomMau?: string;
+  trinhDoHocVan?: string;
+  trinhDoNgoaiNgu?: string;
+  tenHocVi?: string;
+  tenChuyenNganhHocVi?: string;
+  tenHocHam?: string;
+  tenChuyenNganhHocHam?: string;
+  ngayVaoDang?: Date;
 };
 
 export type IUpdateNhanSu = {
@@ -84,4 +98,18 @@ export type IUpdateNhanSu = {
   chieuCao?: number;
   canNang?: number;
   nhomMau?: string;
+  trinhDoHocVan?: string;
+  trinhDoNgoaiNgu?: string;
+  tenHocVi?: string;
+  tenChuyenNganhHocVi?: string;
+  tenHocHam?: string;
+  tenChuyenNganhHocHam?: string;
+  ngayVaoDang?: Date;
+};
+
+export type IViewThongKeNsTheoPhongBan = {
+  id: number;
+  stt?: number | null;
+  tenPhongBan: string | null;
+  soLuongNhanSu: number;
 };

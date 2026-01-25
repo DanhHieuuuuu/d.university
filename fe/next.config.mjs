@@ -8,16 +8,16 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**',
         port: '',
-        pathname: '**',
-      },
-    ],
+        pathname: '**'
+      }
+    ]
   },
   env: {},
 
   // 🔥 Disable ESLint when build (Vercel sẽ không fail vì ESLint nữa)
   eslint: {
-    ignoreDuringBuilds: true,
-  },
+    ignoreDuringBuilds: true
+  }
 };
 
 export default nextConfig;

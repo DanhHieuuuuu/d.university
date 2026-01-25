@@ -1,12 +1,9 @@
-import { Card, Table } from "antd";
-import { IColumn } from "@models/common/table.model";
-import { IViewNsQuanHe } from "@models/nhansu/quanHeGiaDinh.model";
-import { formatDateView } from "@utils/index";
+import { Card, Table } from 'antd';
+import { IColumn } from '@models/common/table.model';
+import { IViewNsQuanHe } from '@models/nhansu/quanHeGiaDinh.model';
+import { formatDateView } from '@utils/index';
 
-const QuanHeGiaDinhDisplay = ({data} : {data: any}) => {
-  
-  
-
+const QuanHeGiaDinhDisplay = ({ data }: { data: any }) => {
   const columsQuanHe: IColumn<IViewNsQuanHe>[] = [
     {
       key: 'tenQuanHe',
@@ -65,6 +62,6 @@ const QuanHeGiaDinhDisplay = ({data} : {data: any}) => {
       />
     </Card>
   );
-}
- 
+};
+
 export default QuanHeGiaDinhDisplay;

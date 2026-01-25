@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ReduxStatus } from '@redux/const';
-import { getListQuyetDinh } from './quyetdinhThunk';
-import { IViewQuyetDinh } from '@models/nhansu/quyetdinh.model';
+import { getDetailQuyetDinhThunk, getListQuyetDinh } from './quyetdinhThunk';
+import { IDetailQuyetDinh, IViewQuyetDinh } from '@models/nhansu/quyetdinh.model';
 
 interface QuyetDinhState {
   status: ReduxStatus;
   selected: {
     status: ReduxStatus;
-    data: IViewQuyetDinh | null;
+    id: number;
+    data: IDetailQuyetDinh | null;
   };
   $create: {
     status: ReduxStatus;
@@ -22,6 +23,7 @@ const initialState: QuyetDinhState = {
   status: ReduxStatus.IDLE,
   selected: {
     status: ReduxStatus.IDLE,
+    id: 0,
     data: null
   },
   $create: {
@@ -38,11 +40,14 @@ const quyetdinhSlice = createSlice({
   name: 'quyetdinh',
   initialState,
   reducers: {
-    selectQuyetDinh: (state, action: PayloadAction<IViewQuyetDinh>) => {
+    selectQuyetDinh: (state, action: PayloadAction<IDetailQuyetDinh>) => {
       state.selected.data = action.payload;
     },
+    selectIdQuyetDinh: (state, action: PayloadAction<number>) => {
+      state.selected.id = action.payload;
+    },
     clearSelected: (state) => {
-      state.selected = { status: ReduxStatus.IDLE, data: null };
+      state.selected = { status: ReduxStatus.IDLE, id: 0, data: null };
     },
     resetStatusCreate: (state) => {
       state.$create = { status: ReduxStatus.IDLE };
@@ -60,12 +65,22 @@ const quyetdinhSlice = createSlice({
       })
       .addCase(getListQuyetDinh.rejected, (state) => {
         state.$list.status = ReduxStatus.FAILURE;
+      })
+      .addCase(getDetailQuyetDinhThunk.pending, (state) => {
+        state.selected.status = ReduxStatus.LOADING;
+      })
+      .addCase(getDetailQuyetDinhThunk.fulfilled, (state, action: PayloadAction<IDetailQuyetDinh>) => {
+        state.selected.status = ReduxStatus.SUCCESS;
+        state.selected.data = action.payload;
+      })
+      .addCase(getDetailQuyetDinhThunk.rejected, (state) => {
+        state.selected.status = ReduxStatus.FAILURE;
       });
   }
 });
 
 const quyetdinhReducer = quyetdinhSlice.reducer;
 
-export const { selectQuyetDinh, clearSelected, resetStatusCreate } = quyetdinhSlice.actions;
+export const { selectQuyetDinh, selectIdQuyetDinh, clearSelected, resetStatusCreate } = quyetdinhSlice.actions;
 
 export default quyetdinhReducer;

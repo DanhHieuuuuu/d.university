@@ -2,19 +2,14 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Select } from 'antd';
-import {
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  SearchOutlined,
-  SyncOutlined
-} from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
+import { MicroIcon } from '@components/custom-icon';
 import { useNavigate } from '@hooks/navigate';
 
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { resetStatusCreate, resetStatusUpdate, selectIdNhanSu } from '@redux/feature/hrm/nhansu/nhansuSlice';
-import { getHoSoNhanSu, getListNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
+import { getHoSoNhanSu, getListNhanSu, semanticSearchThunk } from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { IQueryNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 
 import AppTable from '@components/common/Table';
@@ -23,9 +18,14 @@ import { formatDateView } from '@utils/index';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { useIsGranted } from '@hooks/useIsGranted';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import CreateNhanSuModal from './(dialog)/create-or-update-ns';
+import VoiceSearchModal from '@components/common/VoiceSearch';
+import CreateContractWithNhanSuModal from '../contracts/(dialog)/CreateContractWithNhanSuModal';
+
+type SearchMode = 'FILTER' | 'SEMANTIC';
 
 const Page = () => {
   const { navigateTo } = useNavigate();
@@ -34,9 +34,17 @@ const Page = () => {
   const { list, status, total: totalItem } = useAppSelector((state) => state.nhanSuState);
   const { phongBan } = useAppSelector((state) => state.danhmucState);
 
+  // permission in page
+  const hasPermisisonUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
+  const hasPermissionCreateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonCreateNhanSu);
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [openContract, setOpenContract] = useState<boolean>(false);
+
+  const [openVoice, setOpenVoice] = useState<boolean>(false);
+  const [searchMode, setSearchMode] = useState<SearchMode>('FILTER');
 
   const columns: IColumn<IViewNhanSu>[] = [
     {
@@ -96,8 +104,9 @@ const Page = () => {
       label: 'Sửa',
       tooltip: 'Sửa thông tin nhân sự',
       icon: <EditOutlined />,
+      hidden: () => !hasPermisisonUpdateNhanSu,
       command: (record: IViewNhanSu) => onClickUpdate(record)
-    },
+    }
     // {
     //   label: 'Xóa',
     //   color: 'red',
@@ -114,7 +123,9 @@ const Page = () => {
       Keyword: ''
     },
     onQueryChange: (newQuery) => {
-      dispatch(getListNhanSu(newQuery));
+      if (searchMode === 'FILTER') {
+        dispatch(getListNhanSu(newQuery));
+      }
     },
     triggerFirstLoad: true
   });
@@ -132,6 +143,7 @@ const Page = () => {
   }, 500);
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchMode('FILTER');
     handleDebouncedSearch(event.target.value);
   };
 
@@ -143,7 +155,6 @@ const Page = () => {
 
   const onClickView = (data: IViewNhanSu) => {
     dispatch(selectIdNhanSu(data.idNhanSu));
-    dispatch(getHoSoNhanSu(data.idNhanSu));
     navigateTo(`/hrm/employees/${data.idNhanSu}`);
   };
 
@@ -160,9 +171,14 @@ const Page = () => {
       title="Danh sách nhân sự"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
+        <div className="flex items-center justify-center gap-4">
+          <Button icon={<PlusOutlined />} onClick={() => setOpenContract(true)} hidden={false}>
+            Thêm mới cùng hợp đồng
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissionCreateNhanSu}>
+            Thêm mới
+          </Button>
+        </div>
       }
     >
       <Form form={form} layout="horizontal">
@@ -176,7 +192,10 @@ const Page = () => {
               options={phongBan.$list.data?.map((item) => {
                 return { label: item.tenPhongBan, value: item.id };
               })}
-              onChange={(val) => onFilterChange({ idPhongBan: val })}
+              onChange={(val) => {
+                setSearchMode('FILTER');
+                onFilterChange({ idPhongBan: val });
+              }}
             />
           </Form.Item>
         </div>
@@ -191,11 +210,19 @@ const Page = () => {
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
+                setSearchMode('FILTER');
                 resetFilter();
               }}
             >
               Tải lại
             </Button>
+            <Button
+              type="primary"
+              shape="circle"
+              aria-label="Nhấn để nỏi"
+              icon={<MicroIcon />}
+              onClick={() => setOpenVoice(true)}
+            ></Button>
           </div>
         </Form.Item>
       </Form>
@@ -214,6 +241,28 @@ const Page = () => {
         setIsModalOpen={setIsModalOpen}
         isUpdate={isUpdate}
         isView={isView}
+      />
+
+      <CreateContractWithNhanSuModal isModalOpen={openContract} setIsModalOpen={setOpenContract} />
+
+      <VoiceSearchModal
+        open={openVoice}
+        timeout={3000}
+        onClose={async (resultText) => {
+          if (resultText) {
+            setSearchMode('SEMANTIC');
+
+            await dispatch(
+              semanticSearchThunk({
+                PageIndex: pagination.current!,
+                PageSize: pagination.pageSize!,
+                Keyword: resultText
+              })
+            );
+          }
+
+          setOpenVoice(false);
+        }}
       />
     </Card>
   );

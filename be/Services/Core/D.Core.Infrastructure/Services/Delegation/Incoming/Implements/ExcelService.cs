@@ -134,5 +134,51 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             return sheet.Cells[row, col].Text?.Trim() ?? string.Empty;
         }
+
+        public async Task<byte[]> ExportAsync<T>(List<T> data,string sheetName,string title)
+        {
+            if (data == null || !data.Any())
+                throw new UserFriendlyException(4004, "Không có dữ liệu để xuất Excel");
+
+            ExcelPackage.License.SetNonCommercialPersonal("Hieu_Nguyen");
+
+            using var package = new ExcelPackage();
+            var ws = package.Workbook.Worksheets.Add(sheetName);
+
+            var properties = typeof(T).GetProperties();
+
+            // ===== TITLE =====
+            ws.Cells[1, 1].Value = title;
+            ws.Cells[1, 1, 1, properties.Length].Merge = true;
+            ws.Cells[1, 1].Style.Font.Bold = true;
+            ws.Cells[1, 1].Style.Font.Size = 16;
+            ws.Cells[1, 1].Style.HorizontalAlignment =
+                OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+            // ===== HEADER =====
+            for (int i = 0; i < properties.Length; i++)
+            {
+                ws.Cells[3, i + 1].Value = properties[i].Name;
+                ws.Cells[3, i + 1].Style.Font.Bold = true;
+                ws.Cells[3, i + 1].Style.Border.BorderAround(
+                    OfficeOpenXml.Style.ExcelBorderStyle.Thin
+                );
+            }
+
+            // ===== DATA =====
+            for (int r = 0; r < data.Count; r++)
+            {
+                for (int c = 0; c < properties.Length; c++)
+                {
+                    ws.Cells[r + 4, c + 1].Value =
+                        properties[c].GetValue(data[r]);
+                }
+            }
+
+            ws.Cells.AutoFitColumns();
+
+            return await Task.FromResult(package.GetAsByteArray());
+        }
+
     }
 }

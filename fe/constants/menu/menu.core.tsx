@@ -24,7 +24,8 @@ import {
   UnorderedListOutlined,
   SafetyCertificateOutlined,
   SolutionOutlined,
-  CalculatorOutlined
+  CalculatorOutlined,
+  LineChartOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
@@ -47,14 +48,19 @@ export const listMenuCore: IMenu[] = [
         icon: <UserOutlined />
       },
       {
+        label: 'Thống kê',
+        routerLink: '/hrm/statistical',
+        icon: <LineChartOutlined />
+      },
+      {
         label: 'Danh sách hợp đồng',
         routerLink: '/hrm/contracts',
-        icon: <ApartmentOutlined />
+        icon: <SolutionOutlined />
       },
       {
         label: 'Danh sách quyết định',
         routerLink: '/hrm/decisions',
-        icon: <ApartmentOutlined />
+        icon: <ProfileOutlined />
       }
     ]
   },
@@ -96,26 +102,30 @@ export const listMenuCore: IMenu[] = [
         label: 'Danh sách KPI',
         routerLink: '/kpi/list',
         permissionKeys: [PermissionCoreConst.CoreMenuKpiList],
-        icon: <UnorderedListOutlined />, 
+        icon: <UnorderedListOutlined />,
         items: [
           {
             label: 'Kpi Role',
             routerLink: '/kpi/list/roles',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListRole],
             icon: <SafetyCertificateOutlined />
           },
           {
             label: 'Kpi cá nhân',
             routerLink: '/kpi/list/personals',
-            icon: <UserOutlined /> 
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListPersonal],
+            icon: <UserOutlined />
           },
           {
             label: 'Kpi đơn vị',
             routerLink: '/kpi/list/units',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListUnit],
             icon: <TeamOutlined />
           },
           {
             label: 'Kpi trường',
             routerLink: '/kpi/list/school',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiListSchool],
             icon: <BankOutlined />
           }
         ]
@@ -129,23 +139,26 @@ export const listMenuCore: IMenu[] = [
           {
             label: 'Kê khai Kpi cá nhân',
             routerLink: '/kpi/manage/personals',
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManagePersonal],
             icon: <UserOutlined />
           },
           {
             label: 'Kê khai Kpi đơn vị',
             routerLink: '/kpi/manage/units',
-            icon: <FileTextOutlined /> 
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManageUnit],
+            icon: <FileTextOutlined />
           },
           {
             label: 'Kê khai Kpi trường',
             routerLink: '/kpi/manage/school',
-            icon: <SolutionOutlined /> 
-          },
-          {
-            label: 'Điểm KPI',
-            routerLink: '/kpi/manage/scoreboard',
-            icon: <CalculatorOutlined />
-          },
+            permissionKeys: [PermissionCoreConst.CoreMenuKpiManageSchool],
+            icon: <SolutionOutlined />
+          }
+          // {
+          //   label: 'Điểm KPI',
+          //   routerLink: '/kpi/manage/scoreboard',
+          //   icon: <CalculatorOutlined />
+          // }
         ]
       }
     ]
@@ -153,26 +166,31 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Đoàn vào',
     routerLink: '/delegation/incoming',
+    permissionKeys: [PermissionCoreConst.CoreMenuDelegation],
     icon: <DelegationIcon />,
     items: [
       {
         label: 'Danh sách đoàn vào',
         routerLink: '/delegation/incoming/list-delegation',
+        permissionKeys: [PermissionCoreConst.CoreMenuListDoanVao],
         icon: <SuggestIcon />
       },
       {
         label: 'Xử lý đoàn vào',
         routerLink: '/delegation/incoming/process',
+        permissionKeys: [PermissionCoreConst.CoreMenuXuLyDoanVao],
         icon: <HourglassOutlined />
       },
       {
         label: 'Phòng ban hỗ trợ',
         routerLink: '/delegation/incoming/support',
+        permissionKeys: [PermissionCoreConst.CoreMenuDepartment],
         icon: <TeamOutlined />
       },
       {
         label: 'Nhật ký đoàn vào',
         routerLink: '/delegation/incoming/diary',
+        permissionKeys: [PermissionCoreConst.CoreMenuLog],
         icon: <HistoryOutlined />
       }
     ]

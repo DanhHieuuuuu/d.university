@@ -1,10 +1,24 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag, Select, Tooltip, Modal } from 'antd';
-import { SearchOutlined, SyncOutlined, PlayCircleOutlined, StopOutlined, EyeOutlined, BarChartOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  SyncOutlined,
+  PlayCircleOutlined,
+  StopOutlined,
+  EyeOutlined,
+  BarChartOutlined,
+  ExclamationCircleOutlined
+} from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getPagingSurvey, openSurveyAction, closeSurveyAction, getSurveyById, generateReportAction } from '@redux/feature/survey/surveyThunk';
+import {
+  getPagingSurvey,
+  openSurveyAction,
+  closeSurveyAction,
+  getSurveyById,
+  generateReportAction
+} from '@redux/feature/survey/surveyThunk';
 import { setSelectedSurvey, clearSelectedSurvey } from '@redux/feature/survey/surveySlice';
 import { IQuerySurvey, IViewSurvey, ISurveyDetail } from '@models/survey/survey.model';
 import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
@@ -29,7 +43,7 @@ const Page = () => {
   const { data: list, status, total: totalItem } = $list;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [selectedSurvey, setSelectedSurveyState] = useState<ISurveyDetail | null>(null);
 
   const canOpenSurvey = isGranted(PermissionCoreConst.SurveyButtonSurveyOpen);
@@ -41,13 +55,13 @@ const Page = () => {
       key: 'maKhaoSat',
       dataIndex: 'maKhaoSat',
       title: 'Mã khảo sát',
-      width: 120,
+      width: 120
     },
     {
       key: 'tenKhaoSat',
       dataIndex: 'tenKhaoSat',
       title: 'Tên khảo sát',
-      width: 250,
+      width: 250
     },
     {
       key: 'moTa',
@@ -55,13 +69,13 @@ const Page = () => {
       title: 'Mô tả',
       width: 200,
       ellipsis: {
-        showTitle: false,
+        showTitle: false
       },
       render: (address) => (
         <Tooltip placement="topLeft" title={address}>
           {address}
         </Tooltip>
-      ),
+      )
     },
     {
       key: 'thoiGianBatDau',
@@ -99,8 +113,8 @@ const Page = () => {
       icon: <EyeOutlined />,
       command: async (record: IViewSurvey) => {
         try {
-          const result = await dispatch(getSurveyById(record.id)).unwrap();       
-          setSelectedSurveyState(result as ISurveyDetail);       
+          const result = await dispatch(getSurveyById(record.id)).unwrap();
+          setSelectedSurveyState(result as ISurveyDetail);
           dispatch(setSelectedSurvey(result));
           setIsModalOpen(true);
         } catch (error: any) {
@@ -209,7 +223,9 @@ const Page = () => {
           <Form.Item name="status">
             <Select placeholder="Chọn trạng thái" allowClear onChange={(val) => onFilterChange({ status: val })}>
               {surveyStatusConst.list.map((s) => (
-                <Option key={s.value} value={s.value}>{s.name}</Option>
+                <Option key={s.value} value={s.value}>
+                  {s.name}
+                </Option>
               ))}
             </Select>
           </Form.Item>
@@ -227,13 +243,13 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
       />
-      
+
       <SurveyDetailModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         survey={selectedSurvey}
         onClose={() => {
-            dispatch(clearSelectedSurvey());
+          dispatch(clearSelectedSurvey());
         }}
       />
     </Card>

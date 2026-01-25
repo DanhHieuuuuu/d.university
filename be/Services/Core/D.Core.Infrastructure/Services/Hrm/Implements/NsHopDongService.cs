@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
+using D.Auth.Domain.Entities;
 using D.Constants.Core.Hrm;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain.Dtos.Hrm.HopDong;
@@ -47,12 +48,21 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"Method {nameof(CreateNewContract)} called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var nhansu = _unitOfWork.iNsNhanSuRepository.Table.FirstOrDefault(x =>
-                x.Id == dto.IdNhanSu
-            );
-
-            if (nhansu != null)
+            if (dto.IdNhanSu.HasValue && dto.ThongTinNhanSu == null)
             {
+                // nếu nhân sự đã tồn tại trong db
+                var nhansu = _unitOfWork.iNsNhanSuRepository.Table.FirstOrDefault(x =>
+                    x.Id == dto.IdNhanSu
+                );
+
+                if (nhansu == null)
+                {
+                    throw new UserFriendlyException(
+                        ErrorCodeConstant.CodeNotFound,
+                        $"Không tìm thấy nhân sự cần tạo hợp đồng"
+                    );
+                }
+
                 ValidateMaNhanSu(dto.MaNhanSu!);
 
                 ValidateSoHopDong(dto.SoHopDong!);
@@ -66,7 +76,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 var quyetDinhTuyenDung = _decisionService.TaoQuyetDinh(
                     new CreateNsQuyetDinhDto
                     {
-                        IdNhanSu = dto.IdNhanSu,
+                        IdNhanSu = dto.IdNhanSu.Value,
                         MaNhanSu = dto.MaNhanSu,
                         NoiDungTomTat =
                             $"tuyển dụng nhân sự mới: {string.Join(" ", nhansu.HoDem, nhansu.Ten)}",
@@ -77,6 +87,23 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
                 _decisionService.PheDuyetQuyetDinh(quyetDinhTuyenDung.Id);
 
+                if (dto.NgayBatDauThuViec.HasValue)
+                {
+                    _unitOfWork.iNsQuaTrinhCongTacRepository.Add(
+                        new NsQuaTrinhCongTac
+                        {
+                            IdQuyetDinh = quyetDinhTuyenDung.Id,
+                            IdNhanSu = dto.IdNhanSu,
+                            MaNhanSu = dto.MaNhanSu,
+                            IdChucVu = dto.IdChucVu,
+                            IdPhongBan = dto.IdPhongBan,
+                            IdToBoMon = dto.IdToBoMon,
+                            NgayBatDau = dto.NgayBatDauThuViec,
+                            NgayKetThuc = dto.NgayKetThucThuViec,
+                        }
+                    );
+                }
+
                 _unitOfWork.iNsQuaTrinhCongTacRepository.Add(
                     new NsQuaTrinhCongTac
                     {
@@ -86,8 +113,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                         IdChucVu = dto.IdChucVu,
                         IdPhongBan = dto.IdPhongBan,
                         IdToBoMon = dto.IdToBoMon,
-                        NgayBatDau = DateTime.Now,
-                        NgayKetThuc = null,
+                        NgayBatDau = dto.HopDongCoThoiHanTuNgay,
+                        NgayKetThuc = dto.HopDongCoThoiHanDenNgay,
                     }
                 );
 
@@ -97,6 +124,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     {
                         IdNhanSu = dto.IdNhanSu,
                         MaNhanSu = dto.MaNhanSu,
+                        IdHopDong = newHd.Id,
                         MaSoThue = dto.MaSoThue,
                         TenNganHang1 = dto.TenNganHang1,
                         TenNganHang2 = dto.TenNganHang2,
@@ -104,6 +132,87 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                         Atm2 = dto.Atm2,
                         HienTaiChucVu = dto.IdChucVu,
                         HienTaiPhongBan = dto.IdPhongBan,
+                        DaChamDutHopDong = false,
+                        IsThoiViec = false,
+                    }
+                );
+            }
+            else if (!dto.IdNhanSu.HasValue && dto.ThongTinNhanSu != null)
+            {
+                // nếu nhân sự chưa tồn tại trong db
+                ValidateMaNhanSu(dto.MaNhanSu!);
+
+                var nhansu = _nhansuService.CreateNhanSu(dto.ThongTinNhanSu);
+
+                ValidateSoHopDong(dto.SoHopDong!);
+
+                // Tạo hợp đồng
+                var newHd = _mapper.Map<NsHopDong>(dto);
+
+                _unitOfWork.iNsHopDongRepository.Add(newHd);
+                _unitOfWork.iNsHopDongRepository.SaveChange();
+
+                var quyetDinhTuyenDung = _decisionService.TaoQuyetDinh(
+                    new CreateNsQuyetDinhDto
+                    {
+                        IdNhanSu = nhansu.IdNhanSu!.Value,
+                        MaNhanSu = dto.MaNhanSu,
+                        NoiDungTomTat =
+                            $"tuyển dụng nhân sự mới: {string.Join(" ", nhansu.HoDem, nhansu.Ten)}",
+                        LoaiQuyetDinh = NsLoaiQuyetDinh.TiepNhan,
+                        NgayHieuLuc = dto.HopDongCoThoiHanTuNgay,
+                    }
+                );
+
+                _decisionService.PheDuyetQuyetDinh(quyetDinhTuyenDung.Id);
+
+                if (dto.NgayBatDauThuViec.HasValue)
+                {
+                    _unitOfWork.iNsQuaTrinhCongTacRepository.Add(
+                        new NsQuaTrinhCongTac
+                        {
+                            IdQuyetDinh = quyetDinhTuyenDung.Id,
+                            IdNhanSu = nhansu.IdNhanSu,
+                            MaNhanSu = dto.MaNhanSu,
+                            IdChucVu = dto.IdChucVu,
+                            IdPhongBan = dto.IdPhongBan,
+                            IdToBoMon = dto.IdToBoMon,
+                            NgayBatDau = dto.NgayBatDauThuViec,
+                            NgayKetThuc = dto.NgayKetThucThuViec,
+                        }
+                    );
+                }
+
+                _unitOfWork.iNsQuaTrinhCongTacRepository.Add(
+                    new NsQuaTrinhCongTac
+                    {
+                        IdQuyetDinh = quyetDinhTuyenDung.Id,
+                        IdNhanSu = nhansu.IdNhanSu,
+                        MaNhanSu = dto.MaNhanSu,
+                        IdChucVu = dto.IdChucVu,
+                        IdPhongBan = dto.IdPhongBan,
+                        IdToBoMon = dto.IdToBoMon,
+                        NgayBatDau = dto.HopDongCoThoiHanTuNgay,
+                        NgayKetThuc = dto.HopDongCoThoiHanDenNgay,
+                    }
+                );
+
+                // Update thông tin công việc hiện tại của nhân sự
+                _nhansuService.UpdateThongTinCongViec(
+                    new UpdateNhanSuCongViecDto
+                    {
+                        IdNhanSu = nhansu.IdNhanSu,
+                        MaNhanSu = dto.MaNhanSu,
+                        IdHopDong = newHd.Id,
+                        MaSoThue = dto.MaSoThue,
+                        TenNganHang1 = dto.TenNganHang1,
+                        TenNganHang2 = dto.TenNganHang2,
+                        Atm1 = dto.Atm1,
+                        Atm2 = dto.Atm2,
+                        HienTaiChucVu = dto.IdChucVu,
+                        HienTaiPhongBan = dto.IdPhongBan,
+                        DaChamDutHopDong = false,
+                        IsThoiViec = false,
                     }
                 );
             }

@@ -7,7 +7,7 @@ import { Menu, MenuProps } from 'antd';
 import { getMenuKeysFromPath, mapToAntdItems } from '@helpers/menu.helper';
 import { IMenu } from '@models/common/menu.model';
 import { useNavigate } from '@hooks/navigate';
-import { isGranted } from '@hooks/isGranted';
+import { useAppSelector } from '@redux/hooks';
 
 type MenuPropsCustom = {
   data: IMenu[];
@@ -16,6 +16,8 @@ type MenuPropsCustom = {
 const AppMenu: React.FC<MenuPropsCustom> = ({ data }) => {
   const pathname = usePathname();
   const { navigateTo } = useNavigate();
+
+  const userPermissions = useAppSelector((state) => state.authState.permissions) || [];
 
   const { selectedKeys, openKeys: initOpenKeys } = getMenuKeysFromPath(data, pathname);
   const [openKeys, setOpenKeys] = useState<string[]>(initOpenKeys);
@@ -29,7 +31,10 @@ const AppMenu: React.FC<MenuPropsCustom> = ({ data }) => {
     navigateTo(e.key);
   };
 
-  const items = mapToAntdItems(data, isGranted);
+  const validatePermission = (permissionKey: string) => {
+    return userPermissions.includes(permissionKey);
+  };
+  const items = mapToAntdItems(data, validatePermission);
 
   return (
     <Menu

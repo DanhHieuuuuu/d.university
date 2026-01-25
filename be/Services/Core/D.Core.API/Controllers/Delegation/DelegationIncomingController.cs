@@ -1,5 +1,6 @@
 ﻿using d.Shared.Permission;
 using D.ControllerBase;
+using D.Core.Domain.Dtos.Delegation.Incoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
@@ -555,5 +556,81 @@ namespace D.Core.API.Controllers.Delegation
                 return BadRequest(ex);
             }
         }
+        /// <summary>
+        /// Xuất báo cáo đoàn vào
+        /// </summary>
+        [HttpGet("export-report")]
+        public async Task<IActionResult> ExportDelegationIncomingReport()
+        {
+            var fileBytes = await _mediator.Send(new ExportReport());
+
+            var fileName =$"BaoCaoDoanVao_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+
+            return File(
+                fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName
+            );
+        }
+
+        /// <summary>
+        /// Xuất tờ trình đoàn vào
+        /// </summary>
+        [HttpPost("bao_cao_doan_vao")]
+        public async Task<IActionResult> ExportGiayDoanVao([FromBody] ExportGiayDoanVaoDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+
+                return FileByStream(
+                    result.Stream!,
+                    result.FileName!
+                );
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Thống kê đoàn vào
+        /// </summary>
+        [HttpGet("statistical")]
+        public async Task<ResponseAPI> GetDelegationIncomingSummary()
+        {
+            try
+            {
+                var result = await _mediator.Send(
+                    new StatisticalRequestDto()
+                );
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Lấy danh sách ngày tạo log thời gian tiếp đoàn
+        /// </summary>
+        [HttpGet("get-created-dates")]
+        public async Task<ResponseAPI> GetAllCreatedDate(
+            [FromQuery] GetAllCreatedDateRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+
+
     }
 }

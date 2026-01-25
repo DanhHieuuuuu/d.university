@@ -90,4 +90,42 @@ const findBySdt = async (phone: string) => {
   }
 };
 
-export const NhanSuService = { findPaging, find, findById, createNhanSu, updateNhanSu, getHoSoNhanSu, findBySdt };
+const thongKeNsTheoPhongBan = async () => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/thongke-theo-phongban`);
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+const semanticSearch = async (args: IQueryNhanSu) => {
+  try {
+    const res = await axios.get(`${apiNhanSuEndpoint}/search`, {
+      params: {
+        ...args
+      }
+    });
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+export const NhanSuService = {
+  findPaging,
+  find,
+  findById,
+  createNhanSu,
+  updateNhanSu,
+  getHoSoNhanSu,
+  findBySdt,
+  thongKeNsTheoPhongBan,
+  semanticSearch
+};

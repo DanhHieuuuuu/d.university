@@ -89,7 +89,7 @@ const CreateContractModal: React.FC<ContractModalProps> = (props) => {
       )}
     >
       <Form
-        name="hopDongNhanSu"
+        name="hopDong"
         layout="vertical"
         form={form}
         onFinish={onFinish}

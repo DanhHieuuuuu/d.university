@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Form, FormProps, Input, InputNumber, Modal, Select, Divider } from 'antd';
-import { CloseOutlined, PlusOutlined, SaveOutlined, InfoCircleOutlined, UserOutlined, ExperimentOutlined } from '@ant-design/icons';
+import {
+  CloseOutlined,
+  PlusOutlined,
+  SaveOutlined,
+  InfoCircleOutlined,
+  UserOutlined,
+  ExperimentOutlined
+} from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { clearSeletedKpiCaNhan, resetStatusKpiCaNhan } from '@redux/feature/kpi/kpiSlice';
 import { createKpiCaNhan, updateKpiCaNhan } from '@redux/feature/kpi/kpiThunk';
@@ -36,15 +43,15 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   const watchIdPhongBan = Form.useWatch('idPhongBan', form);
 
   const congThucOptions = useMemo(() => {
-    return listCongThuc.data.map((ct) => ({ 
-      value: ct.id, 
-      label: ct.tenCongThuc 
+    return listCongThuc.data.map((ct) => ({
+      value: ct.id,
+      label: ct.tenCongThuc
     }));
   }, [listCongThuc.data]);
 
   const userOptions: UserOption[] = useMemo(() => {
     return (users || [])
-      .filter(u => !watchIdPhongBan || u.idPhongBan === watchIdPhongBan)
+      .filter((u) => !watchIdPhongBan || u.idPhongBan === watchIdPhongBan)
       .map((u) => {
         const roleValue = KpiRoleConst.list.find(
           (x) => x.name.trim().toLowerCase() === u.tenChucVu?.trim().toLowerCase()
@@ -53,7 +60,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         return {
           value: u.id!,
           label: `${u.maNhanSu} - ${u.hoDem ?? ''} ${u.ten ?? ''} - ${tenChucVuChuan}`.trim(),
-          searchText: `${u.maNhanSu} ${u.hoDem} ${u.ten}`,
+          searchText: `${u.maNhanSu} ${u.hoDem} ${u.ten}`
         };
       });
   }, [users, watchIdPhongBan]);
@@ -62,9 +69,9 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
     if (isModalOpen) {
       setTitle(isView ? 'Xem thông tin KPI Cá nhân' : isUpdate ? 'Cập nhật KPI Cá nhân' : 'Thêm mới KPI Cá nhân');
       dispatch(getAllUser({ PageIndex: 1, PageSize: 2000 }));
-    
+
       if (listCongThuc.data.length === 0) {
-        dispatch(getListKpiCongThuc({})); 
+        dispatch(getListKpiCongThuc({}));
       }
     }
   }, [isModalOpen, isUpdate, isView, dispatch, listCongThuc.data.length]);
@@ -77,11 +84,11 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
     form.setFieldsValue({
       ...selectedData,
       idNhanSu: selectedData.idNhanSu,
-      idPhongBan: selectedData.idPhongBan, 
+      idPhongBan: selectedData.idPhongBan,
       loaiKPI: selectedData.loaiKpi,
       idCongThuc: selectedData.idCongThuc,
       congThucTinh: selectedData.congThuc,
-      namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
+      namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined
     });
   }, [$selected.data, users, isModalOpen, userOptions, form]);
 
@@ -106,7 +113,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
       ...values,
       idNhanSu: values.idNhanSu?.value ?? values.idNhanSu,
       namHoc: values.namHoc.format('YYYY'),
-      trongSo: values.trongSo?.toString() || '0',
+      trongSo: values.trongSo?.toString() || '0'
     };
     try {
       if (isUpdate && $selected.data) {
@@ -123,13 +130,15 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
   return (
     <Modal
-      title={<span className="text-xl font-bold text-blue-700">{title}</span>}
+      title={<span className="text-xl text-blue-700">{title}</span>}
       width={950}
       open={isModalOpen}
       onCancel={handleClose}
       centered
       footer={[
-        <Button key="close" onClick={handleClose} icon={<CloseOutlined />}>Đóng</Button>,
+        <Button key="close" onClick={handleClose} icon={<CloseOutlined />}>
+          Đóng
+        </Button>,
         !isView && (
           <Button
             key="submit"
@@ -141,7 +150,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           >
             {isUpdate ? 'Lưu thay đổi' : 'Tạo mới'}
           </Button>
-        ),
+        )
       ]}
     >
       <Form
@@ -153,11 +162,16 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
         requiredMark="optional"
       >
         <div className="grid grid-cols-2 gap-x-6">
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-blue-600 font-semibold">
+          <div className="col-span-2 mb-2 flex items-center gap-2 text-blue-600">
             <InfoCircleOutlined /> THÔNG TIN CHỈ SỐ KPI
           </div>
 
-          <Form.Item label="Tên KPI" name="kpi" className="col-span-2" rules={[{ required: true, message: 'Nhập tên KPI' }]}>
+          <Form.Item
+            label="Tên KPI"
+            name="kpi"
+            className="col-span-2"
+            rules={[{ required: true, message: 'Nhập tên KPI' }]}
+          >
             <Input.TextArea rows={2} placeholder="Nhập tên chỉ số KPI cá nhân" />
           </Form.Item>
 
@@ -171,14 +185,14 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
 
           <Divider className="col-span-2 my-2" />
 
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-purple-600 font-semibold">
+          <div className="col-span-2 mb-2 flex items-center gap-2 text-purple-600">
             <ExperimentOutlined /> CÔNG THỨC & ĐỊNH DẠNG
           </div>
 
           <Form.Item label="Loại KPI" name="loaiKPI" rules={[{ required: true }]}>
             <Select
               placeholder="Chọn loại"
-              options={KpiLoaiConst.list.map(x => ({ value: x.value, label: x.name }))}
+              options={KpiLoaiConst.list.map((x) => ({ value: x.value, label: x.name }))}
             />
           </Form.Item>
 
@@ -192,7 +206,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
               options={congThucOptions}
               loading={listCongThuc.status === ReduxStatus.LOADING}
               onChange={(value) => {
-                const selected = listCongThuc.data.find(x => x.id === value);
+                const selected = listCongThuc.data.find((x) => x.id === value);
                 form.setFieldsValue({ congThucTinh: selected?.tenCongThuc });
               }}
             />
@@ -203,10 +217,12 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           </Form.Item>
 
           {/* Trường ẩn để gửi tên công thức lên BE nếu BE vẫn yêu cầu cả text */}
-          <Form.Item name="congThucTinh" hidden><Input /></Form.Item>
+          <Form.Item name="congThucTinh" hidden>
+            <Input />
+          </Form.Item>
 
           <Divider className="col-span-2 my-2" />
-          <div className="col-span-2 flex items-center gap-2 mb-2 text-green-600 font-semibold">
+          <div className="col-span-2 mb-2 flex items-center gap-2 text-green-600">
             <UserOutlined /> NHÂN SỰ THỰC HIỆN
           </div>
 
@@ -214,7 +230,7 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
             <Select
               placeholder="Lọc theo đơn vị"
               allowClear
-              options={listPhongBan?.map(x => ({ value: x.id, label: x.tenPhongBan }))}
+              options={listPhongBan?.map((x) => ({ value: x.id, label: x.tenPhongBan }))}
               onChange={() => form.setFieldsValue({ idNhanSu: undefined, role: '' })}
             />
           </Form.Item>
@@ -232,7 +248,11 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
           </Form.Item>
 
           <Form.Item label="Quyền hạn hệ thống (Role)" name="role" className="col-span-2">
-            <Input disabled className="bg-gray-50 font-bold text-blue-600" placeholder="Tự động hiển thị theo nhân sự" />
+            <Input
+              disabled
+              className="bg-gray-50 font-bold text-blue-600"
+              placeholder="Tự động hiển thị theo nhân sự"
+            />
           </Form.Item>
         </div>
       </Form>

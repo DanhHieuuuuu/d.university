@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { SurveyService } from '@services/survey.service';
 import { IMySurveyItem, IQueryMySurvey } from '@models/survey/survey.model';
 import { formatDateTimeView } from '@utils/index';
-import { surveyStatusConst } from '@/constants/core/const/surveyStatus.const';
+import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
 import SurveyDetailDialog from './(dialog)/detail';
 
 const { Search } = Input;
@@ -222,11 +222,7 @@ const Page = () => {
       </Card>
 
       {selectedSurveyId && (
-        <SurveyDetailDialog
-          surveyId={selectedSurveyId}
-          isOpen={isDialogOpen}
-          onClose={handleCloseDialog}
-        />
+        <SurveyDetailDialog surveyId={selectedSurveyId} isOpen={isDialogOpen} onClose={handleCloseDialog} />
       )}
     </div>
   );

@@ -116,7 +116,6 @@ const Page = () => {
     handleDebouncedSearch(event.target.value);
   };
 
-
   return (
     <Card title="Danh sách báo cáo khảo sát" className="h-full">
       <Form form={form} layout="vertical">
@@ -152,7 +151,7 @@ const Page = () => {
         setIsModalOpen={setIsModalOpen}
         report={selectedReport}
         onClose={() => {
-            setSelectedReport(null);
+          setSelectedReport(null);
         }}
       />
     </Card>

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { login, refreshToken, myPermission } from './authThunk';
+import { login, refreshToken, myPermissionThunk } from './authThunk';
 import { setItem as setToken, clearToken } from '@utils/token-storage';
 import { IUser } from '@models/auth/auth.model';
 
@@ -92,7 +92,7 @@ const authSlice = createSlice({
       .addCase(refreshToken.rejected, (state) => {
         state.$login.loading = false;
       })
-      .addCase(myPermission.fulfilled, (state, action) => {
+      .addCase(myPermissionThunk.fulfilled, (state, action) => {
         state.permissions = action.payload || [];
       });
   }

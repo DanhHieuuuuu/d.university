@@ -71,13 +71,15 @@ namespace D.Core.Domain
         DbSet<DtChuongTrinhKhung> DtChuongTrinhKhungs { get; set; }
         DbSet<DtMonTienQuyet> DtMonTienQuyets { get; set; }
         DbSet<DtChuongTrinhKhungMon> DtChuongTrinhKhungMons { get; set; }
-
+        DbSet<DtQuyDinhThangDiem> DtQuyDinhThangDiems { get; set; }
         #endregion
 
         #region sv
 
         DbSet<SvSinhVien> SvSinhViens { get; set; }
-
+        DbSet<SvDiemMonHoc> SvDiemMonHocs { get; set; }
+        DbSet<SvThongTinHocVu> SvThongTinHocVus { get; set; }
+        DbSet<SvKetQuaHocKy> svKetQuaHocKys { get; set; }
         #endregion
 
         #region file
@@ -183,7 +185,9 @@ namespace D.Core.Domain
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.SeedDataHrm();
-            modelBuilder.SeedDataDt();
+            // Seed data đã được chạy qua SQL script: Scripts/seed_all_data.sql
+            // modelBuilder.SeedDataDt();
+            // modelBuilder.SeedDataSv();
             base.OnModelCreating(modelBuilder);
         }
     }

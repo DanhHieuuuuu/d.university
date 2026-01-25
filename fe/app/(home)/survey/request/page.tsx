@@ -94,7 +94,7 @@ const Page = () => {
           'Chờ duyệt': 'orange',
           'Đã duyệt': 'green',
           'Từ chối': 'red',
-          'Hủy': 'gray'
+          Hủy: 'gray'
         };
         return <Tag color={colors[statusName] || 'default'}>{statusName || 'Chưa có'}</Tag>;
       }

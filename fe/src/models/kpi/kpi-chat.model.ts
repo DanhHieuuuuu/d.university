@@ -1,7 +1,7 @@
 export interface IAskKpiChatCommand {
-    question: string;
+  question: string;
 }
 
 export interface IKpiChatResponse {
-    answer: string;
+  answer: string;
 }

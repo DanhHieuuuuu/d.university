@@ -3,6 +3,8 @@ using D.Core.API.Logs;
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
+using D.Embedding.Jina.Configs;
+using D.QdrantClient.Configs;
 using D.Notification.ApplicationService.Configs;
 using D.Notification.Infrastructure.Hubs;
 using D.S3Bucket.Configs;
@@ -66,6 +68,9 @@ namespace D.Core.API
                 builder.ConfigureCors();
                 builder.ConfigureS3();
                 builder.Services.AddHttpClient();
+                builder.ConfigureJinaEmbedding();
+                builder.ConfigureQdrantClient();
+                builder.ConfigureJwtAuthentication();
 
                 var app = builder.Build();
 
@@ -79,7 +84,6 @@ namespace D.Core.API
                     });
                 }
                 app.UseCors(ProgramBase.CorsPolicy);
-                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 app.UseSerilogRequestLogging();
 
                 app.UseAuthentication();
@@ -87,6 +91,7 @@ namespace D.Core.API
                 app.MapControllers();
                
 
+                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 Log.Information("Core started successfully.");
                 app.Run();
             }
