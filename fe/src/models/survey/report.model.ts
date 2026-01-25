@@ -45,3 +45,20 @@ export interface IReportDetail {
   };
   respondents: IRespondent[];
 }
+
+export interface IAIReportDetail {
+  id: number;
+  idBaoCao: number;
+  idTieuChi: number;
+  diemCamXuc: number;
+  nhanCamXuc: string;
+  tomTatNoiDung: string;
+  xuHuong: string;
+  goiYCaiThien: string;
+  tenTieuChi: string;
+  weight: number;
+}
+
+export interface IAnalyzeWithAI {
+  reportId: number;
+}

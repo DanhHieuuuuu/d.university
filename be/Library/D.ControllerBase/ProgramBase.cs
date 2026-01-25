@@ -141,13 +141,15 @@ namespace D.ControllerBase
         /// <param name="builder"></param>
         public static void ConfigureRedis(this WebApplicationBuilder builder)
         {
-            var connectionString = builder.Configuration.GetConnectionString("Redis");
+            var connectionString = "localhost:6379";
+
+            //var connectionString = builder.Configuration.GetConnectionString("Redis");
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = "localhost:6379";
+               connectionString = "localhost:6379";
             }
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
+            var redis = ConnectionMultiplexer.Connect(connectionString);
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 

@@ -18,5 +18,6 @@ namespace D.Core.Domain.Dtos.Survey.Surveys
         public int Status { get; set; }
         public string StatusName => SurveyStatus.Names.ContainsKey(Status) ? SurveyStatus.Names[Status] : "Unknown";
         public string? MaYeuCauGoc { get; set; }
+        public DateTime? ThoiGianNop { get; set; }
     }
 }
