@@ -40,9 +40,6 @@ namespace D.Core.Domain.Entities.Survey
         [ForeignKey(nameof(IdKhaoSat))]
         public virtual KsSurvey Survey { get; set; }
 
-        // [ForeignKey(nameof(IdNguoiDung))] 
-        // public virtual User User { get; set; }
-
         public virtual ICollection<KsSurveySubmissionAnswer> Responses { get; set; }
     }
 }
