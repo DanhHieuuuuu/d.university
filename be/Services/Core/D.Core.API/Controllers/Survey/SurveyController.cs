@@ -168,7 +168,7 @@ namespace D.Core.API.Controllers.Survey
                 return BadRequest(ex);
             }
         }
-        
+
         /// <summary>
         /// Import câu hỏi từ file Excel
         /// </summary>
@@ -393,7 +393,7 @@ namespace D.Core.API.Controllers.Survey
             try
             {
                 await _mediator.Send(new GenerateReportDto(surveyId));
-                return Ok(new ResponseAPI("Đã tạo báo cáo thành công."));               
+                return Ok(new ResponseAPI("Đã tạo báo cáo thành công."));
             }
             catch (Exception ex)
             {
@@ -507,8 +507,24 @@ namespace D.Core.API.Controllers.Survey
             catch (Exception ex)
             {
                 return BadRequest(ex);
-            }
+            }           
         }
 
+        /// <summary>
+        /// Lấy thống kê khảo sát
+        /// </summary>
+        [HttpGet("statistics")]
+        public async Task<ResponseAPI> GetStatistics()
+        {
+            try
+            {
+                var result = await _mediator.Send(new D.Core.Domain.Dtos.Survey.Statistics.GetSurveyStatisticsDto());
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

@@ -6,8 +6,8 @@ import { toast } from 'react-toastify';
 import { SurveyService } from '@services/survey.service';
 import { IMySurveyItem, IQueryMySurvey } from '@models/survey/survey.model';
 import { formatDateTimeView } from '@utils/index';
-import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
 import SurveyDetailDialog from './(dialog)/detail';
+import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
 
 const { Search } = Input;
 

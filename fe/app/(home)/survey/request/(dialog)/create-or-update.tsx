@@ -181,7 +181,17 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
       const result = await dispatch(importExcelQuestions(file)).unwrap();
       
       if (result && result.length > 0) {
-        form.setFieldValue('questions', result);
+        // Update thuTu for all imported questions and answers
+        const questionsWithOrder = result.map((q: any, qIndex: number) => ({
+          ...q,
+          thuTu: qIndex + 1,
+          answers: q.answers?.map((a: any, aIndex: number) => ({
+            ...a,
+            thuTu: aIndex + 1
+          })) || []
+        }));
+        
+        form.setFieldValue('questions', questionsWithOrder);
         toast.success(`Đã import ${result.length} câu hỏi từ Excel`);
         setActiveTab('2');
       } else {
@@ -452,9 +462,30 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
       }
     >
       <Form.List name="questions">
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map(({ key, name, ...restField }) => (
+        {(fields, { add: addQuestion, remove: removeQuestion }) => {
+          const handleAddQuestion = () => {
+            addQuestion({ thuTu: fields.length + 1, answers: [{ thuTu: 1 }, { thuTu: 2 }] });
+            setTimeout(() => {
+              const questions = form.getFieldValue('questions') || [];
+              questions.forEach((_: any, index: number) => {
+                form.setFieldValue(['questions', index, 'thuTu'], index + 1);
+              });
+            }, 0);
+          };
+
+          const handleRemoveQuestion = (name: number) => {
+            removeQuestion(name);
+            setTimeout(() => {
+              const questions = form.getFieldValue('questions') || [];
+              questions.forEach((_: any, index: number) => {
+                form.setFieldValue(['questions', index, 'thuTu'], index + 1);
+              });
+            }, 0);
+          };
+
+          return (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
               <Card
                 key={key}
                 size="small"
@@ -462,7 +493,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                 title={`Câu hỏi ${name + 1}`}
                 extra={
                   !isViewMode && (
-                    <Button type="link" danger onClick={() => remove(name)}>
+                    <Button type="link" danger onClick={() => handleRemoveQuestion(name)}>
                       Xóa câu hỏi này
                     </Button>
                   )
@@ -534,8 +565,30 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                     return (
                       <div style={{ marginTop: 8, paddingLeft: 16, borderLeft: '2px solid #1677ff' }}>
                         <Form.List name={[name, 'answers']}>
-                          {(answerFields, { add: addAnswer, remove: removeAnswer }) => (
-                            <>
+                          {(answerFields, { add: addAnswer, remove: removeAnswer }) => {
+                            // Wrapper functions to update thuTu after add/remove
+                            const handleAddAnswer = () => {
+                              addAnswer({ thuTu: answerFields.length + 1 });
+                              setTimeout(() => {
+                                const answers = form.getFieldValue(['questions', name, 'answers']) || [];
+                                answers.forEach((_: any, index: number) => {
+                                  form.setFieldValue(['questions', name, 'answers', index, 'thuTu'], index + 1);
+                                });
+                              }, 0);
+                            };
+
+                            const handleRemoveAnswer = (answerName: number) => {
+                              removeAnswer(answerName);
+                              setTimeout(() => {
+                                const answers = form.getFieldValue(['questions', name, 'answers']) || [];
+                                answers.forEach((_: any, index: number) => {
+                                  form.setFieldValue(['questions', name, 'answers', index, 'thuTu'], index + 1);
+                                });
+                              }, 0);
+                            };
+
+                            return (
+                              <>
                               {answerFields.map((answerField, index) => {
                                 const { key, ...answerRestField } = answerField;
                                 return (
@@ -557,8 +610,8 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                                     </Col>
                                     {!isViewMode && (
                                       <Col span={5}>
-                                        <Form.Item label={index === 0 ? "Thứ tự" : null} name={[answerField.name, 'thuTu']} style={{ marginBottom: 0 }}>
-                                          <Input type="number" placeholder="Thứ tự" disabled value={index + 1} />
+                                        <Form.Item label={index === 0 ? "Thứ tự" : null} name={[answerField.name, 'thuTu']} style={{ marginBottom: 0 }} initialValue={index + 1}>
+                                          <Input type="number" placeholder="Thứ tự" disabled />
                                         </Form.Item>
                                       </Col>
                                     )}
@@ -569,7 +622,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                                     </Col>
                                     <Col span={2}>
                                       {!isViewMode && (
-                                        <Button type="link" danger onClick={() => removeAnswer(answerField.name)} style={index === 0 ? { marginTop: 30 } : {}}>
+                                        <Button type="link" danger onClick={() => handleRemoveAnswer(answerField.name)} style={index === 0 ? { marginTop: 30 } : {}}>
                                           X
                                         </Button>
                                       )}
@@ -578,13 +631,14 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                                 );
                               })}
                         {!isViewMode && (
-                          <Button type="dashed" size="small" onClick={() => addAnswer({ thuTu: answerFields.length + 1 })} style={{ marginTop: 8 }}>
+                          <Button type="dashed" size="small" onClick={handleAddAnswer} style={{ marginTop: 8 }}>
                             + Thêm đáp án
                           </Button>
                         )}
                               </>
-                            )}
-                          </Form.List>
+                            );
+                          }}
+                        </Form.List>
                         </div>
                       );
                     }}
@@ -592,12 +646,13 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
               </Card>
             ))}
             {!isViewMode && (
-              <Button type="dashed" onClick={() => add()} block icon={<span style={{ fontSize: 16 }}>+</span>}>
+              <Button type="dashed" onClick={handleAddQuestion} block icon={<span style={{ fontSize: 16 }}>+</span>}>
                 Thêm câu hỏi mới
               </Button>
             )}
           </>
-        )}
+          );
+        }}
       </Form.List>
     </Card>
   );

@@ -30,7 +30,6 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import SurveyDetailModal from './(dialog)/detail';
 import { toast } from 'react-toastify';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { isGranted } from '@hooks/isGranted';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const { Option } = Select;
@@ -45,10 +44,6 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [selectedSurvey, setSelectedSurveyState] = useState<ISurveyDetail | null>(null);
-
-  const canOpenSurvey = isGranted(PermissionCoreConst.SurveyButtonSurveyOpen);
-  const canCloseSurvey = isGranted(PermissionCoreConst.SurveyButtonSurveyClose);
-  const canGenerateReport = isGranted(PermissionCoreConst.SurveyButtonReportGenerate);
 
   const columns: IColumn<IViewSurvey>[] = [
     {
@@ -145,8 +140,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonSurveyOpen,
       hidden: (record: IViewSurvey) => 
-        !canOpenSurvey ||
         record.status !== surveyStatusConst.CLOSE
     },
     {
@@ -171,8 +166,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonSurveyClose,
       hidden: (record: IViewSurvey) => 
-        !canCloseSurvey ||
         record.status !== surveyStatusConst.OPEN
     },
     {
@@ -196,8 +191,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonReportGenerate,
       hidden: (record: IViewSurvey) =>
-        !canGenerateReport ||
         record.status !== surveyStatusConst.CLOSE && record.status !== surveyStatusConst.COMPLETE
     }
   ];

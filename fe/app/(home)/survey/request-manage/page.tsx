@@ -30,7 +30,6 @@ import CreateOrUpdateRequestModal from '../request/(dialog)/create-or-update';
 import { toast } from 'react-toastify';
 
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { isGranted } from '@hooks/isGranted';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 
@@ -46,9 +45,6 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequestState] = useState<IViewRequest | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
-
-  const canApprove = isGranted(PermissionCoreConst.SurveyButtonRequestApprove);
-  const canReject = isGranted(PermissionCoreConst.SurveyButtonRequestReject);
   
   const columns: IColumn<IViewRequest>[] = [
     {
@@ -148,8 +144,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonRequestApprove,
       hidden: (record: IViewRequest) => 
-        !canApprove || 
         record.trangThai !== requestStatusConst.PENDING
     },
     {
@@ -191,8 +187,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonRequestReject,
       hidden: (record: IViewRequest) => 
-        !canReject || 
         record.trangThai !== requestStatusConst.PENDING
     }
   ];

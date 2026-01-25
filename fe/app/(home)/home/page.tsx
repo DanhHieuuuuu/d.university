@@ -13,13 +13,16 @@ import {
 import { useAppSelector } from '@redux/hooks';
 import { Column, Pie } from '@ant-design/plots';
 import { IStatistical } from '@models/delegation/delegation.model';
+import { ISurveyStatistics } from '@models/survey/statistics.model';
 import { toast } from 'react-toastify';
 import { DelegationIncomingService } from '@/src/services/delegation/delegationIncoming.service';
+import { SurveyService } from '@/src/services/survey.service';
 import { DelegationStatusConst } from '@/constants/core/delegation/delegation-status.consts';
 const HomePage: React.FC = () => {
   const { user } = useAppSelector((state) => state.authState);
 
   const [statisticalData, setStatisticalData] = useState<IStatistical | null>(null);
+  const [surveyStats, setSurveyStats] = useState<ISurveyStatistics | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -35,7 +38,17 @@ const HomePage: React.FC = () => {
       }
     };
 
+    const fetchSurveyStats = async () => {
+      try {
+        const res = await SurveyService.getStatistics();
+        setSurveyStats(res.data);
+      } catch {
+        toast.error('Không tải được thống kê khảo sát');
+      }
+    };
+
     fetchStatistical();
+    fetchSurveyStats();
   }, []);
 
   // Mock data - Thay thế bằng API call thực tế
@@ -103,6 +116,64 @@ const HomePage: React.FC = () => {
   const pieConfig: any = {
     data: statusChartData,
     angleField: 'total',
+    colorField: 'status',
+    radius: 0.8,
+    label: {
+      text: 'status',
+      position: 'outside'
+    },
+    legend: {
+      color: {
+        title: false,
+        position: 'bottom'
+      }
+    },
+    tooltip: {
+      title: 'status'
+    }
+  };
+
+  // Survey Request Chart Data (Column)
+  const surveyRequestChartData = (surveyStats?.surveyRequests?.byStatus || []).map(item => ({
+    status: item.statusName,
+    count: item.count
+  }));
+
+  const requestColumnConfig: any = {
+    data: surveyRequestChartData,
+    xField: 'status',
+    yField: 'count',
+    label: {
+      text: 'count',
+      position: 'top',
+      style: {
+        fill: '#000000',
+        opacity: 0.6
+      }
+    },
+    axis: {
+      x: {
+        title: 'Trạng thái',
+        labelAutoRotate: false
+      },
+      y: {
+        title: 'Số lượng'
+      }
+    },
+    style: {
+      fill: '#52c41a'
+    }
+  };
+
+  // Survey Chart Data (Pie)
+  const surveyChartData = (surveyStats?.surveys?.byStatus || []).map(item => ({
+    status: item.statusName,
+    count: item.count
+  }));
+
+  const surveyPieConfig: any = {
+    data: surveyChartData,
+    angleField: 'count',
     colorField: 'status',
     radius: 0.8,
     label: {
@@ -266,7 +337,7 @@ const HomePage: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Charts Row */}
+      {/* Delegation Charts Row */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} lg={16}>
           <Card title="Số lượng đoàn vào " variant="borderless">
@@ -277,6 +348,21 @@ const HomePage: React.FC = () => {
         <Col xs={24} lg={8}>
           <Card title="Phân bố số lượng đoàn vào" variant="borderless">
             <Pie {...pieConfig} />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Survey Statistics Row */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} lg={12}>
+          <Card title="Thống kê yêu cầu khảo sát" variant="borderless">
+            <Column {...requestColumnConfig} />
+          </Card>
+        </Col>
+
+        <Col xs={24} lg={12}>
+          <Card title="Phân bố khảo sát" variant="borderless">
+            <Pie {...surveyPieConfig} />
           </Card>
         </Col>
       </Row>

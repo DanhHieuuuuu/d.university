@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { RootState } from '@redux/store';
 import { clearSinhVien } from '@redux/feature/student/studentSlice';
 import { StudentService } from '@services/student.service';
+import NotificationComponent from '@components/common/Notification';
 
 const { Header } = Layout;
 
@@ -62,6 +63,7 @@ const SurveyHeader = () => {
         </div>
 
         <div className="right-header flex items-center gap-4">
+          <NotificationComponent />
           <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={['click']}>
             <div className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white hover:bg-opacity-20">
               <div

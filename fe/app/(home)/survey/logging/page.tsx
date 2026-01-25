@@ -13,6 +13,7 @@ import { formatDateView } from '@utils/index';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { useDebouncedCallback } from '@hooks/useDebounce';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
@@ -155,4 +156,5 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.SurveyMenuLogging);
+

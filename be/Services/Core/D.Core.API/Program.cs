@@ -1,5 +1,4 @@
 ﻿using D.ControllerBase;
-using D.Core.API.Logs;
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
@@ -23,28 +22,10 @@ namespace D.Core.API
             var configuration = builder.Configuration;
 
             // Local Seq + File
-            //Log.Logger = new LoggerConfiguration()
-            //    .ReadFrom.Configuration(configuration)
-            //    .Enrich.FromLogContext()
-            //    .Enrich.WithProperty("ServiceName", "CoreAPI")
-            //    .CreateLogger();
-
-            //  Axiom Cloud Logging
-            var axiomToken = Environment.GetEnvironmentVariable("AXIOM_TOKEN")
-                ?? configuration["Axiom:Token"];
-            var axiomDataset = configuration["Axiom:Dataset"];
-            var axiomUrl = $"{configuration["Axiom:ApiUrl"]}/{axiomDataset}/ingest";
-
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("ServiceName", "CoreAPI") // Hoặc AuthAPI
-                .WriteTo.Http(
-                    requestUri: axiomUrl,
-                    queueLimitBytes: null,
-                    batchFormatter: new AxiomBatchFormatter(),
-                    httpClient: new AxiomHttpClient(axiomToken)
-                )
+                .Enrich.WithProperty("ServiceName", "CoreAPI")
                 .CreateLogger();
 
             try
@@ -71,6 +52,7 @@ namespace D.Core.API
                 builder.ConfigureJinaEmbedding();
                 builder.ConfigureQdrantClient();
                 builder.ConfigureJwtAuthentication();
+                builder.Services.AddHostedService<D.Core.Infrastructure.Services.Logging.LogUploadBackgroundService>();
 
                 var app = builder.Build();
 

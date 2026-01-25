@@ -19,7 +19,6 @@ import { toast } from 'react-toastify';
 import { requestStatusConst } from '@/constants/core/survey/requestStatus.const';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { isGranted } from '@hooks/isGranted';
 import { FileService } from '@services/file.service';
 
 const { Option } = Select;
@@ -34,12 +33,6 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequestState] = useState<IViewRequest | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
-
-  const canCreate = isGranted(PermissionCoreConst.SurveyButtonRequestCreate);
-  const canUpdate = isGranted(PermissionCoreConst.SurveyButtonRequestUpdate);
-  const canSubmit = isGranted(PermissionCoreConst.SurveyButtonRequestSubmit);
-  const canCancelSubmit = isGranted(PermissionCoreConst.SurveyButtonRequestCancelSubmit);
-  const canDelete = isGranted(PermissionCoreConst.SurveyButtonRequestDelete);
 
 
   const onClickAdd = () => {
@@ -133,9 +126,9 @@ const Page = () => {
           toast.error('Không thể tải chi tiết yêu cầu');
         }
       },
+      permission: PermissionCoreConst.SurveyButtonRequestUpdate,
       hidden: (record: IViewRequest) => 
-        !canUpdate || 
-        (record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED)
+        record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
     },
     {
       label: 'Gửi duyệt',
@@ -152,9 +145,9 @@ const Page = () => {
             toast.error('Gửi duyệt thất bại');
           });
       },
+      permission: PermissionCoreConst.SurveyButtonRequestSubmit,
       hidden: (record: IViewRequest) => 
-        !canSubmit || 
-        (record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED)
+        record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED
     },
     {
       label: 'Hủy gửi duyệt',
@@ -171,8 +164,8 @@ const Page = () => {
             toast.error('Hủy gửi duyệt thất bại');
           });
       },
+      permission: PermissionCoreConst.SurveyButtonRequestCancelSubmit,
       hidden: (record: IViewRequest) => 
-        !canCancelSubmit || 
         record.trangThai !== requestStatusConst.PENDING
     },
     {
@@ -206,8 +199,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonRequestDelete,
       hidden: (record: IViewRequest) => 
-        !canDelete || 
         (record.trangThai !== requestStatusConst.DRAFT && record.trangThai !== requestStatusConst.REJECTED)
     }
   ];
@@ -269,13 +262,16 @@ const Page = () => {
       title="Danh sách yêu cầu khảo sát"
       className="h-full"
       extra={
-        canCreate ? (
-          <Space>
-            <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-              Thêm mới
-            </Button>           
-          </Space>
-        ) : null
+        <Space>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={onClickAdd}
+            data-permission={PermissionCoreConst.SurveyButtonRequestCreate}
+          >
+            Thêm mới
+          </Button>           
+        </Space>
       }
     >
       <Form form={form} layout="vertical" initialValues={{ trangThai: requestStatusConst.DRAFT }}>
