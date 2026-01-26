@@ -283,53 +283,53 @@ const Page = () => {
   const bulkActionItems: MenuProps['items'] = [
     ...(canScore
       ? [
-          {
-            key: 'score',
-            label: 'Chấm KPI',
-            icon: <EditOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(scoreSelected)
-          }
-        ]
+        {
+          key: 'score',
+          label: 'Chấm KPI',
+          icon: <EditOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(scoreSelected)
+        }
+      ]
       : []),
     ...(canScore
       ? [
-          {
-            key: 'cancelScore',
-            label: 'Hủy kết quả chấm KPI',
-            icon: <UndoOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(cancelScoredSelected)
-          }
-        ]
+        {
+          key: 'cancelScore',
+          label: 'Hủy kết quả chấm KPI',
+          icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(cancelScoredSelected)
+        }
+      ]
       : []),
     ...(canSyncScore
       ? [
-          {
-            key: 'syncKetQua',
-            label: 'Đồng bộ kết quả thực tế',
-            icon: <SyncOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
-          }
-        ]
+        {
+          key: 'syncKetQua',
+          label: 'Đồng bộ kết quả thực tế',
+          icon: <SyncOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
+        }
+      ]
       : []),
     ...(canPrincipalApprove
       ? [
-          {
-            key: 'principalApprove',
-            label: 'Phê duyệt kết quả chấm',
-            icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
-            onClick: () => requiredSelect(principalApprovedSelected)
-          }
-        ]
+        {
+          key: 'principalApprove',
+          label: 'Phê duyệt kết quả chấm',
+          icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+          onClick: () => requiredSelect(principalApprovedSelected)
+        }
+      ]
       : []),
     ...(canPrincipalApprove
       ? [
-          {
-            key: 'cancelPrincipalApprove',
-            label: 'Hủy phê duyệt kết quả chấm',
-            icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
-            onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
-          }
-        ]
+        {
+          key: 'cancelPrincipalApprove',
+          label: 'Hủy phê duyệt kết quả chấm',
+          icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+          onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
+        }
+      ]
       : [])
   ];
 
@@ -427,14 +427,14 @@ const Page = () => {
         if (record.loaiKpi === 3) {
           return (
             <div
-              className="cursor-pointer items-center font-semibold text-blue-600 underline transition-colors hover:text-blue-900"
+              className="cursor-pointer font-semibold text-blue-600 underline hover:text-blue-900"
               onClick={() => setIsKpiComplianceTableOpen(true)}
-              title="Click để xem bảng tham chiếu"
             >
-              <span>{val || 'Xem phụ lục'}</span>
+              {val || 'Xem phụ lục'}
             </div>
           );
         }
+        return <span>{val || '-'}</span>;
       }
     },
     {

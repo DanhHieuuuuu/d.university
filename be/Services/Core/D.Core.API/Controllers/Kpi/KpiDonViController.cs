@@ -1,4 +1,6 @@
-﻿using D.ControllerBase;
+﻿using d.Shared.Permission;
+using d.Shared.Permission.Permission;
+using D.ControllerBase;
 using D.Core.Domain.Dtos.Kpi.KpiDonVi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +24,7 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiListUnitCreate, PermissionCoreKeys.CoreMenuKpiManageUnitCreate)]
         [HttpPost("kpi-donvi/create")]
         public async Task<ResponseAPI> CreateKpiDonVi([FromBody] CreateKpiDonViDto dto)
         {
@@ -41,6 +44,8 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiListUnit)]
+
         [HttpGet("kpi-donvi/find")]
         public async Task<ResponseAPI> GetAllKpiDonVi([FromQuery] FilterKpiDonViDto dto)
         {
@@ -193,6 +198,7 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiManageUnit)]
         [HttpGet("kpi-donvi/find-ke-khai")]
         public async Task<ResponseAPI> GetKpiDonViKeKhai([FromQuery] FilterKpiDonViKeKhaiDto dto)
         {
