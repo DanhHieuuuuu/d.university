@@ -83,6 +83,11 @@ const Page = () => {
     label: `KPI ${x.name}`
   }));
 
+  const STATUS_ALLOW_EDIT = [
+    KpiTrangThaiConst.DA_GUI_CHAM,
+
+  ];
+
   useEffect(() => {
     dispatch(getListTrangThaiKpiTruong());
     dispatch(getListNamHocKpiTruong());
@@ -214,65 +219,8 @@ const Page = () => {
       }
     });
 
-  const approveSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới được phê duyệt',
-      confirmTitle: 'Phê duyệt',
-      confirmMessage: 'Phê duyệt các KPI đã chọn?',
-      successMsg: 'Phê duyệt thành công',
-      nextStatus: KpiTrangThaiConst.DUOC_GIAO,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      },
-    });
 
-  const rejectSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới có thể từ chối',
-      confirmTitle: 'Từ chối đề xuất',
-      confirmMessage: 'Xác nhận từ chối các KPI đã chọn?',
-      successMsg: 'Từ chối thành công',
-      nextStatus: KpiTrangThaiConst.TU_CHOI,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      }
-    });
 
-  const approveSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới được phê duyệt',
-      confirmTitle: 'Phê duyệt',
-      confirmMessage: 'Phê duyệt các KPI đã chọn?',
-      successMsg: 'Phê duyệt thành công',
-      nextStatus: KpiTrangThaiConst.DUOC_GIAO,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      }
-    });
-
-  const rejectSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới có thể từ chối',
-      confirmTitle: 'Từ chối đề xuất',
-      confirmMessage: 'Xác nhận từ chối các KPI đã chọn?',
-      successMsg: 'Từ chối thành công',
-      nextStatus: KpiTrangThaiConst.TU_CHOI,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      }
-    });
 
   const updateKetQuaCapTren = (id: number, value?: number) => {
     setKetQuaCapTrenMap((prev) => ({ ...prev, [id]: value }));
@@ -319,73 +267,73 @@ const Page = () => {
   const bulkActionItems: MenuProps['items'] = [
     ...(canScore
       ? [
-          {
-            key: 'approve',
-            label: 'Phê duyệt đề xuất',
-            icon: <EditOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(approveSelected)
-          }
-        ]
+        {
+          key: 'approve',
+          label: 'Phê duyệt đề xuất',
+          icon: <EditOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(approveSelected)
+        }
+      ]
       : []),
     ...(canScore
       ? [
-          {
-            key: 'reject',
-            label: 'Từ chối đề xuất',
-            icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
-            onClick: () => requiredSelect(rejectSelected)
-          }
-        ]
+        {
+          key: 'reject',
+          label: 'Từ chối đề xuất',
+          icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
+          onClick: () => requiredSelect(rejectSelected)
+        }
+      ]
       : []),
     ...(canScore
       ? [
-          {
-            key: 'score',
-            label: 'Chấm KPI',
-            icon: <EditOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(scoreSelected)
-          }
-        ]
+        {
+          key: 'score',
+          label: 'Chấm KPI',
+          icon: <EditOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(scoreSelected)
+        }
+      ]
       : []),
     ...(canScore
       ? [
-          {
-            key: 'cancelScore',
-            label: 'Hủy kết quả chấm KPI',
-            icon: <UndoOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(cancelScoredSelected)
-          }
-        ]
+        {
+          key: 'cancelScore',
+          label: 'Hủy kết quả chấm KPI',
+          icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(cancelScoredSelected)
+        }
+      ]
       : []),
     ...(canSyncScore
       ? [
-          {
-            key: 'syncKetQua',
-            label: 'Đồng bộ kết quả thực tế',
-            icon: <SyncOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
-          }
-        ]
+        {
+          key: 'syncKetQua',
+          label: 'Đồng bộ kết quả thực tế',
+          icon: <SyncOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
+        }
+      ]
       : []),
     ...(canPrincipalApprove
       ? [
-          {
-            key: 'principalApprove',
-            label: 'Phê duyệt kết quả chấm',
-            icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
-            onClick: () => requiredSelect(principalApprovedSelected)
-          }
-        ]
+        {
+          key: 'principalApprove',
+          label: 'Phê duyệt kết quả chấm',
+          icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+          onClick: () => requiredSelect(principalApprovedSelected)
+        }
+      ]
       : []),
     ...(canPrincipalApprove
       ? [
-          {
-            key: 'cancelPrincipalApprove',
-            label: 'Hủy duyệt kết quả chấm',
-            icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
-            onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
-          }
-        ]
+        {
+          key: 'cancelPrincipalApprove',
+          label: 'Hủy duyệt kết quả chấm',
+          icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+          onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
+        }
+      ]
       : [])
   ];
 
@@ -546,7 +494,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQuaCapTren(record.id, v)}
-            editable={record.isActive !== 0}
+            editable={record.isActive !== 0 || record.trangThai == KpiTrangThaiConst.DA_GUI_CHAM}
           />
         );
       }
@@ -584,7 +532,7 @@ const Page = () => {
           setSelectedRowKeys(changableRowKeys);
         }
       },
-      { key: 'all-pages', text: 'Chọn tất cả các trang', onSelect: () => {} } // Logic chọn all trang cần gọi API getIds
+      { key: 'all-pages', text: 'Chọn tất cả các trang', onSelect: () => { } } // Logic chọn all trang cần gọi API getIds
     ]
   };
 
