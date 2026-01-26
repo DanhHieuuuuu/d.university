@@ -488,7 +488,7 @@ const Page = () => {
             loaiKetQua={record.loaiKetQua}
             value={value}
             onChange={(v) => updateKetQuaCapTren(record.id, v)}
-            editable={record.isActive !== 0}
+            editable={record.isActive !== 0 || record.trangThai == KpiTrangThaiConst.DA_GUI_CHAM}
           />
         );
       }
