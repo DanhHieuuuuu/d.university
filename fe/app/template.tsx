@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch } from '@redux/hooks';
-import { myPermission } from '@redux/feature/auth/authThunk';
+import { myPermissionThunk } from '@redux/feature/auth/authThunk';
 import { $fetchNotification } from '@redux/feature/noticeSlice';
 
 export default function Template({ children }: { children: React.ReactNode }) {
@@ -19,7 +19,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    dispatch(myPermission());
+    dispatch(myPermissionThunk());
     dispatch($fetchNotification({ PageIndex: 1, PageSize: 10, short: true }));
   }, [pathname]);
 

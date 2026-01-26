@@ -153,8 +153,6 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
     }
   };
 
-
-
   const handleSubmit = async () => {
     if (!surveyData) return;
 
@@ -208,13 +206,13 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
     const isEssay = question.loaiCauHoi === 3; // TextArea
 
     return (
-      <div key={question.id} className="mb-6 p-4 border rounded-lg bg-white">
+      <div key={question.id} className="mb-6 rounded-lg border bg-white p-4">
         <div className="mb-3">
-          <span className="font-semibold text-lg">
+          <span className="text-lg font-semibold">
             Câu {index + 1}: {question.noiDung}
           </span>
-          <span className="text-red-500 ml-1">*</span>
-          <span className="text-xs text-gray-500 ml-2">
+          <span className="ml-1 text-red-500">*</span>
+          <span className="ml-2 text-xs text-gray-500">
             ({isSingleChoice ? 'Chọn 1 đáp án' : isMultipleChoice ? 'Chọn nhiều đáp án' : 'Tự luận'})
           </span>
         </div>
@@ -231,7 +229,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
             >
               <Space direction="vertical" className="w-full">
                 {question.answers.map((answer) => (
-                  <Radio key={answer.id} value={answer.id} className="w-full p-2 hover:bg-gray-50 rounded">
+                  <Radio key={answer.id} value={answer.id} className="w-full rounded p-2 hover:bg-gray-50">
                     {answer.noiDung}
                   </Radio>
                 ))}
@@ -252,7 +250,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
             >
               <Space direction="vertical" className="w-full">
                 {question.answers.map((answer) => (
-                  <Checkbox key={answer.id} value={answer.id} className="w-full p-2 hover:bg-gray-50 rounded">
+                  <Checkbox key={answer.id} value={answer.id} className="w-full rounded p-2 hover:bg-gray-50">
                     {answer.noiDung}
                   </Checkbox>
                 ))}
@@ -286,9 +284,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
           <div>
             <div className="text-xl font-bold">{surveyData?.tenKhaoSat || 'Khảo sát'}</div>
             {surveyData && (
-              <div className="text-sm text-gray-500 mt-1">
-                Tổng số câu hỏi: {surveyData.questions.length}
-              </div>
+              <div className="mt-1 text-sm text-gray-500">Tổng số câu hỏi: {surveyData.questions.length}</div>
             )}
           </div>
         }
@@ -299,7 +295,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
         maskClosable={false}
       >
         {loading ? (
-          <div className="flex justify-center items-center py-20">
+          <div className="flex items-center justify-center py-20">
             <Spin size="large" tip="Đang tải khảo sát..." />
           </div>
         ) : surveyData ? (
@@ -313,7 +309,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
               </div>
               <Progress percent={getProgress()} status="active" />
               {lastSaveTime && (
-                <div className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
                   <ClockCircleOutlined />
                   Lưu lần cuối: {lastSaveTime.toLocaleTimeString('vi-VN')}
                 </div>
@@ -328,7 +324,7 @@ const SurveyDetailDialog = ({ surveyId, isOpen, onClose }: SurveyDetailDialogPro
             </Form>
 
             {/* Actions */}
-            <div className="flex justify-end items-center mt-6 pt-4 border-t">
+            <div className="mt-6 flex items-center justify-end border-t pt-4">
               <Space>
                 <Button onClick={handleClose}>Đóng</Button>
                 <Button

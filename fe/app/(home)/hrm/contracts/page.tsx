@@ -2,14 +2,12 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Button, Card, Form, Select } from 'antd';
-import {
-  PlusOutlined,
-  SearchOutlined,
-  SyncOutlined,
-  EyeOutlined} from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { formatCurrency, formatDateTimeView, formatDateView } from '@utils/index';
+import { withAuthGuard } from '@src/hoc/withAuthGuard';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 import AppTable from '@components/common/Table';
 import { IAction, IColumn } from '@models/common/table.model';
@@ -20,12 +18,15 @@ import { IQueryHopDong, IViewHopDong } from '@models/nhansu/hopdong.model';
 import { getListHopDong } from '@redux/feature/hrm/hopdong/hopdongThunk';
 import { resetStatusCreate, selectNsHopDong } from '@redux/feature/hrm/hopdong/hopdongSlice';
 import CreateContractModal from './(dialog)/CreateContractModal';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { data, status, total: totalItem } = useAppSelector((state) => state.hopdongState.$list);
   const { listLoaiHopDong } = useAppSelector((state) => state.danhmucState);
+
+  const hasPermisisonCreateContract = useIsGranted(PermissionCoreConst.CoreButtonCreateHrmContract);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -98,8 +99,8 @@ const Page = () => {
       title: 'Mức lương',
       align: 'center',
       render: (val: number) => {
-        return <span>{formatCurrency(val)} đ</span>
-      } 
+        return <span>{formatCurrency(val)} đ</span>;
+      }
     },
     {
       key: 'ghiChu',
@@ -117,11 +118,11 @@ const Page = () => {
   ];
 
   useEffect(() => {
-      if (!isModalOpen) {
-        dispatch(resetStatusCreate());
-        dispatch(getListHopDong(query));
-      }
-    }, [isModalOpen]);
+    if (!isModalOpen) {
+      dispatch(resetStatusCreate());
+      dispatch(getListHopDong(query));
+    }
+  }, [isModalOpen]);
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
     onFilterChange({ Keyword: value });
@@ -136,7 +137,7 @@ const Page = () => {
       title="Danh sách hợp đồng"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+        <Button hidden={!hasPermisisonCreateContract} type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
           Thêm mới
         </Button>
       }
@@ -186,4 +187,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuHrmContract);

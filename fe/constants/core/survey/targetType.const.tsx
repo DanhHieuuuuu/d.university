@@ -6,19 +6,19 @@ export class surveyTargetConst {
   static list = [
     {
       value: this.ALL,
-      name: 'Tất cả',
+      name: 'Tất cả'
     },
     {
       value: this.STUDENT,
-      name: 'Sinh viên',
+      name: 'Sinh viên'
     },
     {
       value: this.LECTURER,
-      name: 'Giảng viên',
-    },
+      name: 'Giảng viên'
+    }
   ];
 
   static getName(value?: number) {
-    return this.list.find(x => x.value == value)?.name ?? '';
+    return this.list.find((x) => x.value == value)?.name ?? '';
   }
 }

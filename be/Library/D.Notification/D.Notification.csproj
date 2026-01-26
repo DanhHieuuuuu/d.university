@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.14.1" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\Services\Core\D.Core.Domain\D.Core.Domain.csproj" />
 		<ProjectReference Include="..\D.ControllerBase\D.ControllerBase.csproj" />

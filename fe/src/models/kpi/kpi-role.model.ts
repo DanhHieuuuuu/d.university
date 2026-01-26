@@ -15,26 +15,25 @@ export type IViewKpiRole = {
 export type IQueryKpiRole = IQueryPaging & {
   keyword?: string;
   chucVu?: string;
-}
-
+};
 
 export type ICreateKpiRole = {
   idNhanSu: number;
   idDonVi?: number;
   tiLe?: number;
   role?: string;
-}
+};
 
 export type IUpdateKpiRole = ICreateKpiRole & {
   id: number;
-}
+};
 
 export type INhanSu = {
   idnhanSu?: number;
   maNhanSu?: string;
   hoTenDayDu?: string;
   tenPhongBan?: string;
-}
+};
 
 export interface IRoleOption {
   label: string;

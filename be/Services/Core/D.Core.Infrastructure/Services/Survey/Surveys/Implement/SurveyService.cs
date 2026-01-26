@@ -23,6 +23,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Transactions;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Dtos;
+using D.Notification.Domain.Enums;
 
 namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 {
@@ -30,17 +33,20 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
     {
         private readonly ServiceUnitOfWork _unitOfWork;
         private IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationService _notificationService;
 
         public SurveyService(
             ILogger<SurveyService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
-            ServiceUnitOfWork unitOfWork
+            ServiceUnitOfWork unitOfWork,
+            INotificationService notificationService
         )
             : base(logger, httpContext, mapper)
         {
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContext;
+            _notificationService = notificationService;
         }
 
         public PageResultDto<SurveyResponseDto> Paging(FilterSurveyDto dto)
@@ -505,6 +511,29 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             scope.Complete();
 
+            try
+            {
+                var userId = CommonUntil.GetCurrentUserId(_httpContextAccessor);
+                var surveyName = surveyInfo.TenKhaoSat;
+                
+                await _notificationService.SendAsync(new NotificationMessage
+                {
+                    Receiver = new Receiver
+                    {
+                        UserId = userId
+                    },
+                    Title = "Kết quả khảo sát",
+                    Content = $"Bạn đã hoàn thành khảo sát \"{surveyName}\". Điểm: {totalScore}/{questionTypes.Count} ({correctQuestionsCount} câu có điểm)",
+                    Channel = NotificationChannel.Realtime
+                });
+                
+                _logger.LogInformation($"Sent survey result notification to user {userId}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send survey result notification");
+            }
+
             return new SurveyResultDto
             {
                 SubmissionId = submission.Id,
@@ -734,6 +763,49 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                 CreatedDate = DateTime.Now
             };
             await _unitOfWork.iKsSurveyLogRepository.AddAsync(log);
+        }
+
+        public async Task<D.Core.Domain.Dtos.Survey.Statistics.SurveyStatisticsDto> GetStatisticsAsync()
+        {
+            _logger.LogInformation($"{nameof(GetStatisticsAsync)} method called.");
+
+            // Survey Requests statistics
+            var requestStats = await _unitOfWork.iKsSurveyRequestRepository.TableNoTracking
+                .Where(x => !x.Deleted)
+                .GroupBy(x => x.TrangThai)
+                .Select(g => new D.Core.Domain.Dtos.Survey.Statistics.StatusCountDto
+                {
+                    Status = g.Key,
+                    StatusName = RequestStatus.Names.ContainsKey(g.Key) ? RequestStatus.Names[g.Key] : "Không xác định",
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            // Surveys statistics
+            var surveyStats = await _unitOfWork.iKsSurveyRepository.TableNoTracking
+                .Where(x => !x.Deleted)
+                .GroupBy(x => x.Status)
+                .Select(g => new D.Core.Domain.Dtos.Survey.Statistics.StatusCountDto
+                {
+                    Status = g.Key,
+                    StatusName = SurveyStatus.Names.ContainsKey(g.Key) ? SurveyStatus.Names[g.Key] : "Không xác định",
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            return new D.Core.Domain.Dtos.Survey.Statistics.SurveyStatisticsDto
+            {
+                SurveyRequests = new D.Core.Domain.Dtos.Survey.Statistics.SurveyRequestStatsDto
+                {
+                    Total = requestStats.Sum(x => x.Count),
+                    ByStatus = requestStats
+                },
+                Surveys = new D.Core.Domain.Dtos.Survey.Statistics.SurveyStatsDto
+                {
+                    Total = surveyStats.Sum(x => x.Count),
+                    ByStatus = surveyStats
+                }
+            };
         }
 
     }

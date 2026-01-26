@@ -6,6 +6,7 @@ using d.Shared.Permission.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using D.Core.Domain.Dtos.Hrm.HopDong;
+using D.Core.Domain.Dtos.Hrm.SemanticSearch;
 
 namespace D.Core.API.Controllers.Hrm
 {
@@ -26,6 +27,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuHrmDanhSach)]
         [HttpGet("find")]
         public async Task<ResponseAPI> GetListNhanSu(NsNhanSuRequestDto dto)
         {
@@ -123,7 +125,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreMenuHrmDanhSach)]
         [HttpGet("get")]
         public async Task<ResponseAPI> FindByMaNsSdt(FindByMaNsSdtDto dto)
         {
@@ -143,7 +145,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="idNhanSu"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreMenuHrmDanhSach)]
         [HttpGet("{idNhanSu}")]
         public async Task<ResponseAPI> FindByIdNhanSu(int idNhanSu)
         {
@@ -164,7 +166,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="idNhanSu"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreButtonViewNhanSu)]
         [HttpGet("ho-so/{idNhanSu}")]
         public async Task<ResponseAPI> GetHoSoNhanSu(int idNhanSu)
         {
@@ -185,7 +187,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateHrmContract)]
         [HttpPost("contract/create")]
         public async Task<ResponseAPI> CreateHopDong(CreateHopDongDto dto)
         {
@@ -200,6 +202,12 @@ namespace D.Core.API.Controllers.Hrm
             }
         }
 
+        /// <summary>
+        /// Danh sách hợp đồng
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreTableHrmContract)]
         [HttpGet("contract/find")]
         public async Task<ResponseAPI> GetAllContract(NsHopDongRequestDto dto)
         {
@@ -214,5 +222,62 @@ namespace D.Core.API.Controllers.Hrm
             }
         }
 
+        /// <summary>
+        /// Thống kê nhân sự theo phòng ban
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("thongke-theo-phongban")]
+        public async Task<ResponseAPI> ThongKeNhanSuTheoPhongBanApi()
+        {
+            try
+            {
+                var dto = new ThongKeNhanSuTheoPhongBanRequestDto { };
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Tìm kiếm ngữ nghĩa
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("search")]
+        public async Task<ResponseAPI> SearchSemanticNhanSuApi(SearchSemanticRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Đồng bộ nhân sự vào Qdrant
+        /// </summary>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonSyncNhanSu)]
+        [HttpPost("sync")]
+        public async Task<ResponseAPI> FetchNhanSuQdrantApi()
+        {
+            try
+            {
+                var dto = new FetchNhanSuQdrantDto { };
+                await _mediator.Send(dto);
+                return new("Đã đồng bộ data với Qdrant");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

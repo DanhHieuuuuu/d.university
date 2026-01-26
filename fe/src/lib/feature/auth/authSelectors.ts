@@ -1,13 +1,14 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '@redux/store';
 
-const selectAuthState = (state: RootState) => state.authState;
+export const selectorUser = (state: RootState) => state.authState?.user ?? null;
 
-export const selectorUser = createSelector([selectAuthState], (auth) => auth.user);
+export const selectorPermissions = (state: RootState) => state.authState?.permissions ?? [];
 
-export const selectorPermissions = createSelector([selectAuthState], (auth) => auth.permissions || []);
+// chuyển đổi permissions từ Array sang Set để tìm kiếm nhanh hơn
+const selectPermissionSet = createSelector([selectorPermissions], (permissions) => new Set(permissions));
 
 export const selectorIsGranted = createSelector(
-  [selectorPermissions, (_: RootState, permission: string) => permission],
-  (permissions, permission) => permissions.includes(permission)
+  [selectPermissionSet, (_: RootState, permission: string) => permission],
+  (permissions, permission) => permissions.has(permission)
 );

@@ -16,7 +16,6 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { toast } from 'react-toastify';
 import ReportDetailModal from './(dialog)/detail';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { isGranted } from '@hooks/isGranted';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 const Page = () => {
@@ -28,8 +27,6 @@ const Page = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<IReportDetail | null>(null);
-
-  const canGenerateAIReport = isGranted(PermissionCoreConst.SurveyButtonAIReportGenerate);
 
   const columns: IColumn<IReportItem>[] = [
     // {
@@ -91,7 +88,7 @@ const Page = () => {
           toast.error('Không thể phân tích với AI');
         }
       },
-      hidden: (record: IReportItem) => !canGenerateAIReport
+      permission: PermissionCoreConst.SurveyButtonAIReportGenerate
     }
   ];
 
@@ -115,7 +112,6 @@ const Page = () => {
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     handleDebouncedSearch(event.target.value);
   };
-
 
   return (
     <Card title="Danh sách báo cáo khảo sát" className="h-full">
@@ -152,7 +148,7 @@ const Page = () => {
         setIsModalOpen={setIsModalOpen}
         report={selectedReport}
         onClose={() => {
-            setSelectedReport(null);
+          setSelectedReport(null);
         }}
       />
     </Card>

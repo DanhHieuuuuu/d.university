@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Statistic, Table, Tag } from 'antd';
 import {
   TeamOutlined,
@@ -12,9 +12,44 @@ import {
 } from '@ant-design/icons';
 import { useAppSelector } from '@redux/hooks';
 import { Column, Pie } from '@ant-design/plots';
-
+import { IStatistical } from '@models/delegation/delegation.model';
+import { ISurveyStatistics } from '@models/survey/statistics.model';
+import { toast } from 'react-toastify';
+import { DelegationIncomingService } from '@/src/services/delegation/delegationIncoming.service';
+import { SurveyService } from '@/src/services/survey.service';
+import { DelegationStatusConst } from '@/constants/core/delegation/delegation-status.consts';
 const HomePage: React.FC = () => {
   const { user } = useAppSelector((state) => state.authState);
+
+  const [statisticalData, setStatisticalData] = useState<IStatistical | null>(null);
+  const [surveyStats, setSurveyStats] = useState<ISurveyStatistics | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchStatistical = async () => {
+      try {
+        setLoading(true);
+        const res = await DelegationIncomingService.getStatistical();
+        setStatisticalData(res.data);
+      } catch {
+        toast.error('Không tải được thống kê');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchSurveyStats = async () => {
+      try {
+        const res = await SurveyService.getStatistics();
+        setSurveyStats(res.data);
+      } catch {
+        toast.error('Không tải được thống kê khảo sát');
+      }
+    };
+
+    fetchStatistical();
+    fetchSurveyStats();
+  }, []);
 
   // Mock data - Thay thế bằng API call thực tế
   const statsData = {
@@ -40,12 +75,16 @@ const HomePage: React.FC = () => {
     { faculty: 'Nghệ thuật', students: 50 }
   ];
 
+  const statusChartData = (statisticalData?.byStatus || []).map((item) => ({
+    status: DelegationStatusConst.getInfo(item.status, 'label'),
+    total: item.total
+  }));
   const columnConfig: any = {
-    data: studentsByFacultyData,
-    xField: 'faculty',
-    yField: 'students',
+    data: statusChartData,
+    xField: 'status',
+    yField: 'total',
     label: {
-      text: 'students',
+      text: 'total',
       position: 'top',
       style: {
         fill: '#000000',
@@ -54,11 +93,11 @@ const HomePage: React.FC = () => {
     },
     axis: {
       x: {
-        title: 'Khoa',
+        title: 'Trạng thái',
         labelAutoRotate: false
       },
       y: {
-        title: 'Sinh vien'
+        title: 'Số đoàn vào'
       }
     },
     style: {
@@ -66,21 +105,21 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Dữ liệu biểu đồ tròn - Phân bố nhân sự theo chức vụ
-  const staffByPositionData = [
-    { type: 'Giảng viên', value: 180 },
-    { type: 'Trợ giảng', value: 35 },
-    { type: 'Quản lý', value: 15 },
-    { type: 'Hành chính', value: 15 }
-  ];
+  // // Dữ liệu biểu đồ tròn - Phân bố nhân sự theo chức vụ
+  // const staffByPositionData = [
+  //   { type: 'Giảng viên', value: 180 },
+  //   { type: 'Trợ giảng', value: 35 },
+  //   { type: 'Quản lý', value: 15 },
+  //   { type: 'Hành chính', value: 15 }
+  // ];
 
   const pieConfig: any = {
-    data: staffByPositionData,
-    angleField: 'value',
-    colorField: 'type',
+    data: statusChartData,
+    angleField: 'total',
+    colorField: 'status',
     radius: 0.8,
     label: {
-      text: 'type',
+      text: 'status',
       position: 'outside'
     },
     legend: {
@@ -90,7 +129,65 @@ const HomePage: React.FC = () => {
       }
     },
     tooltip: {
-      title: 'type'
+      title: 'status'
+    }
+  };
+
+  // Survey Request Chart Data (Column)
+  const surveyRequestChartData = (surveyStats?.surveyRequests?.byStatus || []).map(item => ({
+    status: item.statusName,
+    count: item.count
+  }));
+
+  const requestColumnConfig: any = {
+    data: surveyRequestChartData,
+    xField: 'status',
+    yField: 'count',
+    label: {
+      text: 'count',
+      position: 'top',
+      style: {
+        fill: '#000000',
+        opacity: 0.6
+      }
+    },
+    axis: {
+      x: {
+        title: 'Trạng thái',
+        labelAutoRotate: false
+      },
+      y: {
+        title: 'Số lượng'
+      }
+    },
+    style: {
+      fill: '#52c41a'
+    }
+  };
+
+  // Survey Chart Data (Pie)
+  const surveyChartData = (surveyStats?.surveys?.byStatus || []).map(item => ({
+    status: item.statusName,
+    count: item.count
+  }));
+
+  const surveyPieConfig: any = {
+    data: surveyChartData,
+    angleField: 'count',
+    colorField: 'status',
+    radius: 0.8,
+    label: {
+      text: 'status',
+      position: 'outside'
+    },
+    legend: {
+      color: {
+        title: false,
+        position: 'bottom'
+      }
+    },
+    tooltip: {
+      title: 'status'
     }
   };
 
@@ -177,25 +274,16 @@ const HomePage: React.FC = () => {
   return (
     <div style={{ padding: 24 }}>
       {/* Welcome Message */}
-      <p style={{ marginBottom: 24, fontSize: 28, fontWeight: 600 }}>
-        Chào mừng trở lại, {user?.ten || 'Admin'}! 👋
-      </p>
+      <p style={{ marginBottom: 24, fontSize: 28, fontWeight: 600 }}>Chào mừng trở lại, {user?.ten || 'Admin'}! 👋</p>
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card variant="borderless" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
             <Statistic
-              title={<span style={{ color: 'white' }}>Tổng Nhân Sự</span>}
-              value={statsData.totalStaff}
+              title={<span style={{ color: 'white' }}>Tổng Đoàn vào</span>}
+              value={statisticalData?.totalAll}
               prefix={<TeamOutlined />}
-              suffix={
-                statsData.staffGrowth > 0 ? (
-                  <span style={{ fontSize: '14px', color: '#95de64' }}>
-                    <RiseOutlined /> {statsData.staffGrowth}%
-                  </span>
-                ) : null
-              }
               valueStyle={{ color: 'white' }}
             />
           </Card>
@@ -249,17 +337,32 @@ const HomePage: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Charts Row */}
+      {/* Delegation Charts Row */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} lg={16}>
-          <Card title="Số lượng sinh viên theo khoa" variant="borderless">
+          <Card title="Số lượng đoàn vào " variant="borderless">
             <Column {...columnConfig} />
           </Card>
         </Col>
 
         <Col xs={24} lg={8}>
-          <Card title="Phân bố nhân sự theo chức vụ" variant="borderless">
+          <Card title="Phân bố số lượng đoàn vào" variant="borderless">
             <Pie {...pieConfig} />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Survey Statistics Row */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} lg={12}>
+          <Card title="Thống kê yêu cầu khảo sát" variant="borderless">
+            <Column {...requestColumnConfig} />
+          </Card>
+        </Col>
+
+        <Col xs={24} lg={12}>
+          <Card title="Phân bố khảo sát" variant="borderless">
+            <Pie {...surveyPieConfig} />
           </Card>
         </Col>
       </Row>

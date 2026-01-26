@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { ICreateNhanSu, IUpdateNhanSu } from '@models/nhansu/nhansu.model';
 import { clearSelected, resetStatusCreate, resetStatusUpdate } from '@redux/feature/hrm/nhansu/nhansuSlice';
 import { createNhanSuThunk, updateNhanSuThunk } from '@redux/feature/hrm/nhansu/nhansuThunk';
-import { FamilyTab, PersonalTab } from './(tab-ns)';
+import { EducationTab, FamilyTab, PersonalTab } from './(tab-ns)';
 
 type NhanSuModalProps = {
   isModalOpen: boolean;
@@ -40,17 +40,21 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
 
   useEffect(() => {
     if (props.isModalOpen && selected.status === ReduxStatus.SUCCESS && selected.data) {
-      const rawData = selected.data;
+      if (props.isUpdate) {
+        const rawData = selected.data;
 
-      form.setFieldsValue({
-        ...rawData,
-        ngaySinh: rawData.ngaySinh ? dayjs(rawData.ngaySinh) : null,
-        ngayCapCccd: rawData.ngayCapCccd ? dayjs(rawData.ngayCapCccd) : null,
-        thongTinGiaDinh: rawData.thongTinGiaDinh?.map((member: any) => ({
-          ...member,
-          ngaySinh: member.ngaySinh ? dayjs(member.ngaySinh) : null
-        }))
-      });
+        form.setFieldsValue({
+          ...rawData,
+          ngaySinh: rawData.ngaySinh ? dayjs(rawData.ngaySinh) : null,
+          ngayCapCccd: rawData.ngayCapCccd ? dayjs(rawData.ngayCapCccd) : null,
+          thongTinGiaDinh: rawData.thongTinGiaDinh?.map((member: any) => ({
+            ...member,
+            ngaySinh: member.ngaySinh ? dayjs(member.ngaySinh) : null
+          }))
+        });
+      } else {
+        form.resetFields();
+      }
     }
   }, [props.isModalOpen, selected.status, selected.data, form]);
 
@@ -64,6 +68,11 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
       key: 'family',
       label: 'Thông tin gia đình',
       children: <FamilyTab />
+    },
+    {
+      key: 'education',
+      label: 'Học vấn',
+      children: <EducationTab />
     }
   ];
 
@@ -85,7 +94,7 @@ const CreateNhanSuModal: React.FC<NhanSuModalProps> = (props) => {
         idNhanSu: selected.idNhanSu,
         ...values
       };
-      
+
       await dispatch(updateNhanSuThunk(body));
 
       if ($update.status === ReduxStatus.SUCCESS) {

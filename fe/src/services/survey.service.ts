@@ -285,6 +285,16 @@ const pagingSurveyLog = async (query: IQuerySurveyLog) => {
   }
 };
 
+const getStatistics = async () => {
+  try {
+    const res = await axios.get(`${apiSurveyEndpoint}/statistics`);
+    return res.data;
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tải thống kê khảo sát.');
+    throw err;
+  }
+};
+
 export const SurveyService = {
   pagingRequest,
   getRequestById,
@@ -310,5 +320,6 @@ export const SurveyService = {
   analyzeWithAI,
   getAIReportDetail,
   importExcelQuestions,
-  pagingSurveyLog
+  pagingSurveyLog,
+  getStatistics
 };

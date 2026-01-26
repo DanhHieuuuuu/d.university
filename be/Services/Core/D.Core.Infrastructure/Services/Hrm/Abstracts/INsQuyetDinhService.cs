@@ -34,5 +34,12 @@ namespace D.Core.Infrastructure.Services.Hrm.Abstracts
         public PageResultDto<NsQuyetDinhResponseDto> FindPagingNsQuyetDinh(
             NsQuyetDinhRequestDto dto
         );
+
+        /// <summary>
+        /// Chi tiết quyết định
+        /// </summary>
+        /// <param name="idQuyetDing"></param>
+        /// <returns></returns>
+        public NsQuyetDinhFindByIdResponseDto FindById(int idQuyetDing);
     }
 }

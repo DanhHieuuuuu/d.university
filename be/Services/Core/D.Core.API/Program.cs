@@ -1,8 +1,9 @@
 ﻿using D.ControllerBase;
-using D.Core.API.Logs;
 using D.Core.Application;
 using D.Core.Domain;
 using D.Core.Infrastructure;
+using D.Embedding.Jina.Configs;
+using D.QdrantClient.Configs;
 using D.Notification.ApplicationService.Configs;
 using D.Notification.Infrastructure.Hubs;
 using D.S3Bucket.Configs;
@@ -21,28 +22,10 @@ namespace D.Core.API
             var configuration = builder.Configuration;
 
             // Local Seq + File
-            //Log.Logger = new LoggerConfiguration()
-            //    .ReadFrom.Configuration(configuration)
-            //    .Enrich.FromLogContext()
-            //    .Enrich.WithProperty("ServiceName", "CoreAPI")
-            //    .CreateLogger();
-
-            //  Axiom Cloud Logging
-            var axiomToken = Environment.GetEnvironmentVariable("AXIOM_TOKEN")
-                ?? configuration["Axiom:Token"];
-            var axiomDataset = configuration["Axiom:Dataset"];
-            var axiomUrl = $"{configuration["Axiom:ApiUrl"]}/{axiomDataset}/ingest";
-
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("ServiceName", "CoreAPI") // Hoặc AuthAPI
-                .WriteTo.Http(
-                    requestUri: axiomUrl,
-                    queueLimitBytes: null,
-                    batchFormatter: new AxiomBatchFormatter(),
-                    httpClient: new AxiomHttpClient(axiomToken)
-                )
+                .Enrich.WithProperty("ServiceName", "CoreAPI")
                 .CreateLogger();
 
             try
@@ -66,6 +49,10 @@ namespace D.Core.API
                 builder.ConfigureCors();
                 builder.ConfigureS3();
                 builder.Services.AddHttpClient();
+                builder.ConfigureJinaEmbedding();
+                builder.ConfigureQdrantClient();
+                builder.ConfigureJwtAuthentication();
+                builder.Services.AddHostedService<D.Core.Infrastructure.Services.Logging.LogUploadBackgroundService>();
 
                 var app = builder.Build();
 
@@ -79,7 +66,6 @@ namespace D.Core.API
                     });
                 }
                 app.UseCors(ProgramBase.CorsPolicy);
-                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 app.UseSerilogRequestLogging();
 
                 app.UseAuthentication();
@@ -87,6 +73,7 @@ namespace D.Core.API
                 app.MapControllers();
                
 
+                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 Log.Information("Core started successfully.");
                 app.Run();
             }

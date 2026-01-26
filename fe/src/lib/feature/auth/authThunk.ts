@@ -39,7 +39,7 @@ export const refreshToken = createAsyncThunk('auth/refresh', async (_, { rejectW
   }
 });
 
-export const myPermission = createAsyncThunk('auth/permission', async (_, { rejectWithValue }) => {
+export const myPermissionThunk = createAsyncThunk('auth/permission', async (_, { rejectWithValue }) => {
   try {
     const res = await RoleService.getMyPermission();
     return res.data;

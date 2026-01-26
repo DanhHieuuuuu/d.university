@@ -649,41 +649,55 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
             return allowedUserIds.ToList();
         }
 
-        public async Task<string> GetKpiCaNhanContextForAi(int userId, List<int> allowedUserIds)
+        public async Task<object> GetKpiCaNhanContextForAi(int userId, List<int> allowedUserIds)
         {
             var kpis = await _unitOfWork.iKpiCaNhanRepository.TableNoTracking
                 .Where(x => !x.Deleted && allowedUserIds.Contains(x.IdNhanSu))
                 .ToListAsync();
 
-            if (!kpis.Any()) return "### KPI Cá nhân: Không có dữ liệu.";
-
+            if (!kpis.Any()) return null;
             var nhanSuIds = kpis.Select(x => x.IdNhanSu).Distinct().ToList();
             var nhanSuDict = await _unitOfWork.iNsNhanSuRepository.TableNoTracking
                 .Where(ns => nhanSuIds.Contains(ns.Id))
                 .ToDictionaryAsync(x => x.Id, x => (x.HoDem + " " + x.Ten).Trim());
-
-            var sb = new StringBuilder();
-            sb.AppendLine("## [BÁO CÁO KPI CÁ NHÂN NHÂN VIÊN]");
-
-            var groupedByNhanSu = kpis.GroupBy(x => x.IdNhanSu);
-            foreach (var group in groupedByNhanSu)
+            var result = kpis.GroupBy(x => x.IdNhanSu).Select(group =>
             {
-                var tenNV = nhanSuDict.GetValueOrDefault(group.Key, "Ẩn danh");
-                sb.AppendLine($"### Nhân sự: {tenNV}");
-                sb.AppendLine($"- **Tổng điểm tự chấm:** {group.Sum(s => s.DiemKpi ?? 0)}");
-                sb.AppendLine($"- **Tổng điểm cấp trên chấm:** {group.Sum(s => s.DiemKpiCapTren ?? 0)}");
-                sb.AppendLine("| Tên KPI | Loại | Trọng số | Tự chấm | Cấp trên chấm |");
-                sb.AppendLine("| :--- | :--- | :---: | :---: | :---: |");
+                var tongTuCham = group.Sum(s => (s.LoaiKPI == 3 ? -1 : 1) * (s.DiemKpi ?? 0));
+                var tongCapTren = group.Sum(s => (s.LoaiKPI == 3 ? -1 : 1) * (s.DiemKpiCapTren ?? 0));
 
-                foreach (var k in group)
+                return new
                 {
-                    double.TryParse(k.TrongSo, out double ts);
-                    string loaiStr = k.LoaiKPI switch { 1 => "Chức năng", 2 => "Mục tiêu", 3 => "Tuân thủ", _ => "Khác" };
-                    sb.AppendLine($"| {k.KPI} | {loaiStr} | {ts}% | {k.DiemKpi} | {k.DiemKpiCapTren} |");
-                }
-                sb.AppendLine(); 
-            }
-            return sb.ToString();
+                    IdNhanSu = group.Key,
+                    HoTen = nhanSuDict.GetValueOrDefault(group.Key, "UnKnown"),
+                    TongDiemTuCham = tongTuCham,
+                    TongDiemCapTren = tongCapTren,
+                    ChiTietKPI = group.Select(k => {
+                        double.TryParse(k.TrongSo?.Replace("%", "").Trim(), out double ts);
+                        int modifier = k.LoaiKPI == 3 ? -1 : 1;
+
+                        return new
+                        {
+                            TenKPI = k.KPI,
+                            LoaiKPI = k.LoaiKPI switch
+                            {
+                                1 => "Chức năng",
+                                2 => "Mục tiêu",
+                                3 => "Tuân thủ",
+                                _ => "Khác"
+                            },
+                            MucTieu = k.MucTieu ?? "Chưa xác định",
+                            TrongSo = ts,
+                            KetQuaThucTe = k.KetQuaThucTe ?? 0,
+                            DiemTuCham = (k.DiemKpi ?? 0) * modifier,
+                            DiemCapTren = (k.CapTrenDanhGia ?? k.DiemKpiCapTren ?? 0) * modifier,
+                            CongThuc = k.CongThucTinh ?? "Không có công thức",
+                            ChucVu = k.Role ?? "N/A"
+                        };
+                    }).ToList()
+                };
+            }).ToList();
+
+            return result;
         }
 
         private async Task SendKpiStatusNotification(KpiCaNhan kpi, int newStatus, string? note)

@@ -27,7 +27,6 @@ export type IViewStudent = {
   nganh?: number;
   chuyenNganh?: number;
   trangThaiHoc?: number;
-
 };
 
 export type ICreateStudent = {

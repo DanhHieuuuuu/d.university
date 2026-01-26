@@ -8,11 +8,13 @@ import {
   DeploymentUnitOutlined,
   EditOutlined,
   EyeOutlined,
+  FileWordOutlined,
   PlayCircleOutlined,
   PlusOutlined,
   SearchOutlined,
   SendOutlined,
-  SyncOutlined
+  SyncOutlined,
+  UserAddOutlined
 } from '@ant-design/icons';
 
 import { ReduxStatus } from '@redux/const';
@@ -25,9 +27,10 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { ICreateDepartment, IDepartmentSupport, IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
+  getListDelegationIncoming,
   getListGuestGroup,
   getListPhongBan,
   getListStatus,
@@ -38,8 +41,11 @@ import { ETableColumnType } from '@/constants/e-table.consts';
 import { DelegationStatusConst } from '../../../../../constants/core/delegation/delegation-status.consts';
 import AutoCompleteAntd from '@components/hieu-custom/combobox';
 import { toast } from 'react-toastify';
-import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 import { useRouter } from 'next/navigation';
+import { exportBaoCaoDoanVao } from '@helpers/delegation/action.helper';
+import CreateDepartmentSupportModal from '../support/(dialog)/create';
+import { selectDelegationIncomingId, selectDepartmentSupport } from '@redux/feature/delegation/department/departmentSlice';
+import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -72,7 +78,7 @@ const Page = () => {
       dataIndex: 'idPhongBan',
       title: 'Phòng ban phụ trách',
       align: 'center',
-      width:160,
+      width: 160,
       render: (value: number) => {
         const pb = listPhongBan.find((p: any) => p.idPhongBan === value);
         return pb ? pb.tenPhongBan : '';
@@ -82,22 +88,22 @@ const Page = () => {
       key: 'location',
       dataIndex: 'location',
       title: 'Địa điểm',
-      align:'center',
-      width:120
+      align: 'center',
+      width: 120
     },
     {
       key: 'idStaffReception',
       dataIndex: 'staffReceptionName',
       title: 'Nhân sự tiếp đón',
       align: 'center',
-      width:160
+      width: 160
     },
     {
       key: 'totalPerson',
       dataIndex: 'totalPerson',
       title: 'Tổng số người',
       align: 'center',
-      width:120
+      width: 120
     },
     {
       key: 'phoneNumber',
@@ -109,7 +115,7 @@ const Page = () => {
       dataIndex: 'totalMoney',
       title: 'Tổng chi phí',
       align: 'left',
-      width:120
+      width: 120
     },
     {
       key: 'status',
@@ -125,26 +131,44 @@ const Page = () => {
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      command: (record: IViewGuestGroup) => onClickView(record)
+      command: (record: IViewGuestGroup) => onClickView(record),
+      permission: PermissionCoreConst.CoreButtonViewXuLyDoanVao,
     },
     {
       label: 'Báo cáo kết quả',
       icon: <CheckOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
-      command: (record: IViewGuestGroup) => onClickBaoCao(record)
+      command: (record: IViewGuestGroup) => onClickBaoCao(record),
+      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao,
+    },
+    {
+      label: 'Xuất báo cáo',
+      icon: <FileWordOutlined/>,
+      hidden: (r) => r.status !== DelegationStatusConst.DONE,
+      command: (record: IViewGuestGroup) => onExport(record),
+      permission: PermissionCoreConst.CoreButtonUpdateDoanVao,
     },
     {
       label: 'Phê duyệt',
       icon: <CheckOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
-      command: (record: IViewGuestGroup) => onClickPheDuyet(record)
+      command: (record: IViewGuestGroup) => onClickPheDuyet(record),
+      permission: PermissionCoreConst.CoreButtonPheDuyetXuLyDoanVao,
     },
     {
       label: 'Tiếp đoàn',
       icon: <DeploymentUnitOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET || !r.receptionTimes?.length,
-      command: (record: IViewGuestGroup) => onClickTiepDoan(record)
-    }
+      command: (record: IViewGuestGroup) => onClickTiepDoan(record),
+      permission: PermissionCoreConst.CoreButtonTiepDoanXuLyDoanVao,
+    },
+    {
+      label: 'Phân công hỗ trợ',
+      icon: <UserAddOutlined/>,
+      // hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
+      command: (record: IDepartmentSupport) => onClickPhanCong(record),
+      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao,
+    },
   ];
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
@@ -166,6 +190,7 @@ const Page = () => {
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
       dispatch(getListStatus());
+      dispatch(getListDelegationIncoming());
     }
   }, [isModalOpen]);
 
@@ -176,7 +201,12 @@ const Page = () => {
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     handleDebouncedSearch(event.target.value);
   };
-
+const onClickPhanCong = (data: IDepartmentSupport) => {
+  dispatch(selectDelegationIncomingId(data.id));
+  setIsModalView(false);
+  setIsModalUpdate(false);
+  setIsModalOpen(true);
+};
   const onClickView = (data: IViewGuestGroup) => {
     router.push(`/delegation/incoming/detail/${data.id}`);
   };
@@ -202,7 +232,7 @@ const Page = () => {
       okText: 'Đồng ý',
       cancelText: 'Không đồng ý',
       okAction: 'upgrade',
-      cancelAction: 'cancel',
+      cancelAction: 'supplement',
       data,
       dispatch,
       onSuccess: () => {
@@ -223,6 +253,9 @@ const Page = () => {
       }
     });
   };
+  const onExport = (record: IViewGuestGroup) => {
+      exportBaoCaoDoanVao(record);
+  };
 
   return (
     <Card
@@ -238,6 +271,7 @@ const Page = () => {
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
             <Select
+              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
               showSearch
               allowClear
               placeholder="Chọn phòng ban phụ trách"
@@ -252,18 +286,22 @@ const Page = () => {
           </Form.Item>
           <Form.Item name="status" className="!mb-0 w-[200px]">
             <Select
+              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
               placeholder="Chọn trạng thái"
               allowClear
               options={listStatus.map((st: any) => ({
                 value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, "label" ) ?? ''
+                label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
               }))}
               onChange={(value) => onFilterChange({ status: value })}
             />
           </Form.Item>
 
           <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input placeholder="Nhập tên đoàn vào…" onChange={(e) => handleSearch(e)} />
+            <Input 
+              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao} 
+              placeholder="Nhập tên đoàn vào…" 
+              onChange={(e) => handleSearch(e)} />
           </Form.Item>
           <Button
             color="default"
@@ -273,6 +311,7 @@ const Page = () => {
               form.resetFields();
               resetFilter();
             }}
+            data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
           >
             Tải lại
           </Button>
@@ -286,10 +325,17 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        scroll={{x: 'max-content', y: 'calc(100vh - 420px)'}}
+        scroll={{x: 'max-content', y: 'calc(100vh - 350px)'}}
+        data-permission={PermissionCoreConst.CoreButtonTableXuLyDoanVao}
+      />
+      <CreateDepartmentSupportModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        isUpdate={isUpdate}
+        isView={isView}
       />
     </Card>
   );
 };
 
-export default withAuthGuard(Page, PermissionCoreConst.CoreMenuDelegation);
+export default withAuthGuard(Page, PermissionCoreConst.CoreMenuXuLyDoanVao);

@@ -1,5 +1,6 @@
 ﻿using D.Core.Domain.Dtos.Survey.Log;
 using D.Core.Domain.Dtos.Survey.Logging;
+using D.Core.Domain.Dtos.Survey.Statistics;
 using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
 using D.DomainBase.Dto;
@@ -28,5 +29,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Abstracts
         PageResultDto<LogSurveyResponseDto> LogPaging(FilterSurveyLogDto dto);
 
         Task ProcessAutoStatusUpdateAsync();
+        
+        Task<SurveyStatisticsDto> GetStatisticsAsync();
     }
 }

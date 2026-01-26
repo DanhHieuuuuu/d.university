@@ -3,6 +3,7 @@ using D.Notification.Domain.Entities;
 using D.Notification.Dtos;
 using D.Notification.Infrastructure.Hubs;
 using D.Notification.Infrastructures.Persistence;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,7 @@ namespace D.Notification.ApplicationService.Implements.Realtime
         
                 using var scope = _scopeFactory.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
-        
+                var userId = message.Receiver.UserId.Value.ToString();
                 var entity = new NotiNotificationDetail
                 {
                     ReceiverId = message.Receiver.UserId.Value,
@@ -52,7 +53,7 @@ namespace D.Notification.ApplicationService.Implements.Realtime
 
                 suppressTx.Complete();
                 await _hubContext.Clients
-                    .All
+                    .User(userId)
                     .SendAsync("ReceiveNotification", new RealtimeNotificationDto
                     {
                         Id = entity.Id,

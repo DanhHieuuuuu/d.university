@@ -5,6 +5,7 @@ using D.Constants.Core.Delegation;
 using D.ControllerBase.Exceptions;
 using D.Core.Domain;
 using D.Core.Domain.Dtos.Delegation;
+using D.Core.Domain.Dtos.Delegation.Incoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
@@ -12,19 +13,25 @@ using D.Core.Domain.Dtos.Hrm.DanhMuc.DmPhongBan;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Domain.Entities.Hrm.DanhMuc;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
+using D.Core.Infrastructure.Services.File.Abstracts;
 using D.DomainBase.Dto;
+using D.InfrastructureBase.Database;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using D.Notification.ApplicationService.Abstracts;
 using D.Notification.ApplicationService.Implements;
 using D.Notification.Domain.Enums;
 using D.Notification.Dtos;
+using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenXMLLibrary.Dtos;
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -39,19 +46,23 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         private readonly ServiceUnitOfWork _unitOfWork;
         private readonly IExcelService _excelService;
         private readonly INotificationService _notificationService;
+        private readonly IFileService _fileService;
         public DelegationIncomingService(
             ILogger<DelegationIncomingService> logger,
             IHttpContextAccessor httpContext,
             IMapper mapper,
             ServiceUnitOfWork unitOfWork,
             IExcelService excelService,
-            INotificationService notificationService
+            INotificationService notificationService,
+            IFileService fileService
+
         )
             : base(logger, httpContext, mapper)
         {
             _unitOfWork = unitOfWork;
             _excelService = excelService;
             _notificationService = notificationService;
+            _fileService = fileService;
         }
 
         /// <summary>
@@ -546,7 +557,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 {
                     delegation.Status = DelegationStatus.Propose;
                 }
-                else if( dto.OldStatus == DelegationStatus.Propose)
+                else if( dto.OldStatus == DelegationStatus.Propose || dto.OldStatus == DelegationStatus.Edited)
                 {
                     delegation.Status = DelegationStatus.BGHApprove;
                 }
@@ -558,6 +569,14 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 {
                     delegation.Status = DelegationStatus.Done;
                 }
+                else if (dto.OldStatus == DelegationStatus.NeedEdit)
+                {
+                    delegation.Status = DelegationStatus.Edited;
+                }
+            }
+            else if(dto.Action == "supplement")
+            {
+                delegation.Status = DelegationStatus.NeedEdit;
             }
             else if(dto.Action == "cancel")
             {
@@ -612,6 +631,214 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 return false;
             }
         }
+        public async Task<byte[]> ExportDelegationIncomingReport()
+        {
+            var data = await _unitOfWork.iDelegationIncomingRepository
+                .TableNoTracking
+                .Where(x => x.Status == DelegationStatus.Done)
+                .Select(x => new DelegationIncomingReportDto
+                {
+                    Code = x.Code,
+                    Name = x.Name,
+                    TotalPerson = x.TotalPerson,
+                    TotalMoney = x.TotalMoney,
+                    ReceptionDate = x.ReceptionDate,
+                    Status = x.Status,
+                })
+                .ToListAsync();
+
+            if (!data.Any())
+                throw new UserFriendlyException(4004, "Không có đoàn hoàn thành để xuất báo cáo.");
+
+            return await _excelService.ExportAsync(
+                data,
+                sheetName: "BaoCaoDoanVao",
+                title: "BÁO CÁO ĐOÀN VÀO"
+            );
+        }
+        private string FormatDateTimeVN(DateOnly dt)
+        {
+            string thu = dt.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"));
+            thu = char.ToUpper(thu[0]) + thu.Substring(1); // Viết hoa chữ đầu
+            return $"{thu}, ngày {dt:dd}, tháng {dt:MM}, năm {dt:yyyy}";
+        }
+        private string FormatReceptionTimeVN(DateOnly date, TimeOnly start, TimeOnly end)
+        {
+            var culture = new System.Globalization.CultureInfo("vi-VN");
+
+            // Ghép DateOnly + TimeOnly 
+            var startDateTime = date.ToDateTime(start);
+
+            string thu = culture.DateTimeFormat.GetDayName(startDateTime.DayOfWeek);
+            thu = char.ToUpper(thu[0]) + thu.Substring(1);
+
+            return $"{start:HH} giờ {start:mm} – {end:HH} giờ {end:mm}, {thu}, ngày {date:dd}, tháng {date:MM}, năm {date:yyyy}";
+        }
+
+        private string FormatCurrentDateVN()
+        {
+            var now = DateTime.Now;
+            return $"Hà Nội, ngày {now:dd} tháng {now:MM} năm {now:yyyy}";
+        }
+
+        public ExportFileDto ExportGiayDoanVao(ExportGiayDoanVaoDto dto)
+        {
+            try
+            {
+                if (dto.ListId.Count > 0)
+                {
+                    if (dto.IsExportAll)
+                    {
+                        dto.ListId = _unitOfWork.iDelegationIncomingRepository
+                            .TableNoTracking
+                            .Where(x => !x.Deleted)
+                            .Select(x => x.Id)
+                            .ToList();
+                    }
+                }
+                using (var memoryStream = new MemoryStream())
+                {
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                    {
+                        int stt = 1;
+                        string path = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "Template",
+                            "bao_cao_doan_vao.docx"
+                        );
+                        foreach (var id in dto.ListId)
+                        {
+                            var guestGroup = _unitOfWork.iDelegationIncomingRepository.TableNoTracking.FirstOrDefault(s =>
+                                s.Id == id
+                            );
+                            var departmentName = _unitOfWork.iDmPhongBanRepository
+                                .TableNoTracking
+                                .Where(x => x.Id == guestGroup.IdPhongBan)
+                                .Select(x => x.TenPhongBan)
+                                .FirstOrDefault();
+                            var receptionStaffName = _unitOfWork.iNsNhanSuRepository
+                                .TableNoTracking
+                                .Where(x => x.Id == guestGroup.IdStaffReception)
+                                .Select(x => x.HoDem + " " + x.Ten)
+                                .FirstOrDefault();
+                            var gifts = (
+                                from rt in _unitOfWork.iReceptionTimeRepository.TableNoTracking
+                                join p in _unitOfWork.iPrepareRepository.TableNoTracking
+                                    on rt.Id equals p.ReceptionTimeId
+                                where rt.DelegationIncomingId == guestGroup.Id
+                                select new
+                                {
+                                    p.Name,
+                                    p.Money
+                                }
+                            ).ToList();
+                            var giftText = gifts.Any()
+                                ? string.Join(
+                                    Environment.NewLine,
+                                    gifts.Select(g => $"{g.Name} ({g.Money:N0}đ)")
+                                  )
+                                : "";
+                            var receptionTimes = _unitOfWork.iReceptionTimeRepository
+                                .TableNoTracking
+                                .Where(t => t.DelegationIncomingId == guestGroup.Id)
+                                .OrderBy(t => t.Date)
+                                .ThenBy(t => t.StartDate)
+                                .ToList();
+
+
+                            // Format thời gian
+                            string timeDetails = string.Join(
+                                Environment.NewLine,
+                                receptionTimes.Select(t =>
+                                    FormatReceptionTimeVN(t.Date, t.StartDate, t.EndDate)
+                                )
+                            );
+
+
+                            string fileName = $"Tờ trình việc tiếp đón đoàn {guestGroup.Name}.docx";
+                            var result = _fileService.FillTextToDocumentTemplate(
+                                path,
+                                fileName,
+                                new List<InputReplaceDto>
+                                {
+                                    new InputReplaceDto(
+                                        "{department}",
+                                        departmentName ?? ""
+                                    ),
+                                    new InputReplaceDto("{content}", guestGroup.Content ?? ""),
+                                    new InputReplaceDto("{name}", guestGroup.Name ?? ""),                                                                   
+                                    new InputReplaceDto("{totalperson}",guestGroup.TotalPerson.ToString() ?? ""),
+                                    new InputReplaceDto("{location}", guestGroup.Location ?? ""),
+                                    new InputReplaceDto("{gift}", giftText ?? ""),
+                                    new InputReplaceDto("{receptionstaff}", receptionStaffName ?? ""),                                                         
+                                    new InputReplaceDto(
+                                        "{phonenumber}",
+                                        guestGroup.PhoneNumber ?? ""
+                                    ),
+                                    new InputReplaceDto("{currentdate}", FormatCurrentDateVN()),
+                                    new InputReplaceDto("{timeguestgroups}", timeDetails),
+                                }
+                            );                           
+
+                            var tempFile = archive.CreateEntry(fileName);
+                            using (var entryStream = tempFile.Open())
+                            {
+                                result.Stream!.Seek(0, SeekOrigin.Begin);
+                                result.Stream.CopyTo(entryStream);
+                            }
+                            stt++;
+                        }
+                    }
+                    // copy zip file to result
+                    MemoryStream ms = new MemoryStream();
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    memoryStream.CopyTo(ms);
+                    ms.Position = 0;
+
+                    return new ExportFileDto
+                    {
+                        FileName = $"Bao_cao_doan_vao_{DateTime.Now.ToFileTime()}.zip",
+                        Stream = ms,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.Message}");
+                throw;
+            }
+        }
+
+        public StatisticalResultDto GetStatistical()
+        {
+            _logger.LogInformation($"{nameof(GetStatistical)} called.");
+
+            // Query các đoàn vào
+            var query = _unitOfWork.iDelegationIncomingRepository
+                .TableNoTracking
+                .Where(x => !x.Deleted);
+
+            // Tổng tất cả
+            var totalAll = query.Count();
+
+            // Gom theo trạng thái
+            var byStatus = query
+                .GroupBy(x => x.Status)
+                .Select(g => new StatisticalStatusDto
+                {
+                    Status = g.Key,
+                    Total = g.Count()
+                })
+                .OrderBy(x => x.Status)
+                .ToList();
+
+            return new StatisticalResultDto
+            {
+                TotalAll = totalAll,
+                ByStatus = byStatus
+            };
+        }
+
 
 
 

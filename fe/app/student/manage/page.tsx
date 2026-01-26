@@ -13,19 +13,13 @@ import { toast } from 'react-toastify';
 import { formatDateView } from '@utils/index';
 import AppTable from '@components/common/Table';
 import StudentDialog from './(dialog)/create-or-update';
-import {
-  getAllDanToc,
-  getAllGioiTinh,
-  getAllQuocTich,
-  getAllTonGiao
-} from '@redux/feature/danh-muc/danhmucThunk';
+import { getAllDanToc, getAllGioiTinh, getAllQuocTich, getAllTonGiao } from '@redux/feature/danh-muc/danhmucThunk';
 
 const StudentPage = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { list, status, total } = useAppSelector((state) => state.studentState);
   const { listDanToc, listGioiTinh, listQuocTich, listTonGiao } = useAppSelector((s) => s.danhmucState);
-
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedStudent, setSelectedStudent] = useState<IViewStudent | null>(null);

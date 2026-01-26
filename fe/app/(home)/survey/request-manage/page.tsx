@@ -1,10 +1,22 @@
 'use client';
 import { ChangeEvent, useState } from 'react';
 import { Button, Card, Form, Input, Tag, Select, Modal } from 'antd';
-import { SearchOutlined, SyncOutlined, CheckOutlined, CloseOutlined, EyeOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  SyncOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  EyeOutlined,
+  ExclamationCircleOutlined
+} from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getPagingRequest, approveRequestAction, rejectRequestAction, getRequestById } from '@redux/feature/survey/surveyThunk';
+import {
+  getPagingRequest,
+  approveRequestAction,
+  rejectRequestAction,
+  getRequestById
+} from '@redux/feature/survey/surveyThunk';
 import { setSelectedRequest, clearSelectedRequest } from '@redux/feature/survey/surveySlice';
 import { requestStatusConst } from '@/constants/core/survey/requestStatus.const';
 import { IQueryRequest, IViewRequest } from '@models/survey/request.model';
@@ -18,7 +30,6 @@ import CreateOrUpdateRequestModal from '../request/(dialog)/create-or-update';
 import { toast } from 'react-toastify';
 
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { isGranted } from '@hooks/isGranted';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 
 
@@ -34,9 +45,6 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequestState] = useState<IViewRequest | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
-
-  const canApprove = isGranted(PermissionCoreConst.SurveyButtonRequestApprove);
-  const canReject = isGranted(PermissionCoreConst.SurveyButtonRequestReject);
   
   const columns: IColumn<IViewRequest>[] = [
     {
@@ -84,7 +92,7 @@ const Page = () => {
           'Chờ duyệt': 'orange',
           'Đã duyệt': 'green',
           'Từ chối': 'red',
-          'Hủy': 'gray'
+          Hủy: 'gray'
         };
         return <Tag color={colors[statusName] || 'default'}>{statusName || 'Chưa có'}</Tag>;
       }
@@ -136,8 +144,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonRequestApprove,
       hidden: (record: IViewRequest) => 
-        !canApprove || 
         record.trangThai !== requestStatusConst.PENDING
     },
     {
@@ -179,8 +187,8 @@ const Page = () => {
           }
         });
       },
+      permission: PermissionCoreConst.SurveyButtonRequestReject,
       hidden: (record: IViewRequest) => 
-        !canReject || 
         record.trangThai !== requestStatusConst.PENDING
     }
   ];
@@ -211,10 +219,7 @@ const Page = () => {
   };
 
   return (
-    <Card
-      title="Quản lý yêu cầu khảo sát"
-      className="h-full"
-    >
+    <Card title="Quản lý yêu cầu khảo sát" className="h-full">
       <Form form={form} layout="vertical">
         <div className="grid grid-cols-3 gap-3">
           <Form.Item<IQueryRequest> name="Keyword">

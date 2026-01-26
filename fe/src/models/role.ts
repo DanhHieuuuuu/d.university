@@ -22,7 +22,7 @@ export type IUpdateRole = ICreateRole & {
 export type IUpdateRoleStatus = {
   id: number;
   status: number;
-}
+};
 
 export type IRoleDetail = {
   id?: number;

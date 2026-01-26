@@ -6,6 +6,7 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
     {
         public int? IdNhanSu { get; set; }
         public string? MaNhanSu { get; set; }
+        public int? IdHopDong { get; set; }
         public string? MaSoThue { get; set; }
         public string? TenNganHang1 { get; set; }
         public string? Atm1 { get; set; }
@@ -13,5 +14,7 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? Atm2 { get; set; }
         public int? HienTaiChucVu { get; set; }
         public int? HienTaiPhongBan { get; set; }
+        public bool DaChamDutHopDong { get; set; } = false;
+        public bool IsThoiViec { get; set; } = false;
     }
 }

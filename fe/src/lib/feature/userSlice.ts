@@ -35,7 +35,7 @@ export const updateUser = createAsyncThunk(
   async (body: { Id: number; Email?: string; NewPassword?: string }) => {
     try {
       const res = await UserService.updateUser(body);
-      return res.data; 
+      return res.data;
     } catch (error: any) {
       console.error(error);
       throw error;
@@ -150,7 +150,10 @@ const userSlice = createSlice({
           // Cập nhật list local
           const index = state.all.list.findIndex((u) => u.id === state.selected?.id);
           if (index !== -1) {
-            state.all.list[index] = { ...state.all.list[index], email: action.meta.arg.Email ?? state.all.list[index].email };
+            state.all.list[index] = {
+              ...state.all.list[index],
+              email: action.meta.arg.Email ?? state.all.list[index].email
+            };
           }
         }
       })

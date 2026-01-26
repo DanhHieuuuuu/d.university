@@ -49,5 +49,14 @@ namespace D.Core.Domain.Dtos.Hrm.NhanSu
         public string? TenPhongBan { get; set; }
         public string? Email2 { get; set; }
         public int? IdToBoMon { get; set; }
+
+        // Thông tin học vấn
+        public string? TrinhDoHocVan { get; set; }
+        public string? TrinhDoNgoaiNgu { get; set; }
+        public string? TenHocVi { get; set; }
+        public string? TenChuyenNganhHocVi { get; set; }
+        public string? TenHocHam { get; set; }
+        public string? TenChuyenNganhHocHam { get; set; }
+        public DateTime? NgayVaoDang { get; set; }
     }
 }

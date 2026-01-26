@@ -7,6 +7,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { formatDateView } from '@utils/index';
 
+import { RootState } from '@redux/store';
 import { ReduxStatus } from '@redux/const';
 import { getHoSoNhanSu } from '@redux/feature/hrm/nhansu/nhansuThunk';
 import { selectedNhanSu, selectedNhanSuStatus } from '@redux/feature/hrm/nhansu/nhansuSelectors';
@@ -16,6 +17,8 @@ import QuaTrinhDaoTaoDisplay from './QuaTrinhDaoTaoDisplay';
 import QuaTrinhCongTacDisplay from './QuaTrinhCongTacDisplay';
 import QuanHeGiaDinhDisplay from './QuanHeGiaDinhDisplay';
 import '@styles/hrm/ho-so-ns.style.scss';
+import { useIsGranted } from '@hooks/useIsGranted';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 const breadcrumbItems = [
   {
@@ -36,6 +39,9 @@ const Page = ({ params }: { params: { id: string } }) => {
   const dispatch = useAppDispatch();
   const nhansu = useAppSelector(selectedNhanSu);
   const status = useAppSelector(selectedNhanSuStatus);
+  const { listDanToc, listGioiTinh } = useAppSelector((state: RootState) => state.danhmucState);
+
+  const hasPermisisonExportHoSo = useIsGranted(PermissionCoreConst.CoreButtonExportCVNhanSu);
 
   useEffect(() => {
     if (!Number.isNaN(idNhanSu)) {
@@ -82,7 +88,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         <div className="header">
           <p className="header">Hồ sơ nhân sự</p>
           <Dropdown menu={{ items: itemsDropdown }}>
-            <Button type="primary" icon={<DownloadOutlined />}>
+            <Button hidden={!hasPermisisonExportHoSo} type="primary" icon={<DownloadOutlined />}>
               Xuất mẫu hồ sơ
             </Button>
           </Dropdown>
@@ -97,7 +103,7 @@ const Page = ({ params }: { params: { id: string } }) => {
               </div>
               <div className="field">
                 <p className="label">Họ và tên:</p>
-                <p className="value">{nhansu.hoDem}</p>
+                <p className="value">{nhansu.hoTen}</p>
               </div>
               <div className="field">
                 <p className="label">Ngày sinh:</p>
@@ -105,7 +111,7 @@ const Page = ({ params }: { params: { id: string } }) => {
               </div>
               <div className="field">
                 <p className="label">Giới tính:</p>
-                <p className="value">{nhansu.gioiTinh}</p>
+                <p className="value">{listGioiTinh?.find((x) => x.id === nhansu.gioiTinh)?.tenGioiTinh}</p>
               </div>
               <div className="field">
                 <p className="label">Nơi sinh:</p>
@@ -121,7 +127,7 @@ const Page = ({ params }: { params: { id: string } }) => {
               </div>
               <div className="field">
                 <p className="label">Dân tộc:</p>
-                <p className="value">{nhansu.danToc}</p>
+                <p className="value">{listDanToc?.find((x) => x.id === nhansu.danToc)?.tenDanToc}</p>
               </div>
               <div className="field">
                 <p className="label">Số CCCD:</p>
@@ -171,11 +177,11 @@ const Page = ({ params }: { params: { id: string } }) => {
             <div className="grid grid-cols-4 gap-4">
               <div className="field">
                 <p className="label">Học hàm:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{nhansu.tenHocHam}</p>
               </div>
               <div className="field">
                 <p className="label">Chuyên ngành học hàm:</p>
-                <p className="value">{nhansu.chuyenNganhHocHam}</p>
+                <p className="value">{nhansu.tenChuyenNganhHocHam}</p>
               </div>
               <div className="field">
                 <p className="label">Học vị:</p>
@@ -183,39 +189,39 @@ const Page = ({ params }: { params: { id: string } }) => {
               </div>
               <div className="field">
                 <p className="label">Chuyên ngành học vị:</p>
-                <p className="value">{nhansu.chuyenNganhHocVi}</p>
+                <p className="value">{nhansu.tenChuyenNganhHocVi}</p>
               </div>
               <div className="field">
-                <p className="label">Lý luận chính trị:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="label">Chức vụ hiện tại:</p>
+                <p className="value">{nhansu.tenChucVu}</p>
               </div>
               <div className="field">
                 <p className="label">Quản lý nhà nước:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{nhansu.capQuanLyNhaNuoc}</p>
               </div>
               <div className="field">
                 <p className="label">Ngoại ngữ:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{nhansu.trinhDoNgoaiNgu}</p>
               </div>
               <div className="field">
-                <p className="label">Tin học:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="label">Giáo dục phổ thông:</p>
+                <p className="value">{nhansu.trinhDoHocVan}</p>
               </div>
               <div className="field">
                 <p className="label">Ngày vào ĐCS Việt Nam:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{formatDateView(nhansu.ngayVaoDang)}</p>
               </div>
               <div className="field">
                 <p className="label">Ngày chính thức:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{formatDateView(nhansu.ngayVaoDangChinhThuc)}</p>
               </div>
               <div className="field">
                 <p className="label">Ngày nhập ngũ:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{formatDateView(nhansu.ngayNhapNgu)}</p>
               </div>
               <div className="field">
                 <p className="label">Ngày xuất ngũ:</p>
-                <p className="value">{nhansu.hocHam}</p>
+                <p className="value">{formatDateView(nhansu.hocHam)}</p>
               </div>
             </div>
           </Card>

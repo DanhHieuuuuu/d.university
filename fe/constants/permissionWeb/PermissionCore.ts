@@ -8,19 +8,67 @@ export class PermissionCoreConst {
   public static readonly CoreMenuDashboard = `${PermissionCoreConst.Menu}core_dashboad`;
 
   //  Nhân sự
-  public static readonly CoreMenuNhanSu = `${PermissionCoreConst.Menu}hrm`;
+  public static readonly CoreMenuHrm = `${PermissionCoreConst.Menu}hrm`;
+
+  public static readonly CoreMenuHrmDanhSach = `${PermissionCoreConst.Menu}hrm_list`;
+  public static readonly CoreButtonSyncNhanSu = `${PermissionCoreConst.Button}hrm_sync_qdrant`;
   public static readonly CoreButtonCreateNhanSu = `${PermissionCoreConst.Button}hrm_create_nhansu`;
   public static readonly CoreButtonUpdateNhanSu = `${PermissionCoreConst.Button}hrm_update_nhansu`;
   public static readonly CoreButtonDeleteNhanSu = `${PermissionCoreConst.Button}hrm_delete_nhansu`;
+  public static readonly CoreButtonViewNhanSu = `${PermissionCoreConst.Button}hrm_view_nhansu`;
+  public static readonly CoreButtonExportCVNhanSu = `${PermissionCoreConst.Button}hrm_export_hoso_nhansu`;
+
+  public static readonly CoreMenuHrmContract = `${PermissionCoreConst.Menu}hrm_contracts`;
+  public static readonly CoreTableHrmContract = `${PermissionCoreConst.Table}hrm_contracts`;
+  public static readonly CoreButtonCreateHrmContract = `${PermissionCoreConst.Button}hrm_create_contract`;
+
+  public static readonly CoreMenuHrmDecision = `${PermissionCoreConst.Menu}hrm_decisions`;
+  public static readonly CoreButtonViewHrmDecision = `${PermissionCoreConst.Button}hrm_view_decision`;
+  public static readonly CoreButtonCreateHrmDecision = `${PermissionCoreConst.Button}hrm_create_decision`;
+  public static readonly CoreButtonUpdateHrmDecisionStatus = `${PermissionCoreConst.Button}hrm_update_status_decision`;
 
   // Đoàn vào / ra
-  public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}delegation`;
+  public static readonly CoreMenuDelegation = `${PermissionCoreConst.Menu}dio`;
+
+  public static readonly CoreMenuListDoanVao = `${PermissionCoreConst.Menu}dio_danhsach`;
+  public static readonly CoreButtonCreateDoanVao = `${PermissionCoreConst.Button}dio_danhsach_create`;
+  public static readonly CoreButtonUpdateDoanVao = `${PermissionCoreConst.Button}dio_danhsach_update`;
+  public static readonly CoreButtonDeleteDoanVao = `${PermissionCoreConst.Button}dio_danhsach_delete`;
+  public static readonly CoreButtonViewDoanVao = `${PermissionCoreConst.Button}dio_danhsach_view`;
+  public static readonly CoreButtonCreateTimeDoanVao = `${PermissionCoreConst.Button}dio_danhsach_create_time`;
+  public static readonly CoreButtonDeXuatDoanVao = `${PermissionCoreConst.Button}dio_danhsach_dexuat`;
+  public static readonly CoreButtonSearchDoanVao = `${PermissionCoreConst.Button}dio_danhsach_search`;
+  public static readonly CoreTableListDoanVao = `${PermissionCoreConst.Table}dio_danhsach_table_list`;
+
+  public static readonly CoreMenuXuLyDoanVao = `${PermissionCoreConst.Menu}dio_xuly`;
+  public static readonly CoreButtonCreateXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_create`;
+  public static readonly CoreButtonUpdateXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_update`;
+  public static readonly CoreButtonDeleteXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_delete`;
+  public static readonly CoreButtonViewXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_view`;
+  public static readonly CoreButtonBaoCaoXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_baocao`;
+  public static readonly CoreButtonPheDuyetXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_pheduyet`;
+  public static readonly CoreButtonTiepDoanXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_tiepdoan`;
+  public static readonly CoreButtonSearchXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_search`;
+  public static readonly CoreButtonTableXuLyDoanVao = `${PermissionCoreConst.Table}dio_xuly_table`;
+
+  public static readonly CoreMenuDepartment = `${PermissionCoreConst.Menu}dio_department`;
+  public static readonly CoreButtonCreateDepartment = `${PermissionCoreConst.Button}dio_department_create`;
+  public static readonly CoreButtonUpdateDepartment = `${PermissionCoreConst.Button}dio_department_update`;
+  public static readonly CoreButtonDeleteDepartment = `${PermissionCoreConst.Button}dio_department_delete`;
+  public static readonly CoreButtonViewDepartment = `${PermissionCoreConst.Button}dio_department_view`;
+  public static readonly CoreButtonCreateSupporterDepartment = `${PermissionCoreConst.Button}dio_department_create_support`;
+  public static readonly CoreTableDepartment = `${PermissionCoreConst.Table}dio_department_table`;
+  public static readonly CoreButtonSearchDepartment = `${PermissionCoreConst.Button}dio_department_search`;
+
+  public static readonly CoreMenuLog = `${PermissionCoreConst.Menu}dio_log`;
+  public static readonly CoreTableLog = `${PermissionCoreConst.Table}dio_log_table`;
 
   //KPI
   public static readonly CoreMenuKpi = `${PermissionCoreConst.Menu}kpi`;
 
   public static readonly CoreMenuKpiList = `${PermissionCoreConst.Menu}kpi_list`;
 
+  public static readonly CoreMenuKpiListRole = `${PermissionCoreConst.Menu}kpi_list_role`;
   public static readonly CoreMenuKpiListPersonal = `${PermissionCoreConst.Menu}kpi_list_personal`;
   public static readonly CoreMenuKpiListPersonalCreate = `${PermissionCoreConst.Button}kpi_list_personal_create`;
   public static readonly CoreMenuKpiListPersonalUpdate = `${PermissionCoreConst.Button}kpi_list_personal_update`;
@@ -59,7 +107,6 @@ export class PermissionCoreConst {
   public static readonly CoreMenuKpiManagePersonalAction = `${PermissionCoreConst.Button}kpi_manage_personal_action`;
   public static readonly CoreMenuKpiManagePersonalActionSendDeclared = `${PermissionCoreConst.Button}kpi_manage_personal_action_send_declared`;
   public static readonly CoreMenuKpiManagePersonalActionCancelDeclared = `${PermissionCoreConst.Button}kpi_manage_personal_action_cancel_declared`;
-
 
   public static readonly CoreMenuKpiManageUnit = `${PermissionCoreConst.Menu}kpi_manage_unit`;
   public static readonly CoreMenuKpiManageUnitCreate = `${PermissionCoreConst.Button}kpi_manage_unit_create`;

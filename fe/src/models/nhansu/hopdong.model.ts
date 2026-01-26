@@ -1,8 +1,9 @@
-import { IQueryPaging } from "@models/common/model.common";
+import { IQueryPaging } from '@models/common/model.common';
+import { ICreateNhanSu } from './nhansu.model';
 
 export type IQueryHopDong = IQueryPaging & {
   loaiHopDong?: number;
-}
+};
 
 export type ICreateHopDong = {
   soHopDong?: string | null;
@@ -27,6 +28,7 @@ export type ICreateHopDong = {
   idPhongBan?: number;
   idChucVu?: number;
   hasProbation: boolean;
+  thongTinNhanSu?: ICreateNhanSu | null;
 };
 
 export type IViewHopDong = {

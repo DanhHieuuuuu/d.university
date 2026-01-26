@@ -1,7 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IViewNhanSu } from '@models/nhansu/nhansu.model';
+import { IViewNhanSu, IViewThongKeNsTheoPhongBan } from '@models/nhansu/nhansu.model';
 import { ReduxStatus } from '@redux/const';
-import { getListNhanSu, getHoSoNhanSu, createNhanSuThunk, updateNhanSuThunk } from './nhansuThunk';
+import {
+  getListNhanSu,
+  getHoSoNhanSu,
+  createNhanSuThunk,
+  updateNhanSuThunk,
+  thongKeNhanSuTheoPhongBanThunk,
+  semanticSearchThunk,
+  syncQdrantThunk
+} from './nhansuThunk';
 
 interface NhanSuState {
   status: ReduxStatus;
@@ -18,6 +26,13 @@ interface NhanSuState {
   };
   list: IViewNhanSu[];
   total: number;
+  $listThongKe: {
+    status: ReduxStatus;
+    data: IViewThongKeNsTheoPhongBan[];
+  };
+  $syncWithQdrant: {
+    status: ReduxStatus;
+  };
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
@@ -33,7 +48,14 @@ const initialState: NhanSuState = {
     status: ReduxStatus.IDLE
   },
   list: [],
-  total: 0
+  total: 0,
+  $listThongKe: {
+    status: ReduxStatus.IDLE,
+    data: []
+  },
+  $syncWithQdrant: {
+    status: ReduxStatus.IDLE
+  }
 };
 
 const nhanSuSlice = createSlice({
@@ -100,6 +122,36 @@ const nhanSuSlice = createSlice({
       })
       .addCase(updateNhanSuThunk.rejected, (state) => {
         state.$create.status = ReduxStatus.FAILURE;
+      })
+      .addCase(thongKeNhanSuTheoPhongBanThunk.pending, (state) => {
+        state.$listThongKe.status = ReduxStatus.LOADING;
+      })
+      .addCase(thongKeNhanSuTheoPhongBanThunk.fulfilled, (state, action) => {
+        state.$listThongKe.status = ReduxStatus.SUCCESS;
+        state.$listThongKe.data = action.payload ?? [];
+      })
+      .addCase(thongKeNhanSuTheoPhongBanThunk.rejected, (state) => {
+        state.$listThongKe.status = ReduxStatus.FAILURE;
+      })
+      .addCase(semanticSearchThunk.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(semanticSearchThunk.fulfilled, (state, action: PayloadAction<IViewNhanSu[]>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.list = action.payload || [];
+        state.total = action.payload?.length ?? 0;
+      })
+      .addCase(semanticSearchThunk.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      .addCase(syncQdrantThunk.pending, (state) => {
+        state.$syncWithQdrant.status = ReduxStatus.LOADING;
+      })
+      .addCase(syncQdrantThunk.fulfilled, (state) => {
+        state.$syncWithQdrant.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(syncQdrantThunk.rejected, (state) => {
+        state.$syncWithQdrant.status = ReduxStatus.FAILURE;
       });
   }
 });

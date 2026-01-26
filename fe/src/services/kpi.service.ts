@@ -1,12 +1,37 @@
 import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseList, IResponseItem } from '@models/common/response.model';
-import { ICreateKpiCaNhan, IQueryKpiCaNhan, IUpdateCapTrenDanhGiaList, IUpdateKpiCaNhan, IUpdateKpiCaNhanThucTeList, IUpdateTrangThaiKpiCaNhan, IViewKpiCaNhan } from '@models/kpi/kpi-ca-nhan.model';
-import { ICreateKpiDonVi, IGiaoKpiDonVi, IQueryKpiDonVi, IUpdateCapTrenDonViDanhGiaList, IUpdateKpiDonVi, IUpdateKpiDonViThucTeList, IUpdateTrangThaiKpiDonVi, IViewKpiDonVi } from '@models/kpi/kpi-don-vi.model';
+import {
+  ICreateKpiCaNhan,
+  IQueryKpiCaNhan,
+  IUpdateCapTrenDanhGiaList,
+  IUpdateKpiCaNhan,
+  IUpdateKpiCaNhanThucTeList,
+  IUpdateTrangThaiKpiCaNhan,
+  IViewKpiCaNhan
+} from '@models/kpi/kpi-ca-nhan.model';
+import {
+  ICreateKpiDonVi,
+  IGiaoKpiDonVi,
+  IQueryKpiDonVi,
+  IUpdateCapTrenDonViDanhGiaList,
+  IUpdateKpiDonVi,
+  IUpdateKpiDonViThucTeList,
+  IUpdateTrangThaiKpiDonVi,
+  IViewKpiDonVi
+} from '@models/kpi/kpi-don-vi.model';
 import { ICreateKpiRole, IQueryKpiRole, IUpdateKpiRole, IViewKpiRole } from '@models/kpi/kpi-role.model';
-import { ICreateKpiTruong, IQueryKpiTruong, IUpdateCapTrenTruongDanhGiaList, IUpdateKpiTruong, IUpdateKpiTruongThucTeList, IUpdateTrangThaiKpiTruong, IViewKpiTruong } from '@models/kpi/kpi-truong.model';
+import {
+  ICreateKpiTruong,
+  IQueryKpiTruong,
+  IUpdateCapTrenTruongDanhGiaList,
+  IUpdateKpiTruong,
+  IUpdateKpiTruongThucTeList,
+  IUpdateTrangThaiKpiTruong,
+  IViewKpiTruong
+} from '@models/kpi/kpi-truong.model';
 import { IViewNhanSu } from '@models/nhansu/nhansu.model';
-import {  IQueryKpiLogStatus } from '@models/kpi/kpi-log.model';
+import { IQueryKpiLogStatus } from '@models/kpi/kpi-log.model';
 import { IAskKpiChatCommand } from '@models/kpi/kpi-chat.model';
 import { IQueryKpiCongThuc, IViewKpiCongThuc } from '@models/kpi/kpi-cong-thuc.model';
 import { IKpiScoreBoardResponse, IQueryKpiScoreBoard } from '@models/kpi/kpi-scoreboard.model';
@@ -38,10 +63,7 @@ const getListKpiCaNhan = async (query?: IQueryKpiCaNhan) => {
 
 const getListKpiCaNhanKeKhai = async (query?: IQueryKpiCaNhan) => {
   try {
-    const res = await axios.get(
-      `${apiKpiCaNhanEndpoint}/find-ke-khai`,
-      { params: { ...query } }
-    );
+    const res = await axios.get(`${apiKpiCaNhanEndpoint}/find-ke-khai`, { params: { ...query } });
     return res.data;
   } catch (err) {
     processApiMsgError(err, '');
@@ -81,9 +103,7 @@ const deleteKpiCaNhan = async (id: number) => {
 
 export const getListTrangThaiKpiCaNhan = async () => {
   try {
-    const res = await axios.get(
-      `${apiKpiCaNhanEndpoint}/trang-thai`
-    );
+    const res = await axios.get(`${apiKpiCaNhanEndpoint}/trang-thai`);
 
     if (res.data?.code !== 200) {
       return Promise.reject(res.data?.message);
@@ -95,14 +115,9 @@ export const getListTrangThaiKpiCaNhan = async () => {
   }
 };
 
-const updateTrangThaiKpiCaNhan = async (
-  body: IUpdateTrangThaiKpiCaNhan
-) => {
+const updateTrangThaiKpiCaNhan = async (body: IUpdateTrangThaiKpiCaNhan) => {
   try {
-    const res = await axios.put(
-      `${apiKpiCaNhanEndpoint}/update-trang-thai`,
-      body
-    );
+    const res = await axios.put(`${apiKpiCaNhanEndpoint}/update-trang-thai`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -117,14 +132,9 @@ const updateTrangThaiKpiCaNhan = async (
   }
 };
 
-const updateKetQuaThucTeKpiCaNhan = async (
-  body: IUpdateKpiCaNhanThucTeList
-) => {
+const updateKetQuaThucTeKpiCaNhan = async (body: IUpdateKpiCaNhanThucTeList) => {
   try {
-    const res = await axios.put(
-      `${apiKpiCaNhanEndpoint}/update-ket-qua-thuc-te`,
-      body
-    );
+    const res = await axios.put(`${apiKpiCaNhanEndpoint}/update-ket-qua-thuc-te`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -139,14 +149,9 @@ const updateKetQuaThucTeKpiCaNhan = async (
   }
 };
 
-const updateKetQuaCapTrenKpiCaNhan = async (
-  body: IUpdateCapTrenDanhGiaList
-) => {
+const updateKetQuaCapTrenKpiCaNhan = async (body: IUpdateCapTrenDanhGiaList) => {
   try {
-    const res = await axios.put(
-      `${apiKpiCaNhanEndpoint}/update-ket-qua-cap-tren`,
-      body
-    );
+    const res = await axios.put(`${apiKpiCaNhanEndpoint}/update-ket-qua-cap-tren`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -173,7 +178,6 @@ export const getAllNhanSuKiemNhiem = async (idPhongBan?: number) => {
   }
 };
 
-
 //Kpi Don Vi
 const getListKpiDonVi = async (query?: IQueryKpiDonVi) => {
   try {
@@ -192,10 +196,7 @@ const getListKpiDonVi = async (query?: IQueryKpiDonVi) => {
 
 const getListKpiDonViKeKhai = async (query?: IQueryKpiDonVi) => {
   try {
-    const res = await axios.get(
-      `${apiKpiDonViEndpoint}/find-ke-khai`,
-      { params: { ...query } }
-    );
+    const res = await axios.get(`${apiKpiDonViEndpoint}/find-ke-khai`, { params: { ...query } });
     return res.data;
   } catch (err) {
     processApiMsgError(err, '');
@@ -233,14 +234,9 @@ const deleteKpiDonVi = async (id: number) => {
   }
 };
 
-const updateTrangThaiKpiDonVi = async (
-  body: IUpdateTrangThaiKpiDonVi
-) => {
+const updateTrangThaiKpiDonVi = async (body: IUpdateTrangThaiKpiDonVi) => {
   try {
-    const res = await axios.put(
-      `${apiKpiDonViEndpoint}/update-trang-thai`,
-      body
-    );
+    const res = await axios.put(`${apiKpiDonViEndpoint}/update-trang-thai`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -255,14 +251,9 @@ const updateTrangThaiKpiDonVi = async (
   }
 };
 
-const updateKetQuaThucTeKpiDonVi = async (
-  body: IUpdateKpiDonViThucTeList
-) => {
+const updateKetQuaThucTeKpiDonVi = async (body: IUpdateKpiDonViThucTeList) => {
   try {
-    const res = await axios.put(
-      `${apiKpiDonViEndpoint}/update-ket-qua-thuc-te`,
-      body
-    );
+    const res = await axios.put(`${apiKpiDonViEndpoint}/update-ket-qua-thuc-te`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -277,14 +268,9 @@ const updateKetQuaThucTeKpiDonVi = async (
   }
 };
 
-const updateKetQuaCapTrenKpiDonVi = async (
-  body: IUpdateCapTrenDonViDanhGiaList
-) => {
+const updateKetQuaCapTrenKpiDonVi = async (body: IUpdateCapTrenDonViDanhGiaList) => {
   try {
-    const res = await axios.put(
-      `${apiKpiDonViEndpoint}/update-ket-qua-cap-tren`,
-      body
-    );
+    const res = await axios.put(`${apiKpiDonViEndpoint}/update-ket-qua-cap-tren`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -301,9 +287,7 @@ const updateKetQuaCapTrenKpiDonVi = async (
 
 export const getListNamHocKpiDonVi = async () => {
   try {
-    const res = await axios.get(
-      `${apiKpiDonViEndpoint}/list-nam-hoc`
-    );
+    const res = await axios.get(`${apiKpiDonViEndpoint}/list-nam-hoc`);
 
     if (res.data?.code !== 200) {
       return Promise.reject(res.data?.message);
@@ -317,9 +301,7 @@ export const getListNamHocKpiDonVi = async () => {
 
 export const getListTrangThaiKpiDonVi = async () => {
   try {
-    const res = await axios.get(
-      `${apiKpiDonViEndpoint}/trang-thai`
-    );
+    const res = await axios.get(`${apiKpiDonViEndpoint}/trang-thai`);
 
     if (res.data?.code !== 200) {
       return Promise.reject(res.data?.message);
@@ -331,14 +313,9 @@ export const getListTrangThaiKpiDonVi = async () => {
   }
 };
 
-const giaoKpiDonVi = async (
-  body: IGiaoKpiDonVi
-) => {
+const giaoKpiDonVi = async (body: IGiaoKpiDonVi) => {
   try {
-    const res = await axios.put(
-      `${apiKpiDonViEndpoint}/giao-kpi`,
-      body
-    );
+    const res = await axios.put(`${apiKpiDonViEndpoint}/giao-kpi`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -355,12 +332,9 @@ const giaoKpiDonVi = async (
 
 const getNhanSuDaGiaoByKpiDonVi = async (idKpiDonVi: number) => {
   try {
-    const res = await axios.get(
-      `${apiKpiDonViEndpoint}/nhan-su-da-giao`,
-      {
-        params: { idKpiDonVi }
-      }
-    );
+    const res = await axios.get(`${apiKpiDonViEndpoint}/nhan-su-da-giao`, {
+      params: { idKpiDonVi }
+    });
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -421,14 +395,9 @@ const deleteKpiTruong = async (id: number) => {
   }
 };
 
-const updateTrangThaiKpiTruong = async (
-  body: IUpdateTrangThaiKpiTruong
-) => {
+const updateTrangThaiKpiTruong = async (body: IUpdateTrangThaiKpiTruong) => {
   try {
-    const res = await axios.put(
-      `${apiKpiTruongEndpoint}/update-trang-thai`,
-      body
-    );
+    const res = await axios.put(`${apiKpiTruongEndpoint}/update-trang-thai`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -443,14 +412,9 @@ const updateTrangThaiKpiTruong = async (
   }
 };
 
-const updateKetQuaThucTeKpiTruong = async (
-  body: IUpdateKpiTruongThucTeList
-) => {
+const updateKetQuaThucTeKpiTruong = async (body: IUpdateKpiTruongThucTeList) => {
   try {
-    const res = await axios.put(
-      `${apiKpiTruongEndpoint}/update-ket-qua-thuc-te`,
-      body
-    );
+    const res = await axios.put(`${apiKpiTruongEndpoint}/update-ket-qua-thuc-te`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -465,14 +429,9 @@ const updateKetQuaThucTeKpiTruong = async (
   }
 };
 
-const updateKetQuaCapTrenKpiTruong = async (
-  body: IUpdateCapTrenTruongDanhGiaList
-) => {
+const updateKetQuaCapTrenKpiTruong = async (body: IUpdateCapTrenTruongDanhGiaList) => {
   try {
-    const res = await axios.put(
-      `${apiKpiTruongEndpoint}/update-ket-qua-cap-tren`,
-      body
-    );
+    const res = await axios.put(`${apiKpiTruongEndpoint}/update-ket-qua-cap-tren`, body);
 
     if (res.data?.code !== 200) {
       return Promise.reject({
@@ -489,9 +448,7 @@ const updateKetQuaCapTrenKpiTruong = async (
 
 export const getListNamHocKpiTruong = async () => {
   try {
-    const res = await axios.get(
-      `${apiKpiTruongEndpoint}/list-nam-hoc`
-    );
+    const res = await axios.get(`${apiKpiTruongEndpoint}/list-nam-hoc`);
 
     if (res.data?.code !== 200) {
       return Promise.reject(res.data?.message);
@@ -505,9 +462,7 @@ export const getListNamHocKpiTruong = async () => {
 
 export const getListTrangThaiKpiTruong = async () => {
   try {
-    const res = await axios.get(
-      `${apiKpiTruongEndpoint}/trang-thai`
-    );
+    const res = await axios.get(`${apiKpiTruongEndpoint}/trang-thai`);
 
     if (res.data?.code !== 200) {
       return Promise.reject(res.data?.message);
@@ -519,6 +474,17 @@ export const getListTrangThaiKpiTruong = async () => {
   }
 };
 
+const getListAllKpiTruongApi = async () => {
+  try {
+    const res = await axios.get(`${apiKpiTruongEndpoint}/get-list-all`);
+    if (res.data?.code !== 200) {
+      return Promise.reject(res.data?.message);
+    }
+    return res.data.data;
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
 
 // KPI Role
 const getListKpiRole = async (query?: IQueryKpiRole) => {
@@ -565,9 +531,7 @@ const deleteKpiRole = async (ids: number[]) => {
 
 export const getListKpiRoleByUser = async () => {
   try {
-    const res = await axios.get(
-      `${apiKpiRoleEndpoint}/list-role-by-user`
-    );
+    const res = await axios.get(`${apiKpiRoleEndpoint}/list-role-by-user`);
 
     if (res.data?.code !== 200) {
       return Promise.reject(res.data?.message);
@@ -662,6 +626,7 @@ export const KpiService = {
   updateTrangThaiKpiTruong,
   updateKetQuaThucTeKpiTruong,
   updateKetQuaCapTrenKpiTruong,
+  getListAllKpiTruongApi,
   getListKpiRole,
   createKpiRole,
   updateKpiRole,
@@ -670,5 +635,5 @@ export const KpiService = {
   getKpiLogs,
   askKpiAi,
   getListKpiCongThuc,
-  getKpiScoreBoard,
+  getKpiScoreBoard
 };

@@ -64,7 +64,21 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(FindLogReceptionTime)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
-            var query = _unitOfWork.iLogReceptionTimeRepository.TableNoTracking.OrderByDescending(log => log.Id);
+            var query = _unitOfWork.iLogReceptionTimeRepository.TableNoTracking.AsQueryable();
+            //Lọc theo người tạo
+            if (!string.IsNullOrWhiteSpace(dto.CreatedByName))
+            {
+                query = query.Where(x =>
+                    x.CreatedByName != null &&
+                    x.CreatedByName.Contains(dto.CreatedByName));
+            }
+
+            //Lọc theo ngày tạo 
+            if (dto.CreateDate.HasValue)
+            {
+                var date = dto.CreateDate.Value.Date;
+                query = query.Where(x => x.CreatedDate.Date == date);
+            }
 
             var totalCount = query.Count();
 
@@ -76,5 +90,25 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 TotalItem = totalCount
             };
         }
+        public List<DateOptionDto> GetAllCreatedDate()
+        {
+            _logger.LogInformation($"{nameof(GetAllCreatedDate)} method called.");
+
+            var result = _unitOfWork.iLogReceptionTimeRepository
+                .TableNoTracking
+                .Select(x => x.CreatedDate.Date)
+                .Distinct()
+                .OrderByDescending(x => x)
+                .Select(date => new DateOptionDto
+                {
+                    Value = date,
+                    Label = date.ToString("dd/MM/yyyy")
+                })
+                .ToList();
+
+            return result;
+        }
+
+
     }
 }
