@@ -214,65 +214,7 @@ const Page = () => {
       }
     });
 
-  const approveSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới được phê duyệt',
-      confirmTitle: 'Phê duyệt',
-      confirmMessage: 'Phê duyệt các KPI đã chọn?',
-      successMsg: 'Phê duyệt thành công',
-      nextStatus: KpiTrangThaiConst.DUOC_GIAO,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      },
-    });
 
-  const rejectSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới có thể từ chối',
-      confirmTitle: 'Từ chối đề xuất',
-      confirmMessage: 'Xác nhận từ chối các KPI đã chọn?',
-      successMsg: 'Từ chối thành công',
-      nextStatus: KpiTrangThaiConst.TU_CHOI,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      }
-    });
-
-  const approveSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới được phê duyệt',
-      confirmTitle: 'Phê duyệt',
-      confirmMessage: 'Phê duyệt các KPI đã chọn?',
-      successMsg: 'Phê duyệt thành công',
-      nextStatus: KpiTrangThaiConst.DUOC_GIAO,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      }
-    });
-
-  const rejectSelected = () =>
-    processUpdateStatus(selectedRowKeys.map(Number), list, {
-      validStatus: [KpiTrangThaiConst.DE_XUAT],
-      invalidMsg: 'Chỉ KPI "Đề xuất" mới có thể từ chối',
-      confirmTitle: 'Từ chối đề xuất',
-      confirmMessage: 'Xác nhận từ chối các KPI đã chọn?',
-      successMsg: 'Từ chối thành công',
-      nextStatus: KpiTrangThaiConst.TU_CHOI,
-      updateAction: updateTrangThaiKpiTruong,
-      afterSuccess: () => {
-        setSelectedRowKeys([]);
-        dispatch(getAllKpiTruong(query));
-      }
-    });
 
   const updateKetQuaCapTren = (id: number, value?: number) => {
     setKetQuaCapTrenMap((prev) => ({ ...prev, [id]: value }));
