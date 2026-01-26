@@ -76,6 +76,7 @@ namespace D.Core.Infrastructure
             return services
                 .AddScoped<IFileRepository, FileRepository>()
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>()
+                .AddScoped<ISvChatbotHistoryRepository, SvChatbotHistoryRepository>()
 
                 .AddScoped<IDmChucVuRepository, DmChucVuRepository>()
                 .AddScoped<IDmDanTocRepository, DmDanTocRepository>()

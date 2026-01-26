@@ -1,27 +1,35 @@
 import httpx
 from typing import List, Dict, Optional
 
-class GroqClient:
+from app.llm_providers import LLMConfig, get_provider, DEFAULT
+
+class LLMClient:
     """
-    Client de goi Groq API.
-    Goi truc tiep API khong qua LangChain de de custom.
+    Client de goi LLM API (Groq, vLLM, hoac bat ky OpenAI-compatible API nao).
     """
     
-    def __init__(self, api_key: str, model: str = "llama-3.3-70b-versatile"):
+    def __init__(self, provider: LLMConfig = None):
         """
-        Khoi tao Groq client.
+        Khoi tao LLM client.
         
         Args:
-            api_key: Groq API key
-            model: Ten model can su dung
+            provider: Cau hinh LLM tu llm_providers. 
+                      Neu None, su dung DEFAULT (tu .env LLM_PROVIDER)
+        
+        Cach su dung:
+            from app.llm_providers import GROQ, VLLM
+            client = LLMClient(GROQ)  # Su dung Groq
+            client = LLMClient(VLLM)  # Su dung vLLM local
+            client = LLMClient()      # Su dung DEFAULT tu .env
         """
-        self.api_key = api_key
-        self.model = model
-        self.api_url = "https://api.groq.com/openai/v1/chat/completions"
-        self.headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
+        if provider is None:
+            provider = DEFAULT
+        
+        self.provider = provider
+        self.api_url = provider.base_url
+        self.model = provider.model
+        self.headers = provider.headers
+        print(f"LLMClient khoi tao voi provider: {provider.name} ({provider.base_url})")
     
     async def chat_completion(
         self,

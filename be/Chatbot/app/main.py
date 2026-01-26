@@ -11,7 +11,7 @@ from app.models.schemas import (
 )
 from app.services.embedding import EmbeddingService
 from app.services.vector_store import initialize_vector_store
-from app.services.groq_client import GroqClient
+from app.services.groq_client import LLMClient
 from app.services.rag import RAGPipeline
 from app.services.conversation_memory import ConversationMemory
 
@@ -53,18 +53,15 @@ async def lifespan(app: FastAPI):
         embedding_service=embedding_service
     )
     
-    # Khoi tao Groq client
-    print("\n[4/5] Khởi tạo Groq Client...")
-    groq_client = GroqClient(
-        api_key=config.GROQ_API_KEY,
-        model=config.GROQ_MODEL
-    )
+    # Khoi tao LLM client (tu dong chon provider tu .env)
+    print("\n[4/5] Khởi tạo LLM Client...")
+    llm_client = LLMClient()  # Su dung DEFAULT provider tu .env
     
     # Khoi tao RAG pipeline
     print("\n[5/5] Khởi tạo RAG Pipeline...")
     rag_pipeline = RAGPipeline(
         vector_store=vector_store,
-        groq_client=groq_client,
+        llm_client=llm_client,
         top_k=config.TOP_K_RESULTS,
         data_path=config.DATA_PATH  # Truyen duong dan file JSON de doc thong tin sinh vien
     )
@@ -120,12 +117,12 @@ async def chat(request: ChatRequest):
     Endpoint chat voi chatbot.
     
     - **message**: Cau hoi cua sinh vien
-    - **session_id**: ID session de theo doi lich su (auto-generated neu khong truyen)
+    - **conversation_history**: Lich su hoi thoai tu client (optional)
     
-    Server se tu dong:
-    1. Lay lich su hoi thoai tu session_id
-    2. Viet lai cau hoi neu la follow-up question
-    3. Luu cap hoi-dap vao lich su
+    Server se:
+    1. Viet lai cau hoi neu la follow-up question
+    2. Tim kiem context lien quan
+    3. Tra ve phan hoi tu LLM
     """
     if not config.GROQ_API_KEY:
         raise HTTPException(
@@ -134,14 +131,8 @@ async def chat(request: ChatRequest):
         )
     
     try:
-        # Tao hoac lay session_id
-        session_id = request.session_id or str(uuid.uuid4())
-        
-        # Lay lich su hoi thoai tu memory (uu tien hon request.conversation_history)
-        history = conversation_memory.get_history(session_id)
-        if not history and request.conversation_history:
-            # Fallback: dung conversation_history tu request neu chua co trong memory
-            history = request.conversation_history
+        # Lay lich su hoi thoai tu request
+        history = request.conversation_history or []
         
         # Goi RAG pipeline voi query rewriting
         response, contexts, rewritten_query = await rag_pipeline.query(
@@ -150,17 +141,9 @@ async def chat(request: ChatRequest):
             use_query_rewriting=True
         )
         
-        # Luu cap hoi-dap vao memory
-        conversation_memory.add_exchange(
-            session_id=session_id,
-            user_message=request.message,
-            assistant_message=response
-        )
-        
         return ChatResponse(
             response=response,
             context_used=contexts,
-            session_id=session_id,
             rewritten_query=rewritten_query
         )
     except Exception as e:

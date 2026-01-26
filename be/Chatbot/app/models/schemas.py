@@ -6,15 +6,13 @@ import uuid
 class ChatRequest(BaseModel):
     """Request model cho chat endpoint."""
     message: str
-    session_id: Optional[str] = None  # ID session de theo doi lich su hoi thoai
-    conversation_history: Optional[List[dict]] = []  # Backward compatible
+    conversation_history: Optional[List[dict]] = []  # Lich su hoi thoai tu client
 
 
 class ChatResponse(BaseModel):
     """Response model cho chat endpoint."""
     response: str
     context_used: List[str]
-    session_id: str  # Tra ve session_id de frontend dung cho cac request tiep theo
     rewritten_query: Optional[str] = None  # Cau hoi da duoc viet lai (neu co)
 
 
