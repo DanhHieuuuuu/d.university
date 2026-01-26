@@ -50,15 +50,15 @@ namespace D.QdrantClient.Services
             resp.EnsureSuccessStatusCode();
         }
 
-        public async Task<IEnumerable<QdrantSearchResult>> SearchAsync(float[] queryVector, int top = 10, int offset = 0, CancellationToken ct = default)
+        public async Task<IEnumerable<QdrantSearchResult>> SearchAsync(float[] queryVector, int top = 10, int _offset = 0, double? scoreThreshold = null, CancellationToken ct = default)
         {
             var body = new
             {
                 vector = queryVector,
                 limit = top,
-                offest = offset,
+                offest = _offset,
                 with_payload = true,
-                score_threshold = 0.3,
+                score_threshold = scoreThreshold,
             };
             var resp = await _http.PostAsJsonAsync($"/collections/{_opt.Collection}/points/search", body, ct);
 
