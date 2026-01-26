@@ -8,6 +8,7 @@ namespace D.Core.Domain.Dtos.Survey.Request
 {
     public class RequestSurveyQuestionDto
     {
+        public int IdCauHoi { get; set; }
         public string MaCauHoi { get; set; }
         public string NoiDung { get; set; }
         public int LoaiCauHoi { get; set; }

@@ -10,6 +10,7 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class UpdateDepartmentSupportRequestDto : ICommand<UpdateDepartmentSupportResponseDto>
     {
+        public int Id { get; set; }
         public int DepartmentSupportId { get; set; }
         public int DelegationIncomingId { get; set; }
 

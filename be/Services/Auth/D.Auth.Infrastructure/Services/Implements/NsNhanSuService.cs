@@ -242,6 +242,7 @@ namespace D.Auth.Infrastructure.Services.Implements
                 new Claim(CustomClaimType.LastName, nsNhanSu.Ten),
                 new Claim(CustomClaimType.DateOfBirth, nsNhanSu.NgaySinh.ToString()),
                 new Claim(CustomClaimType.UserType, nsNhanSu.UserType.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, nsNhanSu.Id.ToString()),
 
             };
             var key = new SymmetricSecurityKey(

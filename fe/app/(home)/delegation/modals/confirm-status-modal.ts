@@ -9,8 +9,9 @@ interface IConfirmStatusModal {
   content: string;
   okText?: string;
   cancelText?: string;
-  okAction: 'upgrade' | 'cancel';
-  cancelAction?: 'cancel';
+  supplementText?: string;
+  okAction: 'upgrade' | 'cancel' | 'supplement';
+  cancelAction?: 'cancel' | 'supplement';
   data: IViewGuestGroup;
   dispatch: AppDispatch;
   onSuccess?: () => void;
@@ -21,6 +22,7 @@ export const openConfirmStatusModal = ({
   content,
   okText = 'Đồng ý',
   cancelText = 'Hủy',
+  supplementText = 'Cần bổ sung',
   okAction,
   cancelAction,
   data,
@@ -32,6 +34,7 @@ export const openConfirmStatusModal = ({
     content,
     okText,
     cancelText,
+    // closable: true,
     okButtonProps: { type: 'primary' },
     onOk: async () => {
       try {
@@ -61,12 +64,16 @@ export const openConfirmStatusModal = ({
               })
             ).unwrap();
 
-            toast.success('Đã từ chối');
+            toast.success(cancelAction === 'supplement' ? 'Đã yêu cầu chỉnh sửa' : 'Đã huỷ');
             onSuccess?.();
           } catch (error: any) {
             toast.error(error?.message || 'Thao tác thất bại');
           }
         }
-      : undefined
+      : undefined,
+      afterClose: () => {
+     
+    },
+
   });
 };

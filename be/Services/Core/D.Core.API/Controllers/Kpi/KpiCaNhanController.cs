@@ -1,4 +1,6 @@
-﻿using D.ControllerBase;
+﻿using d.Shared.Permission;
+using d.Shared.Permission.Permission;
+using D.ControllerBase;
 using D.Core.Domain.Dtos.Kpi.KpiCaNhan;
 using D.Core.Domain.Dtos.Kpi.KpiCongThuc;
 using D.Core.Domain.Dtos.Kpi.KpiTinhDiem.D.Core.Domain.Dtos.Kpi.KpiTinhDiem;
@@ -24,6 +26,7 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiListPersonalCreate)]
         [HttpPost("kpi-canhan/create")]
         public async Task<ResponseAPI> CreateKpiCaNhan([FromBody] CreateKpiCaNhanDto dto)
         {
@@ -43,6 +46,8 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiListPersonal)]
+
         [HttpGet("kpi-canhan/find")]
         public async Task<ResponseAPI> GetAllKpiCaNhan([FromQuery] FilterKpiCaNhanDto dto)
         {
@@ -63,6 +68,7 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiManagePersonal)]
         [HttpGet("kpi-canhan/find-ke-khai")]
         public async Task<ResponseAPI> GetAllKpiKeKhaiCaNhan([FromQuery] FilterKpiKeKhaiCaNhanDto dto)
         {
@@ -82,6 +88,8 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiListPersonalUpdate)]
+
         [HttpPut("kpi-canhan/update")]
         public async Task<ResponseAPI> UpdateKpiCaNhan([FromBody] UpdateKpiCaNhanDto dto)
         {
@@ -101,6 +109,8 @@ namespace D.Core.API.Controllers.Kpi
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuKpiListPersonalDelete)]
+
         [HttpPut("kpi-canhan/delete")]
         public async Task<ResponseAPI> DeleteKpiCaNhan([FromBody] DeleteKpiCaNhanDto dto)
         {

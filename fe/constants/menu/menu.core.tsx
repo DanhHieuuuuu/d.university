@@ -153,7 +153,7 @@ export const listMenuCore: IMenu[] = [
             routerLink: '/kpi/manage/school',
             permissionKeys: [PermissionCoreConst.CoreMenuKpiManageSchool],
             icon: <SolutionOutlined />
-          },
+          }
           // {
           //   label: 'Điểm KPI',
           //   routerLink: '/kpi/manage/scoreboard',
@@ -166,26 +166,31 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Đoàn vào',
     routerLink: '/delegation/incoming',
+    permissionKeys: [PermissionCoreConst.CoreMenuDelegation],
     icon: <DelegationIcon />,
     items: [
       {
         label: 'Danh sách đoàn vào',
         routerLink: '/delegation/incoming/list-delegation',
+        permissionKeys: [PermissionCoreConst.CoreMenuListDoanVao],
         icon: <SuggestIcon />
       },
       {
         label: 'Xử lý đoàn vào',
         routerLink: '/delegation/incoming/process',
+        permissionKeys: [PermissionCoreConst.CoreMenuXuLyDoanVao],
         icon: <HourglassOutlined />
       },
       {
         label: 'Phòng ban hỗ trợ',
         routerLink: '/delegation/incoming/support',
+        permissionKeys: [PermissionCoreConst.CoreMenuDepartment],
         icon: <TeamOutlined />
       },
       {
         label: 'Nhật ký đoàn vào',
         routerLink: '/delegation/incoming/diary',
+        permissionKeys: [PermissionCoreConst.CoreMenuLog],
         icon: <HistoryOutlined />
       }
     ]
@@ -230,27 +235,38 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Khảo sát',
     routerLink: '/survey',
+    permissionKeys: [PermissionCoreConst.CoreMenuKhaoSat],
     icon: <FormOutlined />,
     items: [
       {
         label: 'Danh sách yêu cầu',
-        routerLink: '/survey/manage/request',
-        icon: <InboxOutlined />
+        routerLink: '/survey/request',
+        permissionKeys: [PermissionCoreConst.SurveyMenuRequest],
+        icon: <InboxOutlined />,      
       },
       {
         label: 'Quản lý yêu cầu',
-        routerLink: '/survey/manage/request-manage',
-        icon: <InboxOutlined />
+        routerLink: '/survey/request-manage',
+        permissionKeys: [PermissionCoreConst.SurveyMenuRequestApproval],
+        icon: <InboxOutlined />,      
       },
       {
         label: 'Danh sách khảo sát',
-        routerLink: '/survey/manage/surveys',
+        routerLink: '/survey/surveys',
+        permissionKeys: [PermissionCoreConst.SurveyMenuManagement],
         icon: <FileTextOutlined />
       },
       {
         label: 'Báo cáo khảo sát',
-        routerLink: '/survey/manage/report',
+        routerLink: '/survey/report',
+        permissionKeys: [PermissionCoreConst.SurveyMenuReport],
         icon: <BarChartOutlined />
+      },
+      {
+        label: 'Nhật ký hoạt động',
+        routerLink: '/survey/logging',
+        permissionKeys: [PermissionCoreConst.SurveyMenuLogging],
+        icon: <HistoryOutlined />
       }
     ]
   },

@@ -12,7 +12,9 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
 {
     public class FindDelegationIncomingLogDto : FilterBaseDto, IQuery<PageResultDto<ViewDelegationIncomingLogDto>>
     {
-        //[FromQuery(Name = "maDoanVao")]
-        //public string? DelegationIncomingCode { get; set; }
+        [FromQuery(Name = "CreatedByName")]
+        public string? CreatedByName { get; set; }
+        [FromQuery(Name = "CreateDate")]
+        public DateTime? CreateDate { get; set; }
     }
 }

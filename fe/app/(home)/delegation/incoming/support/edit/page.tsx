@@ -6,14 +6,14 @@ import { toast } from 'react-toastify';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
 import DetailTable, { DetailRow } from '@components/hieu-custom/detail-table';
-import {
-  getByIdDepartmentSupport,
-  getListNhanSu,
-  updateDepartmentSupport
-} from '@redux/feature/delegation/delegationThunk';
+import { getListNhanSu } from '@redux/feature/delegation/delegationThunk';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { IUpdateDepartmentSupport } from '@models/delegation/delegation.model';
 import { renderField } from '@utils/render-field.helper';
+import {
+  getByIdDepartmentSupport,
+  updateDepartmentSupport
+} from '@redux/feature/delegation/department/departmentThunk';
 
 const DepartmentSupport = () => {
   const [form] = Form.useForm();
@@ -52,12 +52,14 @@ const DepartmentSupport = () => {
     if (!listNhanSu || listNhanSu.length === 0) {
       dispatch(getListNhanSu());
     }
+    console.log('listNs', listNhanSu);
   }, [listNhanSu, dispatch]);
 
   /* ===== Save ===== */
   const onFinish = async (values: any) => {
     try {
       const payload: IUpdateDepartmentSupport = {
+        id: detail.id,
         departmentSupportId: detail.departmentSupportId,
         delegationIncomingId: detail.delegationIncomingId,
         content: values.content,
@@ -123,59 +125,67 @@ const DepartmentSupport = () => {
           })
         ) : (
           <Form.List name="supporters">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name }) => (
-                  <div key={key} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                    <Form.Item
-                      name={[name, 'supporterId']}
-                      rules={[{ required: true, message: 'Chọn nhân sự' }]}
-                      style={{ flex: 2, marginBottom: 0, minWidth: 0 }}
-                    >
-                      <Select
-                        placeholder="Chọn nhân sự"
-                        showSearch
-                        optionFilterProp="label"
-                        options={listNhanSu.map((n) => ({
-                          value: n.idNhanSu,
-                          label: n.tenNhanSu
-                        }))}
-                        onChange={(value) => {
-                          const supporters = form.getFieldValue('supporters') || [];
+            {(fields, { add, remove }) => {
+              // ✅ LẤY DANH SÁCH supporterId ĐÃ CHỌN
+              const selectedIds =
+                form
+                  .getFieldValue('supporters')
+                  ?.map((s: any) => s?.supporterId)
+                  .filter(Boolean) ?? [];
 
-                          // Lấy supporterCode tương ứng nếu đã có trong listNhanSu
-                          const selectedNhanSu = listNhanSu.find((n) => n.idNhanSu === value);
-                          const supporterCode = selectedNhanSu?.supporterCode ?? '';
+              return (
+                <>
+                  {fields.map(({ key, name }) => (
+                    <div key={key} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                      <Form.Item
+                        name={[name, 'supporterId']}
+                        rules={[{ required: true, message: 'Chọn nhân sự' }]}
+                        style={{ flex: 2, marginBottom: 0, minWidth: 0 }}
+                      >
+                        <Select
+                          placeholder="Chọn nhân sự"
+                          showSearch
+                          optionFilterProp="label"
+                          options={listNhanSu.map((n) => ({
+                            value: n.idNhanSu,
+                            label: n.tenNhanSu,
+                            disabled: selectedIds.includes(n.idNhanSu)
+                          }))}
+                          onChange={(value) => {
+                            const selectedNhanSu = listNhanSu.find((n) => n.idNhanSu === value);
 
-                          supporters[name] = {
-                            supporterId: value,
-                            supporterCode // tự điền mã NV
-                          };
+                            // set supporterId
+                            form.setFieldValue(['supporters', name, 'supporterId'], value);
 
-                          form.setFieldsValue({ supporters });
-                        }}
-                      />
-                    </Form.Item>
+                            // auto fill supporterCode
+                            form.setFieldValue(
+                              ['supporters', name, 'supporterCode'],
+                              selectedNhanSu?.supporterCode ?? ''
+                            );
+                          }}
+                        />
+                      </Form.Item>
 
-                    <Form.Item
-                      name={[name, 'supporterCode']}
-                      rules={[{ required: true, message: 'Nhập mã NV' }]}
-                      style={{ flex: 1, marginBottom: 0, minWidth: 0 }}
-                    >
-                      <Input placeholder="Mã NV" />
-                    </Form.Item>
+                      <Form.Item
+                        name={[name, 'supporterCode']}
+                        rules={[{ required: true, message: 'Nhập mã NV' }]}
+                        style={{ flex: 1, marginBottom: 0, minWidth: 0 }}
+                      >
+                        <Input placeholder="Mã NV" />
+                      </Form.Item>
 
-                    <Button danger onClick={() => remove(name)}>
-                      Xoá
-                    </Button>
-                  </div>
-                ))}
+                      <Button danger onClick={() => remove(name)}>
+                        Xoá
+                      </Button>
+                    </div>
+                  ))}
 
-                <Button type="dashed" onClick={() => add()}>
-                  + Thêm người hỗ trợ
-                </Button>
-              </>
-            )}
+                  <Button type="dashed" onClick={() => add()}>
+                    + Thêm người hỗ trợ
+                  </Button>
+                </>
+              );
+            }}
           </Form.List>
         )
       }

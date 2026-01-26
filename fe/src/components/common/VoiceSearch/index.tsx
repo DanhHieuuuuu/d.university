@@ -30,8 +30,8 @@ const VoiceSearchModal = ({ open, timeout = 3000, onClose }: VoiceSearchModalPro
   useEffect(() => {
     if (!open) return;
 
-    setTranscript("");
-    
+    setTranscript('');
+
     const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
     if (!SpeechRecognition) {
@@ -115,7 +115,7 @@ const VoiceSearchModal = ({ open, timeout = 3000, onClose }: VoiceSearchModalPro
   const stopRecording = () => {
     recognitionRef.current?.stop();
     clearTimeout(silenceTimerRef.current);
-    setIsListening(false);    
+    setIsListening(false);
     onClose(transcript);
   };
 

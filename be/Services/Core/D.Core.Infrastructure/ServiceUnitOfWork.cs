@@ -91,6 +91,7 @@ namespace D.Core.Infrastructure
         private SurveyQuestionRepository _surveyQuestionRepository;
         private SurveyTargetRepository _surveyTargetRepository;
         private SurveyCriteriaRepository _surveyCriteriaRepository;
+        private AIResponseRepository _aiResponseRepository;
         #endregion
 
         public ServiceUnitOfWork(IDbContext dbContext, IHttpContextAccessor httpContext)
@@ -773,6 +774,18 @@ namespace D.Core.Infrastructure
                     _surveyCriteriaRepository = new SurveyCriteriaRepository(_dbContext, _httpContext);
                 }
                 return _surveyCriteriaRepository;
+            }
+        }
+
+        public IKsAIResponseRepository iKsAIResponseRepository
+        {
+            get
+            {
+                if (_aiResponseRepository == null)
+                {
+                    _aiResponseRepository = new AIResponseRepository(_dbContext, _httpContext);
+                }
+                return _aiResponseRepository;
             }
         }
 

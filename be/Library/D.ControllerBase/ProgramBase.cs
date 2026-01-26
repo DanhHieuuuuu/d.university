@@ -141,11 +141,13 @@ namespace D.ControllerBase
         /// <param name="builder"></param>
         public static void ConfigureRedis(this WebApplicationBuilder builder)
         {
-            var connectionString = builder.Configuration.GetConnectionString("Redis");
+            var connectionString = "localhost:6379";
+
+            //var connectionString = builder.Configuration.GetConnectionString("Redis");
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = "localhost:6379";
+               connectionString = "localhost:6379";
             }
             var redis = ConnectionMultiplexer.Connect(connectionString);
 
@@ -185,6 +187,24 @@ namespace D.ControllerBase
                     ValidIssuer = issuer,
                     ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+
+                // 🔥 BẮT BUỘC CHO SIGNALR
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken)
+                            && path.StartsWithSegments("/notification-hub"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

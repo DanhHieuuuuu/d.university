@@ -34,11 +34,7 @@ const UserSelect: React.FC<UserSelectProps> = ({
       disabled={disabled}
       placeholder={placeholder}
       optionFilterProp="searchText"
-      filterOption={(input, option) =>
-        (option?.searchText ?? '')
-          .toLowerCase()
-          .includes(input.toLowerCase())
-      }
+      filterOption={(input, option) => (option?.searchText ?? '').toLowerCase().includes(input.toLowerCase())}
       onChange={onChange}
     />
   );

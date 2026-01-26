@@ -1,9 +1,6 @@
-import { LoaiCongThuc } from "@/constants/kpi/loaiCongThuc.enum";
+import { LoaiCongThuc } from '@/constants/kpi/loaiCongThuc.enum';
 
-export const formatKetQua = (
-  value: number | undefined,
-  loaiCongThuc?: LoaiCongThuc
-) => {
+export const formatKetQua = (value: number | undefined, loaiCongThuc?: LoaiCongThuc) => {
   if (value == null) return '-';
 
   switch (loaiCongThuc) {

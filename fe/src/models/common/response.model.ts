@@ -30,3 +30,9 @@ export interface IResponseDialog<Data> {
   data: Data;
   accept: boolean;
 }
+export interface IResponseArray<Item> {
+  code: number;
+  data: Item[];
+  message: string;
+  status: EStatusResonse;
+}

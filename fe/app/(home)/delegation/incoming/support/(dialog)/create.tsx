@@ -5,9 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { Button, Form, FormProps, Input, Modal, Select, DatePicker, InputNumber, Row, Col, Upload } from 'antd';
 import { CloseOutlined, PlusOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { ICreateDepartment, ICreateDoanVao, IUpdateDoanVao } from '@models/delegation/delegation.model';
-import { createDepartmentSupport, createDoanVao, updateDoanVao } from '@redux/feature/delegation/delegationThunk';
+import { ICreateDepartment } from '@models/delegation/delegation.model';
 import { clearSelected } from '@redux/feature/delegation/delegationSlice';
+import { createDepartmentSupport } from '@redux/feature/delegation/department/departmentThunk';
 
 type DepartmentSupportModalProps = {
   isModalOpen: boolean;
@@ -24,6 +24,7 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { selected, listPhongBan, listDelegationIncoming } = useAppSelector((state) => state.delegationState);
+  const { selectedDelegationIncomingId } = useAppSelector((state) => state.departmentState);
   const [form] = Form.useForm<ICreateDepartment>();
   const [title, setTitle] = useState<string>('');
 
@@ -33,17 +34,26 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
         setTitle('Chi tiết phòng ban hỗ trợ');
         initData();
       } else {
-        setTitle('Thêm mới phòng ban hỗ trợ');
+        setTitle('Thêm phòng ban hỗ trợ');
         form.resetFields();
       }
     }
   }, [isModalOpen, selected, isView]);
+  useEffect(() => {
+  if (isModalOpen && selectedDelegationIncomingId) {
+    form.setFieldsValue({
+      delegationIncomingId: selectedDelegationIncomingId
+    });
+  }
+}, [isModalOpen, selectedDelegationIncomingId, form]);
 
   const initData = () => {
     if (!selected.data) return;
 
     form.setFieldsValue({
-      departmentSupportId: selected.data.departmentSupportId,
+        departmentSupportIds: selected.data.departmentSupportId
+      ? [selected.data.departmentSupportId]
+      : [],
       delegationIncomingId: selected.data.delegationIncomingId,
       content: selected.data.content
     });
@@ -61,10 +71,10 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
         content: values.content?.trim() || ''
       };
       await dispatch(createDepartmentSupport(payload)).unwrap();
-      toast.success('Thêm mới thành công');
+      toast.success('Thêm phòng ban thành công');
       onCloseModal();
-    } catch (error) {
-      toast.error('Lỗi khi lưu dữ liệu');
+    } catch (err) {
+      toast.error(String(err));
     }
   };
 
@@ -107,10 +117,13 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
           <Col span={12}>
             <Form.Item
               label="Phòng ban hỗ trợ"
-              name="departmentSupportId"
+              name="departmentSupportIds"
               rules={[{ required: true, message: 'Chọn phòng ban' }]}
             >
               <Select
+                mode="multiple"
+                allowClear
+                placeholder="Chọn phòng ban hỗ trợ"
                 options={listPhongBan.map((pb: any) => ({
                   value: pb.idPhongBan,
                   label: pb.tenPhongBan
@@ -118,6 +131,7 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
               />
             </Form.Item>
           </Col>
+
           <Col span={12}>
             <Form.Item
               label="Đoàn vào"
@@ -125,16 +139,17 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
               rules={[{ required: true, message: 'Chọn đoàn vào' }]}
             >
               <Select
+                disabled={!!selectedDelegationIncomingId}
                 options={listDelegationIncoming.map((d: any) => ({
                   value: d.idDelegationIncoming,
-                  label: d.tenDoanVao
+                  label: `${d.tenDoanVao} - ${d.delegationIncomingCode}`
                 }))}
               />
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item label="Nội dung" name="content">
+        <Form.Item label="Nội dung" name="content" required>
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>

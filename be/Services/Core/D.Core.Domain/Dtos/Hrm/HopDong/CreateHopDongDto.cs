@@ -1,4 +1,5 @@
-﻿using D.DomainBase.Common;
+﻿using D.Core.Domain.Dtos.Hrm.NhanSu;
+using D.DomainBase.Common;
 
 namespace D.Core.Domain.Dtos.Hrm.HopDong
 {
@@ -7,10 +8,10 @@ namespace D.Core.Domain.Dtos.Hrm.HopDong
         public string? SoHopDong { get; set; }
 
         // Nếu nhân sự đã tồn tại trong db thì chỉ cần truyền IdNhanSu
-        public int IdNhanSu { get; set; }
+        public int? IdNhanSu { get; set; }
         // Nếu nhân sự chưa tồn tại trong db thì truyền ThongTinNhanSu
 
-        //public CreateNhanSuDto? ThongTinNhanSu { get; set; }
+        public CreateNhanSuDto? ThongTinNhanSu { get; set; }
 
         public int? IdLoaiHopDong { get; set; }
         public DateTime? NgayKyKet { get; set; }

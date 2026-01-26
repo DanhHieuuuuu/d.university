@@ -1,4 +1,5 @@
 ﻿using D.Core.Domain.Dtos.Delegation;
+using D.Core.Domain.Dtos.Delegation.Incoming;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
@@ -13,6 +14,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
     public interface IExcelService
     {
         Task CheckValidateDetailDelegationAsync(IFormFile file, List<ExcelColumnRule> rules);
-        Task<List<DetailDelegationIncoming>> ParseExcelToListDetailDelegationAsync(IFormFile file);
+        Task<byte[]> ExportAsync<T>(List<T> data,string sheetName,string title);
+        Task<List<DetailDelegationIncoming>> ParseExcelToListDetailDelegationAsync(IFormFile file);  
     }
 }

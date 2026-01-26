@@ -18,6 +18,9 @@ using D.Core.Infrastructure.Services.Kpi.Abstracts;
 using D.Core.Infrastructure.Services.Kpi.Implements;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.Core.Infrastructure.Services.SinhVien.Implements;
+using D.Core.Infrastructure.Services.Survey;
+using D.Core.Infrastructure.Services.Survey.AI.Abstracts;
+using D.Core.Infrastructure.Services.Survey.AI.Implement;
 using D.Core.Infrastructure.Services.Survey.Report.Abstracts;
 using D.Core.Infrastructure.Services.Survey.Report.Implement;
 using D.Core.Infrastructure.Services.Survey.Request.Abstracts;
@@ -59,6 +62,8 @@ namespace D.Core.Infrastructure
                 .AddScoped<IRequestSurveyService, RequestSurveyService>()
                 .AddScoped<ISurveyService, SurveyService>()
                 .AddScoped<IReportSurveyService, ReportSurveyService>()
+                .AddScoped<IAISurveyService, AISurveyService>()
+                .AddHostedService<AutoSurveyStatusService>()
             #endregion
                 .AddScoped<IFileService, FileService>()
             #region Kpi
@@ -96,7 +101,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<INsQuyetDinhRepository, NsQuyetDinhRepository>()
                 .AddScoped<INsQuyetDinhLogRepository, NsQuyetDinhLogRepository>()
                 .AddScoped<INsQuaTrinhCongTacRepository, NsQuaTrinhCongTacRepository>()
-                
+
             #region DaoTao
                 .AddScoped<IDtKhoaRepository, DtKhoaRepository>()
                 .AddScoped<IDtNganhRepository, DtNganhRepository>()
@@ -116,7 +121,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IReceptionTimeRepository, ReceptionTimeRepository>()
                 .AddScoped<ISupporterRepository, SupporterRepository>()
             #endregion
-                
+
             #region Kpi
                 .AddScoped<IKpiCaNhanRepository, KpiCaNhanRepository>()
                 .AddScoped<IKpiDonViRepository, KpiDonViRepository>()
@@ -134,7 +139,8 @@ namespace D.Core.Infrastructure
                 .AddScoped<IKsSurveyLogRepository, SurveyLogRepository>()
                 .AddScoped<IKsSurveySubmissionRepository, SurveySubmissionRepository>()
                 .AddScoped<IKsSurveySubmissionAnswerRepository, SurveySubmissionAnswerRepository>()
-                .AddScoped<IKsSurveySubmissionLogRepository, SurveySubmissionLogRepository>();
+                .AddScoped<IKsSurveySubmissionLogRepository, SurveySubmissionLogRepository>()
+                .AddScoped<AIResponseRepository, AIResponseRepository>();
             #endregion
         }
 

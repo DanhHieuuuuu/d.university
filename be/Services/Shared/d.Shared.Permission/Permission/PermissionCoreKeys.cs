@@ -27,14 +27,70 @@
         #endregion
 
         #region HRM - Nhân sự
-        public const string CoreMenuNhanSu = $"{PermissionPrefixKeys.Menu}hrm";
+        public const string CoreMenuHrm = $"{PermissionPrefixKeys.Menu}hrm";
+
+        // Quản lý danh sách hồ sơ nhân sự
+        public const string CoreMenuHrmDanhSach = $"{PermissionPrefixKeys.Menu}hrm_list";
+        public const string CoreButtonSyncNhanSu = $"{PermissionPrefixKeys.Button}hrm_sync_qdrant";
         public const string CoreButtonCreateNhanSu = $"{PermissionPrefixKeys.Button}hrm_create_nhansu";
         public const string CoreButtonUpdateNhanSu = $"{PermissionPrefixKeys.Button}hrm_update_nhansu";
         public const string CoreButtonDeleteNhanSu = $"{PermissionPrefixKeys.Button}hrm_delete_nhansu";
+        public const string CoreButtonViewNhanSu = $"{PermissionPrefixKeys.Button}hrm_view_nhansu";
+        // public const string CoreButtonExportCVNhanSu = $"{PermissionPrefixKeys.Button}hrm_export_hoso_nhansu";
+
+        // Quản lý hợp đồng tuyển dụng
+        public const string CoreMenuHrmContract = $"{PermissionPrefixKeys.Menu}hrm_contracts";
+        public const string CoreTableHrmContract = $"{PermissionPrefixKeys.Table}hrm_contracts";
+        public const string CoreButtonCreateHrmContract = $"{PermissionPrefixKeys.Button}hrm_create_contract";
+
+        // Quản lý các quyết định
+        public const string CoreMenuHrmDecision = $"{PermissionPrefixKeys.Menu}hrm_decisions";
+        public const string CoreButtonViewHrmDecision = $"{PermissionPrefixKeys.Menu}hrm_view_decision";
+        // public const string CoreButtonCreateHrmDecision = $"{PermissionPrefixKeys.Button}hrm_create_decision";
+        // public const string CoreButtonUpdateHrmDecisionStatus = $"{PermissionPrefixKeys.Button}hrm_update_status_decision";
+
         #endregion
 
         #region Delegation - Đoàn vào / Đoàn ra
-        public const string CoreMenuDelegation = $"{PermissionPrefixKeys.Menu}delegation";
+        public const string CoreMenuDelegation = $"{PermissionPrefixKeys.Menu}dio";
+
+        public const string CoreMenuListDoanVao = $"{PermissionPrefixKeys.Menu}dio_danhsach";
+        public const string CoreButtonCreateDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_create";
+        public const string CoreButtonUpdateDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_update";
+        public const string CoreButtonDeleteDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_delete";
+        public const string CoreButtonViewDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_view";
+        public const string CoreButtonCreateTimeDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_create_time";
+        public const string CoreButtonDeXuatDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_dexuat";
+        public const string CoreButtonSearchDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_search";
+        public const string CoreTableListDoanVao = $"{PermissionPrefixKeys.Table}dio_danhsach_table_list";
+
+
+        public const string CoreMenuXuLyDoanVao = $"{PermissionPrefixKeys.Menu}dio_xuly";
+        public const string CoreButtonCreateXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_create";
+        public const string CoreButtonUpdateXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_update";
+        public const string CoreButtonDeleteXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_delete";
+        public const string CoreButtonViewXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_view";
+        public const string CoreButtonBaoCaoXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_baocao";
+        public const string CoreButtonPheDuyetXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_pheduyet";
+        public const string CoreButtonTiepDoanXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_tiepdoan";
+        public const string CoreButtonSearchXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_search";
+        public const string CoreButtonTableXuLyDoanVao = $"{PermissionPrefixKeys.Table}dio_xuly_table";
+
+        public const string CoreMenuDepartment = $"{PermissionPrefixKeys.Menu}dio_department";
+        public const string CoreButtonCreateDepartment = $"{PermissionPrefixKeys.Button}dio_department_create";
+        public const string CoreButtonUpdateDepartment = $"{PermissionPrefixKeys.Button}dio_department_update";
+        public const string CoreButtonDeleteDepartment = $"{PermissionPrefixKeys.Button}dio_department_delete";
+        public const string CoreButtonViewDepartment = $"{PermissionPrefixKeys.Button}dio_department_view";
+        public const string CoreButtonSearchDepartment = $"{PermissionPrefixKeys.Button}dio_department_search";
+        public const string CoreButtonCreateSupporterDepartment = $"{PermissionPrefixKeys.Button}dio_department_create_support";
+        public const string CoreTableDepartment = $"{PermissionPrefixKeys.Table}dio_department_table";
+
+
+        public const string CoreMenuLog = $"{PermissionPrefixKeys.Menu}dio_log";
+        public const string CoreTableLog = $"{PermissionPrefixKeys.Table}dio_log_table";
+
+
+
         #endregion
 
         #region Kpi
@@ -125,6 +181,9 @@
         // Report Management
         public const string SurveyMenuReport = $"{PermissionPrefixKeys.Menu}survey_report";
         public const string SurveyButtonReportGenerate = $"{PermissionPrefixKeys.Button}survey_report_generate";
+        public const string SurveyButtonAIReportGenerate = $"{PermissionPrefixKeys.Button}survey_ai_report_generate";
+
+        public const string SurveyMenuLogging = $"{PermissionPrefixKeys.Menu}survey_logging";
 
         #endregion
     }

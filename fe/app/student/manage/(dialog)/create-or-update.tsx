@@ -18,21 +18,14 @@ type StudentDialogProps = {
   isView?: boolean;
 };
 
-const StudentDialog: React.FC<StudentDialogProps> = ({
-  open,
-  onClose,
-  onSuccess,
-  student = null,
-  isView = false
-}) => {
+const StudentDialog: React.FC<StudentDialogProps> = ({ open, onClose, onSuccess, student = null, isView = false }) => {
   const [form] = Form.useForm<ICreateStudent>();
   const dispatch = useAppDispatch();
 
   const { $create, $update } = useAppSelector((state) => state.studentState);
   const { listGioiTinh, listQuocTich, listDanToc, listTonGiao } = useAppSelector((s) => s.danhmucState);
 
-  const isLoading =
-    $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
+  const isLoading = $create.status === ReduxStatus.LOADING || $update.status === ReduxStatus.LOADING;
   const title = student ? (isView ? 'Xem sinh viên' : 'Cập nhật sinh viên') : 'Thêm sinh viên mới';
 
   useEffect(() => {
@@ -125,12 +118,7 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
       footer={
         <Space>
           {!isView && (
-            <Button
-              type="primary"
-              onClick={() => form.submit()}
-              icon={<SaveOutlined />}
-              loading={isLoading}
-            >
+            <Button type="primary" onClick={() => form.submit()} icon={<SaveOutlined />} loading={isLoading}>
               {student ? 'Cập nhật' : 'Lưu'}
             </Button>
           )}
@@ -140,34 +128,16 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
         </Space>
       }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        autoComplete="off"
-        disabled={isView}
-      >
+      <Form form={form} layout="vertical" onFinish={onFinish} autoComplete="off" disabled={isView}>
         <div className="grid grid-cols-4 gap-x-5">
-          <Form.Item
-            label="MSSV"
-            name="mssv"
-            rules={[{ required: true, message: 'Không được để trống!' }]}
-          >
+          <Form.Item label="MSSV" name="mssv" rules={[{ required: true, message: 'Không được để trống!' }]}>
             <Input placeholder="Nhập MSSV" disabled={!!student} />
           </Form.Item>
-          <Form.Item
-            label="Họ đệm"
-            name="hoDem"
-            rules={[{ required: true, message: 'Không được để trống!' }]}
-          >
+          <Form.Item label="Họ đệm" name="hoDem" rules={[{ required: true, message: 'Không được để trống!' }]}>
             <Input placeholder="Nhập họ đệm" />
           </Form.Item>
 
-          <Form.Item
-            label="Tên"
-            name="ten"
-            rules={[{ required: true, message: 'Không được để trống!' }]}
-          >
+          <Form.Item label="Tên" name="ten" rules={[{ required: true, message: 'Không được để trống!' }]}>
             <Input placeholder="Nhập tên" />
           </Form.Item>
 
@@ -258,8 +228,6 @@ const StudentDialog: React.FC<StudentDialogProps> = ({
           >
             <Input placeholder="Nhập email" />
           </Form.Item>
-
-          
         </div>
       </Form>
     </Modal>

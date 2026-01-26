@@ -1,4 +1,7 @@
-﻿using D.Core.Domain.Dtos.Survey.Submit;
+﻿using D.Core.Domain.Dtos.Survey.Log;
+using D.Core.Domain.Dtos.Survey.Logging;
+using D.Core.Domain.Dtos.Survey.Statistics;
+using D.Core.Domain.Dtos.Survey.Submit;
 using D.Core.Domain.Dtos.Survey.Surveys;
 using D.DomainBase.Dto;
 using System;
@@ -22,5 +25,11 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Abstracts
         Task<StartSurveyResponseDto> StartSurveyAsync(int surveyId);
         Task SaveDraftAsync(SubmitSurveyRequestDto dto);
         Task<SurveyResultDto> SubmitSurveyAsync(SubmitSurveyRequestDto dto);
+
+        PageResultDto<LogSurveyResponseDto> LogPaging(FilterSurveyLogDto dto);
+
+        Task ProcessAutoStatusUpdateAsync();
+        
+        Task<SurveyStatisticsDto> GetStatisticsAsync();
     }
 }

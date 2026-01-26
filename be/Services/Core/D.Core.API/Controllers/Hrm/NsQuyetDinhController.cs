@@ -1,5 +1,7 @@
 ﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.Hrm.QuyetDinh;
+using d.Shared.Permission;
+using d.Shared.Permission.Permission;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,12 @@ namespace D.Core.API.Controllers.Hrm
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Danh sách các quyết định
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuHrmDecision)]
         [HttpGet("find")]
         public async Task<ResponseAPI> GetAllQuyetDinh(NsQuyetDinhRequestDto dto)
         {
@@ -36,6 +44,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="idQuyetDinh"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonViewHrmDecision)]
         [HttpGet("{idQuyetDinh}")]
         public async Task<ResponseAPI> ChiTietQuyetDinh([FromRoute] int idQuyetDinh)
         {

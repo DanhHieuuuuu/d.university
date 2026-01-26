@@ -28,7 +28,7 @@ export class DelegationStatusConst {
     },
     [this.PHE_DUYET]: {
       value: this.PHE_DUYET,
-      label: 'Phê duyệt',
+      label: 'BGH phê duyệt',
       className: 'tag-approve'
     },
     [this.DANG_TIEP_DOAN]: {

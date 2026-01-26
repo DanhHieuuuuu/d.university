@@ -58,14 +58,22 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
     }),
     [isGroupedTable, sttMap]
   );
-  const openPopupConfig = () => { setOpenConfig(true); };
-  const closePopupConfig = () => { setOpenConfig(false); };
+  const openPopupConfig = () => {
+    setOpenConfig(true);
+  };
+  const closePopupConfig = () => {
+    setOpenConfig(false);
+  };
 
   const renderStatusColumn = useCallback((value: any, col: IColumn<T>, record?: T) => {
     if (!col.getTagInfo) return value;
     const info = col.getTagInfo(value, record);
     if (!info) return value;
-    return <Tag bordered={false} className={info.className} color={info.color}>{info.label}</Tag>;
+    return (
+      <Tag bordered={false} className={info.className} color={info.color}>
+        {info.label}
+      </Tag>
+    );
   }, []);
 
   const enhancedColumns: IColumn<T>[] = useMemo(() => {

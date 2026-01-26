@@ -16,9 +16,12 @@ namespace D.Core.API
     {
         public static void Main(string[] args)
         {
+            Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine($"Serilog Error: {msg}"));
+
             var builder = WebApplication.CreateBuilder(args);
             var configuration = builder.Configuration;
 
+            // Local Seq + File
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
@@ -45,8 +48,11 @@ namespace D.Core.API
                 builder.Services.AddMediatRServices();
                 builder.ConfigureCors();
                 builder.ConfigureS3();
+                builder.Services.AddHttpClient();
                 builder.ConfigureJinaEmbedding();
                 builder.ConfigureQdrantClient();
+                builder.ConfigureJwtAuthentication();
+                builder.Services.AddHostedService<D.Core.Infrastructure.Services.Logging.LogUploadBackgroundService>();
 
                 var app = builder.Build();
 
@@ -60,7 +66,6 @@ namespace D.Core.API
                     });
                 }
                 app.UseCors(ProgramBase.CorsPolicy);
-                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 app.UseSerilogRequestLogging();
 
                 app.UseAuthentication();
@@ -68,6 +73,7 @@ namespace D.Core.API
                 app.MapControllers();
                
 
+                app.MapHub<NotificationHub>("/notification-hub").RequireCors(ProgramBase.SignalRCors);
                 Log.Information("Core started successfully.");
                 app.Run();
             }

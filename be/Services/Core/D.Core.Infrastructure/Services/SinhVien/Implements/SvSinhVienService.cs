@@ -608,7 +608,8 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
             new Claim(CustomClaimType.LastName, sv.Ten ?? ""),
             new Claim(CustomClaimType.DateOfBirth, sv.NgaySinh?.ToString() ?? ""),
             // Sinh viên type 4
-            new Claim(CustomClaimType.UserType, UserTypeConstant.STUDENT.ToString()), 
+            new Claim(CustomClaimType.UserType, UserTypeConstant.STUDENT.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, sv.Id.ToString()),
             // Thêm MSSV vào claim 
             new Claim("Mssv", sv.Mssv ?? "")
             

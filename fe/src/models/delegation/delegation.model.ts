@@ -80,8 +80,14 @@ export type IQuerySupporter = IQueryPaging & {
 export type IQueryDepartmentSupport = IQueryPaging & {
   departmentSupportId?: number;
 };
-export type IQueryLogStatus = IQueryPaging & {};
-export type IQueryLogReceptionTime = IQueryPaging & {};
+export type IQueryLogStatus = IQueryPaging & {
+  CreateDate?: string;
+  CreatedByName?: string;
+};
+export type IQueryLogReceptionTime = IQueryPaging & {
+  CreateDate?: string;
+  CreatedByName?: string;
+};
 export type ICreateDoanVao = {
   code: string;
   name: string;
@@ -154,8 +160,8 @@ export type ICreateSupporter = {
 
 export type ICreateDepartment = {
   delegationIncomingId: number;
-  content: string;
-  departmentSupportId: number;
+  content?: string;
+  departmentSupportIds: number[];
 };
 
 export interface IUpdateStatus {
@@ -164,6 +170,7 @@ export interface IUpdateStatus {
   action: string;
 }
 export interface IUpdateDepartmentSupport {
+  id: number;
   departmentSupportId: number;
   delegationIncomingId: number;
   content: string;
@@ -173,14 +180,31 @@ export interface IUpdateDepartmentSupport {
   }[];
 }
 export interface ICreatePrepareItem {
-  name: string,
-  description: string,
-  money:number,
-  receptionTimeId:number
+  name: string;
+  description: string;
+  money: number;
+  receptionTimeId: number;
 }
 export interface ICreatePrepare {
   items: ICreatePrepareItem[];
 }
 export interface IUpdatePrepare {
   items: IPrepare[];
+}
+export interface BaoCaoDoanVao {
+  listId: number[];
+  isExportAll: boolean;
+}
+
+export interface IStatistical {
+  totalAll: number,
+  byStatus: IStatisticalStatus[]
+}
+export interface IStatisticalStatus{
+  status:number,
+  total: number
+}
+export interface IDateOption {
+  label: string;
+  value: string;
 }

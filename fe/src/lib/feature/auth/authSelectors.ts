@@ -1,7 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '@redux/store';
 
-
 export const selectorUser = (state: RootState) => state.authState?.user ?? null;
 
 export const selectorPermissions = (state: RootState) => state.authState?.permissions ?? [];

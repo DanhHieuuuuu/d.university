@@ -21,7 +21,7 @@ const EducationTab = () => {
         />
       </Form.Item>
       <Form.Item<ICreateNhanSu> label="Trình độ ngoại ngữ" name="trinhDoNgoaiNgu">
-        <Input placeholder='Tiếng Anh - B1, Tiếng Trung - HSK2, ...' />
+        <Input placeholder="Tiếng Anh - B1, Tiếng Trung - HSK2, ..." />
       </Form.Item>
       <Form.Item<ICreateNhanSu> label="Học vị" name="tenHocVi">
         <Input />
@@ -36,7 +36,7 @@ const EducationTab = () => {
         <Input />
       </Form.Item>
       <Form.Item<ICreateNhanSu> label="Ngày vào Đảng Cộng sản Việt Nam" name="ngayVaoDang">
-        <DatePicker allowClear format="DD/MM/YYYY" className='!w-full' />
+        <DatePicker allowClear format="DD/MM/YYYY" className="!w-full" />
       </Form.Item>
     </div>
   );

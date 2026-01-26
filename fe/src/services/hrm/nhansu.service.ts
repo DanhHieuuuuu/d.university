@@ -1,9 +1,4 @@
-import {
-  ICreateNhanSu,
-  IQueryNhanSu,
-  IUpdateNhanSu,
-  IViewNhanSu
-} from '@models/nhansu/nhansu.model';
+import { ICreateNhanSu, IQueryNhanSu, IUpdateNhanSu, IViewNhanSu } from '@models/nhansu/nhansu.model';
 import { IResponseItem, IResponseList } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
@@ -108,12 +103,24 @@ const thongKeNsTheoPhongBan = async () => {
 };
 
 const semanticSearch = async (args: IQueryNhanSu) => {
-  try {    
+  try {
     const res = await axios.get(`${apiNhanSuEndpoint}/search`, {
       params: {
         ...args
       }
     });
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+const syncQdrant = async () => {
+  try {
+    const res = await axios.post(`${apiNhanSuEndpoint}/sync`);
 
     const data = res.data;
     return Promise.resolve(data);
@@ -132,5 +139,6 @@ export const NhanSuService = {
   getHoSoNhanSu,
   findBySdt,
   thongKeNsTheoPhongBan,
-  semanticSearch
+  semanticSearch,
+  syncQdrant
 };

@@ -29,7 +29,7 @@ export enum EStatusResonse {
   ERROR = 0
 }
 
-export interface CRUD<T,S=any> {
+export interface CRUD<T, S = any> {
   $create: {
     status: ReduxStatus;
   };

@@ -27,10 +27,7 @@ export default function NotificationRealtime() {
         });
 
         // Chỉ start khi Disconnected
-        if (
-          connection.state === HubConnectionState.Disconnected &&
-          !startedRef.current
-        ) {
+        if (connection.state === HubConnectionState.Disconnected && !startedRef.current) {
           startedRef.current = true;
 
           await connection.start();

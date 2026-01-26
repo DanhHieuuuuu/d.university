@@ -687,7 +687,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                             },
                             MucTieu = k.MucTieu ?? "N/A",
                             TrongSo = ts,
-                            KetQua = k.KetQuaThucTe ?? 0,
+                            KetQuaThucTe = k.KetQuaThucTe ?? 0,
                             DiemTuCham = (k.DiemKpi ?? 0) * modifier,
                             DiemCapTren = (k.CapTrenDanhGia ?? k.DiemKpiCapTren ?? 0) * modifier,
                             CongThuc = k.CongThucTinh,
