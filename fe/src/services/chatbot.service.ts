@@ -1,14 +1,19 @@
-import axiosBase from 'axios';
+import axios from '@utils/axios';
+import { processApiMsgError } from '@utils/index';
+import { IResponseItem, IResponseArray } from '@models/common/response.model';
 
-const CHATBOT_API_BASE = 'http://localhost:8000/api';
+const apiChatbotEndpoint = 'chatbot';
 
 // Types
 export interface IChatSession {
-  session_id: string;
-  title: string;
-  message_count: number;
-  created_at: string;
-  last_access: string;
+  id: number;
+  sessionId: string;
+  mssv: string;
+  title: string | null;
+  role: 'user' | 'assistant';
+  content: string;
+  lastAccess: string;
+  createdDate: string;
 }
 
 export interface IChatMessage {
@@ -16,87 +21,118 @@ export interface IChatMessage {
   content: string;
 }
 
-export interface ISessionsResponse {
-  total: number;
-  sessions: IChatSession[];
-}
-
-export interface ISessionHistoryResponse {
-  session_id: string;
-  title: string;
-  message_count: number;
-  created_at: string;
-  last_access: string;
-  history: IChatMessage[];
+export interface IChatHistoryItem {
+  id: number;
+  sessionId: string;
+  mssv: string;
+  title: string | null;
+  role: 'user' | 'assistant';
+  content: string;
+  lastAccess: string;
+  createdDate: string;
 }
 
 export interface IChatRequest {
   message: string;
-  session_id: string;
-  conversation_history: IChatMessage[];
+  sessionId: string;
+  mssv: string;
 }
 
-export interface IChatResponse {
+export interface IChatResponseData {
   response: string;
-  context_used: any[];
-  session_id: string;
+  contextUsed: string[];
+  rewrittenQuery: string | null;
+  sessionId: string;
 }
 
 // API Functions
-const getSessions = async (): Promise<ISessionsResponse> => {
+
+/**
+ * Gui tin nhan chat
+ * POST /api/chatbot/chat
+ */
+const sendMessage = async (request: IChatRequest): Promise<IChatResponseData> => {
   try {
-    const res = await axiosBase.get(`${CHATBOT_API_BASE}/sessions`, {
-      headers: { accept: 'application/json' }
-    });
-    return Promise.resolve(res.data);
+    const res = await axios.post(`${apiChatbotEndpoint}/chat`, request);
+    const data: IResponseItem<IChatResponseData> = res.data;
+    return Promise.resolve(data.data);
   } catch (err) {
-    console.error('Failed to fetch sessions:', err);
+    processApiMsgError(err, 'Khong the gui tin nhan. Vui long thu lai.');
     return Promise.reject(err);
   }
 };
 
-const getSessionHistory = async (sessionId: string): Promise<ISessionHistoryResponse> => {
+/**
+ * Lay lich su chat theo session
+ * GET /api/chatbot/by-session?SessionId=xxx
+ */
+const getSessionHistory = async (sessionId: string): Promise<IChatHistoryItem[]> => {
   try {
-    const res = await axiosBase.get(`${CHATBOT_API_BASE}/session/${sessionId}/history`, {
-      headers: { accept: 'application/json' }
+    const res = await axios.get(`${apiChatbotEndpoint}/by-session`, {
+      params: { SessionId: sessionId }
     });
-    return Promise.resolve(res.data);
+    const data: IResponseArray<IChatHistoryItem> = res.data;
+    return Promise.resolve(data.data || []);
   } catch (err) {
-    console.error('Failed to fetch session history:', err);
+    processApiMsgError(err, '');
     return Promise.reject(err);
   }
 };
 
-const sendMessage = async (request: IChatRequest): Promise<IChatResponse> => {
+/**
+ * Lay lich su chat theo mssv
+ * GET /api/chatbot/by-mssv?Mssv=xxx
+ */
+const getHistoryByMssv = async (mssv: string): Promise<IChatHistoryItem[]> => {
   try {
-    const res = await axiosBase.post(`${CHATBOT_API_BASE}/chat`, request, {
-      headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
+    const res = await axios.get(`${apiChatbotEndpoint}/by-mssv`, {
+      params: { Mssv: mssv }
     });
-    return Promise.resolve(res.data);
+    const data: IResponseArray<IChatHistoryItem> = res.data;
+    return Promise.resolve(data.data || []);
   } catch (err) {
-    console.error('Failed to send message:', err);
+    processApiMsgError(err, '');
     return Promise.reject(err);
   }
 };
 
+/**
+ * Lay danh sach session cua sinh vien
+ * GET /api/chatbot/sessions?Mssv=xxx
+ */
+const getSessions = async (mssv: string): Promise<IChatSession[]> => {
+  try {
+    const res = await axios.get(`${apiChatbotEndpoint}/sessions`, {
+      params: { Mssv: mssv }
+    });
+    const data: IResponseArray<IChatSession> = res.data;
+    return Promise.resolve(data.data || []);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
+/**
+ * Xoa lich su chat
+ * DELETE /api/chatbot/delete
+ */
 const deleteSession = async (sessionId: string): Promise<void> => {
   try {
-    await axiosBase.delete(`${CHATBOT_API_BASE}/session/${sessionId}`, {
-      headers: { accept: 'application/json' }
+    await axios.delete(`${apiChatbotEndpoint}/delete`, {
+      params: { SessionId: sessionId }
     });
     return Promise.resolve();
   } catch (err) {
-    console.error('Failed to delete session:', err);
+    processApiMsgError(err, 'Khong the xoa cuoc tro chuyen. Vui long thu lai.');
     return Promise.reject(err);
   }
 };
 
 export const ChatbotService = {
-  getSessions,
-  getSessionHistory,
   sendMessage,
+  getSessionHistory,
+  getHistoryByMssv,
+  getSessions,
   deleteSession
 };
