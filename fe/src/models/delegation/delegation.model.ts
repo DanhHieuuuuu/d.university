@@ -78,7 +78,7 @@ export type IQuerySupporter = IQueryPaging & {
   departmentSupportId?: number;
 };
 export type IQueryDepartmentSupport = IQueryPaging & {
-  departmentSupportId?: number;
+  
 };
 export type IQueryLogStatus = IQueryPaging & {
   CreateDate?: string;

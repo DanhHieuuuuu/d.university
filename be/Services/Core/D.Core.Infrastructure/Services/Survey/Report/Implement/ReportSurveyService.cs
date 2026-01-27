@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using d.Shared.Permission.Auth;
 using D.Core.Domain.Dtos.Survey.Report;
 using D.Core.Domain.Dtos.Survey.AI;
 using D.Core.Domain.Dtos.Survey.Request;

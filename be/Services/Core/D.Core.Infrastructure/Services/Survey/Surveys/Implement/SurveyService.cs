@@ -162,19 +162,19 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
             var entity = _unitOfWork.iKsSurveyRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy khảo sát.");
-            if (entity.Status == SurveyStatus.Close) return;
+            if (entity.Status == SurveyStatus.Pause) return;
             
             var oldStatus = entity.Status;
-            entity.Status = SurveyStatus.Close;
+            entity.Status = SurveyStatus.Pause;
             
             _unitOfWork.iKsSurveyRepository.Update(entity);
 
             await LogActionAsync(
                 entity.MaKhaoSat,
                 "Close",
-                "Đóng khảo sát (Ngưng kích hoạt)",
+                "Đóng khảo sát (Tạm ngưng)",
                 oldStatus.ToString(),
-                SurveyStatus.Close.ToString()
+                SurveyStatus.Pause.ToString()
             );
 
             await _unitOfWork.SaveChangesAsync();
@@ -282,7 +282,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             foreach (var item in result)
             {
                 var submission = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
-                    .Where(sub => sub.IdKhaoSat == item.Id && sub.IdNguoiDung == userId && sub.ThoiGianNop != null)
+                    .Where(sub => sub.IdKhaoSat == item.Id && sub.IdNguoiDung == userId && sub.UserType == userType && sub.ThoiGianNop != null)
                     .FirstOrDefaultAsync();
                 
                 if (submission != null)
@@ -306,7 +306,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             var userType = CommonUntil.GetCurrentUserType(_httpContextAccessor);
 
             var submission = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
-                .FirstOrDefaultAsync(x => x.IdKhaoSat == surveyId && x.IdNguoiDung == userId);
+                .FirstOrDefaultAsync(x => x.IdKhaoSat == surveyId && x.IdNguoiDung == userId && x.UserType == userType);
 
             if (submission != null && submission.TrangThai == SubmissionStatus.Submitted)
             {
@@ -378,6 +378,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                 {
                     IdKhaoSat = surveyId,
                     IdNguoiDung = userId,
+                    UserType = userType,
                     ThoiGianBatDau = DateTime.Now,
                     TrangThai = SubmissionStatus.InProgress,
                     DiemTong = 0
@@ -672,7 +673,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             // Get surveys update
             var surveys = await _unitOfWork.iKsSurveyRepository.Table
                 .Where(s => !s.Deleted &&
-                           (s.Status == SurveyStatus.Close || s.Status == SurveyStatus.Open))
+                           (s.Status == SurveyStatus.Close || s.Status == SurveyStatus.Open || s.Status == SurveyStatus.Pause ))
                 .ToListAsync();
             int openedCount = 0;
             int closedCount = 0;
@@ -683,7 +684,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                     bool statusChanged = false;
                     var oldStatus = survey.Status;
 
-                    // OPEN: Survey is closed & current time >= start time
+                    // OPEN:
                     if (survey.Status == SurveyStatus.Close &&
                         survey.ThoiGianBatDau <= now &&
                         survey.ThoiGianKetThuc > now)
@@ -705,11 +706,11 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
 
                         _logger.LogInformation($"Auto-opened survey: {survey.MaKhaoSat}");
                     }
-                    // CLOSE: Survey is open & current time >= end time
-                    else if (survey.Status == SurveyStatus.Open &&
+                    // CLOSE:
+                    else if (//survey.Status == SurveyStatus.Open &&
                              survey.ThoiGianKetThuc <= now)
                     {
-                        survey.Status = SurveyStatus.Close;
+                        survey.Status = SurveyStatus.Completed;
                         survey.ModifiedDate = DateTime.Now;
                         survey.ModifiedBy = "SYSTEM";
                         statusChanged = true;
@@ -721,7 +722,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                             "Close",
                             "Tự động đóng khảo sát theo lịch",
                             oldStatus.ToString(),
-                            SurveyStatus.Close.ToString()
+                            SurveyStatus.Completed.ToString()
                         );
 
                         _logger.LogInformation($"Auto-closed survey: {survey.MaKhaoSat}");

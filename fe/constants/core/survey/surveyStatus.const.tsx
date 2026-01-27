@@ -2,6 +2,7 @@ export class surveyStatusConst {
   static CLOSE = 1;
   static OPEN = 2;
   static COMPLETE = 3;
+  static PAUSE = 4;
 
   static list = [
     {
@@ -15,6 +16,10 @@ export class surveyStatusConst {
     {
       value: this.COMPLETE,
       name: 'Hoàn thành'
+    },
+    {
+      value: this.PAUSE,
+      name: 'Tạm ngưng'
     }
   ];
 

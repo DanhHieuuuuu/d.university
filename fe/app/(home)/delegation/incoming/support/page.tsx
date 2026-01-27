@@ -21,7 +21,7 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { IDepartmentSupport, IQueryGuestGroup, ISupporter, IViewGuestGroup } from '@models/delegation/delegation.model';
+import { IDepartmentSupport, IQueryDepartmentSupport, IQueryGuestGroup, ISupporter, IViewGuestGroup } from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
   getListDelegationIncoming,
@@ -43,7 +43,7 @@ import { getListDepartmentSupport } from '@redux/feature/delegation/department/d
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { status, total: totalItem } = useAppSelector((state) => state.delegationState);
+  const { status, total: totalItem } = useAppSelector((state) => state.departmentState);
   const { list} = useAppSelector((state) => state.departmentState);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -96,7 +96,7 @@ const Page = () => {
   const onClickView = (data: IDepartmentSupport) => {
     router.push(`/delegation/incoming/support/edit?departmentSupportId=${data.id}`);
   };
-  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryDepartmentSupport>({
     total: totalItem,
     initialQuery: {
       PageIndex: 1,

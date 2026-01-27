@@ -50,6 +50,8 @@ export class PermissionCoreConst {
   public static readonly CoreButtonTiepDoanXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_tiepdoan`;
   public static readonly CoreButtonSearchXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_search`;
   public static readonly CoreButtonTableXuLyDoanVao = `${PermissionCoreConst.Table}dio_xuly_table`;
+  public static readonly CoreButtonPhanCongXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_phancong`;
+  public static readonly CoreButtonXacNhanChinhSuaXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_xacnhan_chinhsua`;
 
   public static readonly CoreMenuDepartment = `${PermissionCoreConst.Menu}dio_department`;
   public static readonly CoreButtonCreateDepartment = `${PermissionCoreConst.Button}dio_department_create`;

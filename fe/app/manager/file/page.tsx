@@ -47,7 +47,7 @@ const Page = () => {
   const [previewImage, setPreviewImage] = useState<string>('');
 
   const getImageUrl = (fileName: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5268/api';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://d-university-9zz7.onrender.com/api';
     return `${baseUrl}/s3-test/download?fileName=${encodeURIComponent(fileName)}`;
   };
 

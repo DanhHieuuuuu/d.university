@@ -392,23 +392,33 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(GetAllNhanSu)} called.");
 
-            var list = (from ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                        where ns.DaChamDutHopDong != true
-                           && ns.DaVeHuu != true
-                           && ns.IsThoiViec != true
-                        join sp in _unitOfWork.iSupporterRepository.TableNoTracking
-                            on ns.Id equals sp.SupporterId into spJoin
-                        from sp in spJoin.DefaultIfEmpty() 
-                        select new ViewNhanSuResponseDto
-                        {
-                            IdNhanSu = ns.Id,
-                            TenNhanSu = (ns.HoDem ?? "") + " " + (ns.Ten ?? ""),
-                            SupporterCode = sp != null ? sp.SupporterCode : null
-                        })
-                        .ToList();
+            var list =
+                (from ns in _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                 where ns.DaChamDutHopDong != true
+                    && ns.DaVeHuu != true
+                    && ns.IsThoiViec != true
+
+                 join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
+                    on ns.HienTaiPhongBan equals pb.Id into pbJoin
+                 from pb in pbJoin.DefaultIfEmpty()
+
+                 join sp in _unitOfWork.iSupporterRepository.TableNoTracking
+                    on ns.Id equals sp.SupporterId into spJoin
+                 from sp in spJoin.DefaultIfEmpty()
+
+                 select new ViewNhanSuResponseDto
+                 {
+                     IdNhanSu = ns.Id,
+                     TenNhanSu = (ns.HoDem ?? "") + " " + (ns.Ten ?? ""),
+                     SupporterCode = sp != null ? sp.SupporterCode : null,
+                     IdPhongBan = ns.HienTaiPhongBan
+
+                 })
+                .ToList();
 
             return list;
         }
+
 
 
         public List<ViewTrangThaiResponseDto> GetListTrangThai(ViewTrangThaiRequestDto dto)
@@ -703,6 +713,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                         int stt = 1;
                         string path = Path.Combine(
                             Directory.GetCurrentDirectory(),
+                            "wwwroot",
                             "Template",
                             "bao_cao_doan_vao.docx"
                         );

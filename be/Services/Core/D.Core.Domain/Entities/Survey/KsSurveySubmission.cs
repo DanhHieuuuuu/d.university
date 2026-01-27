@@ -21,6 +21,10 @@ namespace D.Core.Domain.Entities.Survey
         [Description("Người thực hiện")]
         public int? IdNguoiDung { get; set; }
 
+        [Column("UserType")]
+        [Description("Loại người dùng")]
+        public int? UserType { get; set; }
+
         [Column("StartTime")]
         [Description("Thời gian bắt đầu làm bài")]
         public DateTime ThoiGianBatDau { get; set; }
