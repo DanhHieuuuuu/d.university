@@ -41,6 +41,12 @@ namespace D.S3Bucket
         Task<bool> TestConnectionAsync();
 
         /// <summary>
+        /// Lấy danh sách file trong MinIO theo prefix
+        /// </summary>
+        /// <param name="prefix">Đường dẫn prefix để lọc (vd: logs/auth-api/). Nếu null sẽ lấy tất cả file</param>
+        Task<List<S3FileInfo>> ListFilesAsync(string? prefix = null);
+
+        /// <summary>
         /// Lấy danh sách folder trong MinIO
         /// </summary>
         /// <param name="prefix">Đường dẫn prefix để lọc (vd: auth/anh_dai_dien/). Nếu null sẽ lấy từ thư mục gốc</param>

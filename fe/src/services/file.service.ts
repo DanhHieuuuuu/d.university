@@ -19,6 +19,17 @@ export interface IS3FoldersResponse {
   count: number;
 }
 
+export interface IS3File {
+  fileName: string;
+  size: number;
+  lastModified: string;
+}
+
+export interface IS3FilesResponse {
+  files: IS3File[];
+  count: number;
+}
+
 const findPaging = async (query: IQueryFile) => {
   try {
     const res = await axios.get(`${apiFileEndpoint}/find`, {
@@ -210,6 +221,27 @@ const deleteS3File = async (fileName: string): Promise<void> => {
   }
 };
 
+const listFiles = async (prefix?: string): Promise<IS3FilesResponse> => {
+  try {
+    const { accessToken } = getItem();
+    const params = prefix ? { prefix } : {};
+
+    const axiosInstance = (await import('axios')).default;
+    const res = await axios.get(`${apiFileEndpoint}/list-files`, {
+      params,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        accept: '*/*'
+      }
+    });
+
+    return Promise.resolve(res.data.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể lấy danh sách file');
+    return Promise.reject(err);
+  }
+};
+
 const listFolders = async (prefix?: string): Promise<IS3FoldersResponse> => {
   try {
     const { accessToken } = getItem();
@@ -291,6 +323,7 @@ export const FileService = {
   uploadMultipleFiles,
   downloadFile,
   deleteS3File,
+  listFiles,
   listFolders,
   testConnection,
   // Image methods
