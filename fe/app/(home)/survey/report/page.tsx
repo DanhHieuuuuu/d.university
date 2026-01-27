@@ -82,6 +82,7 @@ const Page = () => {
       command: async (record: IReportItem) => {
         try {
           await dispatch(analyzeWithAI(record.reportId)).unwrap();
+          console.log('data', record)
           toast.success('Phân tích AI thành công!');
         } catch (error: any) {
           console.error('Lỗi phân tích AI:', error);

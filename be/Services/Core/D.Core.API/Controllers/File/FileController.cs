@@ -111,5 +111,24 @@ namespace D.Core.API.Controllers.File
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        /// Lấy danh sách file log
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("list-files")]
+        public async Task<ResponseAPI> GetLogFiles([FromQuery] GetLogFilesDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }

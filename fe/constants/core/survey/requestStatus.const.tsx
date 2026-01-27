@@ -12,11 +12,11 @@ export class requestStatusConst {
     },
     {
       value: this.PENDING,
-      name: 'Chờ duyệt'
+      name: 'Đề xuất '
     },
     {
       value: this.APPROVED,
-      name: 'Đã duyệt'
+      name: 'Phê duyệt'
     },
     {
       value: this.REJECTED,
@@ -24,7 +24,7 @@ export class requestStatusConst {
     },
     {
       value: this.CANCELED,
-      name: 'Hủy'
+      name: 'Bị hủy/đóng'
     }
   ];
 

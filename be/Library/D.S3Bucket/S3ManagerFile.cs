@@ -335,6 +335,55 @@ namespace D.S3Bucket
             }
         }
 
+        public async Task<List<S3FileInfo>> ListFilesAsync(string? prefix = null)
+        {
+            _logger.LogInformation($"ListFilesAsync: Listing files with prefix '{prefix}'");
+
+            try
+            {
+                var bucketName = _config.BucketName;
+                var files = new List<S3FileInfo>();
+
+                var fullPrefix = string.IsNullOrWhiteSpace(prefix)
+                    ? _config.FolderPrefix?.TrimEnd('/') + "/"
+                    : BuildFullPath(prefix.TrimEnd('/') + "/");
+
+                if (!string.IsNullOrWhiteSpace(fullPrefix) && !fullPrefix.EndsWith("/"))
+                {
+                    fullPrefix += "/";
+                }
+
+                // List tất cả objects với prefix
+                var listArgs = new ListObjectsArgs()
+                    .WithBucket(bucketName)
+                    .WithPrefix(fullPrefix)
+                    .WithRecursive(true);
+
+                var observable = _minioClient.ListObjectsEnumAsync(listArgs);
+
+                await foreach (var item in observable)
+                {
+                    if (!string.IsNullOrEmpty(item.Key) && !item.IsDir)
+                    {
+                        files.Add(new S3FileInfo
+                        {
+                            FileName = item.Key,
+                            Size = (long)item.Size,
+                            Url = $"{bucketName}/{item.Key}"
+                        });
+                    }
+                }
+
+                _logger.LogInformation($"Found {files.Count} file(s)");
+                return files.OrderBy(f => f.FileName).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to list files from MinIO");
+                throw new S3Exception(S3ErrorCode.ReadError, $"Failed to list files: {ex.Message}");
+            }
+        }
+
         public async Task<List<string>> ListFoldersAsync(string? prefix = null)
         {
             _logger.LogInformation($"ListFoldersAsync: Listing folders with prefix '{prefix}'");
