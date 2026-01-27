@@ -75,6 +75,7 @@
         public const string CoreButtonTiepDoanXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_tiepdoan";
         public const string CoreButtonSearchXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_search";
         public const string CoreButtonTableXuLyDoanVao = $"{PermissionPrefixKeys.Table}dio_xuly_table";
+        public const string CoreButtonExportXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_export";
 
         public const string CoreMenuDepartment = $"{PermissionPrefixKeys.Menu}dio_department";
         public const string CoreButtonCreateDepartment = $"{PermissionPrefixKeys.Button}dio_department_create";
