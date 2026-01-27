@@ -1,6 +1,7 @@
 ﻿using D.ControllerBase;
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Dtos.SinhVien.Auth;
+using D.Core.Domain.Dtos.SinhVien.ThongTinChiTiet;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,25 @@ namespace D.Core.API.Controllers.SinhVienController
         /// <returns></returns>
         [HttpGet("detail")]
         public async Task<ResponseAPI> FindByMssv(FindByMssvDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy thông tin chi tiết sinh viên (bao gồm khoa, ngành, điểm, chương trình khung)
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("thong-tin-chi-tiet")]
+        public async Task<ResponseAPI> GetThongTinChiTiet(SvThongTinChiTietRequestDto dto)
         {
             try
             {

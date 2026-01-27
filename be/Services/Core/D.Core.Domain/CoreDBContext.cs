@@ -80,6 +80,7 @@ namespace D.Core.Domain
         DbSet<SvDiemMonHoc> SvDiemMonHocs { get; set; }
         DbSet<SvThongTinHocVu> SvThongTinHocVus { get; set; }
         DbSet<SvKetQuaHocKy> svKetQuaHocKys { get; set; }
+        DbSet<SvChatbotHistory> SvChatbotHistories { get; set; }
         #endregion
 
         #region file
