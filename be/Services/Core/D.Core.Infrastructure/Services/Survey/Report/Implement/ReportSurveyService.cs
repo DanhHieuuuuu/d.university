@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using d.Shared.Permission.Auth;
 using D.Core.Domain.Dtos.Survey.Report;
 using D.Core.Domain.Dtos.Survey.AI;
 using D.Core.Domain.Dtos.Survey.Request;
@@ -199,11 +200,11 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
             var respondentsQuery = from s in _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
                                    join nv in _unitOfWork.iNsNhanSuRepository.TableNoTracking
                                    on s.IdNguoiDung equals nv.Id into uGroup
-                                   from nv in uGroup.DefaultIfEmpty()
+                                   from nv in uGroup.Where(u => s.UserType != UserTypeConstant.STUDENT).DefaultIfEmpty()
 
                                    join sv in _unitOfWork.iSvSinhVienRepository.TableNoTracking
                                    on s.IdNguoiDung equals sv.Id into svGroup
-                                   from sv in svGroup.DefaultIfEmpty()
+                                   from sv in svGroup.Where(u => s.UserType == UserTypeConstant.STUDENT).DefaultIfEmpty()
 
                                    where s.IdKhaoSat == report.IdKhaoSat
                                       && s.TrangThai == SubmissionStatus.Submitted
