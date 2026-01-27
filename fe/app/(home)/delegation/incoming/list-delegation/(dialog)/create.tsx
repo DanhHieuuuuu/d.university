@@ -29,6 +29,8 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
   const [form] = Form.useForm<ICreateDoanVao>();
   const [title, setTitle] = useState<string>('');
   const [excelFile, setExcelFile] = useState<File | null>(null);
+  const requestDate = Form.useWatch('requestDate', form);
+  const idPhongBan = Form.useWatch('idPhongBan', form);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -44,7 +46,12 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
       }
     }
   }, [isModalOpen, selected, isUpdate, isView]);
-
+  const filteredNhanSu = idPhongBan ? listNhanSu.filter((ns: any) => ns.idPhongBan === idPhongBan) : [];
+  useEffect(() => {
+    if (idPhongBan) {
+      form.setFieldValue('idStaffReception', undefined);
+    }
+  }, [idPhongBan]);
   const initData = async () => {
     if (selected.data) {
       const data = selected.data;
@@ -169,7 +176,14 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
           </Col>
           <Col span={8}>
             <Form.Item label="Nhân sự tiếp đón" name="idStaffReception" rules={[{ required: true }]}>
-              <Select options={listNhanSu.map((ns: any) => ({ value: ns.idNhanSu, label: ns.tenNhanSu }))} />
+              <Select
+                disabled={!idPhongBan}
+                placeholder={idPhongBan ? 'Chọn nhân sự' : 'Chọn phòng ban trước'}
+                options={filteredNhanSu.map((ns: any) => ({
+                  value: ns.idNhanSu,
+                  label: ns.tenNhanSu
+                }))}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -199,7 +213,13 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
           </Col>
           <Col span={12}>
             <Form.Item label="Ngày tiếp đón" name="receptionDate" rules={[{ required: true }]}>
-              <DatePicker style={{ width: '100%' }} />
+              <DatePicker
+                style={{ width: '100%' }}
+                disabledDate={(current) => {
+                  if (!requestDate) return false;
+                  return current.isBefore(dayjs(requestDate), 'day');
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>

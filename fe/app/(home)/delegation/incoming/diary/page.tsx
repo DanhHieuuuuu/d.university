@@ -37,6 +37,7 @@ const Page = () => {
     listNhanSu
   } = useAppSelector((state) => state.delegationState);
   const [createdDates, setCreatedDates] = useState<{ label: string; value: string }[]>([]);
+  const [activeTab, setActiveTab] = useState<'status' | 'reception'>('status');
 
   // Column cho logStatus
   const logStatusColumns: IColumn<ILogStatus>[] = [
@@ -92,7 +93,7 @@ const Page = () => {
     total: totalLogStatus,
     initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getLogStatus(newQuery)),
-    triggerFirstLoad: true
+    triggerFirstLoad: false
   });
 
   const {
@@ -103,7 +104,7 @@ const Page = () => {
     total: totalReception,
     initialQuery: { PageIndex: 1, PageSize: 10, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getLogReceptionTime(newQuery)),
-    triggerFirstLoad: true
+    triggerFirstLoad: false
   });
 
   const { debounced: handleDebouncedStatusSearch } = useDebouncedCallback((value: string) => {
@@ -115,9 +116,17 @@ const Page = () => {
   }, 500);
 
   useEffect(() => {
-    dispatch(getLogStatus(statusQuery));
-    dispatch(getLogReceptionTime(receptionQuery));
-  }, [dispatch, statusQuery, receptionQuery]);
+    if (activeTab === 'status') {
+      dispatch(getLogStatus(statusQuery));
+    }
+  }, [dispatch, statusQuery, activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'reception') {
+      dispatch(getLogReceptionTime(receptionQuery));
+    }
+  }, [dispatch, receptionQuery, activeTab]);
+
   useEffect(() => {
     dispatch(getListNhanSu());
   }, [dispatch]);
@@ -135,7 +144,8 @@ const Page = () => {
   return (
     <Card title="Nhật ký đoàn vào" className="h-full">
       <Tabs
-        defaultActiveKey="1"
+        defaultActiveKey="status"
+        onChange={(key) => setActiveTab(key as 'status' | 'reception')}
         tabBarExtraContent={
           <div className="flex gap-2">
             {/* Chọn ngày tạo */}
@@ -146,8 +156,11 @@ const Page = () => {
                 allowClear
                 options={createdDates}
                 onChange={(value) => {
-                  onStatusFilter({ CreateDate: value || undefined });
-                  onReceptionFilter({ CreateDate: value || undefined });
+                  if (activeTab === 'status') {
+                    onStatusFilter({ CreateDate: value || undefined });
+                  } else {
+                    onReceptionFilter({ CreateDate: value || undefined });
+                  }
                 }}
               />
             </Form.Item>
@@ -164,17 +177,20 @@ const Page = () => {
                   value: ns.tenNhanSu
                 }))}
                 onChange={(value) => {
-                  onStatusFilter({ CreatedByName: value || undefined });
-                  onReceptionFilter({ CreatedByName: value || undefined });
+                  if (activeTab === 'status') {
+                    onStatusFilter({ CreatedByName: value || undefined });
+                  } else {
+                    onReceptionFilter({ CreatedByName: value || undefined });
+                  }
                 }}
               />
             </Form.Item>
           </div>
         }
       >
-        <TabPane tab="Nhật ký đoàn vào" key="1">
+        <TabPane tab="Nhật ký đoàn vào" key="status">
           <AppTable
-            loading={status === ReduxStatus.LOADING}
+            loading={activeTab === 'status' && status === ReduxStatus.LOADING}
             rowKey="id"
             columns={logStatusColumns}
             dataSource={listLogStatus}
@@ -182,9 +198,9 @@ const Page = () => {
             data-permission={PermissionCoreConst.CoreTableLog}
           />
         </TabPane>
-        <TabPane tab="Nhật ký thời gian tiếp đoàn" key="2">
+        <TabPane tab="Nhật ký thời gian tiếp đoàn" key="reception">
           <AppTable
-            loading={status === ReduxStatus.LOADING}
+            loading={activeTab === 'reception' && status === ReduxStatus.LOADING}
             rowKey="id"
             columns={receptionColumns}
             dataSource={listLogReceptionTime}
