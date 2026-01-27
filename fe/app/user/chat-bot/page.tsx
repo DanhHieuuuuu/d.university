@@ -1,9 +1,9 @@
 'use client';
 
-import { Button, Checkbox, Form, FormProps, Input, Spin } from 'antd';
+import { Button, Checkbox, Form, FormProps, Input, Modal, Spin } from 'antd';
 import { colors } from '@styles/colors';
 import { toast } from 'react-toastify';
-import { GraduationCap, MessageSquarePlus, LogOut, Send, Menu, X } from 'lucide-react';
+import { GraduationCap, MessageSquarePlus, LogOut, Send, Menu, X, Trash2 } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { sinhVienLogin, sinhVienLogout } from '@redux/feature/student/studentThunk';
 import { ISinhVienLogin } from '@models/auth/sinhvien.model';
 import { processApiMsgError } from '@utils/index';
-import { ChatbotService, IChatSession, IChatMessage } from '@services/chatbot.service';
+import { ChatbotService, IChatSession, IChatHistoryItem } from '@services/chatbot.service';
 
 type LoginFormData = {
   mssv: string;
@@ -26,6 +26,21 @@ interface ChatMessageUI {
   content: string;
   timestamp: number;
 }
+
+// Loai bo markdown syntax khoi text
+const stripMarkdown = (text: string): string => {
+  if (!text) return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')  // Bold **text**
+    .replace(/\*(.+?)\*/g, '$1')      // Italic *text*
+    .replace(/__(.+?)__/g, '$1')      // Bold __text__
+    .replace(/_(.+?)_/g, '$1')        // Italic _text_
+    .replace(/~~(.+?)~~/g, '$1')      // Strikethrough
+    .replace(/`(.+?)`/g, '$1')        // Inline code
+    .replace(/#{1,6}\s/g, '')         // Headers
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Links
+    .trim();
+};
 
 function ChatbotPage() {
   const dispatch = useAppDispatch();
@@ -48,10 +63,11 @@ function ChatbotPage() {
 
   // Fetch sessions from API
   const fetchSessions = async () => {
+    if (!user?.mssv) return;
     setIsLoadingSessions(true);
     try {
-      const data = await ChatbotService.getSessions();
-      setSessions(data.sessions || []);
+      const data = await ChatbotService.getSessions(user.mssv);
+      setSessions(data || []);
     } catch (error) {
       console.error('Failed to fetch sessions:', error);
     } finally {
@@ -64,11 +80,13 @@ function ChatbotPage() {
     setIsLoadingMessages(true);
     try {
       const data = await ChatbotService.getSessionHistory(sessionId);
-      const messages: ChatMessageUI[] = (data.history || []).map((msg: IChatMessage, index: number) => ({
-        id: `${sessionId}-${index}`,
+      // Sort by id ascending to get correct order
+      const sortedData = [...data].sort((a, b) => a.id - b.id);
+      const messages: ChatMessageUI[] = sortedData.map((msg: IChatHistoryItem) => ({
+        id: msg.id.toString(),
         role: msg.role,
         content: msg.content,
-        timestamp: Date.now()
+        timestamp: new Date(msg.createdDate).getTime()
       }));
       setActiveMessages(messages);
     } catch (error) {
@@ -81,10 +99,10 @@ function ChatbotPage() {
 
   // Load sessions on mount
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user?.mssv) {
       fetchSessions();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user?.mssv]);
 
   // Load messages when active session changes
   useEffect(() => {
@@ -168,17 +186,11 @@ function ChatbotPage() {
     setIsSending(true);
 
     try {
-      // Build conversation history for API
-      const conversationHistory: IChatMessage[] = activeMessages.map((msg) => ({
-        role: msg.role,
-        content: msg.content
-      }));
-
       // Call chat API using service
       const data = await ChatbotService.sendMessage({
         message: messageToSend,
-        session_id: sessionId,
-        conversation_history: conversationHistory
+        sessionId: sessionId,
+        mssv: user?.mssv || ''
       });
 
       const botMessage: ChatMessageUI = {
@@ -211,20 +223,33 @@ function ChatbotPage() {
   };
 
   // Delete conversation
-  const deleteConversation = async (sessionId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const deleteConversation = async (sessionId: string) => {
     try {
       await ChatbotService.deleteSession(sessionId);
-      setSessions((prev) => prev.filter((s) => s.session_id !== sessionId));
+      setSessions((prev) => prev.filter((s) => s.sessionId !== sessionId));
       if (activeSessionId === sessionId) {
-        const remaining = sessions.filter((s) => s.session_id !== sessionId);
-        setActiveSessionId(remaining.length > 0 ? remaining[0].session_id : null);
+        const remaining = sessions.filter((s) => s.sessionId !== sessionId);
+        setActiveSessionId(remaining.length > 0 ? remaining[0].sessionId : null);
       }
     } catch (error) {
       console.error('Failed to delete session:', error);
       // Still remove from UI even if API fails
-      setSessions((prev) => prev.filter((s) => s.session_id !== sessionId));
+      setSessions((prev) => prev.filter((s) => s.sessionId !== sessionId));
     }
+  };
+
+  // Show confirm dialog before delete
+  const confirmDeleteConversation = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    Modal.confirm({
+      title: 'Xác nhận xóa',
+      content: 'Bạn có chắc chắn muốn xóa cuộc trò chuyện này không?',
+      okText: 'Xóa',
+      cancelText: 'Hủy',
+      okButtonProps: { danger: true },
+      centered: true,
+      onOk: () => deleteConversation(sessionId)
+    });
   };
 
   // Login form component
@@ -338,9 +363,8 @@ function ChatbotPage() {
 
       {/* Sidebar */}
       <div
-        className={`fixed z-40 h-full transition-transform duration-300 md:relative ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed z-40 h-full transition-transform duration-300 md:relative ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          }`}
         style={{
           width: 280,
           backgroundColor: colors.white,
@@ -364,7 +388,7 @@ function ChatbotPage() {
           {/* Chat history */}
           <div className="flex-1 overflow-y-auto px-2">
             <p className="px-2 py-2 text-xs font-semibold uppercase" style={{ color: colors.gray }}>
-              Lich su chat
+              Lịch sử chat
             </p>
             {isLoadingSessions ? (
               <div className="flex justify-center py-4">
@@ -377,29 +401,28 @@ function ChatbotPage() {
             ) : (
               sessions.map((session: IChatSession) => (
                 <div
-                  key={session.session_id}
+                  key={session.sessionId}
                   onClick={() => {
-                    setActiveSessionId(session.session_id);
+                    setActiveSessionId(session.sessionId);
                     setSidebarOpen(false);
                   }}
-                  className={`group mb-1 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 transition-colors ${
-                    activeSessionId === session.session_id ? 'bg-blue-50' : 'hover:bg-gray-100'
-                  }`}
+                  className={`group mb-1 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 transition-colors ${activeSessionId === session.sessionId ? 'bg-blue-50' : 'hover:bg-gray-100'
+                    }`}
                   style={{
-                    backgroundColor: activeSessionId === session.session_id ? `${colors.primaryLight}15` : undefined
+                    backgroundColor: activeSessionId === session.sessionId ? `${colors.primaryLight}15` : undefined
                   }}
                 >
                   <span
                     className="truncate text-sm"
-                    style={{ color: activeSessionId === session.session_id ? colors.primary : colors.black }}
+                    style={{ color: activeSessionId === session.sessionId ? colors.primary : colors.black }}
                   >
-                    {session.title}
+                    {stripMarkdown(session.title || session.content || 'Cuoc tro chuyen').substring(0, 35)}
                   </span>
                   <button
-                    onClick={(e) => deleteConversation(session.session_id, e)}
+                    onClick={(e) => confirmDeleteConversation(session.sessionId, e)}
                     className="rounded p-1 opacity-0 hover:bg-red-100 group-hover:opacity-100"
                   >
-                    <X size={14} style={{ color: colors.red }} />
+                    <Trash2 size={14} style={{ color: colors.red }} />
                   </button>
                 </div>
               ))
@@ -414,6 +437,9 @@ function ChatbotPage() {
                   {user.hoDem && user.ten ? `${user.hoDem} ${user.ten}` : user.ten || 'Sinh vien'}
                 </p>
                 <p style={{ color: colors.gray }}>{user.mssv}</p>
+                <p className="truncate" style={{ color: colors.gray }} title={user.email || ''}>
+                  {user.email}
+                </p>
               </div>
             )}
             <Button
@@ -436,7 +462,7 @@ function ChatbotPage() {
           style={{ backgroundColor: colors.white, borderColor: colors.grayLight }}
         >
           <h2 className="pl-12 text-lg font-semibold md:pl-0" style={{ color: colors.primaryNavy }}>
-            {sessions.find((s) => s.session_id === activeSessionId)?.title || 'Chat mới'}
+            {sessions.find((s) => s.sessionId === activeSessionId)?.title || 'Chat mới'}
           </h2>
         </div>
 
@@ -598,7 +624,7 @@ function ChatbotPage() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onPressEnter={sendMessage}
-              placeholder="Nhap tin nhan..."
+              placeholder="Nhập tin nhắn..."
               className="flex-1 rounded-xl px-4 py-2"
               style={{ borderColor: colors.gray }}
               disabled={isSending}

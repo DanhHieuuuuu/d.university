@@ -3,7 +3,7 @@ import os
 from typing import List, Dict, Any, Optional, Tuple
 
 from app.services.vector_store import VectorStore
-from app.services.groq_client import GroqClient
+from app.services.groq_client import LLMClient
 from app.services.query_rewriter import QueryRewriter
 
 
@@ -16,7 +16,7 @@ class RAGPipeline:
     def __init__(
         self, 
         vector_store: VectorStore, 
-        groq_client: GroqClient, 
+        llm_client: LLMClient, 
         top_k: int = 5,
         data_path: Optional[str] = None
     ):
@@ -25,14 +25,14 @@ class RAGPipeline:
         
         Args:
             vector_store: Vector store de truy xuat
-            groq_client: Client de goi LLM
+            llm_client: Client de goi LLM
             top_k: So luong document lay ra tu vector store
             data_path: Duong dan file JSON chua du lieu sinh vien
         """
         self.vector_store = vector_store
-        self.groq_client = groq_client
+        self.llm_client = llm_client
         self.top_k = top_k
-        self.query_rewriter = QueryRewriter(groq_client)
+        self.query_rewriter = QueryRewriter(llm_client)
         
         # Tai thong tin sinh vien tu file JSON
         self.student_info = None
@@ -91,7 +91,7 @@ class RAGPipeline:
         contexts = [chunk["content"] for chunk, _ in relevant_results]
         
         # Buoc 3: Xay dung prompt (dung cau hoi goc de hoi thoai tu nhien)
-        messages = self.groq_client.build_rag_prompt(
+        messages = self.llm_client.build_rag_prompt(
             query=question,  # Dung cau hoi goc
             context=contexts,
             conversation_history=conversation_history,
@@ -99,7 +99,7 @@ class RAGPipeline:
         )
         
         # Buoc 4: Goi LLM de sinh phan hoi
-        response = await self.groq_client.chat_completion(messages)
+        response = await self.llm_client.chat_completion(messages)
         
         return response, contexts, rewritten_query if rewritten_query != question else None
     
@@ -128,13 +128,13 @@ class RAGPipeline:
         next_curriculum = next_semester_results[0][0]["content"] if next_semester_results else ""
         
         # Xay dung prompt va goi LLM
-        messages = self.groq_client.build_orientation_prompt(
+        messages = self.llm_client.build_orientation_prompt(
             student_info=student_info,
             current_grades=grades_info,
             next_semester_curriculum=next_curriculum
         )
         
-        response = await self.groq_client.chat_completion(messages, temperature=0.5)
+        response = await self.llm_client.chat_completion(messages, temperature=0.5)
         return response
     
     def get_student_summary(self) -> Dict[str, Any]:
