@@ -29,7 +29,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
   const [form] = Form.useForm<ICreateDoanVao>();
   const [title, setTitle] = useState<string>('');
   const [excelFile, setExcelFile] = useState<File | null>(null);
-
+  const requestDate = Form.useWatch('requestDate', form);
   useEffect(() => {
     if (isModalOpen) {
       if (isUpdate && selected.data) {
@@ -199,7 +199,11 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
           </Col>
           <Col span={12}>
             <Form.Item label="Ngày tiếp đón" name="receptionDate" rules={[{ required: true }]}>
-              <DatePicker style={{ width: '100%' }} />
+              <DatePicker style={{ width: '100%' }}
+                 disabledDate={(current) => {
+      if (!requestDate) return false;
+      return current.isBefore(dayjs(requestDate), 'day');
+    }} />
             </Form.Item>
           </Col>
         </Row>
