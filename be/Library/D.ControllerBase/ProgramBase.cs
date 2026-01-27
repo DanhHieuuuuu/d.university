@@ -44,8 +44,9 @@ namespace D.ControllerBase
                     {
                         policy
                             .WithOrigins(
-                                "http://localhost:3077",
-                                "http://localhost:5173"
+                                "https://d-university-3333.vercel.app",
+                                "https://d-university-core-jk86.onrender.com",
+                                "https://d-university-9zz7.onrender.com"
                             )
                             .AllowAnyHeader()
                             .AllowAnyMethod()
@@ -145,8 +146,9 @@ namespace D.ControllerBase
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = "localhost:6379";
+               connectionString = "localhost:6379";
             }
+
             var redis = ConnectionMultiplexer.Connect(connectionString);
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(redis);

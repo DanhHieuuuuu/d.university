@@ -27,6 +27,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreMenuHrmDanhSach)]
         [HttpGet("find")]
         public async Task<ResponseAPI> GetListNhanSu(NsNhanSuRequestDto dto)
         {
@@ -124,7 +125,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreMenuHrmDanhSach)]
         [HttpGet("get")]
         public async Task<ResponseAPI> FindByMaNsSdt(FindByMaNsSdtDto dto)
         {
@@ -144,7 +145,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="idNhanSu"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreMenuHrmDanhSach)]
         [HttpGet("{idNhanSu}")]
         public async Task<ResponseAPI> FindByIdNhanSu(int idNhanSu)
         {
@@ -165,7 +166,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="idNhanSu"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreMenuNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreButtonViewNhanSu)]
         [HttpGet("ho-so/{idNhanSu}")]
         public async Task<ResponseAPI> GetHoSoNhanSu(int idNhanSu)
         {
@@ -186,7 +187,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateNhanSu)]
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateHrmContract)]
         [HttpPost("contract/create")]
         public async Task<ResponseAPI> CreateHopDong(CreateHopDongDto dto)
         {
@@ -206,6 +207,7 @@ namespace D.Core.API.Controllers.Hrm
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreTableHrmContract)]
         [HttpGet("contract/find")]
         public async Task<ResponseAPI> GetAllContract(NsHopDongRequestDto dto)
         {
@@ -262,6 +264,7 @@ namespace D.Core.API.Controllers.Hrm
         /// Đồng bộ nhân sự vào Qdrant
         /// </summary>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonSyncNhanSu)]
         [HttpPost("sync")]
         public async Task<ResponseAPI> FetchNhanSuQdrantApi()
         {

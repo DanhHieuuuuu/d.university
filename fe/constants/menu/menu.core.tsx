@@ -235,27 +235,38 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Khảo sát',
     routerLink: '/survey',
+    permissionKeys: [PermissionCoreConst.CoreMenuKhaoSat],
     icon: <FormOutlined />,
     items: [
       {
         label: 'Danh sách yêu cầu',
-        routerLink: '/survey/manage/request',
-        icon: <InboxOutlined />
+        routerLink: '/survey/request',
+        permissionKeys: [PermissionCoreConst.SurveyMenuRequest],
+        icon: <InboxOutlined />,      
       },
       {
         label: 'Quản lý yêu cầu',
-        routerLink: '/survey/manage/request-manage',
-        icon: <InboxOutlined />
+        routerLink: '/survey/request-manage',
+        permissionKeys: [PermissionCoreConst.SurveyMenuRequestApproval],
+        icon: <InboxOutlined />,      
       },
       {
         label: 'Danh sách khảo sát',
-        routerLink: '/survey/manage/surveys',
+        routerLink: '/survey/surveys',
+        permissionKeys: [PermissionCoreConst.SurveyMenuManagement],
         icon: <FileTextOutlined />
       },
       {
         label: 'Báo cáo khảo sát',
-        routerLink: '/survey/manage/report',
+        routerLink: '/survey/report',
+        permissionKeys: [PermissionCoreConst.SurveyMenuReport],
         icon: <BarChartOutlined />
+      },
+      {
+        label: 'Nhật ký hoạt động',
+        routerLink: '/survey/logging',
+        permissionKeys: [PermissionCoreConst.SurveyMenuLogging],
+        icon: <HistoryOutlined />
       }
     ]
   },

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using D.Core.Domain.Dtos.Survey.Report;
+using D.Core.Domain.Dtos.Survey.AI;
+using D.Core.Domain.Dtos.Survey.Request;
 using D.Core.Domain.Entities.Survey;
 using D.Core.Domain.Entities.Survey.Constants;
 using D.Core.Infrastructure.Services.Survey.Report.Abstracts;
@@ -40,7 +42,6 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
         {
             var submissions = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
                 .Where(s => s.IdKhaoSat == surveyId && s.TrangThai == SubmissionStatus.Submitted)
-                .Include(s => s.Responses)
                 .ToListAsync();
 
             int totalParticipants = submissions.Count;
@@ -54,7 +55,11 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
             var stats = new ReportStatisticsDto();
 
-            var allResponses = submissions.SelectMany(s => s.Responses).ToList();
+            // Get all responses exclude deleted
+            var submissionIds = submissions.Select(s => s.Id).ToList();
+            var allResponses = await _unitOfWork.iKsSurveySubmissionAnswerRepository.TableNoTracking
+                .Where(r => submissionIds.Contains(r.IdPhienLamBai) && !r.Deleted)
+                .ToListAsync();
 
             foreach (var q in questions)
             {
@@ -62,7 +67,8 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
                 {
                     QuestionId = q.Id,
                     Content = q.NoiDung,
-                    Type = q.LoaiCauHoi
+                    Type = q.LoaiCauHoi,
+                    BatBuoc = q.BatBuoc
                 };
 
                 var responsesForQ = allResponses.Where(r => r.IdCauHoi == q.Id).ToList();
@@ -80,7 +86,9 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
                             Count = count,
                             Percent = totalParticipants > 0
                                       ? Math.Round((double)count * 100 / totalParticipants, 2)
-                                      : 0
+                                      : 0,
+                            Value = ans.Value,
+                            IsCorrect = ans.IsCorrect
                         });
                     }
                 }
@@ -231,6 +239,115 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
             };
         }
 
+        public async Task<SurveyAIDataDto> GetAIAnalysisDataAsync(int reportId)
+        {
+            var report = await _unitOfWork.iKsSurveyReportRepository.TableNoTracking
+                .Include(r => r.Survey)
+                    .ThenInclude(s => s.SurveyRequest)
+                        .ThenInclude(sr => sr.Criterias)
+                .Include(r => r.Survey)
+                    .ThenInclude(s => s.SurveyRequest)
+                        .ThenInclude(sr => sr.Targets)
+                .FirstOrDefaultAsync(r => r.Id == reportId);
+
+            if (report == null) throw new Exception("Báo cáo không tồn tại.");
+            if (report.Survey?.SurveyRequest == null) throw new Exception("Không tìm thấy thông tin yêu cầu khảo sát.");
+
+            var stats = string.IsNullOrEmpty(report.DuLieuThongKe)
+                ? new ReportStatisticsDto()
+                : JsonSerializer.Deserialize<ReportStatisticsDto>(report.DuLieuThongKe);
+
+            var criteria = report.Survey.SurveyRequest.Criterias
+                .Select(c => new RequestSurveyCriteriaDto
+                {
+                    IdTieuChi = c.Id,
+                    TenTieuChi = c.TenTieuChi,
+                    Weight = c.Weight,
+                    MoTa = c.MoTa
+                })
+                .ToList();
+
+            var questions = await _unitOfWork.iKsSurveyRequestRepository
+                .GetQuestionsByRequestIdAsync(report.Survey.SurveyRequest.Id);
+
+            var targets = report.Survey.SurveyRequest.Targets
+                .Select(t => new RequestSurveyTargetDto
+                {
+                    LoaiDoiTuong = t.LoaiDoiTuong,
+                    IdPhongBan = t.IdPhongBan,
+                    IdKhoa = t.IdKhoa,
+                    IdKhoaHoc = t.IdKhoaHoc
+                })
+                .ToList();
+
+            return new SurveyAIDataDto
+            {
+                ReportId = report.Id,
+                TenKhaoSat = report.Survey.TenKhaoSat,
+                TotalParticipants = report.TongSoLuotThamGia,
+                AverageScore = report.DiemTrungBinh ?? 0,
+                Statistics = stats,
+                Criteria = criteria,
+                Targets = targets,
+            };
+        }
+
+        public async Task<bool> SaveAIResponseAsync(int reportId, List<AIReportDto> responses)
+        {
+            var report = await _unitOfWork.iKsSurveyReportRepository.TableNoTracking
+                .FirstOrDefaultAsync(r => r.Id == reportId);
+
+            if (report == null) throw new Exception("Báo cáo không tồn tại.");
+
+            var existingResponses = await _unitOfWork.iKsAIResponseRepository.Table
+                .Where(r => r.IdBaoCao == reportId)
+                .ToListAsync();
+
+            if (existingResponses.Any())
+            {
+                _unitOfWork.iKsAIResponseRepository.DeleteRange(existingResponses);
+            }
+
+            var aiResponses = responses.Select(r => new KsAIResponse
+            {
+                IdBaoCao = reportId,
+                IdTieuChi = r.IdTieuChi,
+                DiemCamXuc = r.DiemCamXuc,
+                NhanCamXuc = r.NhanCamXuc,
+                TomTatNoiDung = r.TomTatNoiDung,
+                XuHuong = r.XuHuong,
+                GoiYCaiThien = r.GoiYCaiThien
+            }).ToList();
+
+            await _unitOfWork.iKsAIResponseRepository.AddRangeAsync(aiResponses);
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<AIReportDetailDto>> GetAIResponsesByReportIdAsync(int reportId)
+        {
+            var aiResponses = await _unitOfWork.iKsAIResponseRepository.TableNoTracking
+                .Include(r => r.Criteria)
+                .Where(r => r.IdBaoCao == reportId)
+                .Select(r => new AIReportDetailDto
+                {
+                    Id = r.Id,
+                    IdBaoCao = r.IdBaoCao,
+                    IdTieuChi = r.IdTieuChi,
+                    DiemCamXuc = r.DiemCamXuc,
+                    NhanCamXuc = r.NhanCamXuc,
+                    TomTatNoiDung = r.TomTatNoiDung,
+                    XuHuong = r.XuHuong,
+                    GoiYCaiThien = r.GoiYCaiThien,
+                    TenTieuChi = r.Criteria.TenTieuChi,
+                    Weight = r.Criteria.Weight
+                })
+                .ToListAsync();
+
+            return aiResponses;
+        }
+
         private async Task LogActionAsync(string targetId, string actionType, string description, string? oldValue = null, string? newValue = null)
         {
             var userId = CommonUntil.GetCurrentUserId(_httpContextAccessor);
@@ -240,14 +357,12 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
             var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
 
-            var fullDescription = $"{description}. Thực hiện bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
-
             var log = new KsSurveyLog
             {
                 IdNguoiThaoTac = userId,
                 TenNguoiThaoTac = userName,
                 LoaiHanhDong = actionType,
-                MoTa = fullDescription,
+                MoTa = description,
                 TenBang = nameof(KsSurveyReport),
                 IdDoiTuong = targetId,
                 DuLieuCu = oldValue,

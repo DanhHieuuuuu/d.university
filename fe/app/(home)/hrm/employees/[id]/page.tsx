@@ -17,6 +17,8 @@ import QuaTrinhDaoTaoDisplay from './QuaTrinhDaoTaoDisplay';
 import QuaTrinhCongTacDisplay from './QuaTrinhCongTacDisplay';
 import QuanHeGiaDinhDisplay from './QuanHeGiaDinhDisplay';
 import '@styles/hrm/ho-so-ns.style.scss';
+import { useIsGranted } from '@hooks/useIsGranted';
+import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
 
 const breadcrumbItems = [
   {
@@ -38,6 +40,8 @@ const Page = ({ params }: { params: { id: string } }) => {
   const nhansu = useAppSelector(selectedNhanSu);
   const status = useAppSelector(selectedNhanSuStatus);
   const { listDanToc, listGioiTinh } = useAppSelector((state: RootState) => state.danhmucState);
+
+  const hasPermisisonExportHoSo = useIsGranted(PermissionCoreConst.CoreButtonExportCVNhanSu);
 
   useEffect(() => {
     if (!Number.isNaN(idNhanSu)) {
@@ -84,7 +88,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         <div className="header">
           <p className="header">Hồ sơ nhân sự</p>
           <Dropdown menu={{ items: itemsDropdown }}>
-            <Button type="primary" icon={<DownloadOutlined />}>
+            <Button hidden={!hasPermisisonExportHoSo} type="primary" icon={<DownloadOutlined />}>
               Xuất mẫu hồ sơ
             </Button>
           </Dropdown>

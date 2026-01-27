@@ -118,6 +118,18 @@ const semanticSearch = async (args: IQueryNhanSu) => {
   }
 };
 
+const syncQdrant = async () => {
+  try {
+    const res = await axios.post(`${apiNhanSuEndpoint}/sync`);
+
+    const data = res.data;
+    return Promise.resolve(data);
+  } catch (err) {
+    processApiMsgError(err, '');
+    return Promise.reject(err);
+  }
+};
+
 export const NhanSuService = {
   findPaging,
   find,
@@ -127,5 +139,6 @@ export const NhanSuService = {
   getHoSoNhanSu,
   findBySdt,
   thongKeNsTheoPhongBan,
-  semanticSearch
+  semanticSearch,
+  syncQdrant
 };

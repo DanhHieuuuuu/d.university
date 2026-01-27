@@ -6,11 +6,13 @@ using D.Core.Infrastructure.Services.Survey.Request.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
+using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -108,6 +110,9 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
             var entity = await _unitOfWork.iKsSurveyRequestRepository.GetDetailWithNavigationsForUpdateAsync(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "chỉnh sửa");
+
             if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)
                 throw new Exception("Chỉ được chỉnh sửa khi phiếu ở trạng thái Nháp hoặc bị Từ chối.");
 
@@ -181,6 +186,9 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             var entity =  _unitOfWork.iKsSurveyRequestRepository.FindById(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "xóa");
+
             if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)
                 throw new Exception("Chỉ được xóa phiếu Nháp hoặc phiếu bị Từ chối.");
 
@@ -206,6 +214,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "gửi duyệt");
 
             if (entity.TrangThai != RequestStatus.Draft && entity.TrangThai != RequestStatus.Rejected)          
                 throw new Exception("Chỉ được gửi duyệt khi phiếu ở trạng thái Nháp hoặc đã bị Từ chối.");      
@@ -235,6 +245,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
         {
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
+
+            CheckOwnership(entity, "hủy gửi duyệt");
 
             if (entity.TrangThai != RequestStatus.Pending)
                 throw new Exception("Chỉ có thể hủy gửi duyệt khi phiếu đang ở trạng thái Chờ duyệt.");
@@ -266,14 +278,12 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
             var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
 
-            var fullDescription = $"{description}. Thực hiện bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
-
             var log = new KsSurveyLog
             {
                 IdNguoiThaoTac = userId,
                 TenNguoiThaoTac = userName,
                 LoaiHanhDong = actionType,
-                MoTa = fullDescription,
+                MoTa = description,
                 TenBang = nameof(KsSurveyRequest),
                 IdDoiTuong = targetId,
                 DuLieuCu = oldValue,
@@ -282,6 +292,19 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
             };
 
             await _unitOfWork.iKsSurveyLogRepository.AddAsync(log);
+        }
+
+        private void CheckOwnership(KsSurveyRequest entity, string actionName)
+        {
+            var currentUserId = CommonUntil.GetCurrentUserId(_httpContextAccessor).ToString();
+
+            if (entity.CreatedBy != currentUserId)
+            {
+                throw new UnauthorizedAccessException(
+                    $"Bạn không có quyền {actionName} cho yêu cầu này. " +
+                    $"Chỉ người tạo yêu cầu mới có quyền thực hiện hành động này."
+                );
+            }
         }
 
         public async Task ApproveRequestAsync(int id)
@@ -337,6 +360,64 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
             );
 
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public List<RequestSurveyQuestionDto> ReadExcel(Stream fileStream)
+        {
+            var questions = new List<RequestSurveyQuestionDto>();
+
+            try
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(fileStream))
+                {
+                    var result = reader.AsDataSet(new ExcelDataSetConfiguration()
+                    {
+                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration() { UseHeaderRow = true }
+                    });
+                    if (result.Tables.Count == 0 || !result.Tables.Contains("data"))
+                    {
+                        throw new Exception("File Excel không đúng định dạng. Thiếu sheet 'data'");
+                    }
+                    var table = result.Tables["data"];
+                    RequestSurveyQuestionDto currentQuestion = null;
+                    foreach (DataRow row in table.Rows)
+                    {
+                        // Skip empty rows
+                        if (row.ItemArray.All(field => field == null || string.IsNullOrWhiteSpace(field.ToString())))
+                            continue;
+                        string noiDungCauHoi = row["Nội dung câu hỏi(*)"]?.ToString()?.Trim();
+                        // New question
+                        if (!string.IsNullOrEmpty(noiDungCauHoi))
+                        {
+                            currentQuestion = new RequestSurveyQuestionDto
+                            {
+                                MaCauHoi = row["Mã câu hỏi(*)"]?.ToString()?.Trim(),
+                                NoiDung = noiDungCauHoi,
+                                LoaiCauHoi = int.TryParse(row["Loại câu hỏi(*)(1:Đơn, 2:Nhiều, 3:Tự luận)"]?.ToString(), out int loai) ? loai : 1,
+                                BatBuoc = row["Bắt buộc (X)"]?.ToString()?.Trim().ToUpper() == "X",
+                                Answers = new List<RequestQuestionAnswerDto>()
+                            };
+                            questions.Add(currentQuestion);
+                        }
+                        // Answer
+                        string noiDungDapAn = row["Đáp án(*)"]?.ToString()?.Trim();
+                        if (currentQuestion != null && !string.IsNullOrEmpty(noiDungDapAn))
+                        {
+                            currentQuestion.Answers.Add(new RequestQuestionAnswerDto
+                            {
+                                NoiDung = noiDungDapAn,
+                                Value = int.TryParse(row["Điểm (Value)"]?.ToString(), out int val) ? val : 0,
+                                IsCorrect = row["Đáp án đúng? (X)"]?.ToString()?.Trim().ToUpper() == "X"
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi đọc file Excel: {ex.Message}");
+            }
+            return questions;
         }
 
     }

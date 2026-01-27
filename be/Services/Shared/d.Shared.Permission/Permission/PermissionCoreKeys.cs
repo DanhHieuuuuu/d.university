@@ -27,10 +27,28 @@
         #endregion
 
         #region HRM - Nhân sự
-        public const string CoreMenuNhanSu = $"{PermissionPrefixKeys.Menu}hrm";
+        public const string CoreMenuHrm = $"{PermissionPrefixKeys.Menu}hrm";
+
+        // Quản lý danh sách hồ sơ nhân sự
+        public const string CoreMenuHrmDanhSach = $"{PermissionPrefixKeys.Menu}hrm_list";
+        public const string CoreButtonSyncNhanSu = $"{PermissionPrefixKeys.Button}hrm_sync_qdrant";
         public const string CoreButtonCreateNhanSu = $"{PermissionPrefixKeys.Button}hrm_create_nhansu";
         public const string CoreButtonUpdateNhanSu = $"{PermissionPrefixKeys.Button}hrm_update_nhansu";
         public const string CoreButtonDeleteNhanSu = $"{PermissionPrefixKeys.Button}hrm_delete_nhansu";
+        public const string CoreButtonViewNhanSu = $"{PermissionPrefixKeys.Button}hrm_view_nhansu";
+        // public const string CoreButtonExportCVNhanSu = $"{PermissionPrefixKeys.Button}hrm_export_hoso_nhansu";
+
+        // Quản lý hợp đồng tuyển dụng
+        public const string CoreMenuHrmContract = $"{PermissionPrefixKeys.Menu}hrm_contracts";
+        public const string CoreTableHrmContract = $"{PermissionPrefixKeys.Table}hrm_contracts";
+        public const string CoreButtonCreateHrmContract = $"{PermissionPrefixKeys.Button}hrm_create_contract";
+
+        // Quản lý các quyết định
+        public const string CoreMenuHrmDecision = $"{PermissionPrefixKeys.Menu}hrm_decisions";
+        public const string CoreButtonViewHrmDecision = $"{PermissionPrefixKeys.Menu}hrm_view_decision";
+        // public const string CoreButtonCreateHrmDecision = $"{PermissionPrefixKeys.Button}hrm_create_decision";
+        // public const string CoreButtonUpdateHrmDecisionStatus = $"{PermissionPrefixKeys.Button}hrm_update_status_decision";
+
         #endregion
 
         #region Delegation - Đoàn vào / Đoàn ra
@@ -164,6 +182,9 @@
         // Report Management
         public const string SurveyMenuReport = $"{PermissionPrefixKeys.Menu}survey_report";
         public const string SurveyButtonReportGenerate = $"{PermissionPrefixKeys.Button}survey_report_generate";
+        public const string SurveyButtonAIReportGenerate = $"{PermissionPrefixKeys.Button}survey_ai_report_generate";
+
+        public const string SurveyMenuLogging = $"{PermissionPrefixKeys.Menu}survey_logging";
 
         #endregion
     }

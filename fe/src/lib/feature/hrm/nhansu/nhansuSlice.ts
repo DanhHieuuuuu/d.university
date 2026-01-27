@@ -7,7 +7,8 @@ import {
   createNhanSuThunk,
   updateNhanSuThunk,
   thongKeNhanSuTheoPhongBanThunk,
-  semanticSearchThunk
+  semanticSearchThunk,
+  syncQdrantThunk
 } from './nhansuThunk';
 
 interface NhanSuState {
@@ -29,6 +30,9 @@ interface NhanSuState {
     status: ReduxStatus;
     data: IViewThongKeNsTheoPhongBan[];
   };
+  $syncWithQdrant: {
+    status: ReduxStatus;
+  };
 }
 const initialState: NhanSuState = {
   status: ReduxStatus.IDLE,
@@ -48,6 +52,9 @@ const initialState: NhanSuState = {
   $listThongKe: {
     status: ReduxStatus.IDLE,
     data: []
+  },
+  $syncWithQdrant: {
+    status: ReduxStatus.IDLE
   }
 };
 
@@ -136,6 +143,15 @@ const nhanSuSlice = createSlice({
       })
       .addCase(semanticSearchThunk.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
+      })
+      .addCase(syncQdrantThunk.pending, (state) => {
+        state.$syncWithQdrant.status = ReduxStatus.LOADING;
+      })
+      .addCase(syncQdrantThunk.fulfilled, (state) => {
+        state.$syncWithQdrant.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(syncQdrantThunk.rejected, (state) => {
+        state.$syncWithQdrant.status = ReduxStatus.FAILURE;
       });
   }
 });

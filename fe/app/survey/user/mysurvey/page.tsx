@@ -6,8 +6,8 @@ import { toast } from 'react-toastify';
 import { SurveyService } from '@services/survey.service';
 import { IMySurveyItem, IQueryMySurvey } from '@models/survey/survey.model';
 import { formatDateTimeView } from '@utils/index';
-import { surveyStatusConst } from '@/app/(home)/survey/const/surveyStatus.const';
 import SurveyDetailDialog from './(dialog)/detail';
+import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
 
 const { Search } = Input;
 
@@ -51,8 +51,19 @@ const Page = () => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedSurveyId(null);
-    // Reload surveys to update status
     loadMySurveys();
+  };
+
+  const isSurveyNotStarted = (survey: IMySurveyItem) => {
+    const now = new Date();
+    const startTime = new Date(survey.thoiGianBatDau);
+    return now < startTime;
+  };
+
+  const isSurveyEnded = (survey: IMySurveyItem) => {
+    const now = new Date();
+    const endTime = new Date(survey.thoiGianKetThuc);
+    return now > endTime;
   };
 
   const getStatusTag = (status: number, statusName: string) => {
@@ -114,63 +125,100 @@ const Page = () => {
           </div>
         }
       >
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Spin size="large" tip="Đang tải danh sách khảo sát..." />
-          </div>
-        ) : surveys.length === 0 ? (
-          <Empty description="Không có khảo sát nào" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        ) : (
-          <Row gutter={[16, 16]}>
-            {surveys.map((survey) => (
-              <Col xs={24} sm={12} lg={8} xl={6} key={survey.id}>
-                <Card
-                  hoverable
-                  className="h-full"
-                  actions={[
-                    <Button
-                      key="start"
-                      type="primary"
-                      icon={<PlayCircleOutlined />}
-                      onClick={() => handleStartSurvey(survey.id)}
-                      disabled={survey.status !== surveyStatusConst.OPEN}
-                      block
-                    >
-                      {survey.status === surveyStatusConst.OPEN ? 'Bắt đầu' : 'Không khả dụng'}
-                    </Button>
-                  ]}
+        <Spin spinning={loading}>
+          {surveys.length === 0 ? (
+            <Empty description="Chưa có khảo sát nào" />
+          ) : (
+            <div className="space-y-2">
+              {surveys.map((survey) => (
+                <div
+                  key={survey.id}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-blue-300 transition-all duration-200 bg-white"
                 >
-                  <div className="space-y-3">
-                    <div>
-                      <div className="mb-1 text-xs text-gray-500">Mã khảo sát</div>
-                      <div className="font-semibold text-blue-600">{survey.maKhaoSat}</div>
-                    </div>
-
-                    <div>
-                      <div className="mb-1 text-xs text-gray-500">Tên khảo sát</div>
-                      <div className="line-clamp-2 font-medium" title={survey.tenKhaoSat}>
-                        {survey.tenKhaoSat}
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Survey Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-800 truncate">
+                          {survey.tenKhaoSat}
+                        </h3>
+                        {getStatusTag(survey.status, survey.statusName)}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                        <span className="flex items-center gap-1">
+                          <ClockCircleOutlined />
+                          Bắt đầu: {formatDateTimeView(survey.thoiGianBatDau)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <ClockCircleOutlined />
+                          Kết thúc: {formatDateTimeView(survey.thoiGianKetThuc)}
+                        </span>
+                        {survey.thoiGianNop && (
+                          <span className="flex items-center gap-1 text-green-600 font-medium">
+                            <CheckCircleOutlined />
+                            Đã nộp: {formatDateTimeView(survey.thoiGianNop)}
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    <div>
-                      <div className="mb-1 text-xs text-gray-500">Thời gian</div>
-                      <div className="text-sm">
-                        <div>Bắt đầu: {formatDateTimeView(survey.thoiGianBatDau)}</div>
-                        <div>Kết thúc: {formatDateTimeView(survey.thoiGianKetThuc)}</div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="mb-1 text-xs text-gray-500">Trạng thái</div>
-                      {getStatusTag(survey.status, survey.statusName)}
+                    {/* Action Button */}
+                    <div className="flex-shrink-0">
+                      {survey.thoiGianNop ? (
+                        <Button
+                          icon={<CheckCircleOutlined />}
+                          disabled
+                          size="large"
+                        >
+                          Đã hoàn thành
+                        </Button>
+                      ) : isSurveyNotStarted(survey) ? (
+                        <Button
+                          icon={<ClockCircleOutlined />}
+                          disabled
+                          size="large"
+                        >
+                          Chưa bắt đầu
+                        </Button>
+                      ) : isSurveyEnded(survey) ? (
+                        <Button
+                          icon={<ClockCircleOutlined />}
+                          disabled
+                          size="large"
+                        >
+                          Đã kết thúc
+                        </Button>
+                      ) : survey.status === surveyStatusConst.OPEN ? (
+                        <Button
+                          type="primary"
+                          onClick={() => handleStartSurvey(survey.id)}
+                          size="large"
+                          className="shadow-md hover:shadow-lg transition-shadow"
+                        >
+                          Bắt đầu
+                        </Button>
+                      ) : survey.status === surveyStatusConst.COMPLETE ? (
+                        <Button
+                          disabled
+                          size="large"
+                        >
+                          Đã hoàn thành
+                        </Button>
+                      ) : (
+                        <Button
+                          disabled
+                          size="large"
+                        >
+                          Đã đóng
+                        </Button>
+                      )}
                     </div>
                   </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        )}
+                </div>
+              ))}
+            </div>
+          )}
+        </Spin>
       </Card>
 
       {selectedSurveyId && (

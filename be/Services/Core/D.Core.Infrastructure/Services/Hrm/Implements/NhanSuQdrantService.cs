@@ -107,7 +107,8 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     MaNhanSu = x.MaNhanSu,
                     HoTen = x.HoTen,
                     GioiTinh = x.GioiTinh,
-                    GioiTinhText = x.GioiTinh.HasValue && gtDict.TryGetValue(x.GioiTinh.Value, out var gt)
+                    GioiTinhText =
+                        x.GioiTinh.HasValue && gtDict.TryGetValue(x.GioiTinh.Value, out var gt)
                             ? gt
                             : null,
                     NgaySinh = x.NgaySinh,
@@ -154,13 +155,10 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
 
             foreach (var ns in nhanSus)
             {
-                // Ghép chuỗi mô tả — đây là nội dung sẽ được embed
                 var searchableText = BuildSearchableText(ns);
 
-                // Gọi model embedding để sinh vector
-                var vector = await _jina.GetEmbeddingAsync(searchableText, ct);
+                var vector = await _jina.EmbedPassageAsync(searchableText, ct);
 
-                // Payload lưu kèm vào trong Qdrant
                 var payload = new SearchSemanticResponseDto
                 {
                     IdNhanSu = ns.IdNhanSu,
@@ -192,13 +190,12 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     TenHocVi = ns.TenHocVi,
                 };
 
-                // Generate stableId for vector with each nhansu
-                using var provider = System.Security.Cryptography.MD5.Create();
-                var hash = provider.ComputeHash(Encoding.UTF8.GetBytes(ns.IdNhanSu.ToString()));
+                using var md5 = System.Security.Cryptography.MD5.Create();
+                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(ns.IdNhanSu.ToString()));
                 var stableId = new Guid(hash);
+
                 batch.Add((stableId.ToString(), vector, payload));
 
-                // Upsert theo lô
                 if (batch.Count >= batchSize)
                 {
                     await _qdrant.UpsertPointsBatchAsync(batch, ct);
@@ -222,32 +219,39 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"{nameof(SearchSemanticAsync)}: dto = {JsonSerializer.Serialize(dto)}"
             );
 
+            if (string.IsNullOrEmpty(dto.Keyword))
+            {
+                return null;
+            }
+
             // Sinh embedding từ câu truy vấn
-            var queryVector = await _jina.GetEmbeddingAsync(dto.Keyword, ct);
+            var queryText = $"Tìm nhân sự: {dto.Keyword}";
+            var queryVector = await _jina.EmbedQueryAsync(queryText, ct);
 
             // Gọi API search của Qdrant
             var searchResults = await _qdrant.SearchAsync(
                 queryVector,
                 dto.PageSize,
                 dto.SkipCount(),
+                null,
                 ct
             );
             _logger.LogInformation($"Qdrant found {searchResults.Count()} vectors.");
 
             #region log debugging - Log payload tìm được
 
-            //var options = new JsonSerializerOptions
-            //{
-            //    WriteIndented = true, // format đẹp
-            //};
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true, // format đẹp
+            };
 
-            //foreach (var ns in searchResults)
-            //{
-            //    var payloadJson = JsonSerializer.Serialize(ns.Payload, options);
-            //    _logger.LogInformation(
-            //        $"SearchSemanticAsync - Score: {ns.Score} - Kết quả tìm thấy:\n{payloadJson}"
-            //    );
-            //}
+            foreach (var ns in searchResults)
+            {
+                var payloadJson = JsonSerializer.Serialize(ns.Payload, options);
+                _logger.LogInformation(
+                    $"SearchSemanticAsync - Score: {ns.Score}"
+                );
+            }
 
             #endregion
 
@@ -271,38 +275,63 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
         /// </summary>
         private static string BuildSearchableText(SearchSemanticResponseDto ns)
         {
-            var parts = new List<string>();
+            var sb = new StringBuilder();
 
             if (!string.IsNullOrWhiteSpace(ns.HoTen))
-                parts.Add(ns.HoTen);
-            if (!string.IsNullOrWhiteSpace(ns.MaNhanSu))
-                parts.Add($"Mã nhân sự {ns.MaNhanSu}");
-            if (!string.IsNullOrEmpty(ns.GioiTinhText))
-                parts.Add($"Giới tính ${ns.GioiTinhText}");
-            if (ns.NgaySinh != null)
-                parts.Add($"Sinh ngày {ns.NgaySinh:dd/MM/yyyy}");
-            if (!string.IsNullOrEmpty(ns.TenDanToc))
-                parts.Add($"Dân tộc {ns.TenDanToc}");
-            if (!string.IsNullOrEmpty(ns.TenQuocTich))
-                parts.Add($"Quốc tịch {ns.TenQuocTich}");
-            if (!string.IsNullOrWhiteSpace(ns.NguyenQuan))
-                parts.Add($"Quê ở {ns.NguyenQuan}");
-            if (!string.IsNullOrWhiteSpace(ns.TenPhongBan))
-                parts.Add($"Thuộc {ns.TenPhongBan}");
-            if (!string.IsNullOrWhiteSpace(ns.TenChucVu))
-                parts.Add($"Chức vụ {ns.TenChucVu}");
-            if (!string.IsNullOrWhiteSpace(ns.TenToBoMon))
-                parts.Add($"Tổ bộ môn {ns.TenToBoMon}");
-            if (!string.IsNullOrWhiteSpace(ns.TenHocVi))
-                parts.Add($"Học vị {ns.TenHocVi}");
-            if (!string.IsNullOrWhiteSpace(ns.TenHocHam))
-                parts.Add($"Học hàm {ns.TenHocHam}");
-            if (!string.IsNullOrWhiteSpace(ns.TenChuyenNganhHocVi))
-                parts.Add($"Chuyên ngành {ns.TenChuyenNganhHocVi}");
-            if (!string.IsNullOrWhiteSpace(ns.TenDanToc))
-                parts.Add($"Dân tộc {ns.TenDanToc}");
+                sb.Append($"Nhân sự {ns.HoTen}. ");
 
-            return string.Join(", ", parts);
+            if (!string.IsNullOrWhiteSpace(ns.MaNhanSu))
+                sb.Append($"Mã nhân sự {ns.MaNhanSu}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.GioiTinhText))
+                sb.Append($"Giới tính {ns.GioiTinhText}. ");
+
+            if (ns.NgaySinh.HasValue)
+                sb.Append($"Sinh ngày {ns.NgaySinh:dd/MM/yyyy}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.NoiSinh))
+                sb.Append($"Nơi sinh {ns.NoiSinh}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.NguyenQuan))
+                sb.Append($"Nguyên quán {ns.NguyenQuan}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenDanToc))
+                sb.Append($"Dân tộc {ns.TenDanToc}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenQuocTich))
+                sb.Append($"Quốc tịch {ns.TenQuocTich}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.SoDienThoai))
+                sb.Append($"Số điện thoại {ns.SoDienThoai}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.Email))
+                sb.Append($"Email {ns.Email}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenPhongBan))
+                sb.Append($"Hiện đang công tác tại phòng ban {ns.TenPhongBan}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenChucVu))
+                sb.Append($"Chức vụ {ns.TenChucVu}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenToBoMon))
+                sb.Append($"Thuộc tổ bộ môn {ns.TenToBoMon}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TrinhDoHocVan))
+                sb.Append($"Trình độ học vấn {ns.TrinhDoHocVan}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenHocVi))
+                sb.Append($"Học vị {ns.TenHocVi}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenHocHam))
+                sb.Append($"Học hàm {ns.TenHocHam}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenChuyenNganhHocVi))
+                sb.Append($"Chuyên ngành {ns.TenChuyenNganhHocVi}. ");
+
+            if (!string.IsNullOrWhiteSpace(ns.TenChuyenNganhHocHam))
+                sb.Append($"Chuyên ngành học hàm {ns.TenChuyenNganhHocHam}. ");
+
+            return sb.ToString().Trim();
         }
 
         /// <summary>
@@ -326,19 +355,40 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 MaNhanSu = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.MaNhanSu)),
                 HoTen = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.HoTen)),
                 GioiTinh = ConvertToInt(ciPayload, nameof(SearchSemanticResponseDto.GioiTinh)),
-                GioiTinhText = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.GioiTinhText)),
+                GioiTinhText = ConvertToString(
+                    ciPayload,
+                    nameof(SearchSemanticResponseDto.GioiTinhText)
+                ),
                 NoiSinh = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.NoiSinh)),
                 QuocTich = ConvertToInt(ciPayload, nameof(SearchSemanticResponseDto.QuocTich)),
-                TenQuocTich = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.TenQuocTich)),
+                TenQuocTich = ConvertToString(
+                    ciPayload,
+                    nameof(SearchSemanticResponseDto.TenQuocTich)
+                ),
                 DanToc = ConvertToInt(ciPayload, nameof(SearchSemanticResponseDto.DanToc)),
                 TenDanToc = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.TenDanToc)),
-                NguyenQuan = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.NguyenQuan)),
-                NoiOHienTai = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.NoiOHienTai)),
+                NguyenQuan = ConvertToString(
+                    ciPayload,
+                    nameof(SearchSemanticResponseDto.NguyenQuan)
+                ),
+                NoiOHienTai = ConvertToString(
+                    ciPayload,
+                    nameof(SearchSemanticResponseDto.NoiOHienTai)
+                ),
                 SoCccd = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.SoCccd)),
-                SoDienThoai = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.SoDienThoai)),
+                SoDienThoai = ConvertToString(
+                    ciPayload,
+                    nameof(SearchSemanticResponseDto.SoDienThoai)
+                ),
                 Email = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.Email)),
-                TrinhDoHocVan = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.TrinhDoHocVan)),
-                TrinhDoNgoaiNgu = ConvertToString(ciPayload, nameof(SearchSemanticResponseDto.TrinhDoNgoaiNgu)),
+                TrinhDoHocVan = ConvertToString(
+                    ciPayload,
+                    nameof(SearchSemanticResponseDto.TrinhDoHocVan)
+                ),
+                TrinhDoNgoaiNgu = ConvertToString(
+                    ciPayload,
+                    nameof(SearchSemanticResponseDto.TrinhDoNgoaiNgu)
+                ),
                 NgaySinhText = ConvertToString(
                     ciPayload,
                     nameof(SearchSemanticResponseDto.NgaySinhText)

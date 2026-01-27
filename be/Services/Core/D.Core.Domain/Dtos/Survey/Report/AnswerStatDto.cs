@@ -11,5 +11,7 @@ namespace D.Core.Domain.Dtos.Survey.Report
         public string Label { get; set; }   // Nội dung đáp án
         public int Count { get; set; }      // Số người chọn
         public double Percent { get; set; } // Phần trăm
+        public int Value { get; set; }
+        public bool IsCorrect { get; set; }
     }
 }

@@ -16,6 +16,7 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Abstracts
         Task<CreateRequestSurveyResponseDto> CreateRequestSurvey(CreateRequestSurveyRequestDto dto);
         Task<UpdateRequestSurveyResponseDto> UpdateRequestSurvey(UpdateRequestSurveyRequestDto dto);
         Task<bool> DeleteRequestSurvey(DeleteRequestSurveyDto dto);
+        List<RequestSurveyQuestionDto> ReadExcel(Stream fileStream);
 
         Task SubmitRequestAsync(int id);
         Task CancelSubmitAsync(int id);

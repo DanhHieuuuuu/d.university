@@ -45,6 +45,8 @@ namespace D.Auth.API
 
                 builder.ConfigureJwtAuthentication();
 
+                builder.Services.AddHostedService<D.Auth.Infrastructure.Services.Logging.LogUploadBackgroundService>();
+
                 var app = builder.Build();
 
                 if (app.Environment.IsDevelopment())
