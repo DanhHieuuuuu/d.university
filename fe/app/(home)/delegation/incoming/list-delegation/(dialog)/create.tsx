@@ -199,11 +199,13 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
           </Col>
           <Col span={12}>
             <Form.Item label="Ngày tiếp đón" name="receptionDate" rules={[{ required: true }]}>
-              <DatePicker style={{ width: '100%' }}
-                 disabledDate={(current) => {
-      if (!requestDate) return false;
-      return current.isBefore(dayjs(requestDate), 'day');
-    }} />
+              <DatePicker
+                style={{ width: '100%' }}
+                disabledDate={(current) => {
+                  if (!requestDate) return false;
+                  return current.isBefore(dayjs(requestDate), 'day');
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>
