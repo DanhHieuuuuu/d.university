@@ -298,7 +298,31 @@ namespace D.Core.Infrastructure.Services.File.Implements
             }
         }
 
+        public async Task<List<LogFileInfo>> GetLogFilesAsync(string? prefix)
+        {
+            _logger.LogInformation($"{nameof(GetLogFilesAsync)} method called. Prefix: {prefix}");
 
+            try
+            {
+                // Get files from S3
+                var s3Files = await _s3ManagerFile.ListFilesAsync(prefix);
+
+                // Map S3FileInfo to LogFileInfo
+                var logFiles = s3Files.Select(f => new LogFileInfo
+                {
+                    FileName = f.FileName,
+                    Size = f.Size,
+                    Folder = f.FileName != null ? string.Join("/", f.FileName.Split('/').SkipLast(1)) : ""
+                }).ToList();
+
+                return logFiles;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy danh sách log files từ S3");
+                throw;
+            }
+        }
 
 
     }

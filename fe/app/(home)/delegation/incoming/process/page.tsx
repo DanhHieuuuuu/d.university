@@ -27,7 +27,12 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { ICreateDepartment, IDepartmentSupport, IQueryGuestGroup, IViewGuestGroup } from '@models/delegation/delegation.model';
+import {
+  ICreateDepartment,
+  IDepartmentSupport,
+  IQueryGuestGroup,
+  IViewGuestGroup
+} from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
   getListDelegationIncoming,
@@ -44,8 +49,11 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { exportBaoCaoDoanVao } from '@helpers/delegation/action.helper';
 import CreateDepartmentSupportModal from '../support/(dialog)/create';
-import { selectDelegationIncomingId, selectDepartmentSupport } from '@redux/feature/delegation/department/departmentSlice';
-import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
+import {
+  selectDelegationIncomingId,
+  selectDepartmentSupport
+} from '@redux/feature/delegation/department/departmentSlice';
+import { ConfirmStatusModal } from '../../modals/ConfirmStatusModal';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -55,23 +63,38 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmContent, setConfirmContent] = useState('');
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [selectedData, setSelectedData] = useState<IViewGuestGroup | null>(null);
+  const [confirmActions, setConfirmActions] = useState<
+    {
+      action: 'upgrade' | 'cancel' | 'supplement';
+      label: string;
+      type?: 'primary' | 'default';
+      danger?: boolean;
+    }[]
+  >([]);
 
   const columns: IColumn<IViewGuestGroup>[] = [
     {
       key: 'code',
       dataIndex: 'code',
       title: 'Mã đoàn',
-      align: 'center'
+      align: 'center',
+      width: 120
     },
     {
       key: 'name',
       dataIndex: 'name',
-      title: 'Tên đoàn vào'
+      title: 'Tên đoàn vào',
+      width: 200
     },
     {
       key: 'content',
       dataIndex: 'content',
-      title: 'Nội dung'
+      title: 'Nội dung',
+      width: 200
     },
     {
       key: 'idPhongBan',
@@ -108,7 +131,8 @@ const Page = () => {
     {
       key: 'phoneNumber',
       dataIndex: 'phoneNumber',
-      title: 'SĐT liên hệ'
+      title: 'SĐT liên hệ',
+      width: 120
     },
     {
       key: 'totalMoney',
@@ -132,43 +156,50 @@ const Page = () => {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       command: (record: IViewGuestGroup) => onClickView(record),
-      permission: PermissionCoreConst.CoreButtonViewXuLyDoanVao,
+      permission: PermissionCoreConst.CoreButtonViewXuLyDoanVao
     },
     {
       label: 'Báo cáo kết quả',
       icon: <CheckOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
       command: (record: IViewGuestGroup) => onClickBaoCao(record),
-      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao,
+      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao
     },
     {
       label: 'Xuất báo cáo',
-      icon: <FileWordOutlined/>,
+      icon: <FileWordOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.DONE,
       command: (record: IViewGuestGroup) => onExport(record),
-      permission: PermissionCoreConst.CoreButtonUpdateDoanVao,
+      permission: PermissionCoreConst.CoreButtonUpdateDoanVao
     },
     {
       label: 'Phê duyệt',
       icon: <CheckOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT,
+      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT && r.status !== DelegationStatusConst.DA_CHINH_SUA,
       command: (record: IViewGuestGroup) => onClickPheDuyet(record),
-      permission: PermissionCoreConst.CoreButtonPheDuyetXuLyDoanVao,
+      permission: PermissionCoreConst.CoreButtonPheDuyetXuLyDoanVao
     },
     {
       label: 'Tiếp đoàn',
       icon: <DeploymentUnitOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET || !r.receptionTimes?.length,
       command: (record: IViewGuestGroup) => onClickTiepDoan(record),
-      permission: PermissionCoreConst.CoreButtonTiepDoanXuLyDoanVao,
+      permission: PermissionCoreConst.CoreButtonTiepDoanXuLyDoanVao
     },
     {
       label: 'Phân công hỗ trợ',
-      icon: <UserAddOutlined/>,
-      // hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
+      icon: <UserAddOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
       command: (record: IDepartmentSupport) => onClickPhanCong(record),
-      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao,
+      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao
     },
+    {
+      label: 'Xác nhận chỉnh sửa',
+      icon: <CheckOutlined />,
+      hidden: (r) => r.status !== DelegationStatusConst.CAN_BO_SUNG,
+      command: (record: IViewGuestGroup) => onClickXacNhan(record),
+      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao
+    }
   ];
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryGuestGroup>({
@@ -201,60 +232,70 @@ const Page = () => {
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     handleDebouncedSearch(event.target.value);
   };
-const onClickPhanCong = (data: IDepartmentSupport) => {
-  dispatch(selectDelegationIncomingId(data.id));
-  setIsModalView(false);
-  setIsModalUpdate(false);
-  setIsModalOpen(true);
-};
+  const onClickPhanCong = (data: IDepartmentSupport) => {
+    dispatch(selectDelegationIncomingId(data.id));
+    setIsModalView(false);
+    setIsModalUpdate(false);
+    setIsModalOpen(true);
+  };
   const onClickView = (data: IViewGuestGroup) => {
     router.push(`/delegation/incoming/detail/${data.id}`);
   };
   const onClickTiepDoan = (data: IViewGuestGroup) => {
-    openConfirmStatusModal({
-      title: 'Xác nhận tiếp đoàn',
-      content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,
-      okText: 'Đồng ý',
-      cancelText: 'Không đồng ý',
-      okAction: 'upgrade',
-      cancelAction: 'cancel',
-      data,
-      dispatch,
-      onSuccess: () => {
-        dispatch(getListGuestGroup(query));
-      }
-    });
+    setSelectedData(data);
+    setConfirmTitle('Xác nhận tiếp đoàn');
+    setConfirmContent(`Bạn có muốn tiếp đoàn "${data.name}" không?`);
+    setConfirmActions([
+      { action: 'cancel', label: 'Không đồng ý', danger: true },
+      { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
+    ]);
+    setConfirmOpen(true);
   };
+
   const onClickPheDuyet = (data: IViewGuestGroup) => {
-    openConfirmStatusModal({
-      title: 'Xác nhận tiếp đoàn',
-      content: `Bạn có muốn tiếp đoàn vào "${data.name}" không?`,
-      okText: 'Đồng ý',
-      cancelText: 'Không đồng ý',
-      okAction: 'upgrade',
-      cancelAction: 'supplement',
-      data,
-      dispatch,
-      onSuccess: () => {
-        dispatch(getListGuestGroup(query));
-      }
-    });
+    setSelectedData(data);
+    setConfirmTitle('Xác nhận phê duyệt');
+    setConfirmContent(`Bạn có đồng ý phê duyệt đoàn vào "${data.name}" không?`);
+
+    // ĐÃ CHỈNH SỬA: Đồng ý / Không đồng ý
+    if (data.status === DelegationStatusConst.DA_CHINH_SUA) {
+      setConfirmActions([
+        { action: 'cancel', label: 'Không đồng ý', danger: true },
+        { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
+      ]);
+    }
+    // ĐỀ XUẤT : Cần bổ sung / Đồng ý
+    else {
+      setConfirmActions([
+        { action: 'supplement', label: 'Cần bổ sung' },
+        { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
+      ]);
+    }
+
+    setConfirmOpen(true);
   };
+
   const onClickBaoCao = (data: IViewGuestGroup) => {
-    openConfirmStatusModal({
-      title: 'Xác nhận',
-      content: `Bạn có hoàn thành đoàn vào "${data.name}" không?`,
-      okText: 'Hoàn thành',
-      okAction: 'upgrade',
-      data,
-      dispatch,
-      onSuccess: () => {
-        dispatch(getListGuestGroup(query));
-      }
-    });
+    setSelectedData(data);
+    setConfirmTitle('Xác nhận hoàn thành');
+    setConfirmContent(`Bạn có xác nhận hoàn thành đoàn vào "${data.name}" không?`);
+    setConfirmActions([
+      { action: 'cancel', label: 'Không đồng ý', danger: true },
+      { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
+    ]);
+    setConfirmOpen(true);
   };
+
+  const onClickXacNhan = (data: IViewGuestGroup) => {
+    setSelectedData(data);
+    setConfirmTitle('Xác nhận đã bổ sung');
+    setConfirmContent(`Xác nhận đã bổ sung thông tin cho "${data.name}"`);
+    setConfirmActions([{ action: 'upgrade', label: 'Xác nhận', type: 'primary' }]);
+    setConfirmOpen(true);
+  };
+
   const onExport = (record: IViewGuestGroup) => {
-      exportBaoCaoDoanVao(record);
+    exportBaoCaoDoanVao(record);
   };
 
   return (
@@ -298,10 +339,11 @@ const onClickPhanCong = (data: IDepartmentSupport) => {
           </Form.Item>
 
           <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input 
-              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao} 
-              placeholder="Nhập tên đoàn vào…" 
-              onChange={(e) => handleSearch(e)} />
+            <Input
+              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
+              placeholder="Nhập tên đoàn vào…"
+              onChange={(e) => handleSearch(e)}
+            />
           </Form.Item>
           <Button
             color="default"
@@ -325,7 +367,7 @@ const onClickPhanCong = (data: IDepartmentSupport) => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        scroll={{x: 'max-content', y: 'calc(100vh - 350px)'}}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 350px)' }}
         data-permission={PermissionCoreConst.CoreButtonTableXuLyDoanVao}
       />
       <CreateDepartmentSupportModal
@@ -334,6 +376,20 @@ const onClickPhanCong = (data: IDepartmentSupport) => {
         isUpdate={isUpdate}
         isView={isView}
       />
+      {selectedData && (
+        <ConfirmStatusModal
+          open={confirmOpen}
+          title={confirmTitle}
+          content={confirmContent}
+          data={selectedData}
+          dispatch={dispatch}
+          onClose={() => setConfirmOpen(false)}
+          onSuccess={() => {
+            dispatch(getListGuestGroup(query));
+          }}
+          actions={confirmActions}
+        />
+      )}
     </Card>
   );
 };

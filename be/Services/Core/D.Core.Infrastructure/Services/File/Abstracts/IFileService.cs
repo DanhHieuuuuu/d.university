@@ -13,5 +13,6 @@ namespace D.Core.Infrastructure.Services.File.Abstracts
         Task<bool> UpdateFile(UpdateFileDto dto);
         Task<bool> DeleteFile(DeleteFileDto dto);
         public ExportFileDto FillTextToDocumentTemplate(string filePath, string filename, List<InputReplaceDto> listData);
+        Task<List<LogFileInfo>> GetLogFilesAsync(string? prefix);
     }
 }

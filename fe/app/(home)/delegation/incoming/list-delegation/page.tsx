@@ -43,7 +43,7 @@ import { useRouter } from 'next/navigation';
 import VoiceSearch from '../../../../../src/components/hieu-custom/voice-search';
 import { DelegationIncomingService } from '@/src/services/delegation/delegationIncoming.service';
 import { exportBaoCaoDoanVao } from '@helpers/delegation/action.helper';
-import { openConfirmStatusModal } from '../../modals/confirm-status-modal';
+import { ConfirmStatusModal } from '../../modals/ConfirmStatusModal';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -55,6 +55,18 @@ const Page = () => {
   const [isView, setIsModalView] = useState<boolean>(false);
   const [showVoiceSearch, setShowVoiceSearch] = useState<boolean>(false);
   const [voiceData, setVoiceData] = useState<IViewGuestGroup[] | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmContent, setConfirmContent] = useState('');
+  const [selectedData, setSelectedData] = useState<IViewGuestGroup | null>(null);
+    const [confirmActions, setConfirmActions] = useState<
+    {
+      action: 'upgrade' | 'cancel' | 'supplement';
+      label: string;
+      type?: 'primary' | 'default';
+      danger?: boolean;
+    }[]
+  >([]);
 
   const columns: IColumn<IViewGuestGroup>[] = [
     {
@@ -233,17 +245,14 @@ const Page = () => {
     setIsModalOpen(true);
   };
   const onClickUpdateStatus = (data: IViewGuestGroup) => {
-    openConfirmStatusModal({
-      title: 'Xác nhận đề xuất',
-      content: `Bạn có muốn đề xuất đoàn vào "${data.name}" không?`,
-      okText: 'Đề xuất',
-      okAction: 'upgrade',
-      data,
-      dispatch,
-      onSuccess: () => {
-        dispatch(getListGuestGroup(query));
-      }
-    });
+    setSelectedData(data);
+    setConfirmTitle('Xác nhận đề xuất');
+    setConfirmContent(`Bạn có muốn đề xuất đoàn vào "${data.name}" không?`);
+    setConfirmActions([
+   
+      { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
+    ]);
+    setConfirmOpen(true);
   };
 
   const onClickView = (data: IViewGuestGroup) => {
@@ -377,6 +386,20 @@ const Page = () => {
         isUpdate={isUpdate}
         isView={isView}
       />
+      {selectedData && (
+        <ConfirmStatusModal
+          open={confirmOpen}
+          title={confirmTitle}
+          content={confirmContent}
+          data={selectedData}
+          dispatch={dispatch}
+          onClose={() => setConfirmOpen(false)}
+          onSuccess={() => {
+            dispatch(getListGuestGroup(query));
+          }}
+          actions={confirmActions}
+        />
+      )}
     </Card>
   );
 };

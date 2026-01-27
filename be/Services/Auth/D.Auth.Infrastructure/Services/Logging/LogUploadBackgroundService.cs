@@ -94,7 +94,7 @@ namespace D.Auth.Infrastructure.Services.Logging
                     {
                         var fileInfo = new FileInfo(filePath);
 
-                        // Only upload files older than 1 day (don't upload current log file)
+                        // Only upload files older than 1 day except current log file)
                         if (fileInfo.LastWriteTime.Date >= yesterday)
                         {
                             _logger.LogDebug("Skipping current log file: {FileName}", fileInfo.Name);
