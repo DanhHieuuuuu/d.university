@@ -38,6 +38,7 @@ namespace D.Core.Infrastructure
             return services
                 .AddScoped<ServiceUnitOfWork>()
                 .AddScoped<ISvSinhVienService, SvSinhVienService>()
+                .AddScoped<IChatbotService, ChatbotService>()
                 .AddScoped<IDaoTaoService, DaoTaoService>()
             #region Hrm
                 .AddScoped<INsNhanSuService, NsNhanSuService>()

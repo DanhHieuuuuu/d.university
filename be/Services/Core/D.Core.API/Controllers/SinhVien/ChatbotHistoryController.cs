@@ -1,20 +1,46 @@
 using D.ControllerBase;
 using D.Core.Domain.Dtos.SinhVien.ChatbotHistory;
+using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace D.Core.API.Controllers.SinhVien
 {
-    [Route("/api/chatbot-history")]
+    [Route("/api/chatbot")]
     [ApiController]
     public class ChatbotHistoryController : APIControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IChatbotService _chatbotService;
 
-        public ChatbotHistoryController(IMediator mediator)
-            : base(mediator)
+        public ChatbotHistoryController(
+            IMediator mediator,
+            IChatbotService chatbotService
+        ) : base(mediator)
         {
             _mediator = mediator;
+            _chatbotService = chatbotService;
+        }
+
+        /// <summary>
+        /// Chat với chatbot AI
+        /// </summary>
+        [HttpPost("chat")]
+        public async Task<ResponseAPI> Chat([FromBody] ChatbotRequestDto dto)
+        {
+            try
+            {
+                var result = await _chatbotService.ChatAsync(dto);
+                return new ResponseAPI(result);
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new Exception($"Không thể kết nối đến Chatbot API: {ex.Message}"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>

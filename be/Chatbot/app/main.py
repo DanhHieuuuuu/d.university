@@ -10,7 +10,7 @@ from app.models.schemas import (
     ClearSessionRequest, SessionInfoResponse
 )
 from app.services.embedding import EmbeddingService
-from app.services.vector_store import initialize_vector_store
+from app.services.chroma_vector_store import initialize_chroma_vector_store
 from app.services.groq_client import LLMClient
 from app.services.rag import RAGPipeline
 from app.services.conversation_memory import ConversationMemory
@@ -45,12 +45,13 @@ async def lifespan(app: FastAPI):
     print("\n[2/5] Khởi tạo Embedding Service...")
     embedding_service = EmbeddingService(config.EMBEDDING_MODEL)
     
-    # Khoi tao vector store
-    print("\n[3/5] Khởi tạo Vector Store...")
-    vector_store = initialize_vector_store(
+    # Khởi tạo vector store (ChromaDB)
+    print("\n[3/5] Khởi tạo ChromaDB Vector Store...")
+    vector_store = initialize_chroma_vector_store(
         data_path=config.DATA_PATH,
-        vector_store_path=config.VECTOR_STORE_PATH,
-        embedding_service=embedding_service
+        persist_directory=config.CHROMA_PERSIST_DIR,
+        embedding_service=embedding_service,
+        collection_name=config.CHROMA_COLLECTION_NAME
     )
     
     # Khoi tao LLM client (tu dong chon provider tu .env)
@@ -268,32 +269,30 @@ async def get_student_summary():
 async def rebuild_index():
     """
     Endpoint rebuild vector store index.
-    Goi khi du lieu JSON thay doi.
+    Gọi khi dữ liệu JSON thay đổi.
     """
     global rag_pipeline
     
     try:
         embedding_service = EmbeddingService(config.EMBEDDING_MODEL)
-        vector_store = initialize_vector_store(
+        vector_store = initialize_chroma_vector_store(
             data_path=config.DATA_PATH,
-            vector_store_path=config.VECTOR_STORE_PATH,
+            persist_directory=config.CHROMA_PERSIST_DIR,
             embedding_service=embedding_service,
+            collection_name=config.CHROMA_COLLECTION_NAME,
             force_rebuild=True
         )
         
-        groq_client = GroqClient(
-            api_key=config.GROQ_API_KEY,
-            model=config.GROQ_MODEL
-        )
+        llm_client = LLMClient()
         
         rag_pipeline = RAGPipeline(
             vector_store=vector_store,
-            groq_client=groq_client,
+            llm_client=llm_client,
             top_k=config.TOP_K_RESULTS,
             data_path=config.DATA_PATH
         )
         
-        return {"message": "Đã rebuild index thành công"}
+        return {"message": "Đã rebuild ChromaDB index thành công"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
