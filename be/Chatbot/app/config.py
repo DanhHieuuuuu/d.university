@@ -25,5 +25,9 @@ class Config:
     # Paths
     DATA_PATH: str = os.path.join(os.path.dirname(__file__), "..", "data", "students_rag_data.json")
     VECTOR_STORE_PATH: str = os.path.join(os.path.dirname(__file__), "..", "data", "vector_store")
+    
+    # ChromaDB
+    CHROMA_PERSIST_DIR: str = os.path.join(os.path.dirname(__file__), "..", "data", "chroma_db")
+    CHROMA_COLLECTION_NAME: str = "student_data"
 
 config = Config()
