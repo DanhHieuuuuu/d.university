@@ -218,10 +218,6 @@ const Page = () => {
         dispatch(getAllKpiTruong(query));
       }
     });
-
-
-
-
   const updateKetQuaCapTren = (id: number, value?: number) => {
     setKetQuaCapTrenMap((prev) => ({ ...prev, [id]: value }));
   };
