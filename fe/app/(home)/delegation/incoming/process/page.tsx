@@ -191,14 +191,14 @@ const Page = () => {
       icon: <UserAddOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
       command: (record: IDepartmentSupport) => onClickPhanCong(record),
-      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao
+      permission: PermissionCoreConst.CoreButtonPhanCongXuLyDoanVao
     },
     {
       label: 'Xác nhận chỉnh sửa',
       icon: <CheckOutlined />,
       hidden: (r) => r.status !== DelegationStatusConst.CAN_BO_SUNG,
       command: (record: IViewGuestGroup) => onClickXacNhan(record),
-      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao
+      permission: PermissionCoreConst.CoreButtonXacNhanChinhSuaXuLyDoanVao
     }
   ];
 
