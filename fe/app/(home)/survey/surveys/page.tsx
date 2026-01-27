@@ -142,7 +142,7 @@ const Page = () => {
       },
       permission: PermissionCoreConst.SurveyButtonSurveyOpen,
       hidden: (record: IViewSurvey) => 
-        record.status !== surveyStatusConst.CLOSE
+        record.status !== surveyStatusConst.CLOSE && record.status !== surveyStatusConst.PAUSE
     },
     {
       label: 'Đóng khảo sát',
@@ -193,7 +193,7 @@ const Page = () => {
       },
       permission: PermissionCoreConst.SurveyButtonReportGenerate,
       hidden: (record: IViewSurvey) =>
-        record.status !== surveyStatusConst.CLOSE && record.status !== surveyStatusConst.COMPLETE
+        record.status !== surveyStatusConst.PAUSE && record.status !== surveyStatusConst.COMPLETE
     }
   ];
 
