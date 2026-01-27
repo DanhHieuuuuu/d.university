@@ -1,4 +1,5 @@
 ﻿using d.Shared.Permission;
+using d.Shared.Permission.Permission;
 using D.ControllerBase;
 using D.Core.Domain.Dtos.Delegation.Incoming;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
@@ -48,6 +49,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateDoanVao)]
         [HttpPost("create")]
         public async Task<ResponseAPI> CreateDelegationIncoming([FromForm] CreateRequestDto dto)
         {
@@ -138,6 +140,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonUpdateDoanVao)]
         [HttpPut("update")]
         public async Task<ResponseAPI> UpdateDoanVao([FromForm] UpdateDelegationIncomingRequestDto dto)
         {
@@ -156,7 +159,8 @@ namespace D.Core.API.Controllers.Delegation
         /// Xóa mềm Đoàn vào
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>     
+        /// <returns></returns>    
+        [PermissionFilter(PermissionCoreKeys.CoreButtonDeleteDoanVao)]
         [HttpDelete("delete/{id}")]
         public async Task<ResponseAPI> DeleteDoanVao([FromRoute] int id)
         {
@@ -237,6 +241,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateTimeDoanVao)]
         [HttpPost("create-reception-time")]
         public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeListRequestDto dto)
         {
@@ -356,7 +361,6 @@ namespace D.Core.API.Controllers.Delegation
         /// Insert Log Đoàn vào
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
         [HttpPost("log-status/insert")]
         public async Task<ResponseAPI> InsertLogStatus([FromBody] InsertDelegationIncomingLogDto dto)
         {
@@ -375,7 +379,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-
+        [PermissionFilter(PermissionCoreKeys.CoreMenuLog)]
         [HttpGet("get-log-status")]
         public async Task<ResponseAPI> GetLogStatus([FromQuery] FindDelegationIncomingLogDto dto)
         {
@@ -412,7 +416,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-
+        [PermissionFilter(PermissionCoreKeys.CoreMenuLog)]
         [HttpGet("get-log-reception-time")]
         public async Task<ResponseAPI> GetLogReceptionTime([FromQuery] FindReceptionTimeLogDto dto)
         {

@@ -36,6 +36,7 @@ export class PermissionCoreConst {
   public static readonly CoreButtonTiepDoanXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_tiepdoan`;
   public static readonly CoreButtonSearchXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_search`;
   public static readonly CoreButtonTableXuLyDoanVao = `${PermissionCoreConst.Table}dio_xuly_table`;
+  public static readonly CoreButtonExportXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_export`;
 
 
   public static readonly CoreMenuDepartment = `${PermissionCoreConst.Menu}dio_department`;

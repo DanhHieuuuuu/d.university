@@ -126,7 +126,7 @@ const DepartmentSupport = () => {
         ) : (
           <Form.List name="supporters">
             {(fields, { add, remove }) => {
-              // ✅ LẤY DANH SÁCH supporterId ĐÃ CHỌN
+              // LẤY DANH SÁCH supporterId ĐÃ CHỌN
               const selectedIds =
                 form
                   .getFieldValue('supporters')
