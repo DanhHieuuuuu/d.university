@@ -317,6 +317,7 @@ namespace D.Core.API.Controllers.Delegation
         {
             var filePath = Path.Combine(
                 Directory.GetCurrentDirectory(),
+                "wwwroot",
                 "Template",
                 "detail_delegation.xlsx"
             );
