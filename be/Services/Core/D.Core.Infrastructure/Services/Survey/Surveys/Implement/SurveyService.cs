@@ -282,7 +282,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             foreach (var item in result)
             {
                 var submission = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
-                    .Where(sub => sub.IdKhaoSat == item.Id && sub.IdNguoiDung == userId && sub.ThoiGianNop != null)
+                    .Where(sub => sub.IdKhaoSat == item.Id && sub.IdNguoiDung == userId && sub.UserType == userType && sub.ThoiGianNop != null)
                     .FirstOrDefaultAsync();
                 
                 if (submission != null)
@@ -306,7 +306,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
             var userType = CommonUntil.GetCurrentUserType(_httpContextAccessor);
 
             var submission = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
-                .FirstOrDefaultAsync(x => x.IdKhaoSat == surveyId && x.IdNguoiDung == userId);
+                .FirstOrDefaultAsync(x => x.IdKhaoSat == surveyId && x.IdNguoiDung == userId && x.UserType == userType);
 
             if (submission != null && submission.TrangThai == SubmissionStatus.Submitted)
             {
@@ -378,6 +378,7 @@ namespace D.Core.Infrastructure.Services.Survey.Surveys.Implement
                 {
                     IdKhaoSat = surveyId,
                     IdNguoiDung = userId,
+                    UserType = userType,
                     ThoiGianBatDau = DateTime.Now,
                     TrangThai = SubmissionStatus.InProgress,
                     DiemTong = 0

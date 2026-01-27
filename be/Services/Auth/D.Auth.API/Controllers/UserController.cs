@@ -66,7 +66,6 @@ namespace D.Auth.API.Controllers
         /// </summary>
         /// <param name="dto">request</param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.UserButtonAccountManagerUpdate)]
         [HttpPost("change-password")]
         public async Task<ResponseAPI> ChangePassword(ChangePasswordRequestDto dto)
         {
