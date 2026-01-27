@@ -18,6 +18,9 @@ import { toast } from 'react-toastify';
 import { DelegationIncomingService } from '@/src/services/delegation/delegationIncoming.service';
 import { SurveyService } from '@/src/services/survey.service';
 import { DelegationStatusConst } from '@/constants/core/delegation/delegation-status.consts';
+import { requestStatusConst } from '@/constants/core/survey/requestStatus.const';
+import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
+
 const HomePage: React.FC = () => {
   const { user } = useAppSelector((state) => state.authState);
 
@@ -133,18 +136,27 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Survey Request Chart Data (Column)
-  const surveyRequestChartData = (surveyStats?.surveyRequests?.byStatus || []).map(item => ({
-    status: item.statusName,
-    count: item.count
+  const allRequestStatuses = requestStatusConst.list.map(status => ({
+    status: status.name,
+    total: 0
   }));
+  
+  const apiRequestData = (surveyStats?.surveyRequests?.byStatus || []).map(item => ({
+    status: item.statusName,
+    total: item.count
+  }));
+  
+  const surveyRequestChartData = allRequestStatuses.map(defaultStatus => {
+    const apiData = apiRequestData.find(api => api.status === defaultStatus.status);
+    return apiData || defaultStatus;
+  });
 
   const requestColumnConfig: any = {
     data: surveyRequestChartData,
     xField: 'status',
-    yField: 'count',
+    yField: 'total',
     label: {
-      text: 'count',
+      text: 'total',
       position: 'top',
       style: {
         fill: '#000000',
@@ -165,15 +177,24 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Survey Chart Data (Pie)
-  const surveyChartData = (surveyStats?.surveys?.byStatus || []).map(item => ({
-    status: item.statusName,
-    count: item.count
+  const allSurveyStatuses = surveyStatusConst.list.map(status => ({
+    status: status.name,
+    //total: 0
   }));
+  
+  const apiSurveyData = (surveyStats?.surveys?.byStatus || []).map(item => ({
+    status: item.statusName,
+    total: item.count
+  }));
+  
+  const surveyChartData = allSurveyStatuses.map(defaultStatus => {
+    const apiData = apiSurveyData.find(api => api.status === defaultStatus.status);
+    return apiData || defaultStatus;
+  });
 
   const surveyPieConfig: any = {
     data: surveyChartData,
-    angleField: 'count',
+    angleField: 'total',
     colorField: 'status',
     radius: 0.8,
     label: {
