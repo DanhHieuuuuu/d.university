@@ -32,4 +32,9 @@
     <ProjectReference Include="..\D.Core.Infrastructure\D.Core.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Template\bao_cao_doan_vao.docx" />
+    <None Include="wwwroot\Template\detail_delegation.xlsx" />
+  </ItemGroup>
+
 </Project>
