@@ -1,21 +1,23 @@
+import os
+import urllib
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import urllib
 
 params = urllib.parse.quote_plus(
-    "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=203.210.148.167,8092;"
-    "DATABASE=DO_AN;"
-    "UID=sa;"
-    "PWD=labDev@123;"
+    "DRIVER={ODBC Driver 18 for SQL Server};"
+    f"SERVER={os.getenv('DB_SERVER')};"
+    f"DATABASE={os.getenv('DB_NAME')};"
+    f"UID={os.getenv('DB_USER')};"
+    f"PWD={os.getenv('DB_PASSWORD')};"
+    "Encrypt=yes;"
     "TrustServerCertificate=yes;"
-    "MultipleActiveResultSets=True;"
 )
 
 DATABASE_URL = f"mssql+pyodbc:///?odbc_connect={params}"
 
 engine = create_engine(
     DATABASE_URL,
+    pool_pre_ping=True,
     echo=False
 )
 

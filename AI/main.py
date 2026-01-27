@@ -10,6 +10,9 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3077",
         "http://127.0.0.1:3077",
+        "https://d-university-core-jk86.onrender.com",
+        "https://d-university-9zz7.onrender.com",
+        "https://d-university-3333.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],  
