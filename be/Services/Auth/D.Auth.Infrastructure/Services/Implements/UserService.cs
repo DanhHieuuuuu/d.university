@@ -136,6 +136,55 @@ namespace D.Auth.Infrastructure.Services.Implements
             };
         }
 
+        public async Task<CreateUserResponseDto2> CreateUser2(CreateUserRequestDto2 request)
+        {
+            _logger.LogInformation($"{nameof(CreateUser)} called with");
+            var ns = _unitOfWork.iNsNhanSuRepository.FindByMaNhanSu2(request.MaNhanSu);
+            if (ns != null)
+                throw new UserFriendlyException(ErrorCodeConstant.CodeNotFound, "Nhân sự đã tồn tại trong hệ thống.");
+            var entity = new NsNhanSu();
+
+            string rawPassword = string.IsNullOrWhiteSpace(request.Password)
+                ? PasswordHelper.GenerateRandomPassword()
+                : request.Password;
+
+            var (hash, salt) = PasswordHelper.HashPassword(rawPassword);
+
+            entity.MaNhanSu = request.MaNhanSu;
+            entity.Password = hash;
+            entity.PasswordKey = salt;
+            entity.Status = true;
+            entity.UserType = 4;
+            entity.HoDem = request.hoDem;
+            entity.Ten = request.ten;
+            entity.Email = request.Email2;
+            entity.Email2 = request.Email2;
+
+            _unitOfWork.iNsNhanSuRepository.Add(entity);
+            await _unitOfWork.iNsNhanSuRepository.SaveChangeAsync();
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "newpassword.html");
+            string body = await File.ReadAllTextAsync(templatePath);
+
+            body = body.Replace("{{fullName}}", $"{request.hoDem} {request.ten}")
+                       .Replace("{{userName}}", request.MaNhanSu)
+                       .Replace("{{newPassword}}", rawPassword)
+                       .Replace("{{year}}", DateTime.Now.Year.ToString());
+
+            await _notiService.SendAsync(new NotificationMessage
+            {
+                Title = "Thông tin tài khoản",
+                Channel = NotificationChannel.Email,
+                Receiver = new Receiver { Email = request.Email2, UserId = 12341234 },
+                Content = body,
+                AltContent = "Tài khoản đăng nhập đã được khởi tạo."
+            });
+            return new CreateUserResponseDto2
+            {
+                MaNhanSu = request.MaNhanSu,
+                FullName = $"{request.hoDem} {request.ten}",
+                Email2 = rawPassword
+            };
+        }
 
 
         public async Task<bool> UpdateUser(UpdateUserRequestDto request)

@@ -21,6 +21,7 @@ import { IAction, IColumn } from '@models/common/table.model';
 import CreateNhanSuModal from './(dialog)/create';
 import UserRoleModal from './(dialog)/user-role';
 import EditUserModal from './(dialog)/edit';
+import AddUser from './(dialog)/add';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -28,11 +29,13 @@ const Page = () => {
   const { list, total } = useAppSelector((state) => state.userState.all);
   const status = useAppSelector((state) => state.userState.status);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [openUserRoleModal, setOpenUserRoleModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IUserView | null>(null);
 
   const onClickAdd = () => setIsModalOpen(true);
+  const onClickAdd2 = () => setIsModalOpen2(true);
 
   const columns: IColumn<IUserView>[] = [
     {
@@ -168,9 +171,14 @@ const Page = () => {
       title="Danh sách tài khoản"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
-          Thêm mới
-        </Button>
+        <div>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+            Thêm mới
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd2} style={{marginLeft: 10}}>
+            Thêm vãng lai
+          </Button>
+        </div>
       }
     >
       <Form form={form} layout="horizontal">
@@ -206,6 +214,11 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+      />
+      <AddUser
+        isModalOpen={isModalOpen2}
+        setIsModalOpen={setIsModalOpen2}
+        onSuccess={() => dispatch(getAllUser(query))}
       />
       <CreateNhanSuModal
         isModalOpen={isModalOpen}

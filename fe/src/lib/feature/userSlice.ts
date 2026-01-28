@@ -30,6 +30,15 @@ export const createUser = createAsyncThunk('user/create', async (body: IUserCrea
   }
 });
 
+export const createUser2 = createAsyncThunk('user/create/2', async (body: IUserCreate) => {
+  try {
+    return await UserService.createUser2(body);
+  } catch (error: any) {
+    console.error(error);
+    throw error;
+  }
+});
+
 export const updateUser = createAsyncThunk(
   'user/update',
   async (body: { Id: number; Email?: string; NewPassword?: string }) => {
@@ -83,6 +92,10 @@ interface UserState {
   $addRoles: {
     status: ReduxStatus;
   };
+    
+  $addUser2: {
+    status: ReduxStatus;
+  };
 }
 
 const initialState: UserState = {
@@ -100,6 +113,9 @@ const initialState: UserState = {
   },
 
   $addRoles: {
+    status: ReduxStatus.IDLE
+  },
+  $addUser2:{
     status: ReduxStatus.IDLE
   }
 };
@@ -135,6 +151,11 @@ const userSlice = createSlice({
       })
       .addCase(getAllUserByKpiRole.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
+      })
+      .addCase(createUser2.fulfilled, (state, action: PayloadAction<any>) => {
+        if (action.payload?.id) {
+          state.all.list.push(action.payload);
+        }
       })
       .addCase(createUser.fulfilled, (state, action: PayloadAction<any>) => {
         if (action.payload?.id) {
