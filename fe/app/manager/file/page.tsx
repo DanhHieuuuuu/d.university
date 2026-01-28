@@ -139,12 +139,6 @@ const Page = () => {
 
   const columns: IColumn<IFile>[] = [
     {
-      key: 'id',
-      dataIndex: 'id',
-      title: 'ID',
-      width: 80
-    },
-    {
       key: 'name',
       dataIndex: 'name',
       title: 'Tên file'
