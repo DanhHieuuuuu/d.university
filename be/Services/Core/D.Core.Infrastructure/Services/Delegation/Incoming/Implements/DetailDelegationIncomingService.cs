@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.DetailDelegationIncomingResponseDto;
 
 namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 {
@@ -38,6 +39,33 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
                 .FirstOrDefault(d => d.Id == delegationIncomingId);
+            var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
+            var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
+
+            var departmentSupports =
+                (from ds in _unitOfWork.iDepartmentSupportRepository.TableNoTracking
+                 join pb in phongBanTable
+                     on ds.DepartmentSupportId equals pb.Id
+                 where !ds.Deleted
+                       && ds.DelegationIncomingId == delegationIncomingId
+                 select new DepartmentSupportDto
+                 {
+                     DepartmentSupportId = pb.Id,
+                     DepartmentSupportName = pb.TenPhongBan,
+                     Supporters =
+                        (from sp in _unitOfWork.iSupporterRepository.TableNoTracking
+                         join ns in staffTable
+                             on sp.SupporterId equals ns.Id
+                         where !sp.Deleted
+                               && sp.DepartmentSupportId == ds.DepartmentSupportId
+                         select new SupporterDto
+                         {
+                             Id = sp.Id,
+                             SupporterCode = sp.SupporterCode,
+                             SupporterName = ns.HoDem + " " + ns.Ten
+                         }).ToList()
+
+                 }).ToList();
 
             var result = new DetailDelegationIncomingResponseDto
             {
@@ -51,7 +79,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 IsLeader = detail.IsLeader,
                 DelegationIncomingId = detail.DelegationIncomingId,
                 DelegationName = delegation?.Name,
-                DelegationCode = delegation?.Code
+                DelegationCode = delegation?.Code,
+                DepartmentSupports = departmentSupports
             };
 
             return result;

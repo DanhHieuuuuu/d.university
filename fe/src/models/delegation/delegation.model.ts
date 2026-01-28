@@ -30,6 +30,7 @@ export interface IDetailDelegationIncoming {
   email: string;
   isLeader: boolean;
   delegationIncomingId: number;
+  departmentSupports?: IDepartmentSupport[] | null;
 }
 export interface IReceptionTime {
   id: number;
@@ -65,6 +66,7 @@ export interface ISupporter {
   supporterId: number;
   supporterCode: string;
   departmentSupportId: number;
+  supporterName: string;
   departmentSupport: any | null;
 }
 

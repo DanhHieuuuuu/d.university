@@ -18,6 +18,21 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
         public bool IsLeader { get; set; }
         public int DelegationIncomingId { get; set; }
         public string? DelegationName { get; set; } 
-        public string? DelegationCode { get; set; } 
+        public string? DelegationCode { get; set; }
+        public List<DepartmentSupportDto>? DepartmentSupports { get; set; }
+        public class DepartmentSupportDto
+        {
+            public int DepartmentSupportId { get; set; }
+            public string? DepartmentSupportName { get; set; }
+            public List<SupporterDto>? Supporters { get; set; }
+        }
+
+        public class SupporterDto
+        {
+            public int Id { get; set; }
+            public string? SupporterCode { get; set; }
+            public string? SupporterName { get; set; }
+        }
+
     }
 }
