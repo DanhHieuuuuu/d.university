@@ -47,7 +47,9 @@ namespace D.ControllerBase
                                 "http://localhost:3077",
                                 "https://d-university-3333.vercel.app",
                                 "https://d-university-core-jk86.onrender.com",
-                                "https://d-university-9zz7.onrender.com"
+                                "https://d-university.onrender.com",
+                                "https://d-university-9zz7.onrender.com",
+                                "https://d-university.onrender.com"
                             )
                             .AllowAnyHeader()
                             .AllowAnyMethod()
