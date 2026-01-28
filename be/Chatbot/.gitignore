@@ -31,9 +31,6 @@ wheels/
 .installed.cfg
 *.egg
 
-# Vector store (co the rebuild)
-data/vector_store/
-
 # ChromaDB (data se duoc sync lai tu API)
 data/chroma_db/
 *.bin
