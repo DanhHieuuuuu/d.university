@@ -33,3 +33,25 @@ class SessionInfoResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     message: str
+
+
+class ChatWithMssvRequest(BaseModel):
+    message: str
+    mssv: str
+    conversation_history: Optional[List[dict]] = []
+
+
+class StudentDataItem(BaseModel):
+    mssv: str
+    data: dict
+
+
+class SyncStudentsRequest(BaseModel):
+    students: List[StudentDataItem]
+
+
+class SyncStudentsResponse(BaseModel):
+    success: bool
+    message: str
+    total_students: int
+    total_chunks: int

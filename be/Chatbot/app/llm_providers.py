@@ -1,7 +1,3 @@
-"""
-Cau hinh cac LLM providers.
-Chi can import va su dung ten provider la xong.
-"""
 import os
 from dotenv import load_dotenv
 from dataclasses import dataclass
@@ -12,7 +8,6 @@ load_dotenv()
 
 @dataclass
 class LLMConfig:
-    """Cau hinh cho mot LLM provider."""
     name: str
     base_url: str
     api_key: str
@@ -44,7 +39,6 @@ VLLM = LLMConfig(
 )
 
 
-# Map ten -> config de de su dung
 _PROVIDERS = {
     "groq": GROQ,
     "vllm": VLLM,
@@ -52,16 +46,6 @@ _PROVIDERS = {
 
 
 def get_provider(name: str = None) -> LLMConfig:
-    """
-    Lay cau hinh LLM theo ten.
-    
-    Args:
-        name: Ten provider ("groq", "vllm"). 
-              Neu None, lay tu LLM_PROVIDER trong .env
-    
-    Returns:
-        LLMConfig tuong ung
-    """
     if name is None:
         name = os.getenv("LLM_PROVIDER", "groq")
     
@@ -72,5 +56,4 @@ def get_provider(name: str = None) -> LLMConfig:
     return _PROVIDERS[name]
 
 
-# Provider mac dinh (tu .env)
 DEFAULT = get_provider()

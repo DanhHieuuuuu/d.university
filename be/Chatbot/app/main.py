@@ -7,26 +7,30 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
 from app.models.schemas import (
     ChatRequest, ChatResponse, HealthResponse,
-    ClearSessionRequest, SessionInfoResponse
+    ClearSessionRequest, SessionInfoResponse,
+    ChatWithMssvRequest, SyncStudentsRequest, SyncStudentsResponse
 )
 from app.services.embedding import EmbeddingService
 from app.services.chroma_vector_store import initialize_chroma_vector_store
 from app.services.groq_client import LLMClient
 from app.services.rag import RAGPipeline
 from app.services.conversation_memory import ConversationMemory
+from app.services.student_data_service import StudentDataService
 
 # Global instances
 rag_pipeline: RAGPipeline = None
 conversation_memory: ConversationMemory = None
+student_data_service: StudentDataService = None
+embedding_service_global: EmbeddingService = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Khoi tao cac service khi server start."""
-    global rag_pipeline, conversation_memory
+    global rag_pipeline, conversation_memory, student_data_service, embedding_service_global
     
     print("=" * 50)
-    print("Khởi động Chatbot Server...")
+    print("Khoi dong Chatbot Server...")
     print("=" * 50)
     
     # Kiem tra API key
@@ -35,18 +39,19 @@ async def lifespan(app: FastAPI):
         print("Vui long tao file .env va them GROQ_API_KEY")
     
     # Khoi tao conversation memory voi file storage
-    print("\n[1/5] Khởi tạo Conversation Memory...")
+    print("\n[1/6] Khoi tao Conversation Memory...")
     data_dir = os.path.dirname(config.DATA_PATH)
     storage_path = os.path.join(data_dir, "conversation_history.json")
     conversation_memory = ConversationMemory(storage_path=storage_path)
-    print(f"Lưu trữ lịch sử tại: {storage_path}")
+    print(f"Luu tru lich su tai: {storage_path}")
     
     # Khoi tao embedding service
-    print("\n[2/5] Khởi tạo Embedding Service...")
+    print("\n[2/6] Khoi tao Embedding Service...")
     embedding_service = EmbeddingService(config.EMBEDDING_MODEL)
+    embedding_service_global = embedding_service
     
-    # Khởi tạo vector store (ChromaDB)
-    print("\n[3/5] Khởi tạo ChromaDB Vector Store...")
+    # Khoi tao vector store (ChromaDB)
+    print("\n[3/6] Khoi tao ChromaDB Vector Store...")
     vector_store = initialize_chroma_vector_store(
         data_path=config.DATA_PATH,
         persist_directory=config.CHROMA_PERSIST_DIR,
@@ -54,17 +59,25 @@ async def lifespan(app: FastAPI):
         collection_name=config.CHROMA_COLLECTION_NAME
     )
     
-    # Khoi tao LLM client (tu dong chon provider tu .env)
-    print("\n[4/5] Khởi tạo LLM Client...")
-    llm_client = LLMClient()  # Su dung DEFAULT provider tu .env
+    # Khoi tao LLM client
+    print("\n[4/6] Khoi tao LLM Client...")
+    llm_client = LLMClient()
     
     # Khoi tao RAG pipeline
-    print("\n[5/5] Khởi tạo RAG Pipeline...")
+    print("\n[5/6] Khoi tao RAG Pipeline...")
     rag_pipeline = RAGPipeline(
         vector_store=vector_store,
         llm_client=llm_client,
         top_k=config.TOP_K_RESULTS,
-        data_path=config.DATA_PATH  # Truyen duong dan file JSON de doc thong tin sinh vien
+        data_path=config.DATA_PATH
+    )
+    
+    # Khoi tao StudentDataService
+    print("\n[6/6] Khoi tao Student Data Service...")
+    student_data_service = StudentDataService(
+        embedding_service=embedding_service,
+        persist_directory=config.CHROMA_PERSIST_DIR,
+        collection_name=config.CHROMA_COLLECTION_NAME
     )
     
     print("\n" + "=" * 50)
@@ -293,6 +306,114 @@ async def rebuild_index():
         )
         
         return {"message": "Đã rebuild ChromaDB index thành công"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/sync-students", response_model=SyncStudentsResponse)
+async def sync_students(request: SyncStudentsRequest):
+    """Sync dữ liệu sinh viên vào ChromaDB."""
+    try:
+        students_data = [{"mssv": s.mssv, "data": s.data} for s in request.students]
+        result = student_data_service.sync_students(students_data)
+        return SyncStudentsResponse(
+            success=result["success"],
+            message=result["message"],
+            total_students=result["total_students"],
+            total_chunks=result["total_chunks"]
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/chat-with-mssv", response_model=ChatResponse)
+async def chat_with_mssv(request: ChatWithMssvRequest):
+    """Chat với filter theo mssv."""
+    if not config.GROQ_API_KEY:
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY chưa được cấu hình")
+    
+    try:
+        history = request.conversation_history or []
+        mssv = request.mssv
+        
+        # Lấy thông tin sinh viên
+        student_info = None
+        student_info_result = student_data_service.get_student_info(mssv)
+        if student_info_result:
+            content = student_info_result.get("content", "")
+            student_info = {"ma_sinh_vien": mssv}
+            for line in content.split("\n"):
+                if "Họ tên:" in line:
+                    student_info["ho_ten"] = line.split(":")[-1].strip()
+        
+        # Tìm kiếm context
+        search_results = student_data_service.search_by_mssv(
+            query=request.message, mssv=mssv, top_k=config.TOP_K_RESULTS
+        )
+        
+        relevant_results = [(chunk, score) for chunk, score in search_results if score > 0.1]
+        contexts = [chunk["content"] for chunk, _ in relevant_results]
+        
+        # Fallback: lấy tất cả thông tin sinh viên
+        if not contexts and student_info:
+            all_data = student_data_service.search_by_mssv(
+                query=f"thông tin sinh viên {mssv}", mssv=mssv, top_k=10
+            )
+            contexts = [chunk["content"] for chunk, _ in all_data]
+        
+        if not contexts:
+            return ChatResponse(
+                response=f"Không tìm thấy thông tin sinh viên {mssv}",
+                context_used=[], rewritten_query=None
+            )
+        
+        llm_client = LLMClient()
+        messages = llm_client.build_rag_prompt(
+            query=request.message, context=contexts,
+            conversation_history=history, student_info=student_info
+        )
+        response = await llm_client.chat_completion(messages)
+        
+        return ChatResponse(response=response, context_used=contexts, rewritten_query=None)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/student/{mssv}/info")
+async def get_student_info_by_mssv(mssv: str):
+    """Lấy thông tin sinh viên theo mssv."""
+    try:
+        results = student_data_service.search_by_mssv(
+            query=f"thông tin sinh viên {mssv}", mssv=mssv, top_k=10
+        )
+        if not results:
+            raise HTTPException(status_code=404, detail=f"Không tìm thấy sinh viên {mssv}")
+        return {
+            "mssv": mssv,
+            "data": [{"content": r[0]["content"], "type": r[0].get("metadata", {}).get("type", ""), "score": r[1]} for r in results]
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/debug/chroma-stats")
+async def get_chroma_stats():
+    """Debug: Xem thống kê ChromaDB."""
+    try:
+        count = student_data_service.vector_store.count()
+        sample = student_data_service.vector_store.collection.get(limit=5, include=["metadatas", "documents"])
+        all_meta = student_data_service.vector_store.collection.get(include=["metadatas"])
+        unique_mssv = set(m.get("mssv") for m in all_meta["metadatas"] if m and "mssv" in m)
+        return {
+            "total_documents": count,
+            "unique_students": list(unique_mssv),
+            "sample_documents": [
+                {"id": sample["ids"][i], "metadata": sample["metadatas"][i], "content_preview": sample["documents"][i][:200]}
+                for i in range(len(sample["ids"]))
+            ] if sample["ids"] else []
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

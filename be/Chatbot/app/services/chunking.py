@@ -2,20 +2,12 @@ import json
 from typing import List, Dict, Any
 
 class SemanticChunker:
-    """
-    Chunker theo ngu nghia - chia du lieu JSON thanh cac chunk co y nghia.
-    Khong chia cat giua cac truong du lieu quan trong.
-    """
     
     def __init__(self, chunk_size: int = 500, overlap: int = 50):
         self.chunk_size = chunk_size
         self.overlap = overlap
     
     def chunk_json_data(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """
-        Chia du lieu JSON thanh cac chunk co ngu nghia.
-        Moi chunk bao gom metadata va noi dung.
-        """
         chunks = []
         
         # Chunk thong tin sinh vien
