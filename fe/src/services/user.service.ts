@@ -56,6 +56,21 @@ const createUser = async (body: IUserCreate) => {
   }
 };
 
+const createUser2 = async (body: IUserCreate) => {
+  try {
+    const res = await axios.post('user/create-user-2', body, {
+      baseURL: process.env.NEXT_PUBLIC_AUTH_API_URL
+    });
+    if (res.data.status !== 1) {
+      return Promise.reject(new Error(res.data.message || 'Tạo user thất bại'));
+    }
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không tạo được user');
+    return Promise.reject(err);
+  }
+};
+
 const updateUser = async (body: { Id: number; Email?: string; NewPassword?: string }) => {
   try {
     const res = await axios.put('user/update-user', body, {
@@ -133,5 +148,6 @@ export const UserService = {
   getNhanSuByMaNhanSu,
   updateRolesToUser,
   getRolesOfUser,
-  changeStatusUser
+  changeStatusUser,
+  createUser2
 };
