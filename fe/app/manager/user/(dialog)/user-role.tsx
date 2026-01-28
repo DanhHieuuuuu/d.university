@@ -112,6 +112,7 @@ const UserRoleModal: React.FC<UserRoleModalProps> = ({ isModalOpen, setIsModalOp
             placeholder="Chọn nhóm quyền"
             treeData={treeData}
             style={{ width: '100%' }}
+            treeNodeFilterProp='title'
           />
         </Form.Item>
       </Form>

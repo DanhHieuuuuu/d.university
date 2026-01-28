@@ -14,5 +14,6 @@ namespace D.Auth.Infrastructure.Services.Abstracts
         Task<GetUserRolesByUserIdResponseDto> GetUserRolesByUserId(int nhanSuId);
         Task<bool> UpdateUserRoles(UpdateUserRoleDto dto);
         Task<bool> ChangeStatusUser(int nhanSuId);
+        Task<CreateUserResponseDto2> CreateUser2(CreateUserRequestDto2 request);
     }
 }

@@ -77,7 +77,11 @@ export default function JobTab() {
         <Input />
       </Form.Item>
 
-      <Form.Item<ICreateHopDong> name="soHopDong" label="Số hợp đồng">
+      <Form.Item<ICreateHopDong>
+        name="soHopDong"
+        label="Số hợp đồng"
+        rules={[{ required: true, message: 'Không được để trống' }]}
+      >
         <Input />
       </Form.Item>
 
@@ -93,11 +97,11 @@ export default function JobTab() {
         <DatePicker showTime needConfirm format="HH:mm - DD/MM/YYYY" className="!w-full" />
       </Form.Item>
 
-      <Form.Item<ICreateHopDong> name="idPhongBan" label="Phòng ban">
+      <Form.Item<ICreateHopDong> name="idPhongBan" label="Phòng ban" required>
         <Select allowClear options={phongBanOptions} />
       </Form.Item>
 
-      <Form.Item<ICreateHopDong> name="idChucVu" label="Chức vụ">
+      <Form.Item<ICreateHopDong> name="idChucVu" label="Chức vụ" required>
         <Select allowClear options={chucVuOptions} />
       </Form.Item>
 

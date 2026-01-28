@@ -21,6 +21,12 @@ namespace D.Auth.Infrastructure.Repositories
             return ns;
         }
 
+        public NsNhanSu? FindByMaNhanSu2(string MaNhanSu)
+        {
+            var ns = TableNoTracking.FirstOrDefault(x => x.MaNhanSu == MaNhanSu);
+            return ns;
+        }
+
         public NsNhanSu FindByMaNhanSuFollowChange(string MaNhanSu)
         {
             var ns = Table.FirstOrDefault(x => x.MaNhanSu == MaNhanSu);
@@ -33,6 +39,7 @@ namespace D.Auth.Infrastructure.Repositories
     public interface INsNhanSuRepository : IRepositoryBase<NsNhanSu>
     {
         NsNhanSu FindByMaNhanSu(string MaNhanSu);
+        NsNhanSu? FindByMaNhanSu2(string MaNhanSu);
         NsNhanSu FindByMaNhanSuFollowChange(string MaNhanSu);
     }
 }
