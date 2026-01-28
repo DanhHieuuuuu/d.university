@@ -73,7 +73,10 @@ export default function PersonalTab() {
       <Form.Item<ICreateHopDong>
         name={['thongTinNhanSu', 'soCccd']}
         label="Số CMND / CCCD"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          { len: 12, message: 'Số CCCD phải đủ 12 số' }
+        ]}
       >
         <Input />
       </Form.Item>
@@ -91,14 +94,26 @@ export default function PersonalTab() {
       <Form.Item<ICreateHopDong>
         name={['thongTinNhanSu', 'email']}
         label="Email cá nhân"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          {
+            pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+            message: 'Email chưa đúng định dạng'
+          }
+        ]}
       >
         <Input />
       </Form.Item>
       <Form.Item<ICreateHopDong>
         name={['thongTinNhanSu', 'soDienThoai']}
         label="Số điện thoại"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          {
+            pattern: /(?:\+84|0084|0)[235789][0-9]{1,2}[0-9]{7}(?:[^\d]+|$)/g,
+            message: 'Số điện thoại không đúng định dạng'
+          }
+        ]}
       >
         <Input />
       </Form.Item>

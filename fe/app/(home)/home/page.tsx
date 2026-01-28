@@ -20,12 +20,14 @@ import { SurveyService } from '@/src/services/survey.service';
 import { DelegationStatusConst } from '@/constants/core/delegation/delegation-status.consts';
 import { requestStatusConst } from '@/constants/core/survey/requestStatus.const';
 import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
+import { NhanSuService } from '@services/hrm/nhansu.service';
 
 const HomePage: React.FC = () => {
   const { user } = useAppSelector((state) => state.authState);
 
   const [statisticalData, setStatisticalData] = useState<IStatistical | null>(null);
   const [surveyStats, setSurveyStats] = useState<ISurveyStatistics | null>(null);
+  const [statisticalNhansu, setStatisticalNhansu] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -50,8 +52,18 @@ const HomePage: React.FC = () => {
       }
     };
 
+    const fetchStatisticalNhansu = async() => {
+      try {
+        const res = await NhanSuService.thongKeNsTheoPhongBan();
+        setStatisticalNhansu(res.data)
+      } catch {
+        toast.error("Không tải được thống kê nhân sự");
+      }
+    }
+
     fetchStatistical();
     fetchSurveyStats();
+    fetchStatisticalNhansu();
   }, []);
 
   // Mock data - Thay thế bằng API call thực tế
@@ -209,6 +221,38 @@ const HomePage: React.FC = () => {
     },
     tooltip: {
       title: 'status'
+    }
+  };
+
+  const nhansuChartData = (statisticalNhansu || []).map((item: any) => ({
+    status: item?.tenPhongBan,
+    total: item.soLuongNhanSu
+  }));
+  
+
+  const nhansuColumnConfig: any = {
+    data: nhansuChartData,
+    xField: 'status',
+    yField: 'total',
+    label: {
+      text: 'total',
+      position: 'top',
+      style: {
+        fill: '#fff',
+        opacity: 1,
+      }
+    },
+    axis: {
+      x: {
+        title: 'Phòng ban',
+        labelAutoRotate: false
+      },
+      y: {
+        title: 'Số lượng'
+      }
+    },
+    style: {
+      fill: '#00A8A8'
     }
   };
 
@@ -386,6 +430,16 @@ const HomePage: React.FC = () => {
             <Pie {...surveyPieConfig} />
           </Card>
         </Col>
+      </Row>
+
+      {/* Nhansu Charts Row */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col span={24}>
+            <Card title="Thống kê nhân sự " variant="borderless">
+              <Column {...nhansuColumnConfig} />
+            </Card>
+          </Col>
+        
       </Row>
 
       {/* Recent Activities */}
