@@ -1,7 +1,6 @@
 import os
 from typing import List, Dict, Any, Tuple, Optional
 import chromadb
-from chromadb.config import Settings
 
 from app.services.embedding import EmbeddingService
 
