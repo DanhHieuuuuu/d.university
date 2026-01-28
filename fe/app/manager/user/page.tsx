@@ -36,12 +36,6 @@ const Page = () => {
 
   const columns: IColumn<IUserView>[] = [
     {
-      key: 'Id',
-      dataIndex: 'id',
-      title: 'ID',
-      showOnConfig: false
-    },
-    {
       key: 'maNhanSu',
       dataIndex: 'maNhanSu',
       title: 'Mã nhân sự'
@@ -207,7 +201,7 @@ const Page = () => {
 
       <AppTable
         loading={status === ReduxStatus.LOADING}
-        rowKey="maNhanSu"
+        rowKey="id"
         columns={columns}
         dataSource={list}
         listActions={actions}

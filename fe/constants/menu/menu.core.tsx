@@ -24,7 +24,6 @@ import {
   UnorderedListOutlined,
   SafetyCertificateOutlined,
   SolutionOutlined,
-  CalculatorOutlined,
   LineChartOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
@@ -39,13 +38,14 @@ export const listMenuCore: IMenu[] = [
   {
     label: 'Quản lý nhân sự',
     routerLink: '/hrm',
-    // permissionKeys: [PermissionCoreConst.CoreMenuNhanSu],
+    permissionKeys: [PermissionCoreConst.CoreMenuHrm],
     icon: <TeamOutlined />,
     items: [
       {
         label: 'Danh sách nhân sự',
         routerLink: '/hrm/employees',
-        icon: <UserOutlined />
+        icon: <UserOutlined />,
+        permissionKeys: [PermissionCoreConst.CoreMenuHrmDanhSach]
       },
       {
         label: 'Thống kê',
@@ -55,12 +55,14 @@ export const listMenuCore: IMenu[] = [
       {
         label: 'Danh sách hợp đồng',
         routerLink: '/hrm/contracts',
-        icon: <SolutionOutlined />
+        icon: <SolutionOutlined />,
+        permissionKeys: [PermissionCoreConst.CoreMenuHrmContract]
       },
       {
         label: 'Danh sách quyết định',
         routerLink: '/hrm/decisions',
-        icon: <ProfileOutlined />
+        icon: <ProfileOutlined />,
+        permissionKeys: [PermissionCoreConst.CoreMenuHrmDecision]
       }
     ]
   },
@@ -242,13 +244,13 @@ export const listMenuCore: IMenu[] = [
         label: 'Danh sách yêu cầu',
         routerLink: '/survey/request',
         permissionKeys: [PermissionCoreConst.SurveyMenuRequest],
-        icon: <InboxOutlined />,      
+        icon: <InboxOutlined />
       },
       {
         label: 'Quản lý yêu cầu',
         routerLink: '/survey/request-manage',
         permissionKeys: [PermissionCoreConst.SurveyMenuRequestApproval],
-        icon: <InboxOutlined />,      
+        icon: <InboxOutlined />
       },
       {
         label: 'Danh sách khảo sát',
