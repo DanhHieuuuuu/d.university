@@ -472,38 +472,38 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             var result = query.FirstOrDefault();
             return result;
         }
-        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int id)
-        {
-            _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with id: {id}");
+        //public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int id)
+        //{
+        //    _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with id: {id}");
 
-            var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
-                .FirstOrDefault(d => d.Id == id);
+        //    var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
+        //        .FirstOrDefault(d => d.Id == id);
 
-            if (detail == null)
-            {
-                return null; 
-            }
+        //    if (detail == null)
+        //    {
+        //        return null; 
+        //    }
 
-            var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
-                .FirstOrDefault(d => d.Id == detail.DelegationIncomingId);
+        //    var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
+        //        .FirstOrDefault(d => d.Id == detail.DelegationIncomingId);
            
-            var result = new DetailDelegationIncomingResponseDto
-            {
-                Id = detail.Id,
-                Code = detail.Code,
-                FirstName = detail.FirstName,
-                LastName = detail.LastName,
-                YearOfBirth = detail.YearOfBirth,
-                PhoneNumber = detail.PhoneNumber,
-                Email = detail.Email,
-                IsLeader = detail.IsLeader,
-                DelegationIncomingId = detail.DelegationIncomingId,
-                DelegationName = delegation != null ? delegation.Name : null, 
-                DelegationCode = delegation != null ? delegation.Code : null
-            };
+        //    var result = new DetailDelegationIncomingResponseDto
+        //    {
+        //        Id = detail.Id,
+        //        Code = detail.Code,
+        //        FirstName = detail.FirstName,
+        //        LastName = detail.LastName,
+        //        YearOfBirth = detail.YearOfBirth,
+        //        PhoneNumber = detail.PhoneNumber,
+        //        Email = detail.Email,
+        //        IsLeader = detail.IsLeader,
+        //        DelegationIncomingId = detail.DelegationIncomingId,
+        //        DelegationName = delegation != null ? delegation.Name : null, 
+        //        DelegationCode = delegation != null ? delegation.Code : null
+        //    };
 
-            return result;
-        }
+        //    return result;
+        //}
         public async Task<ReceptionTimeResponseDto> GetByIdReceptionTime(int id)
         {
             _logger.LogInformation($"{nameof(GetByIdReceptionTime)} called with id: {id}");

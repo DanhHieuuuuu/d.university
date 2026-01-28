@@ -27,25 +27,38 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int delegationIncomingId)
+       public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int delegationIncomingId)
         {
             _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with DelegationIncomingId: {delegationIncomingId}");
-          
-            var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
-                .FirstOrDefault(d => d.DelegationIncomingId == delegationIncomingId);
-
-            if (detail == null)
-                return null;
-
+        
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
                 .FirstOrDefault(d => d.Id == delegationIncomingId);
+        
+            if (delegation == null)
+                return null;
+        
+            // Danh sách người tiếp đoàn
+            var members = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
+                .Where(d => d.DelegationIncomingId == delegationIncomingId)
+                .Select(d => new MemberDto
+                {
+                    Id = d.Id,
+                    Code = d.Code,
+                    FirstName = d.FirstName,
+                    LastName = d.LastName,
+                    YearOfBirth = d.YearOfBirth,
+                    PhoneNumber = d.PhoneNumber,
+                    Email = d.Email,
+                    IsLeader = d.IsLeader
+                }).ToList();
+        
+            // Phòng ban, người hỗ trợ
             var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
             var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
-
+        
             var departmentSupports =
                 (from ds in _unitOfWork.iDepartmentSupportRepository.TableNoTracking
-                 join pb in phongBanTable
-                     on ds.DepartmentSupportId equals pb.Id
+                 join pb in phongBanTable on ds.DepartmentSupportId equals pb.Id
                  where !ds.Deleted
                        && ds.DelegationIncomingId == delegationIncomingId
                  select new DepartmentSupportDto
@@ -54,8 +67,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                      DepartmentSupportName = pb.TenPhongBan,
                      Supporters =
                         (from sp in _unitOfWork.iSupporterRepository.TableNoTracking
-                         join ns in staffTable
-                             on sp.SupporterId equals ns.Id
+                         join ns in staffTable on sp.SupporterId equals ns.Id
                          where !sp.Deleted
                                && sp.DepartmentSupportId == ds.DepartmentSupportId
                          select new SupporterDto
@@ -64,27 +76,19 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                              SupporterCode = sp.SupporterCode,
                              SupporterName = ns.HoDem + " " + ns.Ten
                          }).ToList()
-
                  }).ToList();
-
-            var result = new DetailDelegationIncomingResponseDto
+        
+            return new DetailDelegationIncomingResponseDto
             {
-                Id = detail.Id,
-                Code = detail.Code,
-                FirstName = detail.FirstName,
-                LastName = detail.LastName,
-                YearOfBirth = detail.YearOfBirth,
-                PhoneNumber = detail.PhoneNumber,
-                Email = detail.Email,
-                IsLeader = detail.IsLeader,
-                DelegationIncomingId = detail.DelegationIncomingId,
-                DelegationName = delegation?.Name,
-                DelegationCode = delegation?.Code,
+                DelegationIncomingId = delegation.Id,
+                DelegationCode = delegation.Code,
+                DelegationName = delegation.Name,
+                Members = members,
                 DepartmentSupports = departmentSupports
             };
-
-            return result;
         }
+
+
 
     }
 }

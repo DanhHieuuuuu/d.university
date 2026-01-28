@@ -2,37 +2,61 @@
 
 import React, { useMemo } from 'react';
 import DetailTable, { DetailRow } from '@components/hieu-custom/detail-table';
-import { IDetailDelegationIncoming } from '@models/delegation/delegation.model';
 import { Divider, Typography } from 'antd';
+import { IDetailDelegationIncoming } from '@models/delegation/delegation.model';
 
 type DetailGuestGroupTabProps = {
   data: IDetailDelegationIncoming | null;
-  isEdit?: boolean;
+   isEdit?: boolean; 
+
 };
 
 const DetailGuestGroupTab: React.FC<DetailGuestGroupTabProps> = ({ data }) => {
-  const rows: DetailRow[] = useMemo(() => {
-    if (!data) return [];
-
-    return [
-      { label: 'Mã thành viên', value: data.code },
-      { label: 'Họ', value: data.firstName },
-      { label: 'Tên', value: data.lastName },
-      { label: 'Năm sinh', value: data.yearOfBirth },
-      { label: 'SĐT', value: data.phoneNumber },
-      { label: 'Email', value: data.email },
-      { label: 'Trưởng đoàn', value: data.isLeader ? 'Có' : 'Không' }
-    ];
-  }, [data]);
+  if (!data) return null;
 
   return (
     <>
-      <DetailTable rows={rows} />
-      {data?.departmentSupports?.map((dept) => (
+      {/* ===== THÔNG TIN ĐOÀN ===== */}
+      <DetailTable
+        rows={[
+          { label: 'Mã đoàn', value: data.delegationCode },
+          { label: 'Tên đoàn', value: data.delegationName },
+          { label: 'Tổng số thành viên', value: data.members?.length ?? 0 }
+
+        ]}
+      />
+
+      <Divider />
+
+      {/* ===== DANH SÁCH THÀNH VIÊN ===== */}
+      <Typography.Title level={5}>Danh sách thành viên</Typography.Title>
+
+      {data.members.map((member) => {
+        const rows: DetailRow[] = [
+          { label: 'Mã thành viên', value: member.code },
+          { label: 'Họ', value: member.firstName },
+          { label: 'Tên', value: member.lastName },
+          { label: 'Năm sinh', value: member.yearOfBirth },
+          { label: 'SĐT', value: member.phoneNumber },
+          { label: 'Email', value: member.email },
+          { label: 'Trưởng đoàn', value: member.isLeader ? 'Có' : 'Không' }
+        ];
+
+        return (
+          <div key={member.id} style={{ marginBottom: 24 }}>
+            <DetailTable rows={rows} />
+            <Divider />
+          </div>
+        );
+      })}
+
+      {/* ===== PHÒNG BAN HỖ TRỢ ===== */}
+      <Typography.Title level={5}>Phòng ban hỗ trợ</Typography.Title>
+
+      {data.departmentSupports?.map((dept) => (
         <div key={dept.departmentSupportId} style={{ marginTop: 16 }}>
-          <Divider />
           <Typography.Text strong>
-            Phòng ban hỗ trợ: {dept.departmentSupportName}
+            {dept.departmentSupportName}
           </Typography.Text>
 
           {dept.supporters?.length ? (
