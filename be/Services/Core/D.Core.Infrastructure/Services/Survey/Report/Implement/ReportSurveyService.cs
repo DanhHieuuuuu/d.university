@@ -41,6 +41,8 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
         public async Task<bool> GenerateReportAsync(int surveyId)
         {
+            _logger.LogInformation($"{nameof(GenerateReportAsync)} method called, surveyId: {surveyId}.");
+
             var submissions = await _unitOfWork.iKsSurveySubmissionRepository.TableNoTracking
                 .Where(s => s.IdKhaoSat == surveyId && s.TrangThai == SubmissionStatus.Submitted)
                 .ToListAsync();
@@ -156,6 +158,8 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
         public async Task<PageResultDto<SurveyReportResponseDto>> GetReportsPagingAsync(FilterReportSurveyDto dto)
         {
+            _logger.LogInformation($"{nameof(GetReportsPagingAsync)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+
             var query = _unitOfWork.iKsSurveyReportRepository.TableNoTracking
                 .Include(r => r.Survey)
                 .AsQueryable();
@@ -191,6 +195,8 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
         public async Task<SurveyReportDetailDto> GetReportDetailAsync(int reportId)
         {
+            _logger.LogInformation($"{nameof(GetReportDetailAsync)} called with reportId: {reportId}");
+
             var report = await _unitOfWork.iKsSurveyReportRepository.TableNoTracking
                 .Include(r => r.Survey)
                 .FirstOrDefaultAsync(r => r.Id == reportId);
@@ -242,6 +248,8 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
         public async Task<SurveyAIDataDto> GetAIAnalysisDataAsync(int reportId)
         {
+            _logger.LogInformation($"{nameof(GetAIAnalysisDataAsync)} called with reportId: {reportId}");
+
             var report = await _unitOfWork.iKsSurveyReportRepository.TableNoTracking
                 .Include(r => r.Survey)
                     .ThenInclude(s => s.SurveyRequest)
@@ -295,6 +303,8 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
         public async Task<bool> SaveAIResponseAsync(int reportId, List<AIReportDto> responses)
         {
+            _logger.LogInformation($"{nameof(SaveAIResponseAsync)} method called, reportId: {reportId}, responses count: {responses?.Count ?? 0}.");
+
             var report = await _unitOfWork.iKsSurveyReportRepository.TableNoTracking
                 .FirstOrDefaultAsync(r => r.Id == reportId);
 
@@ -328,6 +338,8 @@ namespace D.Core.Infrastructure.Services.Survey.Report.Implement
 
         public async Task<List<AIReportDetailDto>> GetAIResponsesByReportIdAsync(int reportId)
         {
+            _logger.LogInformation($"{nameof(GetAIResponsesByReportIdAsync)} called with reportId: {reportId}");
+
             var aiResponses = await _unitOfWork.iKsAIResponseRepository.TableNoTracking
                 .Include(r => r.Criteria)
                 .Where(r => r.IdBaoCao == reportId)
