@@ -33,4 +33,30 @@ namespace D.Core.Domain.Dtos.SinhVien.ChatbotHistory
         public List<string>? Context_used { get; set; }
         public string? Rewritten_query { get; set; }
     }
+
+    public class StudentDataItem
+    {
+        public string? Mssv { get; set; }
+        public object? Data { get; set; }
+    }
+
+    public class SyncStudentsRequestDto
+    {
+        public List<StudentDataItem>? Students { get; set; }
+    }
+
+    public class SyncStudentsResponseDto
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public int TotalStudents { get; set; }
+        public int TotalChunks { get; set; }
+    }
+
+    public class PythonChatWithMssvRequest
+    {
+        public string? Message { get; set; }
+        public string? Mssv { get; set; }
+        public List<ConversationHistoryItem>? ConversationHistory { get; set; }
+    }
 }

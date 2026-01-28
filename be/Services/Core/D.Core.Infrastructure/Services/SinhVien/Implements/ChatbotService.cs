@@ -1,7 +1,9 @@
 using D.Core.Domain.Dtos.SinhVien.ChatbotHistory;
+using D.Core.Domain.Dtos.SinhVien.ThongTinChiTiet;
 using D.Core.Infrastructure.Repositories.SinhVien;
 using D.Core.Infrastructure.Services.SinhVien.Abstracts;
 using D.InfrastructureBase.Service;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -13,18 +15,24 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
     {
         private readonly ILogger<ChatbotService> _logger;
         private readonly ISvChatbotHistoryRepository _chatbotHistoryRepository;
+        private readonly ISvSinhVienRepository _sinhVienRepository;
+        private readonly ISvSinhVienService _sinhVienService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
 
         public ChatbotService(
             ILogger<ChatbotService> logger,
             ISvChatbotHistoryRepository chatbotHistoryRepository,
+            ISvSinhVienRepository sinhVienRepository,
+            ISvSinhVienService sinhVienService,
             IHttpClientFactory httpClientFactory,
             IConfiguration configuration
         )
         {
             _logger = logger;
             _chatbotHistoryRepository = chatbotHistoryRepository;
+            _sinhVienRepository = sinhVienRepository;
+            _sinhVienService = sinhVienService;
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
         }
@@ -59,22 +67,42 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
             var client = _httpClientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(120);
 
-            var pythonRequest = new PythonChatRequest
-            {
-                Message = request.Message,
-                ConversationHistory = conversationHistory
-            };
-
             var jsonOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
             };
-            var jsonContent = JsonSerializer.Serialize(pythonRequest, jsonOptions);
+
+            string apiEndpoint;
+            string jsonContent;
+
+            // Nếu có mssv, sử dụng API chat-with-mssv để filter theo sinh viên
+            if (!string.IsNullOrEmpty(request.Mssv))
+            {
+                var pythonRequest = new PythonChatWithMssvRequest
+                {
+                    Message = request.Message,
+                    Mssv = request.Mssv,
+                    ConversationHistory = conversationHistory
+                };
+                jsonContent = JsonSerializer.Serialize(pythonRequest, jsonOptions);
+                apiEndpoint = $"{pythonApiUrl}/api/chat-with-mssv";
+            }
+            else
+            {
+                var pythonRequest = new PythonChatRequest
+                {
+                    Message = request.Message,
+                    ConversationHistory = conversationHistory
+                };
+                jsonContent = JsonSerializer.Serialize(pythonRequest, jsonOptions);
+                apiEndpoint = $"{pythonApiUrl}/api/chat";
+            }
+
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            _logger.LogInformation($"Calling Python API: {pythonApiUrl}/api/chat");
+            _logger.LogInformation($"Calling Python API: {apiEndpoint}");
 
-            var response = await client.PostAsync($"{pythonApiUrl}/api/chat", httpContent);
+            var response = await client.PostAsync(apiEndpoint, httpContent);
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -113,6 +141,90 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
                 RewrittenQuery = pythonResponse?.Rewritten_query,
                 SessionId = sessionId
             };
+        }
+
+        public async Task<SyncStudentsResponseDto> SyncAllStudentsAsync()
+        {
+            _logger.LogInformation("SyncAllStudentsAsync called");
+
+            try
+            {
+                // Lấy tất cả sinh viên
+                var allStudents = await _sinhVienRepository.TableNoTracking.ToListAsync();
+                _logger.LogInformation($"Found {allStudents.Count} students to sync");
+
+                var studentsData = new List<StudentDataItem>();
+
+                foreach (var sv in allStudents)
+                {
+                    if (string.IsNullOrEmpty(sv.Mssv)) continue;
+
+                    try
+                    {
+                        // Lấy thông tin chi tiết của từng sinh viên
+                        var thongTinChiTiet = await _sinhVienService.GetThongTinChiTiet(
+                            new SvThongTinChiTietRequestDto { Mssv = sv.Mssv }
+                        );
+
+                        studentsData.Add(new StudentDataItem
+                        {
+                            Mssv = sv.Mssv,
+                            Data = thongTinChiTiet
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning($"Failed to get detail for student {sv.Mssv}: {ex.Message}");
+                    }
+                }
+
+                if (studentsData.Count == 0)
+                {
+                    return new SyncStudentsResponseDto
+                    {
+                        Success = false,
+                        Message = "Không có sinh viên nào để đồng bộ",
+                        TotalStudents = 0,
+                        TotalChunks = 0
+                    };
+                }
+
+                // Gọi Python API để sync
+                var pythonApiUrl = _configuration["ChatbotApi:BaseUrl"] ?? "http://localhost:8000";
+                var client = _httpClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromMinutes(10);
+
+                var syncRequest = new SyncStudentsRequestDto { Students = studentsData };
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                };
+                var jsonContent = JsonSerializer.Serialize(syncRequest, jsonOptions);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                _logger.LogInformation($"Calling Python API: {pythonApiUrl}/api/sync-students with {studentsData.Count} students");
+
+                var response = await client.PostAsync($"{pythonApiUrl}/api/sync-students", httpContent);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var syncResponse = JsonSerializer.Deserialize<SyncStudentsResponseDto>(responseContent, jsonOptions);
+
+                _logger.LogInformation($"Sync completed: {syncResponse?.Message}");
+
+                return syncResponse ?? new SyncStudentsResponseDto
+                {
+                    Success = true,
+                    Message = "Đồng bộ thành công",
+                    TotalStudents = studentsData.Count,
+                    TotalChunks = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"SyncAllStudentsAsync failed: {ex.Message}");
+                throw;
+            }
         }
     }
 }

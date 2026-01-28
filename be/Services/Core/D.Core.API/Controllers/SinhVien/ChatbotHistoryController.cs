@@ -44,6 +44,27 @@ namespace D.Core.API.Controllers.SinhVien
         }
 
         /// <summary>
+        /// Đồng bộ tất cả thông tin sinh viên vào ChromaDB
+        /// </summary>
+        [HttpGet("sync-students")]
+        public async Task<ResponseAPI> SyncStudents()
+        {
+            try
+            {
+                var result = await _chatbotService.SyncAllStudentsAsync();
+                return new ResponseAPI(result);
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequest(new Exception($"Không thể kết nối đến Chatbot API: {ex.Message}"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Lấy lịch sử chat theo SessionId
         /// </summary>
         [HttpGet("by-session")]
