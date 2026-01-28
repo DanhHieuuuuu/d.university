@@ -7,14 +7,14 @@ class QueryRewriter:
     Giup cau hoi theo sau (follow-up) co the tim kiem context tot hon.
     """
     
-    def __init__(self, groq_client):
+    def __init__(self, llm_client):
         """
         Khoi tao Query Rewriter.
         
         Args:
-            groq_client: Groq client de goi LLM
+            llm_client: LLM client de goi API
         """
-        self.groq_client = groq_client
+        self.llm_client = llm_client
     
     async def rewrite_query(
         self,
@@ -137,7 +137,7 @@ Câu hỏi đã viết lại:"""
         ]
         
         try:
-            rewritten = await self.groq_client.chat_completion(
+            rewritten = await self.llm_client.chat_completion(
                 messages, 
                 temperature=0.1,  # Low temperature for consistent output
                 max_tokens=256

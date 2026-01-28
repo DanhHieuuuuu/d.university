@@ -713,6 +713,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                         int stt = 1;
                         string path = Path.Combine(
                             Directory.GetCurrentDirectory(),
+                            "wwwroot",
                             "Template",
                             "bao_cao_doan_vao.docx"
                         );
