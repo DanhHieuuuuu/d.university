@@ -199,6 +199,16 @@ const Page = () => {
       hidden: (r) => r.status !== DelegationStatusConst.CAN_BO_SUNG,
       command: (record: IViewGuestGroup) => onClickXacNhan(record),
       permission: PermissionCoreConst.CoreButtonXacNhanChinhSuaXuLyDoanVao
+    },
+    {
+      label: 'Thêm thời gian',
+      icon: <PlusOutlined />,
+      hidden: (r) =>
+        r.status == DelegationStatusConst.TAO_MOI ||
+        r.status === DelegationStatusConst.DONE ||
+        r.status == DelegationStatusConst.DA_HET_HAN,
+      command: (record: IViewGuestGroup) => onClickCreateTime(record),
+      permission: PermissionCoreConst.CoreButtonCreateTimeXuLyDoanVao
     }
   ];
 
@@ -251,7 +261,9 @@ const Page = () => {
     ]);
     setConfirmOpen(true);
   };
-
+  const onClickCreateTime = (data: IViewGuestGroup) => {
+    router.push(`/delegation/incoming/list-delegation/create-reception-time?delegationIncomingId=${data.id}`);
+  };
   const onClickPheDuyet = (data: IViewGuestGroup) => {
     setSelectedData(data);
     setConfirmTitle('Xác nhận phê duyệt');

@@ -174,17 +174,6 @@ const Page = () => {
       command: (record: IViewGuestGroup) => onClickUpdateStatus(record),
       permission: PermissionCoreConst.CoreButtonDeXuatDoanVao
     },
-
-    {
-      label: 'Thêm thời gian',
-      icon: <PlusOutlined />,
-      hidden: (r) =>
-        r.status == DelegationStatusConst.TAO_MOI ||
-        r.status === DelegationStatusConst.DONE ||
-        r.status == DelegationStatusConst.DA_HET_HAN,
-      command: (record: IViewGuestGroup) => onClickCreateTime(record),
-      permission: PermissionCoreConst.CoreButtonCreateTimeDoanVao
-    },
     {
       label: 'Xuất báo cáo',
       icon: <FileWordOutlined />,
@@ -257,9 +246,6 @@ const Page = () => {
 
   const onClickView = (data: IViewGuestGroup) => {
     router.push(`/delegation/incoming/detail/${data.id}`);
-  };
-  const onClickCreateTime = (data: IViewGuestGroup) => {
-    router.push(`/delegation/incoming/list-delegation/create-reception-time?delegationIncomingId=${data.id}`);
   };
   const onClickUpdate = (data: IViewGuestGroup) => {
     dispatch(select(data));
