@@ -13,6 +13,7 @@ import { DelegationIncomingTab, DetailGuestGroupTab, ReceptionTimeTab } from './
 import { IDetailDelegationIncoming, IReceptionTime, IViewGuestGroup } from '@models/delegation/delegation.model'; 
 import type { FormInstance } from 'antd'; 
 import { toast } from 'react-toastify'; 
+import { DelegationStatusConst } from '@/constants/core/delegation/delegation-status.consts';
 export default function DetailDoanVaoPage() { 
 
   const { id } = useParams(); 
@@ -154,20 +155,26 @@ export default function DetailDoanVaoPage() {
           <span> Chi tiết đoàn vào </span> 
         </div> 
       } 
-      extra={       
-        !isEdit ? ( 
-          <Button type="primary" icon={<EditOutlined />} onClick={onClickUpdate}> 
-            Chỉnh sửa 
-          </Button> 
-        ) : ( 
-          <div style={{ display: 'flex', gap: 8 }}> 
-            <Button onClick={onClickCancel}>Huỷ</Button> 
-            <Button type="primary" onClick={onClickSave}> 
-              Lưu 
-            </Button> 
-          </div> 
-        ) 
-      } 
+      extra={
+        (delegation?.status === DelegationStatusConst.TAO_MOI || delegation?.status === DelegationStatusConst.DE_XUAT || delegation?.status === DelegationStatusConst.CAN_BO_SUNG) && (
+          !isEdit ? (
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={onClickUpdate}
+            >
+              Chỉnh sửa
+            </Button>
+          ) : (
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button onClick={onClickCancel}>Huỷ</Button>
+              <Button type="primary" onClick={onClickSave}>
+                Lưu
+              </Button>
+            </div>
+          )
+        )
+      }
       bodyStyle={{ maxHeight: '90%', overflow: 'auto' }} 
     > 
       <Tabs type="card" items={tabItems} activeKey={activeKey} onChange={handleTabChange} /> 

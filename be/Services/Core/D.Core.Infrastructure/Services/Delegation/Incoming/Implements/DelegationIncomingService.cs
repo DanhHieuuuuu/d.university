@@ -605,8 +605,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             var log = new LogStatus
             {
                 DelegationIncomingCode = delegation.Code,
-                NewStatus = dto.OldStatus,
-                OldStatus = delegation.Status,
+                NewStatus = delegation.Status,
+                OldStatus = dto.OldStatus,
                 Description = $"Đã thay đổi trạng thái từ {DelegationStatus.Names[dto.OldStatus]} => {DelegationStatus.Names[delegation.Status]} ",
                 CreatedDate = DateTime.Now,
                 CreatedByName = userName,
