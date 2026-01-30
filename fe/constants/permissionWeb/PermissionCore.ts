@@ -37,6 +37,7 @@ export class PermissionCoreConst {
   public static readonly CoreButtonViewDoanVao = `${PermissionCoreConst.Button}dio_danhsach_view`;
   public static readonly CoreButtonDeXuatDoanVao = `${PermissionCoreConst.Button}dio_danhsach_dexuat`;
   public static readonly CoreButtonSearchDoanVao = `${PermissionCoreConst.Button}dio_danhsach_search`;
+  public static readonly CoreButtonXuatBaoCaoDoanVao = `${PermissionCoreConst.Button}dio_danhsach_export`;
   public static readonly CoreTableListDoanVao = `${PermissionCoreConst.Table}dio_danhsach_table_list`;
 
   public static readonly CoreMenuXuLyDoanVao = `${PermissionCoreConst.Menu}dio_xuly`;
@@ -51,7 +52,8 @@ export class PermissionCoreConst {
   public static readonly CoreButtonTableXuLyDoanVao = `${PermissionCoreConst.Table}dio_xuly_table`;
   public static readonly CoreButtonPhanCongXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_phancong`;
   public static readonly CoreButtonXacNhanChinhSuaXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_xacnhan_chinhsua`;
-   public static readonly CoreButtonCreateTimeXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_create_time`;
+  public static readonly CoreButtonCreateTimeXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_create_time`;
+  public static readonly CoreButtonXuatBaoCaoXuLyDoanVao = `${PermissionCoreConst.Button}dio_xuly_export`;
 
   public static readonly CoreMenuDepartment = `${PermissionCoreConst.Menu}dio_department`;
   public static readonly CoreButtonCreateDepartment = `${PermissionCoreConst.Button}dio_department_create`;

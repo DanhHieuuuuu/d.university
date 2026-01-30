@@ -39,6 +39,7 @@ import CreateDepartmentSupportModal from './(dialog)/create';
 import router from 'next/router';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getListDepartmentSupport } from '@redux/feature/delegation/department/departmentThunk';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -49,6 +50,12 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
+  const hasPermisisonViewDepartment= useIsGranted(PermissionCoreConst.CoreButtonViewDepartment);
+  const hasPermissionCreateSupporterDepartment = useIsGranted(PermissionCoreConst.CoreButtonCreateSupporterDepartment);
+  const hasPermissisonCreateDepartment = useIsGranted(PermissionCoreConst.CoreButtonCreateDepartment);
+  const hasPermissisonSearchDepartment = useIsGranted(PermissionCoreConst.CoreButtonSearchDepartment)
+  const hasPermissionCreateDoanVao = useIsGranted(PermissionCoreConst.CoreButtonCreateDoanVao);
+  const hasPermissionSearchDoanVao = useIsGranted(PermissionCoreConst.CoreButtonSearchDoanVao);
 
   const columns: IColumn<IDepartmentSupport>[] = [
     {
@@ -80,14 +87,14 @@ const Page = () => {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       command: (record: IDepartmentSupport) => onClickView(record),
-      permission: PermissionCoreConst.CoreButtonViewDepartment,
+      hidden : () => !hasPermisisonViewDepartment
       
     },
     {
       label: 'Thêm nhân viên',
       icon: <UserAddOutlined />,
       command: (record: IDepartmentSupport) => onClickCreateStaff(record),
-      permission: PermissionCoreConst.CoreButtonCreateSupporterDepartment,
+      hidden: ()=> !hasPermissionCreateSupporterDepartment
     }
   ];
   const onClickCreateStaff = (data: IDepartmentSupport) => {
@@ -137,7 +144,7 @@ const Page = () => {
       title=" Phòng ban hỗ trợ"
       className="h-full"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissisonCreateDepartment}>
           Thêm mới
         </Button>
       }
@@ -146,11 +153,12 @@ const Page = () => {
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="name" className="!mb-0 w-[300px]">
             <Input 
-              data-permission={PermissionCoreConst.CoreButtonSearchDepartment} 
+              hidden = {!hasPermissisonSearchDepartment}
               placeholder="Nhập tên đoàn vào…" 
               onChange={(e) => handleSearch(e)} />
           </Form.Item>
           <Button
+            hidden = {!hasPermissisonSearchDepartment}
             color="default"
             variant="filled"
             icon={<SyncOutlined />}

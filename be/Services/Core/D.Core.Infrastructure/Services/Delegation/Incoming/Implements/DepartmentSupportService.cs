@@ -94,12 +94,16 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             _logger.LogInformation($"{nameof(PagingDepartmentSupport)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
             var department = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Include(x => x.Supporters).Include(x => x.DelegationIncoming);
+            var keyword = dto.Keyword?.Trim().ToLower();
 
             var query =
                 from ds in department
                 join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
                     on ds.DepartmentSupportId equals pb.Id
                 where !ds.Deleted
+                && (string.IsNullOrEmpty(keyword)
+                    || (ds.DelegationIncoming != null
+                        && ds.DelegationIncoming.Name.ToLower().Contains(keyword)))
                 select new PageDepartmentSupportResultDto
                 {
                     Id = ds.Id,

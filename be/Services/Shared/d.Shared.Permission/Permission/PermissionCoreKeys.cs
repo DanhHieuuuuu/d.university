@@ -61,6 +61,7 @@
         public const string CoreButtonViewDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_view";
         public const string CoreButtonDeXuatDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_dexuat";
         public const string CoreButtonSearchDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_search";
+        public const string CoreButtonXuatBaoCaoDoanVao = $"{PermissionPrefixKeys.Button}dio_danhsach_export";
         public const string CoreTableListDoanVao = $"{PermissionPrefixKeys.Table}dio_danhsach_table_list";
 
 
@@ -77,6 +78,7 @@
         public const string CoreButtonPhanCongXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_phancong";
         public const string CoreButtonXacNhanChinhSuaXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_xacnhan_chinhsua";
         public const string CoreButtonCreateTimeXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_create_time";
+        public const string CoreButtonXuatBaoCaoXuLyDoanVao = $"{PermissionPrefixKeys.Button}dio_xuly_export";
 
 
         public const string CoreMenuDepartment = $"{PermissionPrefixKeys.Menu}dio_department";
