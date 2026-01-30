@@ -131,11 +131,12 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
             type="primary"
             onClick={form.submit}
             icon={isUpdate ? <SaveOutlined /> : <PlusOutlined />}
+            loading={$create.status === ReduxStatus.LOADING}
           >
             {isUpdate ? 'Lưu' : 'Tạo mới'}
           </Button>
         ),
-        <Button key="close" onClick={onCloseModal} icon={<CloseOutlined />}>
+        <Button key="close" onClick={onCloseModal} icon={<CloseOutlined />} disabled={$create.status === ReduxStatus.LOADING}>
           Đóng
         </Button>
       ]}

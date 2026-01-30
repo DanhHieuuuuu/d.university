@@ -176,8 +176,8 @@ const Page = () => {
       icon: <EditOutlined />,
       hidden: (r) =>
         !hasPermissisonUpdateDoanVao ||
-        r.status == DelegationStatusConst.DONE ||
-        r.status == DelegationStatusConst.DA_HET_HAN,
+        ![DelegationStatusConst.TAO_MOI, DelegationStatusConst.CAN_BO_SUNG].includes(r.status),
+
       command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
     {
