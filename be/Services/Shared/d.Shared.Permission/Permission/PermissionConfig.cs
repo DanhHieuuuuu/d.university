@@ -56,9 +56,9 @@ namespace d.Shared.Permission.Permission
             { PermissionCoreKeys.CoreButtonUpdateDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonUpdateDoanVao, PermissionName = "Cập nhật đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
             { PermissionCoreKeys.CoreButtonDeleteDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonDeleteDoanVao, PermissionName = "Xoá đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
             { PermissionCoreKeys.CoreButtonViewDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonViewDoanVao, PermissionName = "Chi tiết đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
-            { PermissionCoreKeys.CoreButtonCreateTimeDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonCreateTimeDoanVao, PermissionName = "Thêm thời gian tiếp đoàn", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
             { PermissionCoreKeys.CoreButtonDeXuatDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonDeXuatDoanVao, PermissionName = "Đề xuất đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
             { PermissionCoreKeys.CoreButtonSearchDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonSearchDoanVao, PermissionName = "Tìm kiếm đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
+            { PermissionCoreKeys.CoreButtonXuatBaoCaoDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonXuatBaoCaoDoanVao, PermissionName = "Xuất báo cáo", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
             { PermissionCoreKeys.CoreTableListDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreTableListDoanVao, PermissionName = "Bảng danh sách đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },
 
             { PermissionCoreKeys.CoreMenuXuLyDoanVao,new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuXuLyDoanVao, PermissionName = "Xử lý đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuDelegation } },
@@ -72,6 +72,9 @@ namespace d.Shared.Permission.Permission
             { PermissionCoreKeys.CoreButtonTableXuLyDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonTableXuLyDoanVao, PermissionName = "Bảng xử lý đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuXuLyDoanVao } },
             { PermissionCoreKeys.CoreButtonPhanCongXuLyDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonPhanCongXuLyDoanVao, PermissionName = "Phân công hỗ trọ", ParentKey = PermissionCoreKeys.CoreMenuXuLyDoanVao } },
             { PermissionCoreKeys.CoreButtonXacNhanChinhSuaXuLyDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonXacNhanChinhSuaXuLyDoanVao, PermissionName = "Xác nhận chỉnh sửa", ParentKey = PermissionCoreKeys.CoreMenuXuLyDoanVao } },
+            { PermissionCoreKeys.CoreButtonCreateTimeXuLyDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonCreateTimeXuLyDoanVao, PermissionName = "Thêm thời gian tiếp đoàn", ParentKey = PermissionCoreKeys.CoreMenuXuLyDoanVao } },
+            { PermissionCoreKeys.CoreButtonXuatBaoCaoXuLyDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonXuatBaoCaoXuLyDoanVao, PermissionName = "Xuất báo cáo", ParentKey = PermissionCoreKeys.CoreMenuXuLyDoanVao } },
+            { PermissionCoreKeys.CoreButtonPheDuyetXuLyDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonPheDuyetXuLyDoanVao, PermissionName = "Phê duyệt", ParentKey = PermissionCoreKeys.CoreMenuXuLyDoanVao } },
 
             { PermissionCoreKeys.CoreMenuDepartment,new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuDepartment, PermissionName = "Phòng ban hỗ trợ", ParentKey = PermissionCoreKeys.CoreMenuDelegation } },
             { PermissionCoreKeys.CoreButtonCreateDepartment, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonCreateDepartment, PermissionName = "Thêm phòng ban hỗ trợ", ParentKey = PermissionCoreKeys.CoreMenuDepartment } },
@@ -175,8 +178,6 @@ namespace d.Shared.Permission.Permission
             { PermissionCoreKeys.SurveyButtonAIReportGenerate, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonAIReportGenerate, PermissionName = "Đánh giá bằng AI", ParentKey = PermissionCoreKeys.SurveyMenuReport } },
 
             { PermissionCoreKeys.SurveyMenuLogging, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyMenuLogging, PermissionName = "Lịch sử hoạt động", ParentKey = PermissionCoreKeys.CoreMenuKhaoSat } },
-            { PermissionCoreKeys.SurveyMenuReport, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyMenuReport, PermissionName = "Báo cáo khảo sát", ParentKey = PermissionCoreKeys.CoreMenuKhaoSat } },
-            { PermissionCoreKeys.SurveyButtonReportGenerate, new CreatePermissionRequestDto { PermissonKey = PermissionCoreKeys.SurveyButtonReportGenerate, PermissionName = "Tạo báo cáo", ParentKey = PermissionCoreKeys.SurveyMenuReport } },
             
             #endregion
         };

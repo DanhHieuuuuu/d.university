@@ -131,11 +131,12 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
             type="primary"
             onClick={form.submit}
             icon={isUpdate ? <SaveOutlined /> : <PlusOutlined />}
+            loading={$create.status === ReduxStatus.LOADING}
           >
             {isUpdate ? 'Lưu' : 'Tạo mới'}
           </Button>
         ),
-        <Button key="close" onClick={onCloseModal} icon={<CloseOutlined />}>
+        <Button key="close" onClick={onCloseModal} icon={<CloseOutlined />} disabled={$create.status === ReduxStatus.LOADING}>
           Đóng
         </Button>
       ]}
@@ -192,7 +193,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Tổng chi phí" name="totalMoney">
+            <Form.Item label="Tổng chi phí (VNĐ)" name="totalMoney">
               <InputNumber style={{ width: '100%' }} formatter={(value) => (value ? `${value}` : '')} />
             </Form.Item>
           </Col>

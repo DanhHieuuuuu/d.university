@@ -241,7 +241,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateTimeDoanVao)]
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateTimeXuLyDoanVao)]
         [HttpPost("create-reception-time")]
         public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeListRequestDto dto)
         {

@@ -16,11 +16,18 @@ export interface IViewGuestGroup {
   receptionDate: string;
   totalMoney: number;
 
-  delegationDetails?: IDetailDelegationIncoming[] | null;
+  // delegationDetails?: IDetailDelegationIncoming[] | null;
   receptionTimes?: IReceptionTime[] | null;
   departmentSupports?: IDepartmentSupport[] | null;
 }
 export interface IDetailDelegationIncoming {
+ delegationIncomingId: number;
+  delegationCode: string;
+  delegationName: string;
+  members: IDelegationMember[];
+  departmentSupports: IDepartmentSupport[];
+}
+export interface IDelegationMember {
   id: number;
   code: string;
   firstName: string;
@@ -29,8 +36,8 @@ export interface IDetailDelegationIncoming {
   phoneNumber: string;
   email: string;
   isLeader: boolean;
-  delegationIncomingId: number;
 }
+
 export interface IReceptionTime {
   id: number;
   startDate: string;
@@ -65,6 +72,7 @@ export interface ISupporter {
   supporterId: number;
   supporterCode: string;
   departmentSupportId: number;
+  supporterName: string;
   departmentSupport: any | null;
 }
 
