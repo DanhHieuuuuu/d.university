@@ -43,6 +43,25 @@ namespace D.Auth.API.Controllers
         }
 
         /// <summary>
+        /// Thêm người dùng vãng lai
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("create-user-2")]
+        public async Task<ResponseAPI> CreateUser2([FromBody] CreateUserRequestDto2 dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
         /// Thay đổi người dùng
         /// </summary>
         /// <param name="dto"></param>

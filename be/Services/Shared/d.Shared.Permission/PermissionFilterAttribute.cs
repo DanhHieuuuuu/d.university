@@ -28,7 +28,7 @@ namespace d.Shared.Permission
 
             // Gọi sang service Auth để check quyền
             //var response = await httpClient.GetAsync("http://localhost:5268/api/role/my-permissions");
-            var response = await httpClient.GetAsync("https://d-university-9zz7.onrender.com/api/role/my-permissions");
+            var response = await httpClient.GetAsync("https://d-university.onrender.com/api/role/my-permissions");
 
             if ((int)response.StatusCode == 401)
             {

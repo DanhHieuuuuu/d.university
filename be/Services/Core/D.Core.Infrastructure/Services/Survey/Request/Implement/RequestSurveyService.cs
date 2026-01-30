@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -39,6 +40,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public PageResultDto<RequestSurveyResponseDto> Paging(FilterSurveyRequestDto dto)
         {
+            _logger.LogInformation($"{nameof(Paging)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+
             var query = from r in _unitOfWork.iKsSurveyRequestRepository.TableNoTracking
                         join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
                             on r.IdPhongBan equals pb.Id into pbJoin
@@ -74,6 +77,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task<RequestSurveyDetailDto> GetByIdRequest(int id)
         {
+            _logger.LogInformation($"{nameof(GetByIdRequest)} called with id: {id}");
+
             var entity = await _unitOfWork.iKsSurveyRequestRepository.GetDetailWithNavigationsAsync(id);
             if (entity == null) throw new Exception("Không tìm thấy yêu cầu khảo sát.");
 
@@ -82,6 +87,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task<CreateRequestSurveyResponseDto> CreateRequestSurvey(CreateRequestSurveyRequestDto dto)
         {
+            _logger.LogInformation($"{nameof(CreateRequestSurvey)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             // Validate
@@ -106,6 +113,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task<UpdateRequestSurveyResponseDto> UpdateRequestSurvey(UpdateRequestSurveyRequestDto dto)
         {
+            _logger.LogInformation($"{nameof(UpdateRequestSurvey)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
             var entity = await _unitOfWork.iKsSurveyRequestRepository.GetDetailWithNavigationsForUpdateAsync(dto.Id);
@@ -184,6 +193,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task<bool> DeleteRequestSurvey(DeleteRequestSurveyDto dto)
         {
+            _logger.LogInformation($"{nameof(DeleteRequestSurvey)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+
             var entity =  _unitOfWork.iKsSurveyRequestRepository.FindById(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
 
@@ -212,6 +223,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task SubmitRequestAsync(int id)
         {
+            _logger.LogInformation($"{nameof(SubmitRequestAsync)} method called, id: {id}");
+
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
 
@@ -243,6 +256,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task CancelSubmitAsync(int id)
         {
+            _logger.LogInformation($"{nameof(CancelSubmitAsync)} method called, id: {id}");
+
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
 
@@ -309,6 +324,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task ApproveRequestAsync(int id)
         {
+            _logger.LogInformation($"{nameof(ApproveRequestAsync)} method called, id: {id}");
+
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
 
@@ -335,6 +352,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public async Task RejectRequestAsync(RejectRequestDto dto)
         {
+            _logger.LogInformation($"{nameof(RejectRequestAsync)} method called, dto: {JsonSerializer.Serialize(dto)}.");
+
             var entity = _unitOfWork.iKsSurveyRequestRepository.FindById(dto.Id);
             if (entity == null) throw new Exception("Không tìm thấy bản ghi.");
 
@@ -364,6 +383,8 @@ namespace D.Core.Infrastructure.Services.Survey.Request.Implement
 
         public List<RequestSurveyQuestionDto> ReadExcel(Stream fileStream)
         {
+            _logger.LogInformation($"{nameof(ReadExcel)} method called.");
+
             var questions = new List<RequestSurveyQuestionDto>();
 
             try
