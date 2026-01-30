@@ -2,6 +2,7 @@
 using System.Text.Json;
 using D.QdrantClient.Configs;
 using D.QdrantClient.Dtos;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace D.QdrantClient.Services
@@ -9,22 +10,27 @@ namespace D.QdrantClient.Services
     public class QdrantClientService : IQdrantClientService
     {
         private readonly HttpClient _http;
+        private readonly ILogger<QdrantClientService> _logger;
         private readonly QdrantConfig _opt;
         private readonly JsonSerializerOptions _jsonOpt = new()
         {
             PropertyNameCaseInsensitive = true,
         };
 
-        public QdrantClientService(HttpClient http, IOptions<QdrantConfig> opt)
+        public QdrantClientService(HttpClient http, IOptions<QdrantConfig> opt, ILogger<QdrantClientService> logger)
         {
             _http = http;
             _opt = opt.Value;
             _http.BaseAddress = new Uri(_opt.Url.TrimEnd('/'));
             _http.DefaultRequestHeaders.Add("api-key", _opt.ApiKey);
+            _logger = logger;
         }
 
         public async Task EnsureCollectionAsync(CancellationToken ct = default)
         {
+
+            _logger.LogError($"QdrantConfig: {JsonSerializer.Serialize(_opt)}");
+
             var check = await _http.GetAsync($"/collections/{_opt.Collection}", ct);
             if (check.IsSuccessStatusCode)
                 return;
