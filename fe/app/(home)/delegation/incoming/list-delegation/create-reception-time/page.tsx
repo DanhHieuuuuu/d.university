@@ -96,7 +96,7 @@ const CreateReceptionTimePage: React.FC = () => {
           <Button onClick={() => router.back()}>Hủy</Button>
         </div>
       }
-      bodyStyle={{ maxHeight: '90%', overflow: 'auto' }}
+      styles={{ body: { maxHeight: '90%', overflow: 'auto' }}}
     >
       <Form
         form={form}

@@ -168,7 +168,7 @@ export default function DetailDoanVaoPage() {
           </div> 
         ) 
       } 
-      bodyStyle={{ maxHeight: '90%', overflow: 'auto' }} 
+      styles={{ body: { maxHeight: '90%', overflow: 'auto' }} }
     > 
       <Tabs type="card" items={tabItems} activeKey={activeKey} onChange={handleTabChange} /> 
     </Card> 

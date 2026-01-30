@@ -141,12 +141,14 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
       ]}
       style={{
         top: 0,
-        height: '95vh'
+        height: '95vh',
       }}
-      bodyStyle={{
-        maxHeight: 'calc(95vh - 55px - 52px)',
-        overflowY: 'auto',
-        paddingRight: '16px'
+      styles={{
+        body: {
+          maxHeight: 'calc(95vh - 55px - 52px)',
+          overflowY: 'auto',
+          paddingRight: '16px'
+        }
       }}
     >
       <Form form={form} layout="vertical" onFinish={onFinish} disabled={isView}>
