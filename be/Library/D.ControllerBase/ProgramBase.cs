@@ -46,6 +46,7 @@ namespace D.ControllerBase
                             .WithOrigins(
                                 "http://localhost:3077",
                                 "https://d-university-3333.vercel.app",
+                                "https://d-university-5.vercel.app",
                                 "https://d-university-core-jk86.onrender.com",
                                 "https://d-university-core.onrender.com",
                                 "https://d-university-9zz7.onrender.com",

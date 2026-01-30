@@ -100,7 +100,7 @@ namespace D.Core.Infrastructure.Services.Survey.AI.Implement
             _logger.LogInformation($"Dify AI response: {responseContent}");
 
             var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var difyResponse = JsonSerializer.Deserialize<DifyWorkflowResponse>(responseContent, jsonOptions);
+            var difyResponse = JsonSerializer.Deserialize<DifyWorkflowResponseDto>(responseContent, jsonOptions);
 
             var rawJson = difyResponse?.Data?.Outputs?.text?.ToString()
                           ?? difyResponse?.Data?.Outputs?.Result?.ToString();
@@ -130,27 +130,6 @@ namespace D.Core.Infrastructure.Services.Survey.AI.Implement
 
             _logger.LogWarning($"Response: {responseContent}");
             return new List<AIReportDto>();
-        }
-
-        private class DifyWorkflowResponse
-        {
-            public string WorkflowRunId { get; set; }
-            public string TaskId { get; set; }
-            public DifyData Data { get; set; }
-        }
-
-        private class DifyData
-        {
-            public string Id { get; set; }
-            public string WorkflowId { get; set; }
-            public string Status { get; set; }
-            public DifyOutputs Outputs { get; set; }
-        }
-
-        private class DifyOutputs
-        {
-            public object text { get; set; }
-            public object Result { get; set; }
-        }
+        }    
     }
 }

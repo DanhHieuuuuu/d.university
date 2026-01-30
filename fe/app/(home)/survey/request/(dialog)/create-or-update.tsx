@@ -12,6 +12,8 @@ import { getListPhongBan } from '@redux/feature/delegation/delegationThunk';
 import { IViewPhongBan } from '@models/danh-muc/phong-ban.model';
 import { getAllKhoa } from '@redux/feature/dao-tao/khoaThunk';
 import { IViewKhoa } from '@models/dao-tao/khoa.model';
+import { getAllKhoaHoc } from '@redux/feature/danh-muc/danhmucThunk';
+import { IViewKhoaHoc } from '@models/danh-muc/khoa-hoc.model';
 import dayjs from 'dayjs';
 
 
@@ -45,6 +47,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
   const [activeTab, setActiveTab] = useState<string>('1');
   const [departments, setDepartments] = React.useState<IViewPhongBan[]>([]);
   const [faculties, setFaculties] = useState<IViewKhoa[]>([]);
+  const [courses, setCourses] = useState<IViewKhoaHoc[]>([]);
 
   const isEdit = !!request;
 
@@ -93,6 +96,17 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
         })
         .catch((err: any) => {
           console.error('Lỗi khi lấy danh sách khoa:', err);
+        });
+
+      dispatch(getAllKhoaHoc())
+        .unwrap()
+        .then((res: any) => {
+          let courseList = [];
+          courseList = res.items || res;
+          setCourses(courseList);
+        })
+        .catch((err: any) => {
+          console.error('Lỗi khi lấy danh sách khóa học:', err);
         });
     }
   }, [isModalOpen, dispatch]);
@@ -296,32 +310,32 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
 
       <Card title="Đối tượng tham gia" size="small" style={{ marginBottom: 16 }}>
         <Row gutter={16}>
-          <Col span={8}>
+          <Col span={6}>
             <Form.Item
               label="Loại đối tượng"
               name={['targets', 0, 'loaiDoiTuong']}
               rules={[{ required: true, message: 'Chọn loại đối tượng' }]}
             >
-              <Select placeholder="Chọn loại đối tượng" disabled={isViewMode}>
+              <Select placeholder="Chọn loại" disabled={isViewMode}>
                 <Option value={surveyTargetConst.ALL}>{surveyTargetConst.getName(surveyTargetConst.ALL)}</Option>
                 <Option value={surveyTargetConst.STUDENT}>{surveyTargetConst.getName(surveyTargetConst.STUDENT)}</Option>
                 <Option value={surveyTargetConst.LECTURER}>{surveyTargetConst.getName(surveyTargetConst.LECTURER)}</Option>
               </Select>
             </Form.Item>
           </Col>
-          <Col span={8}>
-            <Form.Item
-              noStyle
-              shouldUpdate={(prevValues, currentValues) =>
-                prevValues.targets?.[0]?.loaiDoiTuong !== currentValues.targets?.[0]?.loaiDoiTuong
-              }
-            >
-              {({ getFieldValue }) => {
-                const targetType = getFieldValue(['targets', 0, 'loaiDoiTuong']);
-                return (
-                  <Row gutter={16}>
-                    {(targetType === surveyTargetConst.ALL || targetType === surveyTargetConst.STUDENT) && (
-                      <Col span={12}>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.targets?.[0]?.loaiDoiTuong !== currentValues.targets?.[0]?.loaiDoiTuong
+            }
+          >
+            {({ getFieldValue }) => {
+              const targetType = getFieldValue(['targets', 0, 'loaiDoiTuong']);
+              return (
+                <>
+                  {(targetType === surveyTargetConst.ALL || targetType === surveyTargetConst.STUDENT) && (
+                    <>
+                      <Col span={5}>
                         <Form.Item label="Khoa" name={['targets', 0, 'idKhoa']}>
                           <Select placeholder="Chọn khoa" allowClear disabled={isViewMode}>
                             {faculties.map((faculty: any) => (
@@ -332,26 +346,37 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
                           </Select>
                         </Form.Item>
                       </Col>
-                    )}
-                    {(targetType === surveyTargetConst.ALL || targetType === surveyTargetConst.LECTURER) && (
-                      <Col span={12}>
-                        <Form.Item label="Phòng ban" name={['targets', 0, 'idPhongBan']}>
-                          <Select placeholder="Chọn phòng ban" allowClear disabled={isViewMode}>
-                            {departments.map((dept: any) => (
-                              <Option key={dept.idPhongBan} value={dept.idPhongBan}>
-                                {dept.tenPhongBan}
+                      <Col span={4}>
+                        <Form.Item label="Khóa học" name={['targets', 0, 'idKhoaHoc']}>
+                          <Select placeholder="Chọn khóa học" allowClear disabled={isViewMode}>
+                            {courses.map((course: any) => (
+                              <Option key={course.id} value={course.id}>
+                                {course.tenKhoaHoc}
                               </Option>
                             ))}
                           </Select>
                         </Form.Item>
                       </Col>
-                    )}
-                  </Row>
-                );
-              }}
-            </Form.Item>
-          </Col>
-          <Col span={8}>
+                    </>
+                  )}
+                  {(targetType === surveyTargetConst.ALL || targetType === surveyTargetConst.LECTURER) && (
+                    <Col span={5}>
+                      <Form.Item label="Phòng ban" name={['targets', 0, 'idPhongBan']}>
+                        <Select placeholder="Chọn phòng ban" allowClear disabled={isViewMode}>
+                          {departments.map((dept: any) => (
+                            <Option key={dept.idPhongBan} value={dept.idPhongBan}>
+                              {dept.tenPhongBan}
+                            </Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  )}
+                </>
+              );
+            }}
+          </Form.Item>
+          <Col span={4}>
             <Form.Item label="Mô tả" name={['targets', 0, 'moTa']}>
               <Input placeholder="Mô tả đối tượng" disabled={isViewMode} />
             </Form.Item>
