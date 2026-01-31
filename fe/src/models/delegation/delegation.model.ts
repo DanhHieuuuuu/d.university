@@ -216,3 +216,19 @@ export interface IDateOption {
   label: string;
   value: string;
 }
+
+export interface IUpdateDetailDelegationItem {
+  id?: number;
+  delegationIncomingId: number;
+  code: string;
+  firstName?: string;
+  lastName?: string;
+  yearOfBirth: number;
+  phoneNumber?: string;
+  email?: string;
+  isLeader: boolean;
+}
+
+export interface IUpdateDetailDelegationRequest {
+  items: IUpdateDetailDelegationItem[];
+}

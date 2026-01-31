@@ -15,6 +15,7 @@ import {
   IReceptionTime,
   IStatistical,
   IUpdateDepartmentSupport,
+  IUpdateDetailDelegationRequest,
   IUpdateDoanVao,
   IUpdatePrepare,
   IUpdateReceptionTime,
@@ -191,6 +192,15 @@ const getLogReceptionTime = async (query: any) => {
 const updateReceptionTimes = async (body: IUpdateReceptionTimes) => {
   try {
     const res = await axios.put(`${apiDelegationEndpoint}/update-reception-time`, body);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
+const updateDetailDelegation = async (body: IUpdateDetailDelegationRequest) => {
+  try {
+    const res = await axios.put(`${apiDelegationEndpoint}/update-detail-delegation`, body);
     return Promise.resolve(res.data);
   } catch (err) {
     processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
@@ -380,5 +390,6 @@ export const DelegationIncomingService = {
   updatePrepare,
   baoCaoDoanVao,
   getStatistical,
-  getListCreatedDate
+  getListCreatedDate,
+  updateDetailDelegation
 };

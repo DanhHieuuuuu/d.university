@@ -93,7 +93,7 @@ const CreateReceptionTimePage: React.FC = () => {
           <Button type="primary" onClick={() => form.submit()} loading={loading}>
             Tạo mới
           </Button>
-          <Button onClick={() => router.back()}>Hủy</Button>
+          <Button onClick={() => router.back()} disabled={loading} >Hủy</Button>
         </div>
       }
       bodyStyle={{ maxHeight: '90%', overflow: 'auto' }}

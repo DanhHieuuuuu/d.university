@@ -11,6 +11,7 @@ import {
   IQueryLogReceptionTime,
   IQueryLogStatus,
   IUpdateDepartmentSupport,
+  IUpdateDetailDelegationRequest,
   IUpdateDoanVao,
   IUpdatePrepare,
   IUpdateReceptionTime,
@@ -265,6 +266,16 @@ export const updatePrepare = createAsyncThunk(
   'delegation-incoming/updatePrepare',
   async (payload: IUpdatePrepare, { rejectWithValue }) => {
     const data = await DelegationIncomingService.updatePrepare(payload);
+    if (data?.code !== 200) {
+      return rejectWithValue(data.message);
+    }
+    return data;
+  }
+);
+export const updateDetailDelegation = createAsyncThunk(
+  'delegation-incoming/updateDetailDelegation',
+  async (payload: IUpdateDetailDelegationRequest, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.updateDetailDelegation(payload);
     if (data?.code !== 200) {
       return rejectWithValue(data.message);
     }

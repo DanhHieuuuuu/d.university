@@ -154,6 +154,25 @@ namespace D.Core.API.Controllers.Delegation
                 return BadRequest(ex);
             }
         }
+        /// <summary>
+        /// Cập nhật thông tin chi tiết đoàn vào
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonUpdateDoanVao)]
+        [HttpPut("update-detail-delegation")]
+        public async Task<ResponseAPI> UpdateDetailDelegation([FromBody] UpdateDetailDelegationsRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
         /// <summary>
         /// Xóa mềm Đoàn vào
