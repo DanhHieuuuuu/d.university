@@ -173,7 +173,7 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ dat
  
                             <Col span={6}> 
                               <Form.Item 
-                                label="Chi phí" 
+                                label="Chi phí (VNĐ)" 
                                 name={[pName, 'money']} 
                                 rules={[{ required: true, message: 'Nhập chi phí' }]} 
                               > 

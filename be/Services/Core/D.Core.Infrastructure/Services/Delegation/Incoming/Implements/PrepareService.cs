@@ -54,26 +54,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             }
             var prepare = _mapper.Map<List<Prepare>>(dto.Items);
             _unitOfWork.iPrepareRepository.AddRange(prepare);
-            #region Log
-            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-            var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                .FirstOrDefault(u => u.Id == userId);
-
-            var userName = user != null ? $"{user.HoDem} {user.Ten}" : "Unknown";
-
-            var logs = prepare.Select(rt => new LogReceptionTime
-            {
-                ReceptionTimeId = rt.Id,
-                Type = LogType.Create,
-                Description = "Thêm đồ dùng cho đoàn",
-                Reason = DelegationStatus.Names[DelegationStatus.Create],
-                CreatedDate = DateTime.Now,
-                CreatedBy = userId.ToString(),
-                CreatedByName = userName
-            }).ToList();
-
-            _unitOfWork.iLogReceptionTimeRepository.AddRange(logs);
-            #endregion
 
             await _unitOfWork.SaveChangesAsync();
 

@@ -218,7 +218,7 @@ const CreateReceptionTimePage: React.FC = () => {
                               <Col span={6}>
                                 <Form.Item
                                   name={[pName, 'money']}
-                                  label="Chi phí"
+                                  label="Chi phí (VNĐ)"
                                   rules={[{ required: true, message: 'Nhập chi phí' }]}
                                 >
                                   <InputNumber min={0} style={{ width: '100%' }} />

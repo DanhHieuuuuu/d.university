@@ -64,7 +64,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(FindLogReceptionTime)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
-            var query = _unitOfWork.iLogReceptionTimeRepository.TableNoTracking.AsQueryable();
+            var query = _unitOfWork.iLogReceptionTimeRepository.TableNoTracking.OrderByDescending(x => x.CreatedDate).AsQueryable();
             //Lọc theo người tạo
             if (!string.IsNullOrWhiteSpace(dto.CreatedByName))
             {

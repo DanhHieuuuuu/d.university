@@ -146,7 +146,7 @@ const Page = () => {
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
-      title: 'Tổng chi phí',
+      title: 'Tổng chi phí (VNĐ)',
       align: 'left',
       width: 120
     },
@@ -159,15 +159,12 @@ const Page = () => {
       getTagInfo: (status: number) => DelegationStatusConst.getTag(status)
     }
   ];
-
   const actions: IAction[] = [
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       hidden: (r) =>
-        !hasPermisisonViewDoanVao ||
-        r.status == DelegationStatusConst.DONE ||
-        r.status == DelegationStatusConst.DA_HET_HAN,
+        !hasPermisisonViewDoanVao,
       command: (record: IViewGuestGroup) => onClickView(record)
     },
     {
@@ -176,7 +173,7 @@ const Page = () => {
       icon: <EditOutlined />,
       hidden: (r) =>
         !hasPermissisonUpdateDoanVao ||
-        ![DelegationStatusConst.TAO_MOI, DelegationStatusConst.CAN_BO_SUNG].includes(r.status),
+        ![DelegationStatusConst.TAO_MOI, DelegationStatusConst.CAN_BO_SUNG, DelegationStatusConst.DE_XUAT].includes(r.status),
 
       command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
@@ -197,7 +194,7 @@ const Page = () => {
       color: 'red',
       icon: <DeleteOutlined />,
       command: (record: IViewGuestGroup) => onClickDelete(record),
-      hidden: () => !hasPermissionDeleteDoanVao
+      hidden: (r) => !hasPermissionDeleteDoanVao || r.status !== DelegationStatusConst.TAO_MOI,
     }
   ];
 
@@ -226,7 +223,7 @@ const Page = () => {
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
       dispatch(getListNhanSu());
-      dispatch(getListStatus());
+      dispatch(getListStatus(0));
       setVoiceData(null);
     }
   }, [isModalOpen]);
@@ -323,7 +320,7 @@ const Page = () => {
             </Form.Item>
 
             <Form.Item name="name" className="!mb-0 w-[300px]">
-              <Input placeholder="Nhập tên đoàn vào…" onChange={handleSearch} />
+              <Input placeholder="Nhập tên hoặc mã đoàn vào" onChange={handleSearch} />
             </Form.Item>
 
             <Button

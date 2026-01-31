@@ -80,6 +80,7 @@ export type IQueryGuestGroup = IQueryPaging & {
   name?: string;
   idPhongBan?: number;
   status?: number;
+  differentStatus?: string;
 };
 export type IQuerySupporter = IQueryPaging & {
   supporterCode?: string;

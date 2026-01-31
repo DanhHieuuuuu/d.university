@@ -34,7 +34,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         { 
             _logger.LogInformation($"{nameof(CreateReceptionTimeList)} called, dto: {JsonSerializer.Serialize(dto)}"); 
  
-            var receptionTimes = _mapper.Map<List<ReceptionTime>>(dto.Items); 
+            var receptionTimes = _mapper.Map<List<ReceptionTime>>(dto.Items);
+            var deleagtion = _unitOfWork.iDelegationIncomingRepository.FindById(dto.Items[0].DelegationIncomingId);
             _unitOfWork.iReceptionTimeRepository.AddRange(receptionTimes); 
             #region Log 
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor); 
@@ -47,7 +48,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             { 
                 ReceptionTimeId = rt.Id, 
                 Type = LogType.Create, 
-                Description = "Thêm thời gian tiếp đoàn", 
+                Description = $"Thêm thời gian tiếp đoàn {deleagtion.Name} ({deleagtion.Code})", 
                 Reason = DelegationStatus.Names[DelegationStatus.Create], 
                 CreatedDate = DateTime.Now, 
                 CreatedBy = userId.ToString(), 

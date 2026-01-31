@@ -42,7 +42,7 @@ const Page = () => {
   // Column cho logStatus
   const logStatusColumns: IColumn<ILogStatus>[] = [
     { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center', width: 150 },
-    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 200 },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 350 },
     {
       key: 'oldStatus',
       dataIndex: 'oldStatus',
@@ -73,7 +73,7 @@ const Page = () => {
   const receptionColumns: IColumn<ILogReceptionTime>[] = [
     { key: 'createdByName', dataIndex: 'createdByName', title: 'Người thực hiện', align: 'center', width: 130 },
     { key: 'type', dataIndex: 'type', title: 'Loại', align: 'center' },
-    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 250 },
+    { key: 'description', dataIndex: 'description', title: 'Mô tả', align: 'left', width: 350 },
     { key: 'reason', dataIndex: 'reason', title: 'Lý do' },
     {
       key: 'createdDate',
