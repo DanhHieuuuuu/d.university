@@ -92,10 +92,14 @@ export type IQueryDepartmentSupport = IQueryPaging & {
 export type IQueryLogStatus = IQueryPaging & {
   CreateDate?: string;
   CreatedByName?: string;
+  StartDate?: string;
+  EndDate?: string;
 };
 export type IQueryLogReceptionTime = IQueryPaging & {
   CreateDate?: string;
   CreatedByName?: string;
+  StartDate?: string;
+  EndDate?: string;
 };
 export type ICreateDoanVao = {
   code: string;

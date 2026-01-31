@@ -302,7 +302,22 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             return result;
         }
+        public void DeleteDepartmentSupport(int id)
+        {
+            _logger.LogInformation($"{nameof(DeleteDepartmentSupport)} method called. Dto: {id}");
 
+            var exist = _unitOfWork.iDepartmentSupportRepository.FindById(id);
+
+            if (exist != null)
+            {
+                _unitOfWork.iDepartmentSupportRepository.Delete(exist);
+                _unitOfWork.iDepartmentSupportRepository.SaveChange();
+            }
+            else
+            {
+                throw new Exception($"Phòng ban hỗ trợ không tồn tại hoặc đã bị xóa");
+            }
+        }
 
 
 

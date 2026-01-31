@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, Form, Select, Tabs } from 'antd';
+import { Card, DatePicker, Form, Select, Tabs } from 'antd';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { getLogStatus, getLogReceptionTime, getListNhanSu } from '@redux/feature/delegation/delegationThunk';
 import {
@@ -21,6 +21,7 @@ import { formatDateTimeView } from '@utils/index';
 import { DelegationStatusConst } from '../../../../../constants/core/delegation/delegation-status.consts';
 import { ETableColumnType } from '@/constants/e-table.consts';
 import { DelegationIncomingService } from '@services/delegation/delegationIncoming.service';
+import dayjs from 'dayjs';
 
 const { TabPane } = Tabs;
 
@@ -114,6 +115,7 @@ const Page = () => {
   const { debounced: handleDebouncedReceptionSearch } = useDebouncedCallback((value: string) => {
     onReceptionFilter({ Keyword: value });
   }, 500);
+  const { RangePicker } = DatePicker;
 
   useEffect(() => {
     if (activeTab === 'status') {
@@ -149,17 +151,26 @@ const Page = () => {
         tabBarExtraContent={
           <div className="flex gap-2">
             {/* Chọn ngày tạo */}
-            <Form.Item className="!mb-0 w-[220px]">
-              <Select
-                showSearch
-                placeholder="Chọn ngày tạo"
+            <Form.Item className="!mb-0 w-[320px]">
+              <RangePicker
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
                 allowClear
-                options={createdDates}
-                onChange={(value) => {
+                format="DD/MM/YYYY"
+                placeholder={['Từ ngày', 'Đến ngày']}
+                onChange={(dates) => {
+                  const startDate = dates?.[0]?.startOf('day').toISOString();
+                  const endDate = dates?.[1]?.endOf('day').toISOString();
+
                   if (activeTab === 'status') {
-                    onStatusFilter({ CreateDate: value || undefined });
+                    onStatusFilter({
+                      StartDate: startDate,
+                      EndDate: endDate
+                    });
                   } else {
-                    onReceptionFilter({ CreateDate: value || undefined });
+                    onReceptionFilter({
+                      StartDate: startDate,
+                      EndDate: endDate
+                    });
                   }
                 }}
               />

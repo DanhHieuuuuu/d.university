@@ -112,6 +112,15 @@ const deleteDoanVao = async (id: number) => {
     return Promise.reject(err);
   }
 };
+const deleteDepartmentSupport = async (id: number) => {
+  try {
+    const res = await axios.delete(`${apiDelegationEndpoint}/delete-department-support/${id}`);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Có sự cố xảy ra. Vui lòng thử lại sau.');
+    return Promise.reject(err);
+  }
+};
 const getByIdGuestGroup = async (id: number) => {
   try {
     const res = await axios.get(`${apiDelegationEndpoint}/get-by-id?Id=${id}`);
@@ -391,5 +400,6 @@ export const DelegationIncomingService = {
   baoCaoDoanVao,
   getStatistical,
   getListCreatedDate,
-  updateDetailDelegation
+  updateDetailDelegation,
+  deleteDepartmentSupport
 };
