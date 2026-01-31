@@ -9,7 +9,7 @@ namespace D.QdrantClient.Configs
         public static void ConfigureQdrantClient(this WebApplicationBuilder builder)
         {
             builder.Services.Configure<QdrantConfig>(builder.Configuration.GetSection("Qdrant"));
-
+            
             builder.Services.AddHttpClient<IQdrantClientService, QdrantClientService>();
         }
     }
