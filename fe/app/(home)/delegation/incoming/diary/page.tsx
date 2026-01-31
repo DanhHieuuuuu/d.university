@@ -153,7 +153,6 @@ const Page = () => {
             {/* Chọn ngày tạo */}
             <Form.Item className="!mb-0 w-[320px]">
               <RangePicker
-                disabledDate={(current) => current && current > dayjs().endOf('day')}
                 allowClear
                 format="DD/MM/YYYY"
                 placeholder={['Từ ngày', 'Đến ngày']}
