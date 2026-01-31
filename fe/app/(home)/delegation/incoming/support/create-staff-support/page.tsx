@@ -43,6 +43,7 @@ const CreateSupporterPage: React.FC = () => {
       dispatch(getListNhanSu());
     }
   }, [dispatch]);
+  const filteredNhanSu = listNhanSu.filter((ns: any) => ns.idPhongBan === departmentSupportId);
 
   return (
     <Card
@@ -87,23 +88,18 @@ const CreateSupporterPage: React.FC = () => {
                       rules={[{ required: true, message: 'Chọn nhân sự' }]}
                     >
                       <Select
-                        placeholder="Chọn nhân sự"
-                        options={listNhanSu.map((ns: any) => ({
+                        placeholder={filteredNhanSu.length ? 'Chọn nhân sự' : 'Phòngban chưa có nhân sự'}
+                        showSearch
+                        optionFilterProp="label"
+                        disabled={!filteredNhanSu.length}
+                        options={filteredNhanSu.map((ns: any) => ({
                           value: ns.idNhanSu,
                           label: ns.tenNhanSu
                         }))}
                         onChange={(value) => {
-                          const nhanSu = listNhanSu.find((ns: any) => ns.idNhanSu === value);
+                          const selected = filteredNhanSu.find((ns: any) => ns.idNhanSu === value);
 
-                          if (nhanSu) {
-                            const supporters = form.getFieldValue('supporters') || [];
-                            supporters[name] = {
-                              ...supporters[name],
-                              supporterCode: nhanSu.supporterCode // 👈 field mã nhân sự
-                            };
-
-                            form.setFieldsValue({ supporters });
-                          }
+                          form.setFieldValue(['supporters', name, 'supporterCode'], selected?.supporterCode ?? '');
                         }}
                       />
                     </Form.Item>

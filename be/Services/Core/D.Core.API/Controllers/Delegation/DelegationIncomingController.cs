@@ -195,6 +195,25 @@ namespace D.Core.API.Controllers.Delegation
             }
         }
         /// <summary>
+        /// Xóa mềm DepartmentSupport
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>    
+        [HttpDelete("delete-department-support/{id}")]
+        public async Task<ResponseAPI> DeleteDepartmentSupprot([FromRoute] int id)
+        {
+            try
+            {
+                var dto = new DeleteDepartmentSupportDto { Id = id };
+                await _mediator.Send(dto);
+                return new("Đã xóa thành công.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
         /// Lấy đoàn vào theo Id
         /// </summary>
         /// <param name="dto"></param>
