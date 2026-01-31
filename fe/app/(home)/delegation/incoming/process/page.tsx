@@ -217,9 +217,7 @@ const Page = () => {
       icon: <PlusOutlined />,
       hidden: (r) =>
         !hasPermissionCreateTimeXuLyDoanVao ||
-        r.status == DelegationStatusConst.TAO_MOI ||
-        r.status === DelegationStatusConst.DONE ||
-        r.status == DelegationStatusConst.DA_HET_HAN,
+        r.status !== DelegationStatusConst.PHE_DUYET,
       command: (record: IViewGuestGroup) => onClickCreateTime(record)
     }
   ];
@@ -229,7 +227,10 @@ const Page = () => {
     initialQuery: {
       PageIndex: 1,
       PageSize: 10,
-      Keyword: ''
+      Keyword: '',
+      differentStatus: `${DelegationStatusConst.TAO_MOI},
+                        ${DelegationStatusConst.DA_HET_HAN},
+                        ${DelegationStatusConst.BI_HUY}`,
     },
     onQueryChange: (newQuery) => {
       dispatch(getListGuestGroup(newQuery));
@@ -242,8 +243,8 @@ const Page = () => {
       dispatch(resetStatusCreate());
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
-      dispatch(getListStatus());
-      dispatch(getListDelegationIncoming());
+      dispatch(getListStatus(1));
+      dispatch(getListDelegationIncoming());  
     }
   }, [isModalOpen]);
 
@@ -284,6 +285,7 @@ const Page = () => {
     // ĐÃ CHỈNH SỬA: Đồng ý / Không đồng ý
     if (data.status === DelegationStatusConst.DA_CHINH_SUA) {
       setConfirmActions([
+        { action: 'supplement', label: 'Cần bổ sung' },
         { action: 'cancel', label: 'Không đồng ý', danger: true },
         { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
       ]);
@@ -292,6 +294,7 @@ const Page = () => {
     else {
       setConfirmActions([
         { action: 'supplement', label: 'Cần bổ sung' },
+        { action: 'cancel', label: 'Không đồng ý', danger: true },
         { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
       ]);
     }

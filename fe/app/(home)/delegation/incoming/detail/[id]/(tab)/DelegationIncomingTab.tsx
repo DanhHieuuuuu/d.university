@@ -130,7 +130,7 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
         }, 
  
         { 
-          label: 'Tổng chi phí', 
+          label: 'Tổng chi phí (VNĐ)', 
           value: renderField('totalMoney', data.totalMoney, <InputNumber style={{ width: '100%' }} />, options) 
         }, 
         { 

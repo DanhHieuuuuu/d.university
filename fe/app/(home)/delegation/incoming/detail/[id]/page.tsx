@@ -34,6 +34,8 @@ export default function DetailDoanVaoPage() {
         .unwrap()
         .then((res) => setDelegation(res));
     }
+    console.log(delegation);
+    
   }, [id, activeKey, delegation, dispatch]);
 
   const handleTabChange = (key: string) => {

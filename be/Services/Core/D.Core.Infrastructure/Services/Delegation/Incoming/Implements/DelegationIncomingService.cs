@@ -23,6 +23,7 @@ using D.Notification.ApplicationService.Implements;
 using D.Notification.Domain.Enums;
 using D.Notification.Dtos;
 using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -74,6 +75,11 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(Paging)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
+            var differentStatus = dto.DifferentStatus?
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => int.Parse(s))
+                .ToList();
+
             var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
             var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
             var receptionTime = _unitOfWork.iReceptionTimeRepository.TableNoTracking.Include(d => d.Id);
@@ -85,6 +91,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                         where (string.IsNullOrEmpty(dto.Keyword) || d.Name.ToLower().Contains(dto.Keyword.ToLower()))
                               && (dto.IdPhongBan == 0 || d.IdPhongBan == dto.IdPhongBan)
                               && (dto.Status == 0 || d.Status == dto.Status)
+                              && ((differentStatus == null) || !(differentStatus.Contains(d.Status)))
                         select new PageDelegationIncomingResultDto
                         {
                             Id = d.Id,
@@ -219,7 +226,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 DelegationIncomingCode = newDoanVao.Code,
                 NewStatus = DelegationStatus.Create,
                 OldStatus = DelegationStatus.Create,
-                Description = $"Thêm đoàn vào ",
+                Description = $"Đoàn {newDoanVao.Name} ({newDoanVao.Code}) đã được thêm bởi {userName} vào {DateTime.Now:dd/MM/yyyy HH:mm:ss}",
                 CreatedDate = DateTime.Now,
                 Reason = "Thêm mới đoàn vào",
                 CreatedByName = userName,
@@ -292,7 +299,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             exist.RequestDate = dto.RequestDate;
             exist.ReceptionDate = dto.ReceptionDate;
             exist.TotalMoney = dto.TotalMoney;
-            exist.Status = DelegationStatus.Edited;
 
             _unitOfWork.iDelegationIncomingRepository.Update(exist);
             await _unitOfWork.SaveChangesAsync();
@@ -328,15 +334,15 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             if (oldValues.Status != exist.Status) changes.Add($"Status: '{DelegationStatus.Names[oldValues.Status]} => {DelegationStatus.Names[exist.Status]}'");
 
             var description = changes.Any()
-                ? $"Cập nhật đoàn vào: {string.Join("; ", changes)}."
-                : $"Cập nhật đoàn vào nhưng không thay đổi giá trị.";
+                ? $"Cập nhật đoàn {oldValues.Name} ({oldValues.Code}): {string.Join("; ", changes)}."
+                : $"Cập nhật đoàn {oldValues.Name} ({oldValues.Code}) nhưng không thay đổi giá trị.";
 
             var log = new LogStatus
             {
                 DelegationIncomingCode = exist.Code,
                 OldStatus = oldValues.Status,
                 NewStatus = exist.Status,
-                Reason = "Cập nhật",
+                Reason = "Cập nhật thông tin",
                 Description = description,
                 CreatedDate = DateTime.Now,
                 CreatedByName = userName,
@@ -425,16 +431,16 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(GetListTrangThai)}");
 
-            var trangThaiExist = _unitOfWork.iDelegationIncomingRepository
-                .TableNoTracking
-                .Where(x => x.Status != null)
-                .Select(x => x.Status)
-                .Distinct()
-                .OrderBy(x => x)
-                .ToList();
+            var trangThaiExist = DelegationStatus.Names
+                    .Select(x => new
+                    {
+                        Value = x.Key,
+                        Label = x.Value
+                    })
+                    .ToList();
 
             return trangThaiExist
-                .Select(x => new ViewTrangThaiResponseDto { Status = x })
+                .Select(x => new ViewTrangThaiResponseDto { Status = x.Value })
                 .ToList();
         }
         public async Task<PageDelegationIncomingResultDto> GetByIdDelegationIncoming(int id)
@@ -607,10 +613,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 DelegationIncomingCode = delegation.Code,
                 NewStatus = delegation.Status,
                 OldStatus = dto.OldStatus,
-                Description = $"Đã thay đổi trạng thái từ {DelegationStatus.Names[dto.OldStatus]} => {DelegationStatus.Names[delegation.Status]} ",
+                Description = $"Đã thay đổi trạng thái của đoàn {delegation.Name} ({delegation.Code}) từ {DelegationStatus.Names[dto.OldStatus]} => {DelegationStatus.Names[delegation.Status]} ",
                 CreatedDate = DateTime.Now,
                 CreatedByName = userName,
-                Reason = "Trạng thái"
+                Reason = "Thay đổi trạng thái"
             };
 
             _unitOfWork.iLogStatusRepository.Add(log);

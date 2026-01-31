@@ -22,7 +22,6 @@ export default function VoiceSearch({ onResult }: VoiceSearchProps) {
 
   const sendToBE = async (query: string) => {
     try {
-      debugger
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL_SEARCH_AI}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

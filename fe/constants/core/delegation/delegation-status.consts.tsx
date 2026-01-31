@@ -26,6 +26,16 @@ export class DelegationStatusConst {
       label: 'Đề xuất',
       className: 'tag-propose'
     },
+    [this.CAN_BO_SUNG]: {
+      value: this.CAN_BO_SUNG,
+      label: 'Cần bổ sung',
+      className: 'tag-edit'
+    },
+    [this.DA_CHINH_SUA]: {
+      value: this.DA_CHINH_SUA,
+      label: 'Đã bổ sung',
+      className: 'tag-edit'
+    },
     [this.PHE_DUYET]: {
       value: this.PHE_DUYET,
       label: 'BGH phê duyệt',
@@ -45,16 +55,6 @@ export class DelegationStatusConst {
       value: this.BI_HUY,
       label: 'Bị huỷ',
       className: 'tag-cancel'
-    },
-    [this.CAN_BO_SUNG]: {
-      value: this.CAN_BO_SUNG,
-      label: 'Cần bổ sung',
-      className: 'tag-edit'
-    },
-    [this.DA_CHINH_SUA]: {
-      value: this.DA_CHINH_SUA,
-      label: 'Đã chỉnh sửa',
-      className: 'tag-edit'
     },
     [this.DA_HET_HAN]: {
       value: this.DA_HET_HAN,
