@@ -67,7 +67,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(FindLogDelegationIncoming)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
-            var query = _unitOfWork.iLogStatusRepository.TableNoTracking.AsQueryable();
+            var query = _unitOfWork.iLogStatusRepository.TableNoTracking.OrderByDescending(x => x.CreatedDate).AsQueryable();
             // Lọc theo người tạo
             if (!string.IsNullOrWhiteSpace(dto.CreatedByName))
             {

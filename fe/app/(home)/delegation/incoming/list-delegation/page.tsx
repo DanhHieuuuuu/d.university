@@ -320,7 +320,7 @@ const Page = () => {
             </Form.Item>
 
             <Form.Item name="name" className="!mb-0 w-[300px]">
-              <Input placeholder="Nhập tên đoàn vào…" onChange={handleSearch} />
+              <Input placeholder="Nhập tên hoặc mã đoàn vào" onChange={handleSearch} />
             </Form.Item>
 
             <Button

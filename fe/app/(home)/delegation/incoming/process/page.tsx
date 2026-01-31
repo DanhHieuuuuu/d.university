@@ -174,7 +174,7 @@ const Page = () => {
       hidden: () => !hasPermisisonViewXuLyDoanVao
     },
     {
-      label: 'Báo cáo kết quả',
+      label: 'Hoàn thành',
       icon: <CheckOutlined />,
       hidden: (r) => !hasPermissisonBaoCaoDoanVao || r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
       command: (record: IViewGuestGroup) => onClickBaoCao(record)
@@ -207,7 +207,7 @@ const Page = () => {
       command: (record: IDepartmentSupport) => onClickPhanCong(record)
     },
     {
-      label: 'Xác nhận chỉnh sửa',
+      label: 'Xác nhận bổ sung',
       icon: <CheckOutlined />,
       hidden: (r) => !hasPermissionXacNhanChinhSuaXuLyDoanVao || r.status !== DelegationStatusConst.CAN_BO_SUNG,
       command: (record: IViewGuestGroup) => onClickXacNhan(record)
@@ -364,7 +364,7 @@ const Page = () => {
             </Form.Item>
 
             <Form.Item name="name" className="!mb-0 w-[300px]">
-              <Input placeholder="Nhập tên đoàn vào…" onChange={handleSearch} />
+              <Input placeholder="Nhập tên hoặc mã đoàn vào" onChange={handleSearch} />
             </Form.Item>
 
             <Button
