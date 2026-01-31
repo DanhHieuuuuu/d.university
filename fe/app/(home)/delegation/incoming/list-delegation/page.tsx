@@ -44,6 +44,7 @@ import VoiceSearch from '../../../../../src/components/hieu-custom/voice-search'
 import { DelegationIncomingService } from '@/src/services/delegation/delegationIncoming.service';
 import { exportBaoCaoDoanVao } from '@helpers/delegation/action.helper';
 import { ConfirmStatusModal } from '../../modals/ConfirmStatusModal';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -58,8 +59,16 @@ const Page = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmTitle, setConfirmTitle] = useState('');
   const [confirmContent, setConfirmContent] = useState('');
+  //permission
+  const hasPermisisonViewDoanVao = useIsGranted(PermissionCoreConst.CoreButtonViewDoanVao);
+  const hasPermissionDeleteDoanVao = useIsGranted(PermissionCoreConst.CoreButtonDeleteDoanVao);
+  const hasPermissisonUpdateDoanVao = useIsGranted(PermissionCoreConst.CoreButtonUpdateDoanVao);
+  const hasPermissisonDeXuatDoanVao = useIsGranted(PermissionCoreConst.CoreButtonDeXuatDoanVao);
+  const hasPermissionCreateDoanVao = useIsGranted(PermissionCoreConst.CoreButtonCreateDoanVao);
+  const hasPermissionSearchDoanVao = useIsGranted(PermissionCoreConst.CoreButtonSearchDoanVao);
+  const hasPermissionXuatBaoCaoDoanVao = useIsGranted(PermissionCoreConst.CoreButtonXuatBaoCaoDoanVao);
   const [selectedData, setSelectedData] = useState<IViewGuestGroup | null>(null);
-    const [confirmActions, setConfirmActions] = useState<
+  const [confirmActions, setConfirmActions] = useState<
     {
       action: 'upgrade' | 'cancel' | 'supplement';
       label: string;
@@ -137,7 +146,7 @@ const Page = () => {
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
-      title: 'Tổng chi phí',
+      title: 'Tổng chi phí ước tính (VNĐ)',
       align: 'left',
       width: 120
     },
@@ -150,54 +159,42 @@ const Page = () => {
       getTagInfo: (status: number) => DelegationStatusConst.getTag(status)
     }
   ];
-
   const actions: IAction[] = [
     {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
-      command: (record: IViewGuestGroup) => onClickView(record),
-      permission: PermissionCoreConst.CoreButtonViewDoanVao
+      hidden: (r) =>
+        !hasPermisisonViewDoanVao,
+      command: (record: IViewGuestGroup) => onClickView(record)
     },
     {
       label: 'Chỉnh sửa',
       tooltip: 'Sửa danh sách đoàn vào',
       icon: <EditOutlined />,
-      hidden: (r) => r.status == DelegationStatusConst.DONE || r.status == DelegationStatusConst.DA_HET_HAN,
-      command: (record: IViewGuestGroup) => onClickUpdate(record),
-      permission: PermissionCoreConst.CoreButtonUpdateDoanVao
+      hidden: (r) =>
+        !hasPermissisonUpdateDoanVao ||
+        ![DelegationStatusConst.TAO_MOI, DelegationStatusConst.CAN_BO_SUNG, DelegationStatusConst.DE_XUAT].includes(r.status),
+
+      command: (record: IViewGuestGroup) => onClickUpdate(record)
     },
     {
       label: 'Đề xuất',
       icon: <SendOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.TAO_MOI,
-      command: (record: IViewGuestGroup) => onClickUpdateStatus(record),
-      permission: PermissionCoreConst.CoreButtonDeXuatDoanVao
-    },
-
-    {
-      label: 'Thêm thời gian',
-      icon: <PlusOutlined />,
-      hidden: (r) =>
-        r.status == DelegationStatusConst.TAO_MOI ||
-        r.status === DelegationStatusConst.DONE ||
-        r.status == DelegationStatusConst.DA_HET_HAN,
-      command: (record: IViewGuestGroup) => onClickCreateTime(record),
-      permission: PermissionCoreConst.CoreButtonCreateTimeDoanVao
+      hidden: (r) => !hasPermissisonDeXuatDoanVao || r.status !== DelegationStatusConst.TAO_MOI,
+      command: (record: IViewGuestGroup) => onClickUpdateStatus(record)
     },
     {
       label: 'Xuất báo cáo',
       icon: <FileWordOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DONE,
-      command: (record: IViewGuestGroup) => onExport(record),
-      permission: PermissionCoreConst.CoreButtonUpdateDoanVao
+      hidden: (r) => !hasPermissionXuatBaoCaoDoanVao || r.status !== DelegationStatusConst.DONE,
+      command: (record: IViewGuestGroup) => onExport(record)
     },
     {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
       command: (record: IViewGuestGroup) => onClickDelete(record),
-      permission: PermissionCoreConst.CoreButtonDeleteDoanVao
+      hidden: (r) => !hasPermissionDeleteDoanVao || r.status !== DelegationStatusConst.TAO_MOI,
     }
   ];
 
@@ -226,7 +223,7 @@ const Page = () => {
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
       dispatch(getListNhanSu());
-      dispatch(getListStatus());
+      dispatch(getListStatus(0));
       setVoiceData(null);
     }
   }, [isModalOpen]);
@@ -248,18 +245,12 @@ const Page = () => {
     setSelectedData(data);
     setConfirmTitle('Xác nhận đề xuất');
     setConfirmContent(`Bạn có muốn đề xuất đoàn vào "${data.name}" không?`);
-    setConfirmActions([
-   
-      { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
-    ]);
+    setConfirmActions([{ action: 'upgrade', label: 'Đồng ý', type: 'primary' }]);
     setConfirmOpen(true);
   };
 
   const onClickView = (data: IViewGuestGroup) => {
     router.push(`/delegation/incoming/detail/${data.id}`);
-  };
-  const onClickCreateTime = (data: IViewGuestGroup) => {
-    router.push(`/delegation/incoming/list-delegation/create-reception-time?delegationIncomingId=${data.id}`);
   };
   const onClickUpdate = (data: IViewGuestGroup) => {
     dispatch(select(data));
@@ -293,76 +284,69 @@ const Page = () => {
       title="Danh sách Đoàn vào"
       className="min-h-full"
       extra={
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={onClickAdd}
-          data-permission={PermissionCoreConst.CoreButtonCreateDoanVao}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissionCreateDoanVao}>
           Thêm mới
         </Button>
       }
     >
       <Form form={form} layout="horizontal">
-        <div className="mb-4 flex flex-row items-center space-x-3">
-          <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
-            <Select
-              data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
-              showSearch
-              allowClear
-              placeholder="Chọn phòng ban phụ trách"
-              optionFilterProp="label"
-              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-              options={listPhongBan.map((pb: any) => ({
-                value: pb.idPhongBan,
-                label: pb.tenPhongBan
-              }))}
-              onChange={(value) => onFilterChange({ idPhongBan: value })}
-            />
-          </Form.Item>
-          <Form.Item name="status" className="!mb-0 w-[200px]">
-            <Select
-              data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
-              placeholder="Chọn trạng thái"
-              allowClear
-              options={listStatus.map((st: any) => ({
-                value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
-              }))}
-              onChange={(value) => onFilterChange({ status: value })}
-            />
-          </Form.Item>
+        {hasPermissionSearchDoanVao && (
+          <div className="mb-4 flex flex-row items-center space-x-3">
+            <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
+              <Select
+                showSearch
+                allowClear
+                placeholder="Chọn phòng ban phụ trách"
+                optionFilterProp="label"
+                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                options={listPhongBan.map((pb: any) => ({
+                  value: pb.idPhongBan,
+                  label: pb.tenPhongBan
+                }))}
+                onChange={(value) => onFilterChange({ idPhongBan: value })}
+              />
+            </Form.Item>
 
-          <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input
-              data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
-              placeholder="Nhập tên đoàn vào…"
-              onChange={(e) => handleSearch(e)}
+            <Form.Item name="status" className="!mb-0 w-[200px]">
+              <Select
+                placeholder="Chọn trạng thái"
+                allowClear
+                options={listStatus.map((st: any) => ({
+                  value: st.status,
+                  label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
+                }))}
+                onChange={(value) => onFilterChange({ status: value })}
+              />
+            </Form.Item>
+
+            <Form.Item name="name" className="!mb-0 w-[300px]">
+              <Input placeholder="Nhập tên hoặc mã đoàn vào" onChange={handleSearch} />
+            </Form.Item>
+
+            <Button
+              color="default"
+              variant="filled"
+              icon={<SyncOutlined />}
+              onClick={() => {
+                form.resetFields();
+                resetFilter();
+                setVoiceData(null);
+                dispatch(getListGuestGroup(query));
+              }}
+            >
+              Tải lại
+            </Button>
+
+            <Button
+              color="default"
+              variant="filled"
+              icon={<AudioOutlined />}
+              onClick={() => setShowVoiceSearch((prev) => !prev)}
             />
-          </Form.Item>
-          <Button
-            color="default"
-            variant="filled"
-            icon={<SyncOutlined />}
-            onClick={() => {
-              form.resetFields();
-              resetFilter();
-              setVoiceData(null);
-              dispatch(getListGuestGroup(query));
-            }}
-            data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
-          >
-            Tải lại
-          </Button>
-          <Button
-            color="default"
-            variant="filled"
-            icon={<AudioOutlined />}
-            onClick={() => setShowVoiceSearch((prev) => !prev)}
-            data-permission={PermissionCoreConst.CoreButtonSearchDoanVao}
-          ></Button>
-        </div>
+          </div>
+        )}
       </Form>
+
       {showVoiceSearch && (
         <div className="voice-fixed-wrapper">
           <VoiceSearch onResult={(data) => setVoiceData(data)} />

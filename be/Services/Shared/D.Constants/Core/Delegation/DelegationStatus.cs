@@ -6,11 +6,11 @@ namespace D.Constants.Core.Delegation
         public static int Create = 1;
         public static int Propose = 2;
         public static int BGHApprove = 3;
+        public static int NeedEdit = 7;
+        public static int Edited = 8;
         public static int ReceptionGroup = 4;
         public static int Done = 5;
         public static int Canceled = 6;
-        public static int NeedEdit = 7;
-        public static int Edited = 8;
         public static int Expired = 9;
 
 
@@ -19,11 +19,11 @@ namespace D.Constants.Core.Delegation
             { Create, "Tạo mới" },
             { Propose, "Đề xuất" },
             { BGHApprove, "BGH phê duyệt" },
+            { NeedEdit, "Cần bổ sung" },
+            { Edited, "Đã bổ sung" },
             { ReceptionGroup, "Đang thực hiên tiếp đoàn" },
             { Done, "Hoàn thành" },
             { Canceled, "Bị hủy" },
-            { NeedEdit, "Cần bổ sung" },
-            { Edited, "Đã chỉnh sửa" },
             { Expired, "Đã hết hạn" },
         };
     }

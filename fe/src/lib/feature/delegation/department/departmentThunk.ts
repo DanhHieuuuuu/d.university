@@ -56,3 +56,15 @@ export const getByIdDepartmentSupport = createAsyncThunk(
     }
   }
 );
+export const deleteDepartmentSupport = createAsyncThunk('delegation-incoming/delete-department', async (id: number, { rejectWithValue }) => {
+  try {
+    const res = await DelegationIncomingService.deleteDepartmentSupport(id);
+    return id;
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.message,
+      code: error.code,
+      response: error.response?.data
+    });
+  }
+});

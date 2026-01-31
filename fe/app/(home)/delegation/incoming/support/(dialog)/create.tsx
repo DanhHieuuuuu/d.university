@@ -106,10 +106,12 @@ const CreateDepartmentSupportModal: React.FC<DepartmentSupportModalProps> = ({
         top: 0,
         height: '80vh'
       }}
-      bodyStyle={{
-        maxHeight: 'calc(80vh - 55px - 52px)',
-        overflowY: 'auto',
-        paddingRight: '16px'
+      styles={{
+        body: {
+          maxHeight: 'calc(80vh - 55px - 52px)',
+          overflowY: 'auto',
+          paddingRight: '16px'
+        }
       }}
     >
       <Form form={form} layout="vertical" onFinish={onFinish} disabled={isView}>

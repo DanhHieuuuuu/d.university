@@ -1,2 +1,3 @@
 # vs
 .vs/
+/be/Services/Core/D.Core.Domain/Entities/Delegation/Incoming/DelegationIncoming.cs

@@ -28,12 +28,12 @@ export const listMenuManager: IMenu[] = [
     icon: <TeamOutlined />,
     permissionKeys: [PermissionCoreConst.UserMenuAccountManager]
   },
-  {
-    label: 'Quản lý thông báo',
-    routerLink: '/manager/notification',
-    icon: <NotificationOutlined />,
-    permissionKeys: []
-  },
+  // {
+  //   label: 'Quản lý thông báo',
+  //   routerLink: '/manager/notification',
+  //   icon: <NotificationOutlined />,
+  //   permissionKeys: []
+  // },
   {
     label: 'Quản lý log',
     routerLink: '/manager/log',

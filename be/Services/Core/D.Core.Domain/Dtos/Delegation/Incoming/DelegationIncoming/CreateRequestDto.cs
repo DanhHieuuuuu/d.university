@@ -27,6 +27,8 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
         public string? PhoneNumber { get; set; }
 
         public DateOnly RequestDate { get; set; }
+        public DateOnly ReceptionDate { get; set; }
+        public decimal TotalMoney { get; set; }
 
         public IFormFile DetailDelegation { get; set; }
     }

@@ -154,6 +154,25 @@ namespace D.Core.API.Controllers.Delegation
                 return BadRequest(ex);
             }
         }
+        /// <summary>
+        /// Cập nhật thông tin chi tiết đoàn vào
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.CoreButtonUpdateDoanVao)]
+        [HttpPut("update-detail-delegation")]
+        public async Task<ResponseAPI> UpdateDetailDelegation([FromBody] UpdateDetailDelegationsRequestDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
         /// <summary>
         /// Xóa mềm Đoàn vào
@@ -167,6 +186,25 @@ namespace D.Core.API.Controllers.Delegation
             try
             {
                 var dto = new DeleteDelegationIncomingDto { Id = id };
+                await _mediator.Send(dto);
+                return new("Đã xóa thành công.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        /// <summary>
+        /// Xóa mềm DepartmentSupport
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>    
+        [HttpDelete("delete-department-support/{id}")]
+        public async Task<ResponseAPI> DeleteDepartmentSupprot([FromRoute] int id)
+        {
+            try
+            {
+                var dto = new DeleteDepartmentSupportDto { Id = id };
                 await _mediator.Send(dto);
                 return new("Đã xóa thành công.");
             }
@@ -241,7 +279,7 @@ namespace D.Core.API.Controllers.Delegation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateTimeDoanVao)]
+        [PermissionFilter(PermissionCoreKeys.CoreButtonCreateTimeXuLyDoanVao)]
         [HttpPost("create-reception-time")]
         public async Task<ResponseAPI> CreateReceptionTime([FromBody] CreateReceptionTimeListRequestDto dto)
         {

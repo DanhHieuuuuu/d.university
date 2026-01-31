@@ -16,11 +16,18 @@ export interface IViewGuestGroup {
   receptionDate: string;
   totalMoney: number;
 
-  delegationDetails?: IDetailDelegationIncoming[] | null;
+  // delegationDetails?: IDetailDelegationIncoming[] | null;
   receptionTimes?: IReceptionTime[] | null;
   departmentSupports?: IDepartmentSupport[] | null;
 }
 export interface IDetailDelegationIncoming {
+ delegationIncomingId: number;
+  delegationCode: string;
+  delegationName: string;
+  members: IDelegationMember[];
+  departmentSupports: IDepartmentSupport[];
+}
+export interface IDelegationMember {
   id: number;
   code: string;
   firstName: string;
@@ -29,8 +36,8 @@ export interface IDetailDelegationIncoming {
   phoneNumber: string;
   email: string;
   isLeader: boolean;
-  delegationIncomingId: number;
 }
+
 export interface IReceptionTime {
   id: number;
   startDate: string;
@@ -65,6 +72,7 @@ export interface ISupporter {
   supporterId: number;
   supporterCode: string;
   departmentSupportId: number;
+  supporterName: string;
   departmentSupport: any | null;
 }
 
@@ -72,6 +80,7 @@ export type IQueryGuestGroup = IQueryPaging & {
   name?: string;
   idPhongBan?: number;
   status?: number;
+  differentStatus?: string;
 };
 export type IQuerySupporter = IQueryPaging & {
   supporterCode?: string;
@@ -83,10 +92,14 @@ export type IQueryDepartmentSupport = IQueryPaging & {
 export type IQueryLogStatus = IQueryPaging & {
   CreateDate?: string;
   CreatedByName?: string;
+  StartDate?: string;
+  EndDate?: string;
 };
 export type IQueryLogReceptionTime = IQueryPaging & {
   CreateDate?: string;
   CreatedByName?: string;
+  StartDate?: string;
+  EndDate?: string;
 };
 export type ICreateDoanVao = {
   code: string;
@@ -207,4 +220,20 @@ export interface IStatisticalStatus{
 export interface IDateOption {
   label: string;
   value: string;
+}
+
+export interface IUpdateDetailDelegationItem {
+  id?: number;
+  delegationIncomingId: number;
+  code: string;
+  firstName?: string;
+  lastName?: string;
+  yearOfBirth: number;
+  phoneNumber?: string;
+  email?: string;
+  isLeader: boolean;
+}
+
+export interface IUpdateDetailDelegationRequest {
+  items: IUpdateDetailDelegationItem[];
 }

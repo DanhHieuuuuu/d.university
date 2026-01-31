@@ -4,6 +4,7 @@ import { ReduxStatus } from '@redux/const';
 import { IDepartmentSupport } from '@models/delegation/delegation.model';
 import {
   createDepartmentSupport,
+  deleteDepartmentSupport,
   getByIdDepartmentSupport,
   getListDepartmentSupport,
   updateDepartmentSupport
@@ -121,10 +122,27 @@ const departmentSlice = createSlice({
       .addCase(updateDepartmentSupport.rejected, (state, action: any) => {
         state.$update.status = ReduxStatus.FAILURE;
         state.$update.error = action.error?.message;
+      })
+      // Delete DepartmentSupport
+      .addCase(deleteDepartmentSupport.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(deleteDepartmentSupport.fulfilled, (state, action: PayloadAction<number>) => {
+        state.status = ReduxStatus.SUCCESS;
+        state.list = state.list.filter((item) => item.id !== action.payload);
+        state.total -= 1;
+      })
+      .addCase(deleteDepartmentSupport.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
       });
   }
 });
 const departmentReducer = departmentSlice.reducer;
-export const { selectDepartmentSupport, clearSelectedDepartmentSupport, resetCreateStatus, selectDelegationIncomingId } = departmentSlice.actions;
+export const {
+  selectDepartmentSupport,
+  clearSelectedDepartmentSupport,
+  resetCreateStatus,
+  selectDelegationIncomingId
+} = departmentSlice.actions;
 
 export default departmentReducer;
