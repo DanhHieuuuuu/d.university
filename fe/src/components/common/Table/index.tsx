@@ -111,6 +111,7 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
             title={act.tooltip ?? act.label}
             color={act.color ?? 'default'}
             variant="dashed"
+            className="!w-full"
             icon={act.icon}
             onClick={() => {
               act.command(record);
@@ -129,7 +130,11 @@ const AppTable = <T extends object>(props: AppTableProps<T>) => {
           open={openActionIndex === index}
           onOpenChange={(visible) => setOpenActionIndex(visible ? index : null)}
           placement="bottomRight"
-          content={<Space direction="vertical">{actions}</Space>}
+          content={
+            <Space direction="vertical" style={{ marginRight: 8 }}>
+              {actions}
+            </Space>
+          }
         >
           <Button type="text" icon={<EllipsisOutlined />} />
         </Popover>
