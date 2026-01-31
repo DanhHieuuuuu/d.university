@@ -16,5 +16,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts
         List<ViewDelegationIncomingResponseDto> GetAllDelegationIncoming(ViewDelegationIncomingRequestDto dto);
         Task<UpdateDepartmentSupportResponseDto> UpdateDepartmentSupport(UpdateDepartmentSupportRequestDto dto);
         Task<DetailDepartmentSupportResponseDto?> GetByIdDepartmentSupport(int id);
+        void DeleteDepartmentSupport(int id);
     }
 }

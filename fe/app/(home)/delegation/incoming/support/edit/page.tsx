@@ -82,6 +82,12 @@ const DepartmentSupport = () => {
       toast.error(String(err));
     }
   };
+  const filteredNhanSuByDepartment = useMemo(() => {
+    if (!detail?.departmentSupportId) return [];
+
+    return listNhanSu.filter((ns) => ns.idPhongBan === detail.departmentSupportId);
+  }, [listNhanSu, detail]);
+
   // View and edit
   const rows: DetailRow[] = useMemo(() => {
     if (!detail) return [];
@@ -143,21 +149,18 @@ const DepartmentSupport = () => {
                         style={{ flex: 2, marginBottom: 0, minWidth: 0 }}
                       >
                         <Select
-                          placeholder="Chọn nhân sự"
+                          placeholder={filteredNhanSuByDepartment.length ? 'Chọn nhân sự' : 'Phòng ban chưa có nhân sự'}
                           showSearch
                           optionFilterProp="label"
-                          options={listNhanSu.map((n) => ({
+                          options={filteredNhanSuByDepartment.map((n) => ({
                             value: n.idNhanSu,
                             label: n.tenNhanSu,
                             disabled: selectedIds.includes(n.idNhanSu)
                           }))}
                           onChange={(value) => {
-                            const selectedNhanSu = listNhanSu.find((n) => n.idNhanSu === value);
+                            const selectedNhanSu = filteredNhanSuByDepartment.find((n) => n.idNhanSu === value);
 
-                            // set supporterId
                             form.setFieldValue(['supporters', name, 'supporterId'], value);
-
-                            // auto fill supporterCode
                             form.setFieldValue(
                               ['supporters', name, 'supporterCode'],
                               selectedNhanSu?.supporterCode ?? ''

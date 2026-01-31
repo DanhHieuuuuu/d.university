@@ -49,7 +49,7 @@ namespace d.Shared.Permission.Permission
             #endregion
 
             #region Delegation - đoàn vào / ra
-            { PermissionCoreKeys.CoreMenuDelegation, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuDelegation, PermissionName = "Quản lý đoàn vào / ra", ParentKey = null } },
+            { PermissionCoreKeys.CoreMenuDelegation, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuDelegation, PermissionName = "Quản lý đoàn vào", ParentKey = null } },
 
             { PermissionCoreKeys.CoreMenuListDoanVao,new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreMenuListDoanVao, PermissionName = "Danh sách đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuDelegation } },
             { PermissionCoreKeys.CoreButtonCreateDoanVao, new CreatePermissionRequestDto { PermissonKey= PermissionCoreKeys.CoreButtonCreateDoanVao, PermissionName = "Thêm đoàn vào", ParentKey = PermissionCoreKeys.CoreMenuListDoanVao } },

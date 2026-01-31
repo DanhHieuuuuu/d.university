@@ -80,6 +80,7 @@ export type IQueryGuestGroup = IQueryPaging & {
   name?: string;
   idPhongBan?: number;
   status?: number;
+  differentStatus?: string;
 };
 export type IQuerySupporter = IQueryPaging & {
   supporterCode?: string;
@@ -91,10 +92,14 @@ export type IQueryDepartmentSupport = IQueryPaging & {
 export type IQueryLogStatus = IQueryPaging & {
   CreateDate?: string;
   CreatedByName?: string;
+  StartDate?: string;
+  EndDate?: string;
 };
 export type IQueryLogReceptionTime = IQueryPaging & {
   CreateDate?: string;
   CreatedByName?: string;
+  StartDate?: string;
+  EndDate?: string;
 };
 export type ICreateDoanVao = {
   code: string;
@@ -215,4 +220,20 @@ export interface IStatisticalStatus{
 export interface IDateOption {
   label: string;
   value: string;
+}
+
+export interface IUpdateDetailDelegationItem {
+  id?: number;
+  delegationIncomingId: number;
+  code: string;
+  firstName?: string;
+  lastName?: string;
+  yearOfBirth: number;
+  phoneNumber?: string;
+  email?: string;
+  isLeader: boolean;
+}
+
+export interface IUpdateDetailDelegationRequest {
+  items: IUpdateDetailDelegationItem[];
 }

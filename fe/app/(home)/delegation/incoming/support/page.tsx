@@ -21,7 +21,13 @@ import { useDebouncedCallback } from '@hooks/useDebounce';
 import { usePaginationWithFilter } from '@hooks/usePagination';
 import { withAuthGuard } from '@src/hoc/withAuthGuard';
 import { PermissionCoreConst } from '@/constants/permissionWeb/PermissionCore';
-import { IDepartmentSupport, IQueryDepartmentSupport, IQueryGuestGroup, ISupporter, IViewGuestGroup } from '@models/delegation/delegation.model';
+import {
+  IDepartmentSupport,
+  IQueryDepartmentSupport,
+  IQueryGuestGroup,
+  ISupporter,
+  IViewGuestGroup
+} from '@models/delegation/delegation.model';
 import {
   deleteDoanVao,
   getListDelegationIncoming,
@@ -38,23 +44,26 @@ import { toast } from 'react-toastify';
 import CreateDepartmentSupportModal from './(dialog)/create';
 import router from 'next/router';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getListDepartmentSupport } from '@redux/feature/delegation/department/departmentThunk';
+import {
+  deleteDepartmentSupport,
+  getListDepartmentSupport
+} from '@redux/feature/delegation/department/departmentThunk';
 import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { status, total: totalItem } = useAppSelector((state) => state.departmentState);
-  const { list} = useAppSelector((state) => state.departmentState);
+  const { list } = useAppSelector((state) => state.departmentState);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
-  const hasPermisisonViewDepartment= useIsGranted(PermissionCoreConst.CoreButtonViewDepartment);
+  const hasPermisisonViewDepartment = useIsGranted(PermissionCoreConst.CoreButtonViewDepartment);
   const hasPermissionCreateSupporterDepartment = useIsGranted(PermissionCoreConst.CoreButtonCreateSupporterDepartment);
   const hasPermissisonCreateDepartment = useIsGranted(PermissionCoreConst.CoreButtonCreateDepartment);
-  const hasPermissisonSearchDepartment = useIsGranted(PermissionCoreConst.CoreButtonSearchDepartment)
-  const hasPermissionCreateDoanVao = useIsGranted(PermissionCoreConst.CoreButtonCreateDoanVao);
+  const hasPermissisonSearchDepartment = useIsGranted(PermissionCoreConst.CoreButtonSearchDepartment);
+  const hasPermissionDeleteDepartmentSupport = useIsGranted(PermissionCoreConst.CoreButtonDeleteDepartment);
   const hasPermissionSearchDoanVao = useIsGranted(PermissionCoreConst.CoreButtonSearchDoanVao);
 
   const columns: IColumn<IDepartmentSupport>[] = [
@@ -87,14 +96,20 @@ const Page = () => {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       command: (record: IDepartmentSupport) => onClickView(record),
-      hidden : () => !hasPermisisonViewDepartment
-      
+      hidden: () => !hasPermisisonViewDepartment
     },
+    // {
+    //   label: 'Thêm nhân viên',
+    //   icon: <UserAddOutlined />,
+    //   command: (record: IDepartmentSupport) => onClickCreateStaff(record),
+    //   hidden: ()=> !hasPermissionCreateSupporterDepartment
+    // }
     {
-      label: 'Thêm nhân viên',
-      icon: <UserAddOutlined />,
-      command: (record: IDepartmentSupport) => onClickCreateStaff(record),
-      hidden: ()=> !hasPermissionCreateSupporterDepartment
+      label: 'Xóa',
+      color: 'red',
+      icon: <DeleteOutlined />,
+      command: (record: IDepartmentSupport) => onClickDelete(record),
+      hidden: (r) => !hasPermissionDeleteDepartmentSupport
     }
   ];
   const onClickCreateStaff = (data: IDepartmentSupport) => {
@@ -138,27 +153,46 @@ const Page = () => {
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
+  const onClickDelete = (record: IDepartmentSupport) => {
+    console.log(record);
+    Modal.confirm({
+      title: `Xóa phòng ban hỗ trợ "${record.departmentSupportName}"?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await dispatch(deleteDepartmentSupport(record.id)).unwrap();
+          dispatch(getListDepartmentSupport(query));
+          toast.success('Xóa thành công!');
+        } catch (error: any) {
+          toast.error(error?.response?.message || 'Xóa thất bại!');
+        }
+      }
+    });
+  };
 
   return (
     <Card
-      title=" Phòng ban hỗ trợ"
+      title="Phòng ban hỗ trợ"
       className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissisonCreateDepartment}>
-          Thêm mới
-        </Button>
-      }
+      // extra={
+      //   <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissisonCreateDepartment}>
+      //     Thêm mới
+      //   </Button>
+      // }
     >
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex flex-row items-center space-x-3">
           <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input 
-              hidden = {!hasPermissisonSearchDepartment}
-              placeholder="Nhập tên đoàn vào…" 
-              onChange={(e) => handleSearch(e)} />
+            <Input
+              hidden={!hasPermissisonSearchDepartment}
+              placeholder="Nhập tên đoàn vào…"
+              onChange={(e) => handleSearch(e)}
+            />
           </Form.Item>
           <Button
-            hidden = {!hasPermissisonSearchDepartment}
+            hidden={!hasPermissisonSearchDepartment}
             color="default"
             variant="filled"
             icon={<SyncOutlined />}

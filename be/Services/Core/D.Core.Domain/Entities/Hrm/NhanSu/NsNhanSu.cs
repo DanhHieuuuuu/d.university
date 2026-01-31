@@ -71,5 +71,6 @@ namespace D.Core.Domain.Entities.Hrm.NhanSu
         public string? TenHocHam { get; set; }
         public string? TenChuyenNganhHocHam { get; set; }
         public DateTime? NgayVaoDang { get; set; }
+        public int? UserType { get; set; }
     }
 }

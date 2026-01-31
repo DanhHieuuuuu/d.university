@@ -93,7 +93,7 @@ const CreateReceptionTimePage: React.FC = () => {
           <Button type="primary" onClick={() => form.submit()} loading={loading}>
             Tạo mới
           </Button>
-          <Button onClick={() => router.back()}>Hủy</Button>
+          <Button onClick={() => router.back()} disabled={loading} >Hủy</Button>
         </div>
       }
       styles={{ body: { maxHeight: '90%', overflow: 'auto' }}}
@@ -135,7 +135,9 @@ const CreateReceptionTimePage: React.FC = () => {
                         label="Ngày tiếp đoàn"
                         rules={[{ required: true, message: 'Chọn ngày' }]}
                       >
-                        <DatePicker style={{ width: '100%' }} />
+                        <DatePicker style={{ width: '100%' }} disabledDate={(current) =>
+                          current && current < dayjs().startOf('day')
+                        } />
                       </Form.Item>
                     </Col>
 

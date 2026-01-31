@@ -193,7 +193,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Tổng chi phí (VNĐ)" name="totalMoney">
+            <Form.Item label="Tổng chi phí ước tính (VNĐ)" name="totalMoney">
               <InputNumber style={{ width: '100%' }} formatter={(value) => (value ? `${value}` : '')} />
             </Form.Item>
           </Col>

@@ -199,6 +199,7 @@ namespace D.Core.Domain
             CreateMap<CreatePrepareRequestItemDto, Prepare>();
             CreateMap<Prepare, CreatePrepareResponseDto>();
             CreateMap<Prepare, UpdatePrepareResponseDto>();
+            CreateMap<DetailDelegationIncoming, UpdateDetailDelegationResponseDto>();
 
 
             #endregion
