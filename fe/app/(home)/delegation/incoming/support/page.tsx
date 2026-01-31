@@ -90,12 +90,12 @@ const Page = () => {
       hidden : () => !hasPermisisonViewDepartment
       
     },
-    {
-      label: 'Thêm nhân viên',
-      icon: <UserAddOutlined />,
-      command: (record: IDepartmentSupport) => onClickCreateStaff(record),
-      hidden: ()=> !hasPermissionCreateSupporterDepartment
-    }
+    // {
+    //   label: 'Thêm nhân viên',
+    //   icon: <UserAddOutlined />,
+    //   command: (record: IDepartmentSupport) => onClickCreateStaff(record),
+    //   hidden: ()=> !hasPermissionCreateSupporterDepartment
+    // }
   ];
   const onClickCreateStaff = (data: IDepartmentSupport) => {
     router.push(`/delegation/incoming/support/create-staff-support?departmentSupportId=${data.id}`);
@@ -141,13 +141,13 @@ const Page = () => {
 
   return (
     <Card
-      title=" Phòng ban hỗ trợ"
+      title="Phòng ban hỗ trợ"
       className="h-full"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissisonCreateDepartment}>
-          Thêm mới
-        </Button>
-      }
+      // extra={
+      //   <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd} hidden={!hasPermissisonCreateDepartment}>
+      //     Thêm mới
+      //   </Button>
+      // }
     >
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex flex-row items-center space-x-3">

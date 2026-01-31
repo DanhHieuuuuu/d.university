@@ -117,8 +117,9 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         { 
             if (dtos == null || !dtos.Any())throw new Exception("Danh sách thời gian tiếp đoàn trống."); 
  
-            var delegationId = dtos.First().DelegationIncomingId; 
- 
+            var delegationId = dtos.First().DelegationIncomingId;
+            var delegation = _unitOfWork.iDelegationIncomingRepository.FindById(delegationId);
+
             var dbItems = _unitOfWork.iReceptionTimeRepository.TableNoTracking 
                 .Where(x => x.DelegationIncomingId == delegationId && !x.Deleted) 
                 .ToList(); 
@@ -170,7 +171,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     ReceptionTimeId = exist.Id, 
                     Type = LogType.Update, 
                     Description = changes.Any() 
-                        ? $"Cập nhật thời gian tiếp đoàn: {string.Join("; ", changes)}." 
+                        ? $"Cập nhật thời gian tiếp đoàn {delegation.Name} ({delegation.Code}): {string.Join("; ", changes)}." 
                         : "Cập nhật thời gian tiếp đoàn nhưng không thay đổi dữ liệu.", 
                     Reason = DelegationStatus.Names[DelegationStatus.Edited], 
                     CreatedDate = DateTime.Now, 
@@ -198,7 +199,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 { 
                     ReceptionTimeId = item.Id, 
                     Type = LogType.Delete, 
-                    Description = $"Xoá thời gian tiếp đoàn.", 
+                    Description = $"Xoá thời gian tiếp đoàn {delegation.Name} ({delegation.Code}.", 
                     Reason = DelegationStatus.Names[DelegationStatus.Edited], 
                     CreatedDate = DateTime.Now, 
                     CreatedBy = userId.ToString(), 

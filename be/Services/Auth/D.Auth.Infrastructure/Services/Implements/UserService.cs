@@ -154,7 +154,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             entity.Password = hash;
             entity.PasswordKey = salt;
             entity.Status = true;
-            entity.UserType = 4;
+            entity.UserType = 6;
             entity.HoDem = request.hoDem;
             entity.Ten = request.ten;
             entity.Email = request.Email2;

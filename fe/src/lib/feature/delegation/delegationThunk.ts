@@ -67,7 +67,6 @@ export const getListNhanSu = createAsyncThunk('delegation-incoming/getNhanSu', a
 export const getListStatus = createAsyncThunk('delegation-incoming/getStatus', async (edit: number| 0, thunkAPI) => {
   try {
     const res = await DelegationIncomingService.getListStatus();
-  debugger
   if (edit === 1) {
     return Object.values(res.data).filter(
       (s: any) => s.status !== DelegationStatusConst.TAO_MOI  && 

@@ -151,7 +151,7 @@ const Page = () => {
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
-      title: 'Tổng chi phí (VNĐ)',
+      title: 'Tổng chi phí ước tính (VNĐ)',
       align: 'left',
       width: 120
     },
@@ -203,7 +203,7 @@ const Page = () => {
     {
       label: 'Phân công hỗ trợ',
       icon: <UserAddOutlined />,
-      hidden: (r) => !hasPermissisonPhanCongXuLyDoanVao || r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
+      hidden: (r) => !hasPermissisonPhanCongXuLyDoanVao || r.status !== DelegationStatusConst.PHE_DUYET,
       command: (record: IDepartmentSupport) => onClickPhanCong(record)
     },
     {

@@ -135,7 +135,9 @@ const CreateReceptionTimePage: React.FC = () => {
                         label="Ngày tiếp đoàn"
                         rules={[{ required: true, message: 'Chọn ngày' }]}
                       >
-                        <DatePicker style={{ width: '100%' }} />
+                        <DatePicker style={{ width: '100%' }} disabledDate={(current) =>
+                          current && current < dayjs().startOf('day')
+                        } />
                       </Form.Item>
                     </Col>
 

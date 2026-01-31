@@ -146,7 +146,7 @@ const Page = () => {
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
-      title: 'Tổng chi phí (VNĐ)',
+      title: 'Tổng chi phí ước tính (VNĐ)',
       align: 'left',
       width: 120
     },

@@ -1,23 +1,25 @@
 ﻿using AutoMapper;
-using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
+using d.Shared.Permission.Auth;
 using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming;
+using D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging;
 using D.Core.Domain.Entities.Delegation.Incoming;
 using D.Core.Infrastructure.Services.Delegation.Incoming.Abstracts;
 using D.DomainBase.Dto;
 using D.InfrastructureBase.Service;
+using D.InfrastructureBase.Shared;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
-using D.Notification.Domain.Enums;
-using D.Notification.Dtos;
-using D.Notification.ApplicationService.Abstracts;
-using D.InfrastructureBase.Shared;
+using System.Threading.Tasks;
 
 namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 {
@@ -46,7 +48,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             );
 
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-
+            var delegation = _unitOfWork.iDelegationIncomingRepository.FindById(dto.DelegationIncomingId);
             //Kiểm tra tất cả phòng ban có tồn tại không
             var phongBanIds = dto.DepartmentSupportIds.Distinct().ToList();
 
@@ -56,6 +58,18 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             if (phongBanExistCount != phongBanIds.Count)
                 throw new Exception("Danh sách phòng ban hỗ trợ có phòng ban không tồn tại");
+            
+            foreach (var item in phongBanIds)
+            {
+                var data = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Where(x => x.DepartmentSupportId == item && x.DelegationIncomingId == dto.DelegationIncomingId).Include( x => x.DelegationIncoming);
+                if(data != null)
+                {
+                    var department = _unitOfWork.iDmPhongBanRepository.FindById(item);
+                    throw new Exception($"Phòng ban {department.TenPhongBan} đã hỗ trợ đoàn {delegation.Name}");
+                }
+
+            }
+
 
             //Map danh sách entity
             var newSupporters = phongBanIds.Select(id => new DepartmentSupport
@@ -77,7 +91,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             {
                 Receiver = new Receiver
                 {
-                    UserId = userId,
+                    UserId = delegation.IdStaffReception,
                 },
                 Title = "Phân công hỗ trợ phòng ban",
                 Content = "Bạn vừa tạo mới danh sách phòng ban hỗ trợ.",
@@ -93,6 +107,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(PagingDepartmentSupport)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
+            var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
+            var user = _unitOfWork.iNsNhanSuRepository.TableNoTracking
+                                    .FirstOrDefault(u => u.Id == userId);
+
             var department = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Include(x => x.Supporters).Include(x => x.DelegationIncoming);
             var keyword = dto.Keyword?.Trim().ToLower();
 
@@ -104,6 +122,11 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 && (string.IsNullOrEmpty(keyword)
                     || (ds.DelegationIncoming != null
                         && ds.DelegationIncoming.Name.ToLower().Contains(keyword)))
+                // Ban giám hiệu id = 5
+                && (user.HienTaiPhongBan == pb.Id 
+                ||  user.HienTaiPhongBan == 5 
+                ||  user.UserType == UserTypeConstant.SUPER_ADMIN
+                ||  user.UserType == UserTypeConstant.ADMIN)
                 select new PageDepartmentSupportResultDto
                 {
                     Id = ds.Id,
