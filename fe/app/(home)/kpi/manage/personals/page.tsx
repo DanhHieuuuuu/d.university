@@ -76,7 +76,7 @@ const Page = () => {
     return buildKpiGroupedTable<IViewKpiCaNhan>(sortedList);
   }, [list]);
 
-  const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiCaNhan>({
+  const { query, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKpiCaNhan>({
     total: totalItem || 0,
     initialQuery: { PageIndex: 1, PageSize: 1000, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getKpiCaNhanKeKhai(newQuery)),
@@ -158,23 +158,23 @@ const Page = () => {
   const bulkActionItems: MenuProps['items'] = [
     ...(canSendDeclared
       ? [
-          {
-            key: 'send-approve',
-            label: 'Gửi duyệt',
-            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-            onClick: () => requiredSelect(approveSelected)
-          }
-        ]
+        {
+          key: 'send-approve',
+          label: 'Gửi duyệt',
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          onClick: () => requiredSelect(approveSelected)
+        }
+      ]
       : []),
     ...(canCancelDeclared
       ? [
-          {
-            key: 'cancel-send-approve',
-            label: 'Hủy duyệt',
-            icon: <UndoOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(cancelApproveSelected)
-          }
-        ]
+        {
+          key: 'cancel-send-approve',
+          label: 'Hủy duyệt',
+          icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(cancelApproveSelected)
+        }
+      ]
       : [])
   ];
 
@@ -218,6 +218,7 @@ const Page = () => {
   const onClickView = (record: IViewKpiCaNhan) => {
     dispatch(setSelectedKpiCaNhan(record));
     setIsModalView(true);
+    setIsModalUpdate(false);
     setIsModalOpen(true);
   };
   const onClickDelete = (record: IViewKpiCaNhan) => {
@@ -391,9 +392,9 @@ const Page = () => {
     }
   ];
 
-  // const actions: IAction[] = [
-  //   { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
-  // ];
+  const actions: IAction[] = [
+    { label: 'Chi tiết', icon: <EyeOutlined />, command: onClickView, hidden: r => r.rowType !== 'data' },
+  ];
 
   const rowSelection = {
     selectedRowKeys,
@@ -410,13 +411,15 @@ const Page = () => {
         <Form form={form} layout="horizontal">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div className="flex flex-1 items-center gap-2">
-              <Input
-                placeholder="Tìm KPI..."
-                prefix={<SearchOutlined />}
-                allowClear
-                onChange={(e) => handleDebouncedSearch(e.target.value)}
-                className="max-w-[250px]"
-              />
+              <Form.Item name="Keyword" noStyle>
+                <Input
+                  placeholder="Tìm KPI..."
+                  prefix={<SearchOutlined />}
+                  allowClear
+                  onChange={(e) => handleDebouncedSearch(e.target.value)}
+                  className="max-w-[250px]"
+                />
+              </Form.Item>
               <Form.Item name="role" noStyle>
                 <Select
                   placeholder="Vị trí làm việc"
@@ -435,16 +438,20 @@ const Page = () => {
                 onClick={() => {
                   form.resetFields();
                   filterForm.resetFields();
-                  onFilterChange({
+                  setKetQuaMap({});
+                  setSelectedRowKeys([]);
+                  const resetQuery = {
+                    PageIndex: 1,
+                    PageSize: 1000,
                     Keyword: '',
                     idPhongBan: undefined,
                     idNhanSu: undefined,
                     loaiKpi: undefined,
                     trangThai: undefined,
-                    PageIndex: 1
-                  });
-                  setKetQuaMap({});
-                  setSelectedRowKeys([]);
+                  };
+                  onFilterChange(resetQuery);
+                  dispatch(getKpiCaNhanKeKhai(resetQuery));
+                  // resetFilter();
                 }}
               >
                 Tải lại
@@ -492,6 +499,7 @@ const Page = () => {
             rowKey="id"
             columns={columns}
             dataSource={tableData}
+            // listActions={actions}
             isGroupedTable={true}
             pagination={false}
             rowSelection={{

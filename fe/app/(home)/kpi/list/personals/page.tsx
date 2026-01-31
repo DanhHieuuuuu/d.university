@@ -566,13 +566,15 @@ const Page = () => {
       <Form form={form} layout="horizontal">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-2">
-            <Input
-              placeholder="Tìm KPI..."
-              prefix={<SearchOutlined />}
-              allowClear
-              onChange={(e) => handleDebouncedSearch(e.target.value)}
-              className="max-w-[250px]"
-            />
+            <Form.Item name="Keyword" noStyle>
+              <Input
+                placeholder="Tìm KPI..."
+                prefix={<SearchOutlined />}
+                allowClear
+                onChange={(e) => handleDebouncedSearch(e.target.value)}
+                className="max-w-[250px]"
+              />
+            </Form.Item>
             <Form.Item name="idPhongBan" noStyle>
               <Select
                 placeholder="Tất cả đơn vị"
@@ -612,14 +614,18 @@ const Page = () => {
                 form.resetFields();
                 filterForm.resetFields();
                 setKetQuaCapTrenMap({});
-                onFilterChange({
+                setSelectedRowKeys([]);
+                const resetQuery = {
+                  PageIndex: 1,
+                  PageSize: query.PageSize || 10, 
                   Keyword: '',
                   idPhongBan: undefined,
                   idNhanSu: undefined,
                   loaiKpi: activeLoaiKpi,
                   trangThai: undefined
-                });
-                setSelectedRowKeys([]);
+                };
+                onFilterChange(resetQuery);
+                dispatch(getAllKpiCaNhan(resetQuery));
               }}
             >
               Tải lại

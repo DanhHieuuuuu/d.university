@@ -93,7 +93,7 @@ const Page = () => {
     dispatch(getListNamHocKpiDonVi());
   }, [dispatch]);
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiDonVi>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKpiDonVi>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -306,73 +306,73 @@ const Page = () => {
   const bulkActionItems: MenuProps['items'] = [
     ...(canApprove
       ? [
-          {
-            key: 'approve',
-            label: 'Phê duyệt',
-            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-            onClick: () => requiredSelect(approveSelected)
-          }
-        ]
+        {
+          key: 'approve',
+          label: 'Phê duyệt',
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          onClick: () => requiredSelect(approveSelected)
+        }
+      ]
       : []),
     ...(canApprove
       ? [
-          {
-            key: 'reject',
-            label: 'Từ chối phê duyệt',
-            icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
-            onClick: () => requiredSelect(rejectSelected) // Bạn tạo thêm 1 state openRejectModal
-          }
-        ]
+        {
+          key: 'reject',
+          label: 'Từ chối phê duyệt',
+          icon: <CloseCircleOutlined style={{ color: '#ff4d4f' }} />,
+          onClick: () => requiredSelect(rejectSelected) // Bạn tạo thêm 1 state openRejectModal
+        }
+      ]
       : []),
     ...(canScore
       ? [
-          {
-            key: 'score',
-            label: 'Chấm KPI',
-            icon: <EditOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(scoreSelected)
-          }
-        ]
+        {
+          key: 'score',
+          label: 'Chấm KPI',
+          icon: <EditOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(scoreSelected)
+        }
+      ]
       : []),
     ...(canScore
       ? [
-          {
-            key: 'cancelScore',
-            label: 'Hủy kết quả chấm KPI',
-            icon: <UndoOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(cancelScoredSelected)
-          }
-        ]
+        {
+          key: 'cancelScore',
+          label: 'Hủy kết quả chấm KPI',
+          icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(cancelScoredSelected)
+        }
+      ]
       : []),
     ...(canSyncScore
       ? [
-          {
-            key: 'syncKetQua',
-            label: 'Đồng bộ kết quả thực tế',
-            icon: <SyncOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
-          }
-        ]
+        {
+          key: 'syncKetQua',
+          label: 'Đồng bộ kết quả thực tế',
+          icon: <SyncOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(syncKetQuaThucTeToCapTren)
+        }
+      ]
       : []),
     ...(canPrincipalApprove
       ? [
-          {
-            key: 'principalApprove',
-            label: 'Phê duyệt kết quả chấm',
-            icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
-            onClick: () => requiredSelect(principalApprovedSelected)
-          }
-        ]
+        {
+          key: 'principalApprove',
+          label: 'Phê duyệt kết quả chấm',
+          icon: <EditOutlined style={{ color: '#00ff1a6b' }} />,
+          onClick: () => requiredSelect(principalApprovedSelected)
+        }
+      ]
       : []),
     ...(canPrincipalApprove
       ? [
-          {
-            key: 'cancelPrincipalApprove',
-            label: 'Hủy phê duyệt kết quả chấm',
-            icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
-            onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
-          }
-        ]
+        {
+          key: 'cancelPrincipalApprove',
+          label: 'Hủy phê duyệt kết quả chấm',
+          icon: <UndoOutlined style={{ color: '#00ff1a6b' }} />,
+          onClick: () => requiredSelect(cancelPrincipalApprovedSelected)
+        }
+      ]
       : [])
   ];
 
@@ -604,13 +604,15 @@ const Page = () => {
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-2">
-            <Input
-              placeholder="Tìm KPI..."
-              prefix={<SearchOutlined />}
-              allowClear
-              onChange={(e) => handleDebouncedSearch(e.target.value)}
-              className="max-w-[250px]"
-            />
+            <Form.Item name="Keyword" noStyle>
+              <Input
+                placeholder="Tìm KPI..."
+                prefix={<SearchOutlined />}
+                allowClear
+                onChange={(e) => handleDebouncedSearch(e.target.value)}
+                className="max-w-[250px]"
+              />
+            </Form.Item>
             <Form.Item name="idDonVi" noStyle>
               <Select
                 placeholder="Tất cả đơn vị"
@@ -629,8 +631,19 @@ const Page = () => {
               onClick={() => {
                 form.resetFields();
                 filterForm.resetFields();
-                onFilterChange({ Keyword: '', idDonVi: undefined, loaiKpi: activeLoaiKpi, trangThai: undefined });
                 setSelectedRowKeys([]);
+                const resetQuery = {
+                  PageIndex: 1,
+                  PageSize: 10, 
+                  Keyword: '',
+                  idDonVi: undefined,
+                  loaiKpi: activeLoaiKpi,
+                  trangThai: undefined,
+                  namHoc: undefined
+                };
+                onFilterChange(resetQuery);
+                dispatch(getAllKpiDonVi(resetQuery));
+                resetFilter();
               }}
             >
               {' '}

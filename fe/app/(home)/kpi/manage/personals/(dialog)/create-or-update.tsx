@@ -77,20 +77,29 @@ const PositionModal: React.FC<PositionModalProps> = (props) => {
   }, [isModalOpen, isUpdate, isView, dispatch, listCongThuc.data.length]);
 
   useEffect(() => {
-    if (!$selected.data || users.length === 0 || !isModalOpen) return;
-    const selectedData = $selected.data;
-    const nhanSuOption = selectedData.idNhanSu ? userOptions.find((u) => u.value === selectedData.idNhanSu) : undefined;
-
-    form.setFieldsValue({
-      ...selectedData,
-      idNhanSu: selectedData.idNhanSu,
-      idPhongBan: selectedData.idPhongBan,
-      loaiKPI: selectedData.loaiKpi,
-      idCongThuc: selectedData.idCongThuc,
-      congThucTinh: selectedData.congThuc,
-      namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined
-    });
-  }, [$selected.data, users, isModalOpen, userOptions, form]);
+    if (!isModalOpen) {
+      form.resetFields();
+      return;
+    }
+    if ((isUpdate || isView) && $selected.data && users.length > 0) {
+      const selectedData = $selected.data;
+      
+      form.setFieldsValue({
+        ...selectedData,
+        idNhanSu: selectedData.idNhanSu,
+        idPhongBan: selectedData.idPhongBan,
+        loaiKPI: selectedData.loaiKpi,
+        idCongThuc: selectedData.idCongThuc,
+        congThucTinh: selectedData.congThuc,
+        namHoc: selectedData.namHoc ? dayjs(selectedData.namHoc, 'YYYY') : undefined,
+        loaiKetQua: selectedData.loaiKetQua, 
+        role: selectedData.role
+      });
+    } 
+    else if (!isUpdate && !isView) {
+        form.resetFields();
+    }
+  }, [isModalOpen, isUpdate, isView, $selected.data, users, form]);
 
   useEffect(() => {
     if ($create.status === ReduxStatus.SUCCESS || $update.status === ReduxStatus.SUCCESS) {

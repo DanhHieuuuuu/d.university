@@ -88,7 +88,7 @@ const Page = () => {
     return buildKpiGroupedTable<IViewKpiDonVi>(sortedList);
   }, [list]);
 
-  const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiDonVi>({
+  const { query, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKpiDonVi>({
     total: totalItem || 0,
     initialQuery: { PageIndex: 1, PageSize: 2000, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getKpiDonViKeKhai(newQuery)),
@@ -202,43 +202,43 @@ const Page = () => {
   const bulkActionItems: MenuProps['items'] = [
     ...(canPropose
       ? [
-          {
-            key: 'propose',
-            label: 'Đề xuất',
-            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-            onClick: () => requiredSelect(proposeSelected)
-          }
-        ]
+        {
+          key: 'propose',
+          label: 'Đề xuất',
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          onClick: () => requiredSelect(proposeSelected)
+        }
+      ]
       : []),
     ...(canCancelPropose
       ? [
-          {
-            key: 'cancelPropose',
-            label: 'Hủy đề xuất',
-            icon: <CheckCircleOutlined style={{ color: 'yellow' }} />,
-            onClick: () => requiredSelect(cancelProposeSelected)
-          }
-        ]
+        {
+          key: 'cancelPropose',
+          label: 'Hủy đề xuất',
+          icon: <CheckCircleOutlined style={{ color: 'yellow' }} />,
+          onClick: () => requiredSelect(cancelProposeSelected)
+        }
+      ]
       : []),
     ...(canSendDeclared
       ? [
-          {
-            key: 'sendScore',
-            label: 'Gửi chấm',
-            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-            onClick: () => requiredSelect(approveSelected)
-          }
-        ]
+        {
+          key: 'sendScore',
+          label: 'Gửi chấm',
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          onClick: () => requiredSelect(approveSelected)
+        }
+      ]
       : []),
     ...(canCancelDeclared
       ? [
-          {
-            key: 'cancelScore',
-            label: 'Hủy gửi chấm',
-            icon: <UndoOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(cancelApproveSelected)
-          }
-        ]
+        {
+          key: 'cancelScore',
+          label: 'Hủy gửi chấm',
+          icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(cancelApproveSelected)
+        }
+      ]
       : [])
   ];
 
@@ -459,13 +459,13 @@ const Page = () => {
     },
     ...(canAssign
       ? [
-          {
-            label: 'Giao KPI',
-            icon: <RobotFilled />,
-            command: onClickAssign,
-            hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data'
-          }
-        ]
+        {
+          label: 'Giao KPI',
+          icon: <RobotFilled />,
+          command: onClickAssign,
+          hidden: (r: KpiTableRow<IViewKpiDonVi>) => r.rowType !== 'data'
+        }
+      ]
       : [])
   ];
 
@@ -499,13 +499,15 @@ const Page = () => {
         <Form form={form} layout="horizontal">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div className="flex flex-1 items-center gap-2">
-              <Input
-                placeholder="Tìm KPI..."
-                prefix={<SearchOutlined />}
-                allowClear
-                onChange={(e) => handleDebouncedSearch(e.target.value)}
-                className="max-w-[250px]"
-              />
+              <Form.Item name="Keyword" noStyle>
+                <Input
+                  placeholder="Tìm KPI..."
+                  prefix={<SearchOutlined />}
+                  allowClear
+                  onChange={(e) => handleDebouncedSearch(e.target.value)}
+                  className="max-w-[250px]"
+                />
+              </Form.Item>
               <Button
                 icon={<SyncOutlined />}
                 onClick={() => {
@@ -520,7 +522,7 @@ const Page = () => {
                   };
                   onFilterChange(defaultQuery);
                   dispatch(getKpiDonViKeKhai(defaultQuery));
-
+                  // resetFilter();
                   setKetQuaMap({});
                   setSelectedRowKeys([]);
                 }}
