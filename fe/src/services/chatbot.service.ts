@@ -1,6 +1,7 @@
 import axios from '@utils/axios';
 import { processApiMsgError } from '@utils/index';
 import { IResponseItem, IResponseArray } from '@models/common/response.model';
+import { IModelChatbot, ICreateModelChatbot, IUpdateModelChatbot } from '@models/chatbot/modelChatbot.model';
 
 const apiChatbotEndpoint = 'chatbot';
 
@@ -129,10 +130,92 @@ const deleteSession = async (sessionId: string): Promise<void> => {
   }
 };
 
+// ==================== Model Chatbot APIs ====================
+
+/**
+ * Lay danh sach tat ca Chatbot Model
+ * GET /api/chatbot/model/list
+ */
+const getModelList = async (): Promise<IModelChatbot[]> => {
+  try {
+    const res = await axios.get(`${apiChatbotEndpoint}/model/list`);
+    const data: IResponseArray<IModelChatbot> = res.data;
+    return Promise.resolve(data.data || []);
+  } catch (err) {
+    processApiMsgError(err, 'Khong the tai danh sach model');
+    return Promise.reject(err);
+  }
+};
+
+/**
+ * Lay Chatbot Model theo Id
+ * GET /api/chatbot/model/{id}
+ */
+const getModelById = async (id: number): Promise<IModelChatbot> => {
+  try {
+    const res = await axios.get(`${apiChatbotEndpoint}/model/${id}`);
+    const data: IResponseItem<IModelChatbot> = res.data;
+    return Promise.resolve(data.data);
+  } catch (err) {
+    processApiMsgError(err, 'Khong the tai thong tin model');
+    return Promise.reject(err);
+  }
+};
+
+/**
+ * Them moi Chatbot Model
+ * POST /api/chatbot/model/create
+ */
+const createModel = async (model: ICreateModelChatbot): Promise<IModelChatbot> => {
+  try {
+    const res = await axios.post(`${apiChatbotEndpoint}/model/create`, model);
+    const data: IResponseItem<IModelChatbot> = res.data;
+    return Promise.resolve(data.data);
+  } catch (err) {
+    processApiMsgError(err, 'Khong the tao model moi');
+    return Promise.reject(err);
+  }
+};
+
+/**
+ * Cap nhat Chatbot Model
+ * PUT /api/chatbot/model/update
+ */
+const updateModel = async (model: IUpdateModelChatbot): Promise<IModelChatbot> => {
+  try {
+    const res = await axios.put(`${apiChatbotEndpoint}/model/update`, model);
+    const data: IResponseItem<IModelChatbot> = res.data;
+    return Promise.resolve(data.data);
+  } catch (err) {
+    processApiMsgError(err, 'Khong the cap nhat model');
+    return Promise.reject(err);
+  }
+};
+
+/**
+ * Xoa Chatbot Model
+ * DELETE /api/chatbot/model/delete/{id}
+ */
+const deleteModel = async (id: number): Promise<void> => {
+  try {
+    await axios.delete(`${apiChatbotEndpoint}/model/delete/${id}`);
+    return Promise.resolve();
+  } catch (err) {
+    processApiMsgError(err, 'Khong the xoa model');
+    return Promise.reject(err);
+  }
+};
+
 export const ChatbotService = {
   sendMessage,
   getSessionHistory,
   getHistoryByMssv,
   getSessions,
-  deleteSession
+  deleteSession,
+  // Model APIs
+  getModelList,
+  getModelById,
+  createModel,
+  updateModel,
+  deleteModel
 };

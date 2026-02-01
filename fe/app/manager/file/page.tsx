@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Breadcrumb, Button, Card, Form, Input, Modal, Image } from 'antd';
 import {
   DeleteOutlined,
+  DownloadOutlined,
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
@@ -48,6 +49,21 @@ const Page = () => {
 
   const getImageUrl = (fileName: string) => {
     return `${process.env.NEXT_PUBLIC_AUTH_API_URL}s3-test/download?fileName=${encodeURIComponent(fileName)}`;
+  };
+
+  // Hàm kiểm tra file có phải là ảnh hay không
+  const isImageFile = (fileName: string): boolean => {
+    const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'ico'];
+    const extension = fileName.split('.').pop()?.toLowerCase() || '';
+    return imageExtensions.includes(extension);
+  };
+
+  // Hàm tải file xuống
+  const downloadFile = (file: IFile) => {
+    if (file.link) {
+      const downloadUrl = getImageUrl(file.link);
+      window.open(downloadUrl, '_blank');
+    }
   };
 
   const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter({
@@ -105,8 +121,14 @@ const Page = () => {
 
   const onClickPreview = (file: IFile) => {
     if (file.link) {
-      const imageUrl = getImageUrl(file.link);
-      setPreviewImage(imageUrl);
+      // Kiểm tra nếu là file ảnh thì preview, nếu không thì tải xuống
+      if (isImageFile(file.link)) {
+        const imageUrl = getImageUrl(file.link);
+        setPreviewImage(imageUrl);
+      } else {
+        // Không phải file ảnh, tải xuống thay vì preview
+        downloadFile(file);
+      }
     } else {
       toast.warning('File không có link để preview');
     }
@@ -165,7 +187,17 @@ const Page = () => {
       label: 'Preview',
       tooltip: 'Xem ảnh',
       icon: <EyeOutlined />,
-      command: (record: IFile) => onClickPreview(record)
+      command: (record: IFile) => onClickPreview(record),
+      // Chỉ hiện nút Preview cho file ảnh
+      hidden: (record: IFile) => !record.link || !isImageFile(record.link)
+    },
+    {
+      label: 'Tải xuống',
+      tooltip: 'Tải xuống file',
+      icon: <DownloadOutlined />,
+      command: (record: IFile) => downloadFile(record),
+      // Chỉ hiện nút Tải xuống cho file không phải ảnh
+      hidden: (record: IFile) => !record.link || isImageFile(record.link)
     },
     {
       label: 'Cập nhật',
