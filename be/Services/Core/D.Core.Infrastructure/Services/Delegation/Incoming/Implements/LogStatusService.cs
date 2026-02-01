@@ -84,8 +84,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             if (dto.EndDate.HasValue)
             {
-                var end = dto.EndDate.Value.Date.AddDays(1).AddTicks(-1);
-                query = query.Where(x => x.CreatedDate <= end);
+                var end = dto.EndDate.Value.Date.AddDays(1);
+                query = query.Where(x => x.CreatedDate < end);
             }
 
 
