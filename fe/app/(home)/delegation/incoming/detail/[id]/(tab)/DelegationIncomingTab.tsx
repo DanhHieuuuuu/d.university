@@ -21,6 +21,8 @@ const REQUIRED_RULE = [{ required: true, message: 'Trường này không đượ
 const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProps>(
   ({ data, isEdit = false, onUpdated, onUpdatedSuccess }, ref) => {
     const [form] = Form.useForm();
+    const requestDate = Form.useWatch('requestDate', form);
+
     const selectedPhongBan = Form.useWatch("idPhongBan", form);
     const dispatch = useAppDispatch();
     useImperativeHandle(ref, () => form);
@@ -117,12 +119,13 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
                 .filter((ns) => ns.idPhongBan === selectedPhongBan)
                 .map((ns) => ({
                   value: ns.idNhanSu,
-                  label: ns.tenNhanSu
+                  label: `${ns.tenNhanSu} - ${ns.supporterCode}`
                 }))}
             />,
             {
               isEdit,
-              displayValueFormatter: (val) => listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu ?? '-'
+              rules: [{ required: true,  message: 'Nhân sự tiếp đón không được để trống'}],
+              displayValueFormatter: (val) => listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu ? `${listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu} - ${listNhanSu.find((ns) => ns.idNhanSu === val)?.supporterCode}` : '-',
             }
           )
         },
@@ -139,24 +142,61 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
         },
         {
           label: 'SĐT liên hệ',
-          value: renderField('phoneNumber', data.phoneNumber, <Input />, {
-            isEdit,
-            rules: [{ required: true, message: 'Số điện thoại liên hệ không được để trống' }]
-          })
+          value: renderField(
+            'phoneNumber',
+            data.phoneNumber,
+            <Input placeholder="Nhập số điện thoại" />,
+            {
+              isEdit,
+              rules: [
+                { required: true, message: 'Số điện thoại liên hệ không được để trống' },
+                {
+                  pattern: /^(0[3|5|7|8|9])[0-9]{8}$/,
+                  message: 'Số điện thoại không hợp lệ'
+                }
+              ]
+            }
+          )
         },
         {
           label: 'Ngày yêu cầu',
-          value: renderField('requestDate', dayjs(data.requestDate), <DatePicker style={{ width: '100%' }} />, {
-            isEdit,
-            rules: [{ required: true, message: 'Ngày yêu cầu không được để trống' }]
-          })
+          value: renderField(
+            'requestDate',
+            dayjs(data.requestDate),
+            <DatePicker
+              style={{ width: '100%' }}
+              disabledDate={(current) =>
+                current && current < dayjs().startOf('day')
+              }
+              onChange={() => {
+                // reset ngày tiếp đón khi đổi ngày yêu cầu
+                form.setFieldValue('receptionDate', null);
+              }}
+            />,
+            {
+              isEdit,
+              rules: [{ required: true, message: 'Ngày yêu cầu không được để trống' }]
+            }
+          )
         },
         {
           label: 'Ngày tiếp đón',
-          value: renderField('receptionDate', dayjs(data.receptionDate), <DatePicker style={{ width: '100%' }} />, {
-            isEdit,
-            rules: [{ required: true, message: 'Ngày tiếp đón không được để trống' }]
-          })
+          value: renderField(
+            'receptionDate',
+            dayjs(data.receptionDate),
+            <DatePicker
+              style={{ width: '100%' }}
+              disabled={!requestDate} // 🔥 CHƯA CÓ ngày yêu cầu → disable
+              disabledDate={(current) => {
+                if (!requestDate) return true;
+                return current.isBefore(dayjs(requestDate), 'day');
+              }}
+            />,
+            {
+              isEdit,
+              rules: [{ required: true, message: 'Ngày tiếp đón không được để trống' }]
+            }
+          )
         }
       ];
     }, [data, isEdit, listPhongBan, listNhanSu, selectedPhongBan]);

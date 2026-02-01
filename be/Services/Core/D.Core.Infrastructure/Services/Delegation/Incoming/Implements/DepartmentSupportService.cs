@@ -216,55 +216,24 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 }
             }
             // Xoá mềm những nguòi nếu request gửi lên ko có 
-            var requestIds = dto.Supporters      
-                .Select(x => x.SupporterId)
-                .ToList();
+            var deleteOld = _unitOfWork.iSupporterRepository.Table.Where(x => x.DepartmentSupportId == dto.Id);
+            var createNew = new List<Supporter>();
 
-            var supportersToSoftDelete = departmentSupport.Supporters
-                .Where(x => !x.Deleted && !requestIds.Contains(x.SupporterId))
-                .ToList();
-
-            foreach (var supporter in supportersToSoftDelete)
-            {
-                supporter.Deleted = true;
-            }
             // Update supporter
             foreach (var item in dto.Supporters)
             {
-                // check nhân sự có tồn tại không
-                var nhanSuExist = await _unitOfWork.iNsNhanSuRepository
-                    .TableNoTracking
-                    .AnyAsync(x => x.Id == item.SupporterId && !x.Deleted);
-
-                if (!nhanSuExist)
-                    throw new Exception($"Không tồn tại nhân sự ID = {item.SupporterId}");
-
-                // tìm supporter trong bảng Supporter
-                var supporter = await _unitOfWork.iSupporterRepository
-                    .Table
-                    .FirstOrDefaultAsync(x => x.SupporterId == item.SupporterId);
-
-                if (supporter != null)
+                // Tạo mới supporter khi chưa có trong bảng supporter
+                var supporterNew = new Supporter
                 {
-                    // đã có supporterId → gán và cập nhật
-                    supporter.SupporterCode = item.SupporterCode;
-                    supporter.DepartmentSupportId = departmentSupport.Id;
-                    supporter.Deleted = false;
-                }
-                else
-                {
-                    // Tạo mới supporter khi chưa có trong bảng supporter
-                    var supporterNew = new Supporter
-                    {
-                        SupporterId = item.SupporterId,
-                        SupporterCode = item.SupporterCode,
-                        DepartmentSupportId = departmentSupport.Id,
-                        Deleted = false
-                    };
-
-                    _unitOfWork.iSupporterRepository.Add(supporterNew);
-                }
+                    SupporterId = item.SupporterId,
+                    SupporterCode = item.SupporterCode,
+                    DepartmentSupportId = departmentSupport.Id,
+                    Deleted = false 
+                };
+                createNew.Add(supporterNew);
             }
+            _unitOfWork.iSupporterRepository.DeleteRange(deleteOld);
+            _unitOfWork.iSupporterRepository.AddRange(createNew);
             _unitOfWork.iDepartmentSupportRepository.Update(departmentSupport);
             await _unitOfWork.SaveChangesAsync();
 
@@ -315,11 +284,17 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
                 Supporters = detail.Supporters
                     .Where(s => !s.Deleted)
-                    .Select(s => new DepartmentSupporterDto
-                    {
-                        SupporterId = s.SupporterId,
-                        SupporterCode = s.SupporterCode
-                    })            
+                    .Join(
+                        _unitOfWork.iNsNhanSuRepository.Table,
+                        s => s.SupporterId,
+                        ns => ns.Id,
+                        (s, ns) => new DepartmentSupporterDto
+                        {
+                            SupporterId = s.SupporterId,
+                            SupporterCode = s.SupporterCode,
+                            TenNhanSu = $"{ns.HoDem} {ns.Ten}",
+                        }
+                    )
                     .ToList()
             };
 

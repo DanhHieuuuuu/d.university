@@ -445,7 +445,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                  {
                      IdNhanSu = ns.Id,
                      TenNhanSu = (ns.HoDem ?? "") + " " + (ns.Ten ?? ""),
-                     IdPhongBan = ns.HienTaiPhongBan
+                     IdPhongBan = ns.HienTaiPhongBan,
+                     SupporterCode = ns.MaNhanSu
 
                  })
                 .ToList();
