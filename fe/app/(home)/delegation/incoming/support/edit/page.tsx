@@ -135,7 +135,7 @@ const DepartmentSupport = () => {
                 <div style={{ lineHeight: 1.8 }}>
                   {supporters.map((s, i) => (
                     <div key={s.supporterId}>
-                      {i + 1}. {s.supporterCode}
+                      {i + 1}. {s.tenNhanSu} - {s.supporterCode}
                     </div>
                   ))}
                 </div>
@@ -187,7 +187,7 @@ const DepartmentSupport = () => {
                         rules={[{ required: true, message: 'Nhập mã NV' }]}
                         style={{ flex: 1, marginBottom: 0, minWidth: 0 }}
                       >
-                        <Input placeholder="Mã NV" />
+                        <Input placeholder="Mã NV" disabled/>
                       </Form.Item>
 
                       <Button danger onClick={() => remove(name)}>

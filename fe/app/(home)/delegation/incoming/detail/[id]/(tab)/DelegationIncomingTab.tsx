@@ -117,12 +117,13 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
                 .filter((ns) => ns.idPhongBan === selectedPhongBan)
                 .map((ns) => ({
                   value: ns.idNhanSu,
-                  label: ns.tenNhanSu
+                  label: `${ns.tenNhanSu} - ${ns.supporterCode}`
                 }))}
             />,
             {
               isEdit,
-              displayValueFormatter: (val) => listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu ?? '-'
+              rules: [{ required: true,  message: 'Nhân sự tiếp đón không được để trống'}],
+              displayValueFormatter: (val) => listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu ? `${listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu} - ${listNhanSu.find((ns) => ns.idNhanSu === val)?.supporterCode}` : '-',
             }
           )
         },
@@ -139,10 +140,21 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
         },
         {
           label: 'SĐT liên hệ',
-          value: renderField('phoneNumber', data.phoneNumber, <Input />, {
-            isEdit,
-            rules: [{ required: true, message: 'Số điện thoại liên hệ không được để trống' }]
-          })
+          value: renderField(
+            'phoneNumber',
+            data.phoneNumber,
+            <Input placeholder="Nhập số điện thoại" />,
+            {
+              isEdit,
+              rules: [
+                { required: true, message: 'Số điện thoại liên hệ không được để trống' },
+                {
+                  pattern: /^(0[3|5|7|8|9])[0-9]{8}$/,
+                  message: 'Số điện thoại không hợp lệ'
+                }
+              ]
+            }
+          )
         },
         {
           label: 'Ngày yêu cầu',

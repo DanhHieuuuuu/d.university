@@ -184,7 +184,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
                 placeholder={idPhongBan ? 'Chọn nhân sự' : 'Chọn phòng ban trước'}
                 options={filteredNhanSu.map((ns: any) => ({
                   value: ns.idNhanSu,
-                  label: ns.tenNhanSu
+                  label: `${ns.tenNhanSu} - ${ns.supporterCode}`
                 }))}
               />
             </Form.Item>
