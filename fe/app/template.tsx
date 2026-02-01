@@ -20,7 +20,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
     }
 
     dispatch(myPermissionThunk());
-    dispatch($fetchNotification({ PageIndex: 1, PageSize: 10, short: true }));
+
+    // disable notification
+    // dispatch($fetchNotification({ PageIndex: 1, PageSize: 10, short: true }));
   }, [pathname]);
 
   return <>{children}</>;

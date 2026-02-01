@@ -1,7 +1,7 @@
 'use client';
 import { toast } from 'react-toastify';
-import React, { useEffect, useState } from 'react';
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Space, Select, Card, Checkbox, Tabs, TabsProps, Upload } from 'antd';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { Button, Col, DatePicker, Form, Input, Modal, Row, Space, Select, Card, Checkbox, Tabs, TabsProps, Upload, Collapse } from 'antd';
 import { CloseOutlined, SaveOutlined, FileExcelOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { createRequest, updateRequest, importExcelQuestions } from '@redux/feature/survey/surveyThunk';
@@ -325,9 +325,11 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
           </Col>
           <Form.Item
             noStyle
-            shouldUpdate={(prevValues, currentValues) =>
-              prevValues.targets?.[0]?.loaiDoiTuong !== currentValues.targets?.[0]?.loaiDoiTuong
-            }
+            shouldUpdate={(prevValues, currentValues) => {
+              const prevType = prevValues?.targets?.[0]?.loaiDoiTuong;
+              const currType = currentValues?.targets?.[0]?.loaiDoiTuong;
+              return prevType !== currType;
+            }}
           >
             {({ getFieldValue }) => {
               const targetType = getFieldValue(['targets', 0, 'loaiDoiTuong']);
@@ -489,193 +491,207 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
       <Form.List name="questions">
         {(fields, { add: addQuestion, remove: removeQuestion }) => {
           const handleAddQuestion = () => {
-            addQuestion({ thuTu: fields.length + 1, answers: [{ thuTu: 1 }, { thuTu: 2 }] });
-            setTimeout(() => {
-              const questions = form.getFieldValue('questions') || [];
-              questions.forEach((_: any, index: number) => {
-                form.setFieldValue(['questions', index, 'thuTu'], index + 1);
-              });
-            }, 0);
+            const currentQuestions = form.getFieldValue('questions') || [];
+            addQuestion({ thuTu: currentQuestions.length + 1, answers: [{ thuTu: 1 }, { thuTu: 2 }] });
           };
 
           const handleRemoveQuestion = (name: number) => {
             removeQuestion(name);
-            setTimeout(() => {
-              const questions = form.getFieldValue('questions') || [];
-              questions.forEach((_: any, index: number) => {
-                form.setFieldValue(['questions', index, 'thuTu'], index + 1);
-              });
-            }, 0);
+            // Re-index after removal
+            const questions = form.getFieldValue('questions') || [];
+            const updatedQuestions = questions.filter((_: any, idx: number) => idx !== name);
+            updatedQuestions.forEach((_: any, index: number) => {
+              updatedQuestions[index].thuTu = index + 1;
+            });
+            form.setFieldValue('questions', updatedQuestions);
           };
+
 
           return (
             <>
-              {fields.map(({ key, name, ...restField }) => (
-              <Card
-                key={key}
-                size="small"
-                style={{ marginBottom: 16, backgroundColor: '#fafafa' }}
-                title={`Câu hỏi ${name + 1}`}
-                extra={
-                  !isViewMode && (
-                    <Button type="link" danger onClick={() => handleRemoveQuestion(name)}>
-                      Xóa câu hỏi này
-                    </Button>
-                  )
-                }
+              <Collapse 
+                accordion={false}
+                defaultActiveKey={fields.length <= 3 ? fields.map((f) => f.key) : []}
+                style={{ marginBottom: 16 }}
               >
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <Form.Item
-                      {...restField}
-                      label="Mã câu hỏi"
-                      name={[name, 'maCauHoi']}
-                      rules={[{ required: true, message: 'Nhập mã câu hỏi' }]}
-                    >
-                      <Input placeholder="Mã câu hỏi" disabled={isViewMode} />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item
-                      {...restField}
-                      label="Loại câu hỏi"
-                      name={[name, 'loaiCauHoi']}
-                      rules={[{ required: true, message: 'Chọn loại câu hỏi' }]}
-                    >
-                      <Select
-                        placeholder="Loại câu hỏi"
-                        disabled={isViewMode}
-                        onChange={(value) => {
-                          if (value === 3) {
-                            form.setFieldValue(['questions', name, 'answers'], []);
-                          }
-                        }}
-                      >
-                        <Option value={1}>Trắc nghiệm</Option>
-                        <Option value={2}>Chọn nhiều đáp án</Option>
-                        <Option value={3}>Tự luận</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  {!isViewMode && (
-                    <Col span={8}>
-                      <Form.Item {...restField} label="Thứ tự hiển thị" name={[name, 'thuTu']} initialValue={name + 1}>
-                        <Input type="number" placeholder="Thứ tự" disabled />
-                      </Form.Item>
-                    </Col>
-                  )}
-                </Row>
-                <Form.Item
-                  {...restField}
-                  label="Nội dung câu hỏi"
-                  name={[name, 'noiDung']}
-                  rules={[{ required: true, message: 'Nhập nội dung câu hỏi' }]}
-                >
-                  <TextArea rows={2} placeholder="Nội dung câu hỏi" disabled={isViewMode} />
-                </Form.Item>
-                <Form.Item {...restField} label="Câu hỏi bắt buộc" name={[name, 'batBuoc']} valuePropName="checked">
-                  <Checkbox disabled={isViewMode}>Bắt buộc trả lời</Checkbox>
-                </Form.Item>
-
-                {/* Only show answers section for multiple choice questions (type 1 or 2), not essay (type 3) */}
-                <Form.Item noStyle shouldUpdate>
-                  {({ getFieldValue }) => {
-                    const questionType = getFieldValue(['questions', name, 'loaiCauHoi']);
-
-                    // Only show answers for type 1 (Trắc nghiệm) or type 2 (Chọn nhiều đáp án)
-                    if (questionType === 3) {
-                      return null;
-                    }
-
-                    return (
-                      <div style={{ marginTop: 8, paddingLeft: 16, borderLeft: '2px solid #1677ff' }}>
-                        <Form.List name={[name, 'answers']}>
-                          {(answerFields, { add: addAnswer, remove: removeAnswer }) => {
-                            // Wrapper functions to update thuTu after add/remove
-                            const handleAddAnswer = () => {
-                              addAnswer({ thuTu: answerFields.length + 1 });
-                              setTimeout(() => {
-                                const answers = form.getFieldValue(['questions', name, 'answers']) || [];
-                                answers.forEach((_: any, index: number) => {
-                                  form.setFieldValue(['questions', name, 'answers', index, 'thuTu'], index + 1);
-                                });
-                              }, 0);
-                            };
-
-                            const handleRemoveAnswer = (answerName: number) => {
-                              removeAnswer(answerName);
-                              setTimeout(() => {
-                                const answers = form.getFieldValue(['questions', name, 'answers']) || [];
-                                answers.forEach((_: any, index: number) => {
-                                  form.setFieldValue(['questions', name, 'answers', index, 'thuTu'], index + 1);
-                                });
-                              }, 0);
-                            };
-
-                            return (
-                              <>
-                              {answerFields.map((answerField, index) => {
-                                const { key, ...answerRestField } = answerField;
-                                return (
-                                  <Row key={key} gutter={16} align="middle" style={{ marginBottom: 8 }}>
-                                    <Col span={7}>
-                                      <Form.Item
-                                        label={index === 0 ? "Nội dung đáp án" : null}
-                                        name={[answerField.name, 'noiDung']}
-                                        rules={[{ required: true, message: 'Nhập nội dung' }]}
-                                        style={{ marginBottom: 0 }}
-                                      >
-                                        <Input placeholder="Nội dung" disabled={isViewMode} />
-                                      </Form.Item>
-                                    </Col>
-                                    <Col span={5}>
-                                      <Form.Item label={index === 0 ? "Giá trị" : null} name={[answerField.name, 'value']} style={{ marginBottom: 0 }}>
-                                        <Input type="number" placeholder="Số" disabled={isViewMode} />
-                                      </Form.Item>
-                                    </Col>
-                                    {!isViewMode && (
-                                      <Col span={5}>
-                                        <Form.Item label={index === 0 ? "Thứ tự" : null} name={[answerField.name, 'thuTu']} style={{ marginBottom: 0 }} initialValue={index + 1}>
-                                          <Input type="number" placeholder="Thứ tự" disabled />
-                                        </Form.Item>
-                                      </Col>
-                                    )}
-                                    <Col span={5}>
-                                      <Form.Item label={index === 0 ? "Đáp án đúng" : null} name={[answerField.name, 'isCorrect']} valuePropName="checked" style={{ marginBottom: 0 }}>
-                                        <Checkbox disabled={isViewMode}>Đúng</Checkbox>
-                                      </Form.Item>
-                                    </Col>
-                                    <Col span={2}>
-                                      {!isViewMode && (
-                                        <Button type="link" danger onClick={() => handleRemoveAnswer(answerField.name)} style={index === 0 ? { marginTop: 30 } : {}}>
-                                          X
-                                        </Button>
-                                      )}
-                                    </Col>
-                                  </Row>
-                                );
-                              })}
+                {fields.map(({ key, name, ...restField }) => (
+                  <Collapse.Panel
+                    key={key}
+                    header={
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>Câu hỏi {name + 1}</span>
                         {!isViewMode && (
-                          <Button type="dashed" size="small" onClick={handleAddAnswer} style={{ marginTop: 8 }}>
-                            + Thêm đáp án
+                          <Button 
+                            type="link" 
+                            danger 
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveQuestion(name);
+                            }}
+                          >
+                            Xóa
                           </Button>
                         )}
-                              </>
-                            );
-                          }}
-                        </Form.List>
-                        </div>
-                      );
-                    }}
-                  </Form.Item>
-              </Card>
-            ))}
-            {!isViewMode && (
-              <Button type="dashed" onClick={handleAddQuestion} block icon={<span style={{ fontSize: 16 }}>+</span>}>
-                Thêm câu hỏi mới
-              </Button>
-            )}
-          </>
+                      </div>
+                    }
+                  >
+                    <Row gutter={16}>
+                      <Col span={8}>
+                        <Form.Item
+                          {...restField}
+                          label="Mã câu hỏi"
+                          name={[name, 'maCauHoi']}
+                          rules={[{ required: true, message: 'Nhập mã câu hỏi' }]}
+                        >
+                          <Input placeholder="Mã câu hỏi" disabled={isViewMode} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={8}>
+                        <Form.Item
+                          {...restField}
+                          label="Loại câu hỏi"
+                          name={[name, 'loaiCauHoi']}
+                          rules={[{ required: true, message: 'Chọn loại câu hỏi' }]}
+                        >
+                          <Select
+                            placeholder="Loại câu hỏi"
+                            disabled={isViewMode}
+                            onChange={(value) => {
+                              if (value === 3) {
+                                form.setFieldValue(['questions', name, 'answers'], []);
+                              }
+                            }}
+                          >
+                            <Option value={1}>Trắc nghiệm</Option>
+                            <Option value={2}>Chọn nhiều đáp án</Option>
+                            <Option value={3}>Tự luận</Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      {!isViewMode && (
+                        <Col span={8}>
+                          <Form.Item {...restField} label="Thứ tự hiển thị" name={[name, 'thuTu']} initialValue={name + 1}>
+                            <Input type="number" placeholder="Thứ tự" disabled />
+                          </Form.Item>
+                        </Col>
+                      )}
+                    </Row>
+                    <Form.Item
+                      {...restField}
+                      label="Nội dung câu hỏi"
+                      name={[name, 'noiDung']}
+                      rules={[{ required: true, message: 'Nhập nội dung câu hỏi' }]}
+                    >
+                      <TextArea rows={2} placeholder="Nội dung câu hỏi" disabled={isViewMode} />
+                    </Form.Item>
+                    <Form.Item {...restField} label="Câu hỏi bắt buộc" name={[name, 'batBuoc']} valuePropName="checked">
+                      <Checkbox disabled={isViewMode}>Bắt buộc trả lời</Checkbox>
+                    </Form.Item>
+
+                    {/* Only show answers section for multiple choice questions (type 1 or 2), not essay (type 3) */}
+                    <Form.Item 
+                      noStyle 
+                      shouldUpdate={(prevValues, currentValues) => {
+                        const prevType = prevValues?.questions?.[name]?.loaiCauHoi;
+                        const currType = currentValues?.questions?.[name]?.loaiCauHoi;
+                        return prevType !== currType;
+                      }}
+                    >
+                      {({ getFieldValue }) => {
+                        const questionType = getFieldValue(['questions', name, 'loaiCauHoi']);
+
+                        // Only show answers for type 1 (Trắc nghiệm) or type 2 (Chọn nhiều đáp án)
+                        if (questionType === 3) {
+                          return null;
+                        }
+
+                        return (
+                          <div style={{ marginTop: 8, paddingLeft: 16, borderLeft: '2px solid #1677ff' }}>
+                            <Form.List name={[name, 'answers']}>
+                              {(answerFields, { add: addAnswer, remove: removeAnswer }) => {
+                                // Wrapper functions to update thuTu after add/remove
+                                const handleAddAnswer = () => {
+                                  const currentAnswers = form.getFieldValue(['questions', name, 'answers']) || [];
+                                  addAnswer({ thuTu: currentAnswers.length + 1 });
+                                };
+
+                                const handleRemoveAnswer = (answerName: number) => {
+                                  removeAnswer(answerName);
+                                  // Re-index after removal
+                                  const answers = form.getFieldValue(['questions', name, 'answers']) || [];
+                                  const updatedAnswers = answers.filter((_: any, idx: number) => idx !== answerName);
+                                  updatedAnswers.forEach((_: any, index: number) => {
+                                    updatedAnswers[index].thuTu = index + 1;
+                                  });
+                                  form.setFieldValue(['questions', name, 'answers'], updatedAnswers);
+                                };
+
+                                return (
+                                  <>
+                                  {answerFields.map((answerField, index) => {
+                                    const { key, ...answerRestField } = answerField;
+                                    return (
+                                      <Row key={key} gutter={16} align="middle" style={{ marginBottom: 8 }}>
+                                        <Col span={7}>
+                                          <Form.Item
+                                            label={index === 0 ? "Nội dung đáp án" : null}
+                                            name={[answerField.name, 'noiDung']}
+                                            rules={[{ required: true, message: 'Nhập nội dung' }]}
+                                            style={{ marginBottom: 0 }}
+                                          >
+                                            <Input placeholder="Nội dung" disabled={isViewMode} />
+                                          </Form.Item>
+                                        </Col>
+                                        <Col span={5}>
+                                          <Form.Item label={index === 0 ? "Giá trị" : null} name={[answerField.name, 'value']} style={{ marginBottom: 0 }}>
+                                            <Input type="number" placeholder="Số" disabled={isViewMode} />
+                                          </Form.Item>
+                                        </Col>
+                                        {!isViewMode && (
+                                          <Col span={5}>
+                                            <Form.Item label={index === 0 ? "Thứ tự" : null} name={[answerField.name, 'thuTu']} style={{ marginBottom: 0 }} initialValue={index + 1}>
+                                              <Input type="number" placeholder="Thứ tự" disabled />
+                                            </Form.Item>
+                                          </Col>
+                                        )}
+                                        <Col span={5}>
+                                          <Form.Item label={index === 0 ? "Đáp án đúng" : null} name={[answerField.name, 'isCorrect']} valuePropName="checked" style={{ marginBottom: 0 }}>
+                                            <Checkbox disabled={isViewMode}>Đúng</Checkbox>
+                                          </Form.Item>
+                                        </Col>
+                                        <Col span={2}>
+                                          {!isViewMode && (
+                                            <Button type="link" danger onClick={() => handleRemoveAnswer(answerField.name)} style={index === 0 ? { marginTop: 30 } : {}}>
+                                              X
+                                            </Button>
+                                          )}
+                                        </Col>
+                                      </Row>
+                                    );
+                                  })}
+                            {!isViewMode && (
+                              <Button type="dashed" size="small" onClick={handleAddAnswer} style={{ marginTop: 8 }}>
+                                + Thêm đáp án
+                              </Button>
+                            )}
+                                  </>
+                                );
+                              }}
+                            </Form.List>
+                            </div>
+                          );
+                        }}
+                      </Form.Item>
+                  </Collapse.Panel>
+                ))}
+              </Collapse>
+              {!isViewMode && (
+                <Button type="dashed" onClick={handleAddQuestion} block icon={<span style={{ fontSize: 16 }}>+</span>}>
+                  Thêm câu hỏi mới
+                </Button>
+              )}
+            </>
           );
         }}
       </Form.List>
@@ -711,6 +727,7 @@ const CreateOrUpdateRequestModal: React.FC<CreateOrUpdateRequestModalProps> = ({
         layout="vertical"
         onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
+        validateTrigger="onSubmit"
         initialValues={{
           targets: [{}],
           questions: [{ answers: [{ thuTu: 1 }, { thuTu: 2 }] }],

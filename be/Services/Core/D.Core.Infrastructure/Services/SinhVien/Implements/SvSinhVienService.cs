@@ -673,5 +673,21 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
         }
 
         #endregion
+
+        public async Task<SvThongKeResponseDto> GetThongKe()
+        {
+            _logger.LogInformation($"{nameof(GetThongKe)} method called.");
+
+            var tongSoSinhVien = await _unitOfWork.iSvSinhVienRepository.TableNoTracking.CountAsync();
+            var tongSoMonHoc = await _unitOfWork.iDtMonHocRepository.TableNoTracking.CountAsync();
+            var tongSoKhoa = await _unitOfWork.iDtKhoaRepository.TableNoTracking.CountAsync();
+
+            return new SvThongKeResponseDto
+            {
+                TongSoSinhVien = tongSoSinhVien,
+                TongSoMonHoc = tongSoMonHoc,
+                TongSoKhoa = tongSoKhoa
+            };
+        }
     }
 }

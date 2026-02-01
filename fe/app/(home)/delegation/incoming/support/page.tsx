@@ -213,6 +213,7 @@ const Page = () => {
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
         data-permission={PermissionCoreConst.CoreTableDepartment}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 350px)' }}
       />
       <CreateDepartmentSupportModal
         isModalOpen={isModalOpen}
