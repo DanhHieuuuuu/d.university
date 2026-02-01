@@ -1,6 +1,7 @@
 using D.ApplicationBase;
 using D.Core.Domain.Dtos.SinhVien.ChatbotHistory;
 using D.Core.Infrastructure.Repositories.SinhVien;
+using Microsoft.EntityFrameworkCore;
 
 namespace D.Core.Application.Command.SinhVien.ChatbotHistory
 {
@@ -18,11 +19,17 @@ namespace D.Core.Application.Command.SinhVien.ChatbotHistory
             CancellationToken cancellationToken
         )
         {
-            var entity = _repository.FindById(req.Id);
-            if (entity == null)
-                throw new Exception("Không tìm thấy lịch sử chatbot!");
+            if (string.IsNullOrEmpty(req.SessionId))
+                throw new Exception("SessionId không được để trống!");
 
-            _repository.Delete(entity);
+            var entities = await _repository.Table
+                .Where(x => x.SessionId == req.SessionId)
+                .ToListAsync(cancellationToken);
+
+            if (!entities.Any())
+                throw new Exception("Không tìm thấy lịch sử chatbot với SessionId này!");
+
+            _repository.DeleteRange(entities);
             await _repository.SaveChangeAsync();
 
             return true;
