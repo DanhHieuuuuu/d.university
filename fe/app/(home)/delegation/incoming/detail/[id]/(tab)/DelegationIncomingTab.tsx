@@ -21,6 +21,8 @@ const REQUIRED_RULE = [{ required: true, message: 'Trường này không đượ
 const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProps>(
   ({ data, isEdit = false, onUpdated, onUpdatedSuccess }, ref) => {
     const [form] = Form.useForm();
+    const requestDate = Form.useWatch('requestDate', form);
+
     const selectedPhongBan = Form.useWatch("idPhongBan", form);
     const dispatch = useAppDispatch();
     useImperativeHandle(ref, () => form);
@@ -158,17 +160,43 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
         },
         {
           label: 'Ngày yêu cầu',
-          value: renderField('requestDate', dayjs(data.requestDate), <DatePicker style={{ width: '100%' }} />, {
-            isEdit,
-            rules: [{ required: true, message: 'Ngày yêu cầu không được để trống' }]
-          })
+          value: renderField(
+            'requestDate',
+            dayjs(data.requestDate),
+            <DatePicker
+              style={{ width: '100%' }}
+              disabledDate={(current) =>
+                current && current < dayjs().startOf('day')
+              }
+              onChange={() => {
+                // reset ngày tiếp đón khi đổi ngày yêu cầu
+                form.setFieldValue('receptionDate', null);
+              }}
+            />,
+            {
+              isEdit,
+              rules: [{ required: true, message: 'Ngày yêu cầu không được để trống' }]
+            }
+          )
         },
         {
           label: 'Ngày tiếp đón',
-          value: renderField('receptionDate', dayjs(data.receptionDate), <DatePicker style={{ width: '100%' }} />, {
-            isEdit,
-            rules: [{ required: true, message: 'Ngày tiếp đón không được để trống' }]
-          })
+          value: renderField(
+            'receptionDate',
+            dayjs(data.receptionDate),
+            <DatePicker
+              style={{ width: '100%' }}
+              disabled={!requestDate} // 🔥 CHƯA CÓ ngày yêu cầu → disable
+              disabledDate={(current) => {
+                if (!requestDate) return true;
+                return current.isBefore(dayjs(requestDate), 'day');
+              }}
+            />,
+            {
+              isEdit,
+              rules: [{ required: true, message: 'Ngày tiếp đón không được để trống' }]
+            }
+          )
         }
       ];
     }, [data, isEdit, listPhongBan, listNhanSu, selectedPhongBan]);

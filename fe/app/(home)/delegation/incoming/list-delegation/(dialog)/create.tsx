@@ -27,6 +27,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
   const dispatch = useAppDispatch();
   const { selected, $create, listPhongBan, listNhanSu } = useAppSelector((state) => state.delegationState);
   const [form] = Form.useForm<ICreateDoanVao>();
+  
   const [title, setTitle] = useState<string>('');
   const [excelFile, setExcelFile] = useState<File | null>(null);
   const requestDate = Form.useWatch('requestDate', form);
@@ -198,7 +199,13 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="SĐT liên hệ" name="phoneNumber" rules={[{ required: true, message: 'Vui lòng số điện thoại' }]}>
+            <Form.Item label="SĐT liên hệ" name="phoneNumber" rules={[
+                          { required: true, message: 'Số điện thoại liên hệ không được để trống' },
+                          {
+                            pattern: /^(0[3|5|7|8|9])[0-9]{8}$/,
+                            message: 'Số điện thoại không hợp lệ'
+                          }
+                        ]}>
               <Input />
             </Form.Item>
           </Col>
@@ -206,12 +213,13 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item label="Ngày yêu cầu" name="requestDate" rules={[{ required: true, message: 'Vui lòng nhập ngày yêu cầu' }]}>
-              <DatePicker style={{ width: '100%' }} />
+              <DatePicker style={{ width: '100%' }} disabledDate={(current) => current && current < dayjs().startOf('day')}/>
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item label="Ngày tiếp đón" name="receptionDate" rules={[{ required: true, message: 'Vui lòng nhập ngày tiếp đón' }]}>
               <DatePicker
+                disabled={!requestDate}
                 style={{ width: '100%' }}
                 disabledDate={(current) => {
                   if (!requestDate) return false;
