@@ -360,7 +360,7 @@ const Page = () => {
         dataSource={voiceData?.length ? voiceData : list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
-        height={370}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 355px)' }}
         data-permission={PermissionCoreConst.CoreTableListDoanVao}
       />
 

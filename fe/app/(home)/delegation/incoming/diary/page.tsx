@@ -206,6 +206,7 @@ const Page = () => {
             dataSource={listLogStatus}
             pagination={{ position: ['bottomRight'], ...statusPagination }}
             data-permission={PermissionCoreConst.CoreTableLog}
+            scroll={{ x: 'max-content', y: 'calc(100vh - 350px)' }}
           />
         </TabPane>
         <TabPane tab="Nhật ký thời gian tiếp đoàn" key="reception">
