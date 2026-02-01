@@ -183,7 +183,7 @@ namespace D.Core.Infrastructure.Services.Kpi.Implements
                     CapTrenDanhGia = kpi.CapTrenDanhGia,
                     DiemKpiCapTren = kpi.DiemKpiCapTren,
                     DiemKpi = kpi.DiemKpi,
-                    IsActive = kpi.Status == KpiStatus.Evaluated ?  isActive : 0
+                    IsActive = kpi.Status == KpiStatus.Evaluated || kpi.Status == KpiStatus.Assigned || kpi.Status == KpiStatus.Edited ?  isActive : 0
                 };
             }).ToList();
 

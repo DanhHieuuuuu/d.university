@@ -5,6 +5,7 @@ export class KpiRoleConst {
   static TRUONG_DON_VI_CAP_2 = 'TRUONG_DON_VI_CAP_2';
   static CHUYEN_VIEN = 'CHUYEN_VIEN';
   static GIANG_VIEN = 'GIANG_VIEN';
+  static KI_SU = 'KI_SU';
 
   static list = [
     {
@@ -30,6 +31,10 @@ export class KpiRoleConst {
     {
       value: this.GIANG_VIEN,
       name: 'Giảng viên'
+    },
+    {
+      value: this.KI_SU,
+      name: 'Kĩ sư'
     }
   ];
 
