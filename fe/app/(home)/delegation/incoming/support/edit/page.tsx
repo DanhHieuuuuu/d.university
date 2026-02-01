@@ -82,6 +82,25 @@ const DepartmentSupport = () => {
       toast.error(String(err));
     }
   };
+  const filteredNhanSuByDepartment = useMemo(() => {
+  if (!detail?.departmentSupportId) return [];
+
+  const filtered = listNhanSu.filter(
+    (ns) => ns.idPhongBan === detail.departmentSupportId
+  );
+
+  // remove duplicate by idNhanSu
+  const map = new Map<number, any>();
+
+  filtered.forEach((n) => {
+    if (!map.has(n.idNhanSu)) {
+      map.set(n.idNhanSu, n);
+    }
+  });
+
+  return Array.from(map.values());
+}, [listNhanSu, detail?.departmentSupportId]);
+
   // View and edit
   const rows: DetailRow[] = useMemo(() => {
     if (!detail) return [];
@@ -116,7 +135,7 @@ const DepartmentSupport = () => {
                 <div style={{ lineHeight: 1.8 }}>
                   {supporters.map((s, i) => (
                     <div key={s.supporterId}>
-                      {i + 1}. {s.supporterCode}
+                      {i + 1}. {s.tenNhanSu} - {s.supporterCode}
                     </div>
                   ))}
                 </div>
@@ -143,21 +162,18 @@ const DepartmentSupport = () => {
                         style={{ flex: 2, marginBottom: 0, minWidth: 0 }}
                       >
                         <Select
-                          placeholder="Chọn nhân sự"
+                          placeholder={filteredNhanSuByDepartment.length ? 'Chọn nhân sự' : 'Phòng ban chưa có nhân sự'}
                           showSearch
                           optionFilterProp="label"
-                          options={listNhanSu.map((n) => ({
+                          options={filteredNhanSuByDepartment.map((n) => ({
                             value: n.idNhanSu,
                             label: n.tenNhanSu,
                             disabled: selectedIds.includes(n.idNhanSu)
                           }))}
                           onChange={(value) => {
-                            const selectedNhanSu = listNhanSu.find((n) => n.idNhanSu === value);
+                            const selectedNhanSu = filteredNhanSuByDepartment.find((n) => n.idNhanSu === value);
 
-                            // set supporterId
                             form.setFieldValue(['supporters', name, 'supporterId'], value);
-
-                            // auto fill supporterCode
                             form.setFieldValue(
                               ['supporters', name, 'supporterCode'],
                               selectedNhanSu?.supporterCode ?? ''
@@ -171,7 +187,7 @@ const DepartmentSupport = () => {
                         rules={[{ required: true, message: 'Nhập mã NV' }]}
                         style={{ flex: 1, marginBottom: 0, minWidth: 0 }}
                       >
-                        <Input placeholder="Mã NV" />
+                        <Input placeholder="Mã NV" disabled/>
                       </Form.Item>
 
                       <Button danger onClick={() => remove(name)}>

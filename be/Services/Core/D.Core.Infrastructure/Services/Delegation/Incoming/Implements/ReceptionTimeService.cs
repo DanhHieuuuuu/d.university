@@ -34,7 +34,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         { 
             _logger.LogInformation($"{nameof(CreateReceptionTimeList)} called, dto: {JsonSerializer.Serialize(dto)}"); 
  
-            var receptionTimes = _mapper.Map<List<ReceptionTime>>(dto.Items); 
+            var receptionTimes = _mapper.Map<List<ReceptionTime>>(dto.Items);
+            var deleagtion = _unitOfWork.iDelegationIncomingRepository.FindById(dto.Items[0].DelegationIncomingId);
             _unitOfWork.iReceptionTimeRepository.AddRange(receptionTimes); 
             #region Log 
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor); 
@@ -47,7 +48,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             { 
                 ReceptionTimeId = rt.Id, 
                 Type = LogType.Create, 
-                Description = "Thêm thời gian tiếp đoàn", 
+                Description = $"Thêm thời gian tiếp đoàn {deleagtion.Name} ({deleagtion.Code})", 
                 Reason = DelegationStatus.Names[DelegationStatus.Create], 
                 CreatedDate = DateTime.Now, 
                 CreatedBy = userId.ToString(), 
@@ -116,8 +117,9 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         { 
             if (dtos == null || !dtos.Any())throw new Exception("Danh sách thời gian tiếp đoàn trống."); 
  
-            var delegationId = dtos.First().DelegationIncomingId; 
- 
+            var delegationId = dtos.First().DelegationIncomingId;
+            var delegation = _unitOfWork.iDelegationIncomingRepository.FindById(delegationId);
+
             var dbItems = _unitOfWork.iReceptionTimeRepository.TableNoTracking 
                 .Where(x => x.DelegationIncomingId == delegationId && !x.Deleted) 
                 .ToList(); 
@@ -169,7 +171,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     ReceptionTimeId = exist.Id, 
                     Type = LogType.Update, 
                     Description = changes.Any() 
-                        ? $"Cập nhật thời gian tiếp đoàn: {string.Join("; ", changes)}." 
+                        ? $"Cập nhật thời gian tiếp đoàn {delegation.Name} ({delegation.Code}): {string.Join("; ", changes)}." 
                         : "Cập nhật thời gian tiếp đoàn nhưng không thay đổi dữ liệu.", 
                     Reason = DelegationStatus.Names[DelegationStatus.Edited], 
                     CreatedDate = DateTime.Now, 
@@ -197,7 +199,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 { 
                     ReceptionTimeId = item.Id, 
                     Type = LogType.Delete, 
-                    Description = $"Xoá thời gian tiếp đoàn.", 
+                    Description = $"Xoá thời gian tiếp đoàn {delegation.Name} ({delegation.Code}.", 
                     Reason = DelegationStatus.Names[DelegationStatus.Edited], 
                     CreatedDate = DateTime.Now, 
                     CreatedBy = userId.ToString(), 

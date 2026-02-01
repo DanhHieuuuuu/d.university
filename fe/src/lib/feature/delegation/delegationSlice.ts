@@ -16,6 +16,7 @@ import {
   getListStatus,
   getLogReceptionTime,
   getLogStatus,
+  updateDetailDelegation,
   updateDoanVao,
   updatePrepare,
   updateReceptionTimes,
@@ -258,6 +259,16 @@ const delegationSlice = createSlice({
         state.status = ReduxStatus.SUCCESS;
       })
       .addCase(updateReceptionTimes.rejected, (state) => {
+        state.status = ReduxStatus.FAILURE;
+      })
+      // update detailDelegation
+      .addCase(updateDetailDelegation.pending, (state) => {
+        state.status = ReduxStatus.LOADING;
+      })
+      .addCase(updateDetailDelegation.fulfilled, (state, action) => {
+        state.status = ReduxStatus.SUCCESS;
+      })
+      .addCase(updateDetailDelegation.rejected, (state) => {
         state.status = ReduxStatus.FAILURE;
       })
       // create ReceptionTime

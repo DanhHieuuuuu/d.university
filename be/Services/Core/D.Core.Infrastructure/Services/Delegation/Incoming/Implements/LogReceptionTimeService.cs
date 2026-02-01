@@ -64,7 +64,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _logger.LogInformation($"{nameof(FindLogReceptionTime)} method called, dto: {JsonSerializer.Serialize(dto)}.");
 
-            var query = _unitOfWork.iLogReceptionTimeRepository.TableNoTracking.AsQueryable();
+            var query = _unitOfWork.iLogReceptionTimeRepository.TableNoTracking.OrderByDescending(x => x.CreatedDate).AsQueryable();
             //Lọc theo người tạo
             if (!string.IsNullOrWhiteSpace(dto.CreatedByName))
             {
@@ -72,12 +72,17 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     x.CreatedByName != null &&
                     x.CreatedByName.Contains(dto.CreatedByName));
             }
-
-            //Lọc theo ngày tạo 
-            if (dto.CreateDate.HasValue)
+            // Lọc theo khoảng ngày tạo
+            if (dto.StartDate.HasValue)
             {
-                var date = dto.CreateDate.Value.Date;
-                query = query.Where(x => x.CreatedDate.Date == date);
+                var start = dto.StartDate.Value.Date;
+                query = query.Where(x => x.CreatedDate >= start);
+            }
+
+            if (dto.EndDate.HasValue)
+            {
+                var end = dto.EndDate.Value.Date.AddDays(1);
+                query = query.Where(x => x.CreatedDate < end);
             }
 
             var totalCount = query.Count();

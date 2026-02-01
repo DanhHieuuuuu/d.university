@@ -13,6 +13,7 @@ import { DelegationIncomingTab, DetailGuestGroupTab, ReceptionTimeTab } from './
 import { IDetailDelegationIncoming, IReceptionTime, IViewGuestGroup } from '@models/delegation/delegation.model'; 
 import type { FormInstance } from 'antd'; 
 import { toast } from 'react-toastify'; 
+import { DelegationStatusConst } from '@/constants/core/delegation/delegation-status.consts';
 export default function DetailDoanVaoPage() { 
 
   const { id } = useParams(); 
@@ -33,10 +34,16 @@ export default function DetailDoanVaoPage() {
         .unwrap()
         .then((res) => setDelegation(res));
     }
+    console.log(delegation);
+    
   }, [id, activeKey, delegation, dispatch]);
 
   const handleTabChange = (key: string) => {
+    // Thoát chế độ chỉnh sửa khi đổi tab
+    setIsEdit(false);
+
     setActiveKey(key);
+
     if (key === 'staffReception' && !detailDelegation) {
       dispatch(getByIdDetailDelegation(Number(id)))
         .unwrap()
@@ -47,6 +54,7 @@ export default function DetailDoanVaoPage() {
         .then((res) => setReceptionTime(res));
     }
   };
+
 
   // Sự kiện khi update
   const onClickUpdate = () => { 
@@ -59,30 +67,47 @@ export default function DetailDoanVaoPage() {
   }; 
 
   // Sự kiện khi lưu
-  const onClickSave = async () => { 
-    try { 
+const onClickSave = async () => {
+  try {
+    if (activeKey === 'delegation') {
+      await delegationFormRef.current?.validateFields();
+      delegationFormRef.current?.submit();
+    }
 
-      await Promise.all([ 
-        delegationFormRef.current?.submit(), 
-        staffFormRef.current?.submit(), 
-        receptionTimeFormRef.current?.submit() 
-      ]); 
+    if (activeKey === 'staffReception') {
+      await staffFormRef.current?.validateFields();
+      staffFormRef.current?.submit();
+    }
 
-      toast.success('Cập nhật thành công'); 
-      setIsEdit(false); 
+    if (activeKey === 'receptionTime') {
+      await receptionTimeFormRef.current?.validateFields();
+      receptionTimeFormRef.current?.submit();
+    }
 
-    } catch (err) { 
+  } catch (err) {
+    //  validateFields FAIL
+    // Form tự highlight lỗi → KHÔNG LƯU
+    return;
+  }
+};
+const handleUpdateSuccess = () => {
+  toast.success('Cập nhật thành công');
+  setIsEdit(false);
+};
 
-      toast.error(String(err)); 
 
-    } 
-  };
 
   // Sự kiện reload
   const reloadDelegation = async () => { 
     if (!id) return; 
     const res = await dispatch(getByIdGuestGroup(Number(id))).unwrap(); 
     setDelegation(res); 
+  }; 
+  // Sự kiện reload detailDelegation
+  const reloadDetailDelegation = async () => { 
+    if (!id) return; 
+    const res = await dispatch(getByIdDetailDelegation(Number(id))).unwrap(); 
+    setDetailDelegation(res); 
   }; 
 
   // Sự kiện reload thời gian đoàn vào
@@ -98,7 +123,7 @@ export default function DetailDoanVaoPage() {
       key: 'delegation', 
       label: 'Thông tin đoàn vào', 
       children: delegation ? ( 
-        <DelegationIncomingTab data={delegation} isEdit={isEdit} ref={delegationFormRef} onUpdated={reloadDelegation} /> 
+        <DelegationIncomingTab data={delegation} isEdit={isEdit} ref={delegationFormRef} onUpdated={reloadDelegation} onUpdatedSuccess={handleUpdateSuccess}/> 
       ) : ( 
         <Empty description="Không có dữ liệu đoàn vào" /> 
       ) 
@@ -107,7 +132,7 @@ export default function DetailDoanVaoPage() {
       key: 'staffReception', 
       label: 'Thông tin nhân sự tiếp đoàn', 
       children: detailDelegation ? ( 
-        <DetailGuestGroupTab data={detailDelegation} isEdit={isEdit} /> 
+        <DetailGuestGroupTab data={detailDelegation} isEdit={isEdit}  ref={staffFormRef} onUpdated={reloadDetailDelegation} onUpdatedSuccess={handleUpdateSuccess}/> 
       ) : ( 
         <Empty description="Không có dữ liệu nhân sự tiếp đoàn" /> 
       ) 
@@ -122,6 +147,7 @@ export default function DetailDoanVaoPage() {
             data={receptionTime} 
             isEdit={isEdit} 
             onUpdated={reloadReceptionTime} 
+            onUpdatedSuccess={handleUpdateSuccess}
           /> 
         ) : ( 
           <Empty description="Không có dữ liệu thời gian tiếp đoàn" /> 
@@ -154,20 +180,26 @@ export default function DetailDoanVaoPage() {
           <span> Chi tiết đoàn vào </span> 
         </div> 
       } 
-      extra={       
-        !isEdit ? ( 
-          <Button type="primary" icon={<EditOutlined />} onClick={onClickUpdate}> 
-            Chỉnh sửa 
-          </Button> 
-        ) : ( 
-          <div style={{ display: 'flex', gap: 8 }}> 
-            <Button onClick={onClickCancel}>Huỷ</Button> 
-            <Button type="primary" onClick={onClickSave}> 
-              Lưu 
-            </Button> 
-          </div> 
-        ) 
-      } 
+      extra={
+        (delegation?.status === DelegationStatusConst.TAO_MOI || delegation?.status === DelegationStatusConst.DE_XUAT || delegation?.status === DelegationStatusConst.CAN_BO_SUNG) && (
+          !isEdit ? (
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={onClickUpdate}
+            >
+              Chỉnh sửa
+            </Button>
+          ) : (
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button onClick={onClickCancel}>Huỷ</Button>
+              <Button type="primary" onClick={onClickSave} htmlType="submit">
+                Lưu
+              </Button>
+            </div>
+          )
+        )
+      }
       bodyStyle={{ maxHeight: '90%', overflow: 'auto' }} 
     > 
       <Tabs type="card" items={tabItems} activeKey={activeKey} onChange={handleTabChange} /> 

@@ -110,11 +110,11 @@ const Page = () => {
   ];
 
   const actions: IAction[] = [
-    {
-      label: 'Xem',
-      icon: <EyeOutlined />,
-      command: (record: IViewHopDong) => onClickView(record)
-    }
+    // {
+    //   label: 'Xem',
+    //   icon: <EyeOutlined />,
+    //   command: (record: IViewHopDong) => onClickView(record),
+    // }
   ];
 
   useEffect(() => {

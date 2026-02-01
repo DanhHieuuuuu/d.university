@@ -76,7 +76,7 @@ const Page = () => {
     return buildKpiGroupedTable<IViewKpiTruong>(sortedList);
   }, [list]);
 
-  const { query, onFilterChange } = usePaginationWithFilter<IQueryKpiTruong>({
+  const { query, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKpiTruong>({
     total: totalItem || 0,
     initialQuery: { PageIndex: 1, PageSize: 1000, Keyword: '' },
     onQueryChange: (newQuery) => dispatch(getAllKpiTruong(newQuery)),
@@ -179,23 +179,23 @@ const Page = () => {
     },
     ...(canSendDeclared
       ? [
-          {
-            key: 'send-approve',
-            label: 'Gửi chấm',
-            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-            onClick: () => requiredSelect(approveSelected)
-          }
-        ]
+        {
+          key: 'send-approve',
+          label: 'Gửi chấm',
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+          onClick: () => requiredSelect(approveSelected)
+        }
+      ]
       : []),
     ...(canCancelDeclared
       ? [
-          {
-            key: 'cancel-send-approve',
-            label: 'Hủy gửi chấm',
-            icon: <UndoOutlined style={{ color: '#1890ff' }} />,
-            onClick: () => requiredSelect(cancelApproveSelected)
-          }
-        ]
+        {
+          key: 'cancel-send-approve',
+          label: 'Hủy gửi chấm',
+          icon: <UndoOutlined style={{ color: '#1890ff' }} />,
+          onClick: () => requiredSelect(cancelApproveSelected)
+        }
+      ]
       : [])
   ];
 
@@ -413,13 +413,15 @@ const Page = () => {
       label: 'Sửa',
       color: 'blue',
       icon: <EditOutlined />,
-      command: onClickUpdate
+      command: onClickUpdate,
+      hidden: (r: any) => r.rowType !== 'data'
     },
     {
       label: 'Xóa',
       color: 'red',
       icon: <DeleteOutlined />,
-      command: onClickDelete
+      command: onClickDelete,
+      hidden: (r: any) => r.rowType !== 'data'
     }
   ];
 
@@ -452,19 +454,29 @@ const Page = () => {
         <Form form={form} layout="horizontal">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div className="flex flex-1 items-center gap-2">
-              <Input
-                placeholder="Tìm KPI..."
-                prefix={<SearchOutlined />}
-                allowClear
-                onChange={(e) => handleDebouncedSearch(e.target.value)}
-                className="max-w-[250px]"
-              />
+              <Form.Item name="Keyword" noStyle>
+                <Input
+                  placeholder="Tìm KPI..."
+                  prefix={<SearchOutlined />}
+                  allowClear
+                  onChange={(e) => handleDebouncedSearch(e.target.value)}
+                  className="max-w-[250px]"
+                />
+              </Form.Item>
               <Button
                 icon={<SyncOutlined />}
                 onClick={() => {
                   form.resetFields();
                   filterForm.resetFields();
-                  onFilterChange({ Keyword: '', loaiKpi: undefined, trangThai: undefined, PageIndex: 1 });
+                  const resetQuery = {
+                    PageIndex: 1,
+                    PageSize: 1000,
+                    Keyword: '',
+                    loaiKpi: undefined,
+                    trangThai: undefined
+                  };
+                  onFilterChange(resetQuery);
+                  dispatch(getAllKpiTruong(resetQuery));
                   setKetQuaMap({});
                   setSelectedRowKeys([]);
                 }}

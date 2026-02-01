@@ -171,14 +171,11 @@ const Page = () => {
       title="Danh sách tài khoản"
       className="h-full"
       extra={
-        <div>
+
           <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd}>
             Thêm mới
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={onClickAdd2} style={{marginLeft: 10}}>
-            Thêm vãng lai
-          </Button>
-        </div>
+
       }
     >
       <Form form={form} layout="horizontal">

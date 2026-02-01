@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -14,7 +14,7 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedIdChucVu } from '@redux/feature/danh-muc/danhmucSlice';
-import { getAllChucVu } from '@redux/feature/danh-muc/danhmucThunk';
+import { deleteChucVu, getAllChucVu } from '@redux/feature/danh-muc/danhmucThunk';
 
 import AppTable from '@components/common/Table';
 import { useDebouncedCallback } from '@hooks/useDebounce';
@@ -25,6 +25,7 @@ import PositionModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
+  const [_modal, contextHolder] = Modal.useModal();
   const dispatch = useAppDispatch();
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.chucVu.$list);
 
@@ -65,6 +66,23 @@ const Page = () => {
     setIsModalUpdate(false);
     setIsModalOpen(true);
   };
+
+  const onClickDelete = (id: number) => {
+      setSelectedId(id);
+      _modal.confirm({
+        type: 'warning',
+        title: 'Bạn chắc chắn muốn xóa chức vụ này ?',
+        cancelText: 'Hủy',
+        okText: 'Xác nhận',
+        onOk: () => {
+          var result = dispatch(deleteChucVu(id))
+            .unwrap()
+            .then(() => {
+              refreshData();
+            });
+        }
+      });
+    };
 
   const refreshData = () => {
     dispatch(getAllChucVu(query));
@@ -118,6 +136,7 @@ const Page = () => {
       icon: <DeleteOutlined />,
       command: (record: IViewChucVu) => {
         dispatch(setSelectedIdChucVu(record.id));
+        onClickDelete(record.id)
       }
     }
   ];
@@ -140,6 +159,7 @@ const Page = () => {
         </Button>
       }
     >
+      {contextHolder}
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
           <Form.Item<IQueryChucVu> label="Tên chức vụ:" name="Keyword">

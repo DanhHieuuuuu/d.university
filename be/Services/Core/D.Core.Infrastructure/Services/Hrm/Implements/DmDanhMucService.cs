@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmChucVu;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmDanToc;
 using D.Core.Domain.Dtos.Hrm.DanhMuc.DmGioiTinh;
@@ -16,7 +17,6 @@ using D.InfrastructureBase.Service;
 using D.InfrastructureBase.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace D.Core.Infrastructure.Services.Hrm.Implements
 {
@@ -135,6 +135,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 || x.TenPhongBan.ToLower().Contains(dto.Keyword.ToLower())
             );
 
+            if (dto.idLoaiPhongBan.HasValue)
+            {
+                query = query.Where(pb => pb.IdLoaiPhongBan == dto.idLoaiPhongBan.Value);
+            }
+
             var totalCount = query.Count();
 
             var items = query.Skip(dto.SkipCount()).Take(dto.PageSize).ToList();
@@ -152,6 +157,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                             .iDmLoaiPhongBanRepository.FindById(x.IdLoaiPhongBan.Value)
                             .TenLoaiPhongBan
                         : null,
+                    IdLoaiPhongBan = x.IdLoaiPhongBan,
                     DiaChi = x.DiaChi,
                     Hotline = x.Hotline,
                     Fax = x.Fax,
@@ -167,18 +173,24 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 TotalItem = totalCount,
             };
         }
-        public PageResultDto<DmPhongBanByKpiRoleResponseDto> GetAllDmPhongBanByKpiRole(DmPhongBanByKpiRoleRequestDto dto)
+
+        public PageResultDto<DmPhongBanByKpiRoleResponseDto> GetAllDmPhongBanByKpiRole(
+            DmPhongBanByKpiRoleRequestDto dto
+        )
         {
             _logger.LogInformation(
                 $"{nameof(GetAllDmPhongBanByKpiRole)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
-            var userRoles = _unitOfWork.iKpiRoleRepository.TableNoTracking
-                .Where(x => x.IdNhanSu == userId)
+            var userRoles = _unitOfWork
+                .iKpiRoleRepository.TableNoTracking.Where(x => x.IdNhanSu == userId)
                 .ToList();
             var isHieuTruong = userRoles.Any(x => x.Role == "HIEU_TRUONG");
-            var donViIds = userRoles.Where(x => x.IdDonVi.HasValue && 
-                ( x.Role == "PHO_HIEU_TRUONG" || x.Role == "TRUONG_DON_VI_CAP_2"))
+            var donViIds = userRoles
+                .Where(x =>
+                    x.IdDonVi.HasValue
+                    && (x.Role == "PHO_HIEU_TRUONG" || x.Role == "TRUONG_DON_VI_CAP_2")
+                )
                 .Select(x => x.IdDonVi!.Value)
                 .Distinct()
                 .ToList();
@@ -190,7 +202,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     return new PageResultDto<DmPhongBanByKpiRoleResponseDto>
                     {
                         Items = new List<DmPhongBanByKpiRoleResponseDto>(),
-                        TotalItem = 0
+                        TotalItem = 0,
                     };
                 }
 
@@ -210,29 +222,34 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 .Take(dto.PageSize)
                 .ToList();
 
-            var result = items.Select(x => new DmPhongBanByKpiRoleResponseDto
-            {
-                Id = x.Id,
-                MaPhongBan = x.MaPhongBan,
-                TenPhongBan = x.TenPhongBan,
-                LoaiPhongBan = x.IdLoaiPhongBan.HasValue
-                    ? _unitOfWork.iDmLoaiPhongBanRepository.FindById(x.IdLoaiPhongBan.Value)?.TenLoaiPhongBan
-                    : null,
-                DiaChi = x.DiaChi,
-                Hotline = x.Hotline,
-                Fax = x.Fax,
-                NgayThanhLap = x.NgayThanhLap,
-                STT = x.STT,
-                NguoiDaiDien = x.NguoiDaiDien,
-                ChucVuNguoiDaiDien = x.ChucVuNguoiDaiDien,
-            }).ToList();
+            var result = items
+                .Select(x => new DmPhongBanByKpiRoleResponseDto
+                {
+                    Id = x.Id,
+                    MaPhongBan = x.MaPhongBan,
+                    TenPhongBan = x.TenPhongBan,
+                    LoaiPhongBan = x.IdLoaiPhongBan.HasValue
+                        ? _unitOfWork
+                            .iDmLoaiPhongBanRepository.FindById(x.IdLoaiPhongBan.Value)
+                            ?.TenLoaiPhongBan
+                        : null,
+                    DiaChi = x.DiaChi,
+                    Hotline = x.Hotline,
+                    Fax = x.Fax,
+                    NgayThanhLap = x.NgayThanhLap,
+                    STT = x.STT,
+                    NguoiDaiDien = x.NguoiDaiDien,
+                    ChucVuNguoiDaiDien = x.ChucVuNguoiDaiDien,
+                })
+                .ToList();
 
             return new PageResultDto<DmPhongBanByKpiRoleResponseDto>
             {
                 Items = result,
-                TotalItem = totalCount
+                TotalItem = totalCount,
             };
         }
+
         public PageResultDto<DmQuanHeGiaDinhResponseDto> GetAllDmQuanHeGiaDinh(
             DmQuanHeGiaDinhRequestDto dto
         )
@@ -277,6 +294,11 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 string.IsNullOrEmpty(dto.Keyword)
                 || x.TenBoMon.ToLower().Contains(dto.Keyword.ToLower())
             );
+
+            if (dto.IdPhongBan.HasValue)
+            {
+                query = query.Where(tbm => tbm.IdPhongBan == dto.IdPhongBan.Value);
+            }
 
             var totalCount = query.Count();
 
@@ -484,7 +506,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
             else
             {
-                throw new Exception($"Chức vụ không tồn tại hoặc đã bị xóa");
+                throw new Exception($"Phòng ban không tồn tại hoặc đã bị xóa");
             }
         }
 
@@ -497,17 +519,22 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             );
 
             var exist = _unitOfWork.iDmToBoMonRepository.IsMaBoMonExist(dto.MaBoMon!);
+
             if (exist)
                 throw new Exception($"Đã tồn tại tổ bộ môn có mã {dto.MaBoMon}");
+
             if (dto.IdPhongBan.HasValue)
             {
                 var existPhongBan = _unitOfWork.iDmPhongBanRepository.TableNoTracking.Any(x =>
                     x.Id == dto.IdPhongBan.Value
                 );
+
                 if (!existPhongBan)
                     throw new Exception($"Không tìm thấy phòng ban có Id = {dto.IdPhongBan}");
             }
+
             var newToBoMon = _mapper.Map<DmToBoMon>(dto);
+
             _unitOfWork.iDmToBoMonRepository.Add(newToBoMon);
             _unitOfWork.iDmToBoMonRepository.SaveChange();
         }
@@ -518,9 +545,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 $"{nameof(UpdateDmToBoMon)} method called. Dto: {JsonSerializer.Serialize(dto)}"
             );
 
-            var exist = _unitOfWork.iDmToBoMonRepository.TableNoTracking.FirstOrDefault(x =>
-                x.Id == dto.Id
-            );
+            var exist = _unitOfWork.iDmToBoMonRepository.FindById(dto.Id);
 
             if (exist == null)
                 throw new Exception($"Không tìm thấy tổ bộ môn có Id = {dto.Id}");
@@ -546,6 +571,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             exist.TenBoMon = dto.TenBoMon;
             exist.NgayThanhLap = dto.NgayThanhLap;
             exist.IdPhongBan = dto.IdPhongBan;
+
             _unitOfWork.iDmToBoMonRepository.Update(exist);
             _unitOfWork.iDmToBoMonRepository.SaveChange();
         }

@@ -18,5 +18,6 @@ namespace D.Core.Infrastructure.Services.SinhVien.Abstracts
         Task<SvLoginResponseDto> Login(SvLoginRequestDto loginRequest);
         Task<bool> Logout(SvLogoutRequestDto logoutRequestDto);
         Task<SvRefreshTokenResponseDto> RefreshToken(SvRefreshTokenRequestDto refreshToken);
+        Task<SvThongKeResponseDto> GetThongKe();
     }
 }

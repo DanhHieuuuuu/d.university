@@ -19,6 +19,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Any;
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace D.Auth.Infrastructure.Services.Implements
 {
@@ -67,7 +70,10 @@ namespace D.Auth.Infrastructure.Services.Implements
 
             var (hash, salt) = PasswordHelper.HashPassword(rawPassword);
 
-            ns.Email2 = request.Email2;
+            // Update email2
+
+
+            ns.Email2 = $"{NormalizeText(request.MaNhanSu)}{request.Email2}";
             ns.Password = hash;
             ns.PasswordKey = salt;
             ns.Status = true;
@@ -136,6 +142,38 @@ namespace D.Auth.Infrastructure.Services.Implements
             };
         }
 
+        private static string NormalizeText(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            // Đưa về chữ thường
+            input = input.ToLowerInvariant();
+
+            // Chuẩn hóa Unicode
+            string normalized = input.Normalize(NormalizationForm.FormD);
+
+            // Bỏ dấu
+            var sb = new StringBuilder();
+            foreach (var c in normalized)
+            {
+                if (Char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            string noAccent = sb.ToString().Normalize(NormalizationForm.FormC);
+
+            // Xử lý riêng chữ đ / Đ
+            noAccent = noAccent.Replace("đ", "d");
+
+            // Bỏ khoảng trắng và ký tự đặc biệt
+            noAccent = Regex.Replace(noAccent, @"[^a-z0-9]", "");
+
+            return noAccent;
+        }
+
         public async Task<CreateUserResponseDto2> CreateUser2(CreateUserRequestDto2 request)
         {
             _logger.LogInformation($"{nameof(CreateUser)} called with");
@@ -154,7 +192,7 @@ namespace D.Auth.Infrastructure.Services.Implements
             entity.Password = hash;
             entity.PasswordKey = salt;
             entity.Status = true;
-            entity.UserType = 4;
+            entity.UserType = 6;
             entity.HoDem = request.hoDem;
             entity.Ten = request.ten;
             entity.Email = request.Email2;

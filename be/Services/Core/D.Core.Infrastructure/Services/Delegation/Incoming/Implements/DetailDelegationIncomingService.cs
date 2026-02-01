@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.DetailDelegationIncomingResponseDto;
 
 namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 {
@@ -26,36 +27,131 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int delegationIncomingId)
+       public async Task<DetailDelegationIncomingResponseDto> GetByIdDetailDelegation(int delegationIncomingId)
         {
             _logger.LogInformation($"{nameof(GetByIdDetailDelegation)} called with DelegationIncomingId: {delegationIncomingId}");
-          
-            var detail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
-                .FirstOrDefault(d => d.DelegationIncomingId == delegationIncomingId);
-
-            if (detail == null)
-                return null;
-
+        
             var delegation = _unitOfWork.iDelegationIncomingRepository.TableNoTracking
                 .FirstOrDefault(d => d.Id == delegationIncomingId);
+        
+            if (delegation == null)
+                return null;
+        
+            // Danh sách người tiếp đoàn
+            var members = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking
+                .Where(d => d.DelegationIncomingId == delegationIncomingId)
+                .Select(d => new MemberDto
+                {
+                    Id = d.Id,
+                    Code = d.Code,
+                    FirstName = d.FirstName,
+                    LastName = d.LastName,
+                    YearOfBirth = d.YearOfBirth,
+                    PhoneNumber = d.PhoneNumber,
+                    Email = d.Email,
+                    IsLeader = d.IsLeader
+                }).ToList();
+        
+            // Phòng ban, người hỗ trợ
+            var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
+            var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
 
-            var result = new DetailDelegationIncomingResponseDto
+            var supporters = _unitOfWork.iSupporterRepository.TableNoTracking;
+
+            var departmentSupports =
+                (from ds in _unitOfWork.iDepartmentSupportRepository.TableNoTracking
+                 join pb in phongBanTable on ds.DepartmentSupportId equals pb.Id
+                 where !ds.Deleted
+                       && ds.DelegationIncomingId == delegationIncomingId
+                 select new DepartmentSupportDto
+                 {
+                     DepartmentSupportId = pb.Id,
+                     DepartmentSupportName = pb.TenPhongBan,
+                     Supporters = supporters
+                    .Where(s => s.DepartmentSupportId == ds.Id)
+                    .Join(
+                        staffTable,
+                        s => s.SupporterId,      // khóa bên supporters
+                        n => n.Id,             // khóa bên nsNhansu
+                        (s, n) => new SupporterDto
+                        {
+                            Id = s.Id,
+                            SupporterCode = s.SupporterCode,
+                            SupporterName = $"{n.HoDem} {n.Ten}"
+                        }
+                    )
+                    .ToList()
+                 }).ToList();
+        
+            return new DetailDelegationIncomingResponseDto
             {
-                Id = detail.Id,
-                Code = detail.Code,
-                FirstName = detail.FirstName,
-                LastName = detail.LastName,
-                YearOfBirth = detail.YearOfBirth,
-                PhoneNumber = detail.PhoneNumber,
-                Email = detail.Email,
-                IsLeader = detail.IsLeader,
-                DelegationIncomingId = detail.DelegationIncomingId,
-                DelegationName = delegation?.Name,
-                DelegationCode = delegation?.Code
+                DelegationIncomingId = delegation.Id,
+                DelegationCode = delegation.Code,
+                DelegationName = delegation.Name,
+                Members = members,
+                DepartmentSupports = departmentSupports
             };
-
-            return result;
         }
+        public async Task<List<UpdateDetailDelegationResponseDto>> UpdateDetailDelegationIncoming(List<UpdateDetailDelegationItemDto> dtos)
+        {
+            if (dtos == null || !dtos.Any())
+                throw new Exception("Danh sách thành viên đoàn trống.");
+
+            var delegationId = dtos.First().DelegationIncomingId;
+
+            var dbItems = _unitOfWork.iDetailDelegationIncomingRepository.Table
+                .Where(x => x.DelegationIncomingId == delegationId && !x.Deleted)
+                .ToList();
+
+            // ================= UPDATE =================
+            foreach (var dto in dtos.Where(x => x.Id.HasValue))
+            {           
+                var isExist = _unitOfWork.iDetailDelegationIncomingRepository
+                    .IsCodeExist(dto.Code, dto.DelegationIncomingId, dto.Id);
+
+                if (isExist)
+                    throw new Exception($"Mã {dto.Code} đã tồn tại trong đoàn.");
+
+                var exist = dbItems.FirstOrDefault(x => x.Id == dto.Id.Value);
+                if (exist == null) continue;
+
+                exist.Code = dto.Code;
+                exist.FirstName = dto.FirstName;
+                exist.LastName = dto.LastName;
+                exist.YearOfBirth = dto.YearOfBirth;
+                exist.PhoneNumber = dto.PhoneNumber;
+                exist.Email = dto.Email;
+                exist.IsLeader = dto.IsLeader;
+
+                _unitOfWork.iDetailDelegationIncomingRepository.Update(exist);
+            }
+
+            // ================= SOFT DELETE =================
+            var clientIds = dtos
+                .Where(x => x.Id.HasValue)
+                .Select(x => x.Id.Value)
+                .ToList();
+
+            var softDeleteItems = dbItems
+                .Where(x => !clientIds.Contains(x.Id))
+                .ToList();
+
+            foreach (var item in softDeleteItems)
+            {
+                item.Deleted = true;
+                _unitOfWork.iDetailDelegationIncomingRepository.Update(item);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var result = _unitOfWork.iDetailDelegationIncomingRepository.Table
+                .Where(x => x.DelegationIncomingId == delegationId && !x.Deleted)
+                .ToList();
+
+            return _mapper.Map<List<UpdateDetailDelegationResponseDto>>(result);
+        }
+
+
 
     }
 }

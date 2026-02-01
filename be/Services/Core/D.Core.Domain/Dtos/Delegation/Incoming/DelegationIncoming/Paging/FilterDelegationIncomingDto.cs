@@ -16,8 +16,9 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming.Paging
     {
         [FromQuery(Name = "IdPhongBan")]
         public int IdPhongBan { get; set; }
-        [FromQuery(Name = "Status")] 
+        [FromQuery(Name = "Status")]
         public int Status { get; set; }
-        
-    } 
+        public string? DifferentStatus { get; set; }
+
+    }
 }

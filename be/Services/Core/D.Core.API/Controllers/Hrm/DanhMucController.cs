@@ -112,12 +112,12 @@ namespace D.Core.API.Controllers.Hrm
         /// <param name="id"></param>
         /// <returns></returns>
         [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
-        [HttpDelete("chuc-vu/delete/{id}")]
+        [HttpDelete("chuc-vu/{id}")]
         public async Task<ResponseAPI> DeleteDmChucVu([FromRoute] int id)
         {
             try
             {
-                var dto = new DeleteDmPhongBanDto { Id = id };
+                var dto = new DeleteDmChucVuDto { Id = id };
                 await _mediator.Send(dto);
                 return new("Đã xóa chức vụ.");
             }
@@ -306,10 +306,10 @@ namespace D.Core.API.Controllers.Hrm
         /// <summary>
         /// Xóa phòng ban
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
-        [HttpDelete("phong-ban/delete/{id}")]
+        [HttpDelete("phong-ban/{id}")]
         public async Task<ResponseAPI> DeleteDmPhongBan([FromRoute] int id)
         {
             try
@@ -396,6 +396,69 @@ namespace D.Core.API.Controllers.Hrm
             {
                 await _mediator.Send(dto);
                 return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Xem thông tin tổ bộ môn
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
+        [HttpGet("to-bo-mon/{id}")]
+        public async Task<ResponseAPI> GetDmToBoMonById([FromRoute] int id)
+        {
+            try
+            {
+                var dto = new DmToBoMonGetByIdRequestDto { Id = id };
+                var result = await _mediator.Send(dto);
+                return new(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin tổ bộ môn
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
+        [HttpPut("to-bo-mon/{id}")]
+        public async Task<ResponseAPI> UpdateDmToBoMon(UpdateDmToBoMonDto dto)
+        {
+            try
+            {
+                
+                await _mediator.Send(dto);
+                return new();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Xóa tổ bộ môn
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [PermissionFilter(PermissionCoreKeys.UserMenuAdmin)]
+        [HttpDelete("to-bo-mon/{id}")]
+        public async Task<ResponseAPI> DeleteDmToBoMon([FromRoute] int id)
+        {
+            try
+            {
+                var dto = new DeleteDmToBoMonDto { Id = id };
+                await _mediator.Send(dto);
+                return new("Đã xóa tổ bộ môn");
             }
             catch (Exception ex)
             {

@@ -95,15 +95,6 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                     await UpdateExpiredRecordsAsync(uow, notificationService);
                     await UpdateExpiredContractsAsync(uow, notificationService);
                     _logger.LogInformation($"Auto update expired contracts.");
-
-                    //var expiredList = await uow.iReceptionTimeRepository.TableNoTracking.Where(x => x.Date > now.Date);
-
-                    //if (expiredList.Any())
-                    //{
-                    //    expiredList.ForEach(x => x.Status = DelegationStatus.Expired);
-
-                    //    _logger.LogInformation($"Auto update {expiredList.Count} expired records");
-                    //}
                 }
                 catch (Exception ex)
                 {
@@ -111,7 +102,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 }
                 _logger.LogInformation($"Auto update expired records");
                 // chạy mỗi 1 tiếng
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(60), stoppingToken);
             }
         }
 

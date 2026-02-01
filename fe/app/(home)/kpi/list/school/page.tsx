@@ -93,7 +93,7 @@ const Page = () => {
     dispatch(getListNamHocKpiTruong());
   }, [dispatch]);
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiTruong>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKpiTruong>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -546,13 +546,15 @@ const Page = () => {
       <Form form={form} layout="horizontal">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-2">
-            <Input
-              placeholder="Tìm KPI..."
-              prefix={<SearchOutlined />}
-              allowClear
-              onChange={(e) => handleDebouncedSearch(e.target.value)}
-              className="max-w-[250px]"
-            />
+            <Form.Item name="Keyword" noStyle>
+              <Input
+                placeholder="Tìm KPI..."
+                prefix={<SearchOutlined />}
+                allowClear
+                onChange={(e) => handleDebouncedSearch(e.target.value)}
+                className="max-w-[250px]"
+              />
+            </Form.Item>
             <Button
               color="default"
               variant="filled"
@@ -567,6 +569,7 @@ const Page = () => {
                   namHoc: undefined,
                   PageIndex: 1
                 });
+                resetFilter();
                 setSelectedRowKeys([]);
               }}
             >
@@ -663,7 +666,7 @@ const Page = () => {
         data={logData}
         loading={logStatus === ReduxStatus.LOADING}
       />
-      <KpiAiChat />
+      {/* <KpiAiChat /> */}
     </Card>
   );
 };

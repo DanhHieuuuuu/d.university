@@ -11,6 +11,7 @@ import {
   IQueryLogReceptionTime,
   IQueryLogStatus,
   IUpdateDepartmentSupport,
+  IUpdateDetailDelegationRequest,
   IUpdateDoanVao,
   IUpdatePrepare,
   IUpdateReceptionTime,
@@ -19,6 +20,7 @@ import {
 } from '@models/delegation/delegation.model';
 import { DelegationIncomingService } from '@services/delegation/delegationIncoming.service';
 import { rejects } from 'assert';
+import { DelegationStatusConst } from '@/constants/core/delegation/delegation-status.consts';
 
 export const getListGuestGroup = createAsyncThunk(
   'delegation-incoming/list',
@@ -62,11 +64,16 @@ export const getListNhanSu = createAsyncThunk('delegation-incoming/getNhanSu', a
     });
   }
 });
-export const getListStatus = createAsyncThunk('delegation-incoming/getStatus', async (_, thunkAPI) => {
+export const getListStatus = createAsyncThunk('delegation-incoming/getStatus', async (edit: number| 0, thunkAPI) => {
   try {
     const res = await DelegationIncomingService.getListStatus();
-
-    return res.data;
+  if (edit === 1) {
+    return Object.values(res.data).filter(
+      (s: any) => s.status !== DelegationStatusConst.TAO_MOI  && 
+                  s.status !==DelegationStatusConst.BI_HUY &&
+                  s.status !==DelegationStatusConst.DA_HET_HAN)
+  }
+      return res.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue({
       message: error.message,
@@ -265,6 +272,16 @@ export const updatePrepare = createAsyncThunk(
   'delegation-incoming/updatePrepare',
   async (payload: IUpdatePrepare, { rejectWithValue }) => {
     const data = await DelegationIncomingService.updatePrepare(payload);
+    if (data?.code !== 200) {
+      return rejectWithValue(data.message);
+    }
+    return data;
+  }
+);
+export const updateDetailDelegation = createAsyncThunk(
+  'delegation-incoming/updateDetailDelegation',
+  async (payload: IUpdateDetailDelegationRequest, { rejectWithValue }) => {
+    const data = await DelegationIncomingService.updateDetailDelegation(payload);
     if (data?.code !== 200) {
       return rejectWithValue(data.message);
     }

@@ -16,5 +16,10 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
         public string? CreatedByName { get; set; }
         [FromQuery(Name = "CreateDate")]
         public DateTime? CreateDate { get; set; }
+        [FromQuery(Name = "StartDate")]
+        public DateTime? StartDate { get; set; }
+
+        [FromQuery(Name = "EndDate")]
+        public DateTime? EndDate { get; set; }
     }
 }

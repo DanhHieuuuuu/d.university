@@ -33,7 +33,7 @@ const Page = () => {
   const [isView, setIsModalView] = useState<boolean>(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-  const { query, pagination, onFilterChange } = usePaginationWithFilter<IQueryKpiRole>({
+  const { query, pagination, onFilterChange, resetFilter } = usePaginationWithFilter<IQueryKpiRole>({
     total: totalItem || 0,
     initialQuery: {
       PageIndex: 1,
@@ -232,6 +232,7 @@ const Page = () => {
               onClick={() => {
                 form.resetFields();
                 form.submit();
+                resetFilter();
               }}
             >
               Tải lại

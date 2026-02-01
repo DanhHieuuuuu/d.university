@@ -54,6 +54,7 @@ import {
   selectDepartmentSupport
 } from '@redux/feature/delegation/department/departmentSlice';
 import { ConfirmStatusModal } from '../../modals/ConfirmStatusModal';
+import { useIsGranted } from '@hooks/useIsGranted';
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -67,6 +68,19 @@ const Page = () => {
   const [confirmContent, setConfirmContent] = useState('');
   const [confirmTitle, setConfirmTitle] = useState('');
   const [selectedData, setSelectedData] = useState<IViewGuestGroup | null>(null);
+  //permission
+  const hasPermisisonViewXuLyDoanVao = useIsGranted(PermissionCoreConst.CoreButtonViewXuLyDoanVao);
+  const hasPermissionPheDuyetXuLyDoanVao = useIsGranted(PermissionCoreConst.CoreButtonPheDuyetXuLyDoanVao);
+  const hasPermissisonTiepDoanXuLyDoanVao = useIsGranted(PermissionCoreConst.CoreButtonTiepDoanXuLyDoanVao);
+  const hasPermissisonPhanCongXuLyDoanVao = useIsGranted(PermissionCoreConst.CoreButtonPhanCongXuLyDoanVao);
+  const hasPermissisonBaoCaoDoanVao = useIsGranted(PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao);
+  const hasPermissionXacNhanChinhSuaXuLyDoanVao = useIsGranted(
+    PermissionCoreConst.CoreButtonXacNhanChinhSuaXuLyDoanVao
+  );
+  const hasPermissionCreateTimeXuLyDoanVao = useIsGranted(PermissionCoreConst.CoreButtonCreateTimeXuLyDoanVao);
+  const hasPermissionSearchXuLyDoanVao = useIsGranted(PermissionCoreConst.CoreButtonSearchXuLyDoanVao);
+  const hasPermissionXuatBaoCaoXuLyDoanVao = useIsGranted(PermissionCoreConst.CoreButtonXuatBaoCaoXuLyDoanVao);
+
   const [confirmActions, setConfirmActions] = useState<
     {
       action: 'upgrade' | 'cancel' | 'supplement';
@@ -112,7 +126,7 @@ const Page = () => {
       dataIndex: 'location',
       title: 'Địa điểm',
       align: 'center',
-      width: 120
+      width: 200
     },
     {
       key: 'idStaffReception',
@@ -137,7 +151,7 @@ const Page = () => {
     {
       key: 'totalMoney',
       dataIndex: 'totalMoney',
-      title: 'Tổng chi phí',
+      title: 'Tổng chi phí ước tính (VNĐ)',
       align: 'left',
       width: 120
     },
@@ -156,49 +170,55 @@ const Page = () => {
       label: 'Xem chi tiết',
       icon: <EyeOutlined />,
       command: (record: IViewGuestGroup) => onClickView(record),
-      permission: PermissionCoreConst.CoreButtonViewXuLyDoanVao
+      permission: PermissionCoreConst.CoreButtonViewXuLyDoanVao,
+      hidden: () => !hasPermisisonViewXuLyDoanVao
     },
     {
-      label: 'Báo cáo kết quả',
+      label: 'Hoàn thành',
       icon: <CheckOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
-      command: (record: IViewGuestGroup) => onClickBaoCao(record),
-      permission: PermissionCoreConst.CoreButtonBaoCaoXuLyDoanVao
+      hidden: (r) => !hasPermissisonBaoCaoDoanVao || r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
+      command: (record: IViewGuestGroup) => onClickBaoCao(record)
     },
     {
       label: 'Xuất báo cáo',
       icon: <FileWordOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DONE,
-      command: (record: IViewGuestGroup) => onExport(record),
-      permission: PermissionCoreConst.CoreButtonUpdateDoanVao
+      hidden: (r) => !hasPermissionXuatBaoCaoXuLyDoanVao || r.status !== DelegationStatusConst.DONE,
+      command: (record: IViewGuestGroup) => onExport(record)
     },
     {
       label: 'Phê duyệt',
       icon: <CheckOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DE_XUAT && r.status !== DelegationStatusConst.DA_CHINH_SUA,
-      command: (record: IViewGuestGroup) => onClickPheDuyet(record),
-      permission: PermissionCoreConst.CoreButtonPheDuyetXuLyDoanVao
+      hidden: (r) =>
+        !hasPermissionPheDuyetXuLyDoanVao ||
+        (r.status !== DelegationStatusConst.DE_XUAT && r.status !== DelegationStatusConst.DA_CHINH_SUA),
+      command: (record: IViewGuestGroup) => onClickPheDuyet(record)
     },
     {
       label: 'Tiếp đoàn',
       icon: <DeploymentUnitOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.PHE_DUYET || !r.receptionTimes?.length,
-      command: (record: IViewGuestGroup) => onClickTiepDoan(record),
-      permission: PermissionCoreConst.CoreButtonTiepDoanXuLyDoanVao
+      hidden: (r) =>
+        !hasPermissisonTiepDoanXuLyDoanVao || r.status !== DelegationStatusConst.PHE_DUYET || !r.receptionTimes?.length,
+      command: (record: IViewGuestGroup) => onClickTiepDoan(record)
     },
     {
       label: 'Phân công hỗ trợ',
       icon: <UserAddOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.DANG_TIEP_DOAN,
-      command: (record: IDepartmentSupport) => onClickPhanCong(record),
-      permission: PermissionCoreConst.CoreButtonPhanCongXuLyDoanVao
+      hidden: (r) => !hasPermissisonPhanCongXuLyDoanVao || r.status !== DelegationStatusConst.PHE_DUYET,
+      command: (record: IDepartmentSupport) => onClickPhanCong(record)
     },
     {
-      label: 'Xác nhận chỉnh sửa',
+      label: 'Xác nhận bổ sung',
       icon: <CheckOutlined />,
-      hidden: (r) => r.status !== DelegationStatusConst.CAN_BO_SUNG,
-      command: (record: IViewGuestGroup) => onClickXacNhan(record),
-      permission: PermissionCoreConst.CoreButtonXacNhanChinhSuaXuLyDoanVao
+      hidden: (r) => !hasPermissionXacNhanChinhSuaXuLyDoanVao || r.status !== DelegationStatusConst.CAN_BO_SUNG,
+      command: (record: IViewGuestGroup) => onClickXacNhan(record)
+    },
+    {
+      label: 'Thêm thời gian',
+      icon: <PlusOutlined />,
+      hidden: (r) =>
+        !hasPermissionCreateTimeXuLyDoanVao ||
+        r.status !== DelegationStatusConst.PHE_DUYET,
+      command: (record: IViewGuestGroup) => onClickCreateTime(record)
     }
   ];
 
@@ -207,7 +227,10 @@ const Page = () => {
     initialQuery: {
       PageIndex: 1,
       PageSize: 10,
-      Keyword: ''
+      Keyword: '',
+      differentStatus: `${DelegationStatusConst.TAO_MOI},
+                        ${DelegationStatusConst.DA_HET_HAN},
+                        ${DelegationStatusConst.BI_HUY}`,
     },
     onQueryChange: (newQuery) => {
       dispatch(getListGuestGroup(newQuery));
@@ -220,8 +243,8 @@ const Page = () => {
       dispatch(resetStatusCreate());
       dispatch(getListGuestGroup(query));
       dispatch(getListPhongBan());
-      dispatch(getListStatus());
-      dispatch(getListDelegationIncoming());
+      dispatch(getListStatus(1));
+      dispatch(getListDelegationIncoming());  
     }
   }, [isModalOpen]);
 
@@ -251,7 +274,9 @@ const Page = () => {
     ]);
     setConfirmOpen(true);
   };
-
+  const onClickCreateTime = (data: IViewGuestGroup) => {
+    router.push(`/delegation/incoming/list-delegation/create-reception-time?delegationIncomingId=${data.id}`);
+  };
   const onClickPheDuyet = (data: IViewGuestGroup) => {
     setSelectedData(data);
     setConfirmTitle('Xác nhận phê duyệt');
@@ -260,6 +285,7 @@ const Page = () => {
     // ĐÃ CHỈNH SỬA: Đồng ý / Không đồng ý
     if (data.status === DelegationStatusConst.DA_CHINH_SUA) {
       setConfirmActions([
+        { action: 'supplement', label: 'Cần bổ sung' },
         { action: 'cancel', label: 'Không đồng ý', danger: true },
         { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
       ]);
@@ -268,6 +294,7 @@ const Page = () => {
     else {
       setConfirmActions([
         { action: 'supplement', label: 'Cần bổ sung' },
+        { action: 'cancel', label: 'Không đồng ý', danger: true },
         { action: 'upgrade', label: 'Đồng ý', type: 'primary' }
       ]);
     }
@@ -309,55 +336,48 @@ const Page = () => {
       //   }
     >
       <Form form={form} layout="horizontal">
-        <div className="mb-4 flex flex-row items-center space-x-3">
-          <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
-            <Select
-              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
-              showSearch
-              allowClear
-              placeholder="Chọn phòng ban phụ trách"
-              optionFilterProp="label"
-              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-              options={listPhongBan.map((pb: any) => ({
-                value: pb.idPhongBan,
-                label: pb.tenPhongBan
-              }))}
-              onChange={(value) => onFilterChange({ idPhongBan: value })}
-            />
-          </Form.Item>
-          <Form.Item name="status" className="!mb-0 w-[200px]">
-            <Select
-              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
-              placeholder="Chọn trạng thái"
-              allowClear
-              options={listStatus.map((st: any) => ({
-                value: st.status,
-                label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
-              }))}
-              onChange={(value) => onFilterChange({ status: value })}
-            />
-          </Form.Item>
+        {hasPermissionSearchXuLyDoanVao && (
+          <div className="mb-4 flex flex-row items-center space-x-3">
+            <Form.Item name="idPhongBan" className="!mb-0 w-[350px]">
+              <Select
+                showSearch
+                allowClear
+                placeholder="Chọn phòng ban phụ trách"
+                options={listPhongBan.map((pb: any) => ({
+                  value: pb.idPhongBan,
+                  label: pb.tenPhongBan
+                }))}
+                onChange={(value) => onFilterChange({ idPhongBan: value })}
+              />
+            </Form.Item>
 
-          <Form.Item name="name" className="!mb-0 w-[300px]">
-            <Input
-              data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
-              placeholder="Nhập tên đoàn vào…"
-              onChange={(e) => handleSearch(e)}
-            />
-          </Form.Item>
-          <Button
-            color="default"
-            variant="filled"
-            icon={<SyncOutlined />}
-            onClick={() => {
-              form.resetFields();
-              resetFilter();
-            }}
-            data-permission={PermissionCoreConst.CoreButtonSearchXuLyDoanVao}
-          >
-            Tải lại
-          </Button>
-        </div>
+            <Form.Item name="status" className="!mb-0 w-[200px]">
+              <Select
+                allowClear
+                placeholder="Chọn trạng thái"
+                options={listStatus.map((st: any) => ({
+                  value: st.status,
+                  label: DelegationStatusConst.getInfo(st.status, 'label') ?? ''
+                }))}
+                onChange={(value) => onFilterChange({ status: value })}
+              />
+            </Form.Item>
+
+            <Form.Item name="name" className="!mb-0 w-[300px]">
+              <Input placeholder="Nhập tên hoặc mã đoàn vào" onChange={handleSearch} />
+            </Form.Item>
+
+            <Button
+              icon={<SyncOutlined />}
+              onClick={() => {
+                form.resetFields();
+                resetFilter();
+              }}
+            >
+              Tải lại
+            </Button>
+          </div>
+        )}
       </Form>
 
       <AppTable

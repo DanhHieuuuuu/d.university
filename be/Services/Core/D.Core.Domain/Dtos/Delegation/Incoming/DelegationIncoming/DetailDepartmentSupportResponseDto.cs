@@ -27,5 +27,6 @@ namespace D.Core.Domain.Dtos.Delegation.Incoming.DelegationIncoming
         public int SupporterId { get; set; }
 
         public string? SupporterCode { get; set; }
+        public string? TenNhanSu { get; set; }
     }
 }

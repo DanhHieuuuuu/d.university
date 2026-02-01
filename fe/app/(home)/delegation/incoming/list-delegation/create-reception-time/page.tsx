@@ -93,10 +93,10 @@ const CreateReceptionTimePage: React.FC = () => {
           <Button type="primary" onClick={() => form.submit()} loading={loading}>
             Tạo mới
           </Button>
-          <Button onClick={() => router.back()}>Hủy</Button>
+          <Button onClick={() => router.back()} disabled={loading} >Hủy</Button>
         </div>
       }
-      bodyStyle={{ maxHeight: '90%', overflow: 'auto' }}
+      styles={{ body: { maxHeight: '90%', overflow: 'auto' }}}
     >
       <Form
         form={form}
@@ -135,7 +135,9 @@ const CreateReceptionTimePage: React.FC = () => {
                         label="Ngày tiếp đoàn"
                         rules={[{ required: true, message: 'Chọn ngày' }]}
                       >
-                        <DatePicker style={{ width: '100%' }} />
+                        <DatePicker style={{ width: '100%' }} disabledDate={(current) =>
+                          current && current < dayjs().startOf('day')
+                        } />
                       </Form.Item>
                     </Col>
 
@@ -218,7 +220,7 @@ const CreateReceptionTimePage: React.FC = () => {
                               <Col span={6}>
                                 <Form.Item
                                   name={[pName, 'money']}
-                                  label="Chi phí"
+                                  label="Chi phí (VNĐ)"
                                   rules={[{ required: true, message: 'Nhập chi phí' }]}
                                 >
                                   <InputNumber min={0} style={{ width: '100%' }} />

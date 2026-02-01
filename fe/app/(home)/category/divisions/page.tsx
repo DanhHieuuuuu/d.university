@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -13,7 +13,7 @@ import {
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { setSelectedIdToBoMon } from '@redux/feature/danh-muc/danhmucSlice';
-import { getAllToBoMon } from '@redux/feature/danh-muc/danhmucThunk';
+import { deleteToBoMon, getAllToBoMon } from '@redux/feature/danh-muc/danhmucThunk';
 import { formatDateView } from '@utils/index';
 
 import AppTable from '@components/common/Table';
@@ -25,6 +25,7 @@ import DivisionModal from './(dialog)/create-or-update';
 
 const Page = () => {
   const [form] = Form.useForm();
+  const [_modal, contextHolder] = Modal.useModal();
   const dispatch = useAppDispatch();
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.toBoMon.$list);
 
@@ -64,6 +65,23 @@ const Page = () => {
     setIsModalView(true);
     setIsModalUpdate(false);
     setIsModalOpen(true);
+  };
+
+  const onClickDelete = (id: number) => {
+    setSelectedId(id);
+    _modal.confirm({
+      type: 'warning',
+      title: 'Bạn chắc chắn muốn xóa tổ bộ môn này ?',
+      cancelText: 'Hủy',
+      okText: 'Xác nhận',
+      onOk: () => {
+        var result = dispatch(deleteToBoMon(id))
+          .unwrap()
+          .then(() => {
+            refreshData();
+          });
+      }
+    });
   };
 
   const refreshData = () => {
@@ -122,6 +140,7 @@ const Page = () => {
       icon: <DeleteOutlined />,
       command: (record: IViewToBoMon) => {
         dispatch(setSelectedIdToBoMon(record.id));
+        onClickDelete(record.id);
       }
     }
   ];
@@ -144,6 +163,7 @@ const Page = () => {
         </Button>
       }
     >
+      {contextHolder}
       <Form form={form} layout="horizontal">
         <div className="grid grid-cols-2">
           <Form.Item<IQueryToBoMon> label="Tên bộ môn:" name="Keyword">
