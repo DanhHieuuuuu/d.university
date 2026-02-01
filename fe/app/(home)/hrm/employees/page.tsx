@@ -42,16 +42,17 @@ const Page = () => {
   const { status: syncStatus } = useAppSelector((state) => state.nhanSuState.$syncWithQdrant);
 
   // permission in page
-  const hasPermisisonSyncNhanSu= useIsGranted(PermissionCoreConst.CoreButtonSyncNhanSu);
+  const hasPermisisonSyncNhanSu = useIsGranted(PermissionCoreConst.CoreButtonSyncNhanSu);
   const hasPermissionCreateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonCreateNhanSu);
   const hasPermisisonUpdateNhanSu = useIsGranted(PermissionCoreConst.CoreButtonUpdateNhanSu);
-  const hasPermisisonViewNhanSu = useIsGranted(PermissionCoreConst.CoreButtonViewNhanSu)
+  const hasPermisisonViewNhanSu = useIsGranted(PermissionCoreConst.CoreButtonViewNhanSu);
   const hasPermisisonCreateContract = useIsGranted(PermissionCoreConst.CoreButtonCreateHrmContract);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
   const [isView, setIsModalView] = useState<boolean>(false);
   const [openContract, setOpenContract] = useState<boolean>(false);
+  const [voiceText, setVoiceText] = useState<string | null>(null);
 
   const [openVoice, setOpenVoice] = useState<boolean>(false);
   const [searchMode, setSearchMode] = useState<SearchMode>('FILTER');
@@ -144,7 +145,7 @@ const Page = () => {
   }, [isModalOpen]);
 
   const { debounced: handleDebouncedSearch } = useDebouncedCallback((value: string) => {
-    onFilterChange({ cccd: value });
+    onFilterChange({ Keyword: value });
   }, 500);
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
@@ -210,9 +211,9 @@ const Page = () => {
       }
     >
       <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-2 gap-2">
-          <Form.Item<IQueryNhanSu> label="Cccd:" name="cccd">
-            <Input onChange={(e) => handleSearch(e)} />
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item<IQueryNhanSu> label="Họ tên:" name="Keyword">
+            <Input onChange={(e) => handleSearch(e)} allowClear />
           </Form.Item>
           <Form.Item<IQueryNhanSu> label="Phòng ban" name="idPhongBan">
             <Select
@@ -221,11 +222,18 @@ const Page = () => {
                 return { label: item.tenPhongBan, value: item.id };
               })}
               onChange={(val) => {
+                setVoiceText(null);
                 setSearchMode('FILTER');
                 onFilterChange({ idPhongBan: val });
               }}
             />
           </Form.Item>
+          {voiceText && (
+            <div className="result-text-voice-search mb-4">
+              <span className="mr-1 font-semibold">Bạn đang tìm:</span>
+              <span className="italic">{voiceText}</span>
+            </div>
+          )}
         </div>
         <Form.Item>
           <div className="flex flex-row justify-center space-x-2">
@@ -238,6 +246,7 @@ const Page = () => {
               icon={<SyncOutlined />}
               onClick={() => {
                 form.resetFields();
+                setVoiceText(null);
                 setSearchMode('FILTER');
                 resetFilter();
               }}
@@ -249,7 +258,10 @@ const Page = () => {
               shape="circle"
               aria-label="Nhấn để nỏi"
               icon={<MicroIcon />}
-              onClick={() => setOpenVoice(true)}
+              onClick={() => {
+                setVoiceText(null);
+                setOpenVoice(true);
+              }}
             ></Button>
           </div>
         </Form.Item>
@@ -279,6 +291,7 @@ const Page = () => {
         onClose={async (resultText) => {
           if (resultText) {
             setSearchMode('SEMANTIC');
+            setVoiceText(resultText);
 
             await dispatch(
               semanticSearchThunk({

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
 import { Layout, Dropdown, Modal, Form, Input, Button, Space, message } from 'antd';
 import { LockOutlined, LogoutOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { useNavigate } from '@hooks/navigate';
@@ -17,8 +17,9 @@ const { Header } = Layout;
 
 const AppHeader = () => {
   const { navigateTo } = useNavigate();
-  const dispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.authState);
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state: RootState) => state.authState);
+  const { chucVu, phongBan } = useAppSelector((state) => state.danhmucState);
 
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const [changePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
@@ -165,20 +166,30 @@ const AppHeader = () => {
           />
           <div className="w-full space-y-3">
             <div className="flex justify-between border-b py-2">
-              <span className="font-medium">Mã nhân viên:</span>
+              <span className="font-medium">Mã nhân sự:</span>
               <span>{user?.maNhanSu || 'N/A'}</span>
             </div>
             <div className="flex justify-between border-b py-2">
-              <span className="font-medium">Họ đệm:</span>
-              <span>{user?.hoDem || 'N/A'}</span>
-            </div>
-            <div className="flex justify-between border-b py-2">
-              <span className="font-medium">Tên:</span>
-              <span>{user?.ten || 'N/A'}</span>
+              <span className="font-medium">Họ tên:</span>
+              <span>{userDisplayName || 'N/A'}</span>
             </div>
             <div className="flex justify-between border-b py-2">
               <span className="font-medium">Email:</span>
               <span>{user?.email || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between border-b py-2">
+              <span className="font-medium">Phòng ban:</span>
+              <span>
+                {user?.hienTaiPhongBan
+                  ? phongBan.$list.data.find((x) => x.id == user.hienTaiPhongBan)?.tenPhongBan
+                  : null}
+              </span>
+            </div>
+            <div className="flex justify-between border-b py-2">
+              <span className="font-medium">Chức vụ:</span>
+              <span>
+                {user?.hienTaiChucVu ? chucVu.$list.data.find((x) => x.id == user.hienTaiChucVu)?.tenChucVu : null}
+              </span>
             </div>
           </div>
         </div>

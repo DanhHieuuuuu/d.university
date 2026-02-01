@@ -21,4 +21,6 @@ export type IUser = {
   email: string | null;
   imageLink?: string | null;
   userType?: number;
+  hienTaiPhongBan: number | null;
+  hienTaiChucVu: number | null;
 };
