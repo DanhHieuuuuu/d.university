@@ -1,17 +1,28 @@
 using D.ApplicationBase;
 using D.Core.Domain.Dtos.SinhVien.ChatbotHistory;
 using D.Core.Infrastructure.Repositories.SinhVien;
+using D.InfrastructureBase.Shared;
+using D.Notification.ApplicationService.Abstracts;
+using D.Notification.Domain.Enums;
+using D.Notification.Dtos;
 using D.Untils.DataUntils;
+using Microsoft.AspNetCore.Http;
 
 namespace D.Core.Application.Command.SinhVien.ChatbotModel
 {
     public class UpdateSvChatbotModel : ICommandHandler<UpdateSvChatbotModelDto, SvChatbotModelResponseDto>
     {
         private readonly ISvChatbotModelRepository _repository;
-
-        public UpdateSvChatbotModel(ISvChatbotModelRepository repository)
+        private readonly INotificationService _notificationService;
+        private IHttpContextAccessor _httpContextAccessor;
+        public UpdateSvChatbotModel(
+            ISvChatbotModelRepository repository,
+            INotificationService notificationService,
+            IHttpContextAccessor httpContext)
         {
             _repository = repository;
+            _notificationService = notificationService;
+            _httpContextAccessor = httpContext;
         }
 
         public async Task<SvChatbotModelResponseDto> Handle(
@@ -56,6 +67,17 @@ namespace D.Core.Application.Command.SinhVien.ChatbotModel
 
             _repository.Update(entity);
             await _repository.SaveChangeAsync();
+            var userId = CommonUntil.GetCurrentUserId(_httpContextAccessor);
+
+            // Send notification
+            await _notificationService.SendAsync(new NotificationMessage
+            {
+                Receiver = new Receiver { UserId = userId },
+                Title = "Cập nhật Chatbot Model",
+                Content = $"Chatbot Model '{entity.Name}' đã được cập nhật.",
+                AltContent = $"Chatbot Model '{entity.Name}' ({entity.ModelName}) đã được cập nhật thành công.",
+                Channel = NotificationChannel.Realtime
+            });
 
             return new SvChatbotModelResponseDto
             {

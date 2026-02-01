@@ -21,6 +21,7 @@ import { DelegationStatusConst } from '@/constants/core/delegation/delegation-st
 import { requestStatusConst } from '@/constants/core/survey/requestStatus.const';
 import { surveyStatusConst } from '@/constants/core/survey/surveyStatus.const';
 import { NhanSuService } from '@services/hrm/nhansu.service';
+import { StudentService, IStudentStatistics } from '@services/student.service';
 
 const HomePage: React.FC = () => {
   const { user } = useAppSelector((state) => state.authState);
@@ -28,6 +29,7 @@ const HomePage: React.FC = () => {
   const [statisticalData, setStatisticalData] = useState<IStatistical | null>(null);
   const [surveyStats, setSurveyStats] = useState<ISurveyStatistics | null>(null);
   const [statisticalNhansu, setStatisticalNhansu] = useState<any>(null);
+  const [studentStats, setStudentStats] = useState<IStudentStatistics | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -52,7 +54,7 @@ const HomePage: React.FC = () => {
       }
     };
 
-    const fetchStatisticalNhansu = async() => {
+    const fetchStatisticalNhansu = async () => {
       try {
         const res = await NhanSuService.thongKeNsTheoPhongBan();
         setStatisticalNhansu(res.data)
@@ -61,21 +63,26 @@ const HomePage: React.FC = () => {
       }
     }
 
+    const fetchStudentStats = async () => {
+      try {
+        const res = await StudentService.getStatistics();
+        setStudentStats(res.data);
+      } catch {
+        toast.error('Không tải được thống kê sinh viên');
+      }
+    };
+
     fetchStatistical();
     fetchSurveyStats();
     fetchStatisticalNhansu();
+    fetchStudentStats();
   }, []);
 
-  // Mock data - Thay thế bằng API call thực tế
+  // Dữ liệu thống kê từ API
   const statsData = {
-    totalStaff: 245,
-    totalStudents: 1520,
-    totalCourses: 68,
-    totalFaculties: 8,
-    staffGrowth: 12.5,
-    studentGrowth: 8.3,
-    courseGrowth: 15.2,
-    facultyGrowth: 0
+    totalStudents: studentStats?.tongSoSinhVien || 0,
+    totalCourses: studentStats?.tongSoMonHoc || 0,
+    totalFaculties: studentStats?.tongSoKhoa || 0
   };
 
   // Dữ liệu biểu đồ cột - Số lượng sinh viên theo khoa
@@ -152,12 +159,12 @@ const HomePage: React.FC = () => {
     status: status.name,
     total: 0
   }));
-  
+
   const apiRequestData = (surveyStats?.surveyRequests?.byStatus || []).map(item => ({
     status: item.statusName,
     total: item.count
   }));
-  
+
   const surveyRequestChartData = allRequestStatuses.map(defaultStatus => {
     const apiData = apiRequestData.find(api => api.status === defaultStatus.status);
     return apiData || defaultStatus;
@@ -193,12 +200,12 @@ const HomePage: React.FC = () => {
     status: status.name,
     //total: 0
   }));
-  
+
   const apiSurveyData = (surveyStats?.surveys?.byStatus || []).map(item => ({
     status: item.statusName,
     total: item.count
   }));
-  
+
   const surveyChartData = allSurveyStatuses.map(defaultStatus => {
     const apiData = apiSurveyData.find(api => api.status === defaultStatus.status);
     return apiData || defaultStatus;
@@ -228,7 +235,7 @@ const HomePage: React.FC = () => {
     status: item?.tenPhongBan,
     total: item.soLuongNhanSu
   }));
-  
+
 
   const nhansuColumnConfig: any = {
     data: nhansuChartData,
@@ -339,7 +346,7 @@ const HomePage: React.FC = () => {
   return (
     <div style={{ padding: 24 }}>
       {/* Welcome Message */}
-      <p style={{ marginBottom: 24, fontSize: 28, fontWeight: 600 }}>Chào mừng trở lại, {user?.ten || 'Admin'}! 👋</p>
+      <p style={{ marginBottom: 24, fontSize: 28, fontWeight: 600 }}>Chào mừng trở lại, {user?.ten || 'Admin'}!</p>
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
@@ -360,13 +367,6 @@ const HomePage: React.FC = () => {
               title={<span style={{ color: 'white' }}>Tổng Sinh Viên</span>}
               value={statsData.totalStudents}
               prefix={<UserOutlined />}
-              suffix={
-                statsData.studentGrowth > 0 ? (
-                  <span style={{ fontSize: '14px', color: '#95de64' }}>
-                    <RiseOutlined /> {statsData.studentGrowth}%
-                  </span>
-                ) : null
-              }
               valueStyle={{ color: 'white' }}
             />
           </Card>
@@ -378,13 +378,6 @@ const HomePage: React.FC = () => {
               title={<span style={{ color: 'white' }}>Tổng Môn Học</span>}
               value={statsData.totalCourses}
               prefix={<BookOutlined />}
-              suffix={
-                statsData.courseGrowth > 0 ? (
-                  <span style={{ fontSize: '14px', color: '#95de64' }}>
-                    <RiseOutlined /> {statsData.courseGrowth}%
-                  </span>
-                ) : null
-              }
               valueStyle={{ color: 'white' }}
             />
           </Card>
@@ -434,12 +427,12 @@ const HomePage: React.FC = () => {
 
       {/* Nhansu Charts Row */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-          <Col span={24}>
-            <Card title="Thống kê nhân sự " variant="borderless">
-              <Column {...nhansuColumnConfig} />
-            </Card>
-          </Col>
-        
+        <Col span={24}>
+          <Card title="Thống kê nhân sự " variant="borderless">
+            <Column {...nhansuColumnConfig} />
+          </Card>
+        </Col>
+
       </Row>
 
       {/* Recent Activities */}

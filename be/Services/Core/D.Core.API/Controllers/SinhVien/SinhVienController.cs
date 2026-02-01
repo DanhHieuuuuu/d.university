@@ -2,6 +2,7 @@
 using D.Core.Domain.Dtos.SinhVien;
 using D.Core.Domain.Dtos.SinhVien.Auth;
 using D.Core.Domain.Dtos.SinhVien.ThongTinChiTiet;
+using D.Core.Application.Query.SinhVien.SvSinhVien;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -198,6 +199,23 @@ namespace D.Core.API.Controllers.SinhVienController
             try
             {
                 var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Thống kê: số lượng sinh viên, môn học, khoa
+        /// </summary>
+        [HttpGet("thong-ke")]
+        public async Task<ResponseAPI> GetThongKe()
+        {
+            try
+            {
+                var result = await _mediator.Send(new SvThongKeRequestDto());
                 return new ResponseAPI(result);
             }
             catch (Exception ex)

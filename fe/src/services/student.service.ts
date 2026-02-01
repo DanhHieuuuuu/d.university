@@ -1,9 +1,16 @@
 import { IQueryStudent, IViewStudent, ICreateStudent, IUpdateStudent } from '@models/student/student.model';
 import { ISinhVienLogin, ISinhVienConnectToken } from '@models/auth/sinhvien.model';
-import { IResponseList } from '@models/common/response.model';
+import { IResponseList, IResponseItem } from '@models/common/response.model';
 import { processApiMsgError } from '@utils/index';
 import axios from '@utils/axios';
 import axiosBase from 'axios';
+
+// Interface cho thống kê sinh viên
+export interface IStudentStatistics {
+  tongSoSinhVien: number;
+  tongSoMonHoc: number;
+  tongSoKhoa: number;
+}
 
 const apiStudentEndpoint = 'sinhvien';
 
@@ -107,6 +114,20 @@ const sinhVienLogoutApi = async () => {
   }
 };
 
+/**
+ * Lấy thống kê sinh viên
+ * GET /api/sinhvien/thong-ke
+ */
+const getStatistics = async (): Promise<IResponseItem<IStudentStatistics>> => {
+  try {
+    const res = await axios.get(`${apiStudentEndpoint}/thong-ke`);
+    return Promise.resolve(res.data);
+  } catch (err) {
+    processApiMsgError(err, 'Không thể tải thống kê sinh viên.');
+    return Promise.reject(err);
+  }
+};
+
 export const StudentService = {
   findPaging,
   // find,
@@ -115,5 +136,7 @@ export const StudentService = {
   remove,
   sinhVienLoginApi,
   sinhVienRefreshTokenApi,
-  sinhVienLogoutApi
+  sinhVienLogoutApi,
+  getStatistics
 };
+
