@@ -107,7 +107,7 @@ const Page = () => {
       key: 'location',
       dataIndex: 'location',
       title: 'Địa điểm',
-      width: 100
+      width: 200
     },
     {
       key: 'staffReceptionName',

@@ -55,7 +55,9 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             // Phòng ban, người hỗ trợ
             var phongBanTable = _unitOfWork.iDmPhongBanRepository.TableNoTracking;
             var staffTable = _unitOfWork.iNsNhanSuRepository.TableNoTracking;
-        
+
+            var supporters = _unitOfWork.iSupporterRepository.TableNoTracking;
+
             var departmentSupports =
                 (from ds in _unitOfWork.iDepartmentSupportRepository.TableNoTracking
                  join pb in phongBanTable on ds.DepartmentSupportId equals pb.Id
@@ -65,17 +67,20 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                  {
                      DepartmentSupportId = pb.Id,
                      DepartmentSupportName = pb.TenPhongBan,
-                     Supporters =
-                        (from sp in _unitOfWork.iSupporterRepository.TableNoTracking
-                         join ns in staffTable on sp.SupporterId equals ns.Id
-                         where !sp.Deleted
-                               && sp.DepartmentSupportId == ds.DepartmentSupportId
-                         select new SupporterDto
-                         {
-                             Id = sp.Id,
-                             SupporterCode = sp.SupporterCode,
-                             SupporterName = ns.HoDem + " " + ns.Ten
-                         }).ToList()
+                     Supporters = supporters
+                    .Where(s => s.DepartmentSupportId == ds.Id)
+                    .Join(
+                        staffTable,
+                        s => s.SupporterId,      // khóa bên supporters
+                        n => n.Id,             // khóa bên nsNhansu
+                        (s, n) => new SupporterDto
+                        {
+                            Id = s.Id,
+                            SupporterCode = s.SupporterCode,
+                            SupporterName = $"{n.HoDem} {n.Ten}"
+                        }
+                    )
+                    .ToList()
                  }).ToList();
         
             return new DetailDelegationIncomingResponseDto

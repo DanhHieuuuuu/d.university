@@ -11,10 +11,11 @@ import { DeleteOutlined } from '@ant-design/icons';
 type ReceptionTimeTabProps = { 
   data: IReceptionTime[] | null; 
   isEdit?: boolean; 
-  onUpdated?: () => void; 
+  onUpdated?: () => void;
+  onUpdatedSuccess?: () => void;
 }; 
  
-const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ data, isEdit = false, onUpdated }, ref) => { 
+const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ data, isEdit = false, onUpdated, onUpdatedSuccess }, ref) => { 
   const [form] = Form.useForm(); 
   const dispatch = useAppDispatch();  
   useImperativeHandle(ref, () => form); 
@@ -63,6 +64,7 @@ const ReceptionTimeTab = forwardRef<FormInstance, ReceptionTimeTabProps> (({ dat
         await dispatch(updatePrepare(preparePayload)).unwrap(); 
       } 
       onUpdated?.(); 
+      onUpdatedSuccess?.(); 
     } catch (err) { 
     } 
   }; 

@@ -13,10 +13,11 @@ type DetailGuestGroupTabProps = {
   data: IDetailDelegationIncoming | null;
   isEdit?: boolean;
   onUpdated?: () => void;
+  onUpdatedSuccess?: () => void;
 };
 
 const DetailGuestGroupTab = forwardRef<FormInstance, DetailGuestGroupTabProps>(
-  ({ data, isEdit = false, onUpdated }, ref) => {
+  ({ data, isEdit = false, onUpdated, onUpdatedSuccess }, ref) => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const currentYear = new Date().getFullYear();
@@ -51,7 +52,8 @@ const DetailGuestGroupTab = forwardRef<FormInstance, DetailGuestGroupTabProps>(
       });
 
       await dispatch(updateDetailDelegation({ items: payloadItems })).unwrap();
-      onUpdated?.();
+      onUpdated?.();          // reload data
+      onUpdatedSuccess?.();   // 👈 báo cha: OK
     };
 
     return (
@@ -61,37 +63,41 @@ const DetailGuestGroupTab = forwardRef<FormInstance, DetailGuestGroupTabProps>(
         <Divider />
 
         {/* ===== DANH SÁCH THÀNH VIÊN ===== */}
-        <Typography.Title level={5}>Danh sách thành viên tiếp đoàn</Typography.Title>
+        <Typography.Title level={5}>Danh sách thành viên</Typography.Title>
 
         {data.members?.length ? (
           data.members.map((member, index) => {
             const rows: DetailRow[] = [
               {
                 label: 'Mã thành viên',
-                value: renderField(['members', index, 'code'], member.code, <Input />, { isEdit })
+                value: renderField(['members', index, 'code'], member.code, <Input disabled/>, {isEdit, rules: [{ required: true, message: 'Mã thành viên không được để trống' }] })
               },
               {
                 label: 'Họ',
-                value: renderField(['members', index, 'firstName'], member.firstName, <Input />, { isEdit })
+                value: renderField(['members', index, 'firstName'], member.firstName, <Input />, {isEdit, rules: [{ required: true, message: 'Họ không được để trống' }] })
               },
               {
                 label: 'Tên',
-                value: renderField(['members', index, 'lastName'], member.lastName, <Input />, { isEdit })
+                value: renderField(['members', index, 'lastName'], member.lastName, <Input />, {isEdit, rules: [{ required: true, message: 'Tên không được để trống' }] })
               },
               {
                 label: 'Năm sinh',
-                value: renderField(['members', index, 'yearOfBirth'], member.yearOfBirth.toString(), <Input />, {
-                  isEdit
-                })
+                value: renderField(['members', index, 'yearOfBirth'], member.yearOfBirth.toString(), <Input />, 
+                {isEdit, rules: [{ required: true, message: 'Năm sinh không được để trống' }] }
+              )
               },
 
               {
-                label: 'SĐT',
-                value: renderField(['members', index, 'phoneNumber'], member.phoneNumber, <Input />, { isEdit })
+                label: 'Số điện thoại',
+                value: renderField(['members', index, 'phoneNumber'], member.phoneNumber, <Input />, 
+                  {isEdit, rules: [{ required: true, message: 'Số điện thoại không được để trống' }] }
+                )
               },
               {
                 label: 'Email',
-                value: renderField(['members', index, 'email'], member.email, <Input />, { isEdit })
+                value: renderField(['members', index, 'email'], member.email, <Input />, 
+                  {isEdit, rules: [{ required: true, message: 'Email không được để trống' }] }
+                )
               },
               {
                 label: 'Trưởng đoàn',

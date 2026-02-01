@@ -135,14 +135,9 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             {
                 throw new Exception($"Đã tồn tại Đoàn vào có mã {dto.Code}");
             }
-            var newDoanVao = _mapper.Map<DelegationIncoming>(dto);
 
-            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-
-            newDoanVao.Status = DelegationStatus.Create;
-            _unitOfWork.iDelegationIncomingRepository.Add(newDoanVao);
-            await _unitOfWork.SaveChangesAsync();
+            // 1️⃣ Validate & parse Excel trước
+            List<DetailDelegationIncoming>? detailDelegationIncomings = null;
 
             if (dto.DetailDelegation != null)
             {
@@ -201,8 +196,26 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
                 await _excelService.CheckValidateDetailDelegationAsync(dto.DetailDelegation, templateRules);
 
-                List<DetailDelegationIncoming> detailDelegationIncomings = await _excelService.ParseExcelToListDetailDelegationAsync(dto.DetailDelegation);
+                detailDelegationIncomings =
+                    await _excelService.ParseExcelToListDetailDelegationAsync(dto.DetailDelegation);
+            }
 
+            var newDoanVao = _mapper.Map<DelegationIncoming>(dto);
+
+            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+
+
+            newDoanVao.Status = DelegationStatus.Create;
+            if(detailDelegationIncomings != null)
+            {
+                newDoanVao.TotalPerson = detailDelegationIncomings.Count();
+            }
+            _unitOfWork.iDelegationIncomingRepository.Add(newDoanVao);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (dto.DetailDelegation != null)
+            {
                 int countDetail = _unitOfWork.iDetailDelegationIncomingRepository.TableNoTracking.Count();
 
                 for(int i = 0; i < detailDelegationIncomings.Count(); i++)
@@ -253,6 +266,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             return _mapper.Map<CreateResponseDto>(newDoanVao);
 
         }
+         
 
         public async Task<UpdateDelegationIncomingResponseDto> UpdateDelegationIncoming(UpdateDelegationIncomingRequestDto dto)
         {
@@ -271,6 +285,28 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
             if (existMaDoanVao)
                 throw new Exception($"Đã tồn tại mã Đoàn vào \"{dto.Code}\".");
+
+            // validate
+            if (string.IsNullOrWhiteSpace(dto.Code))
+                throw new Exception("Mã đoàn vào không được để trống");
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                throw new Exception("Tên đoàn vào không để trống");
+
+            if (dto.IdPhongBan == null || dto.IdPhongBan == 0)
+                throw new Exception("Phòng ban không đưuọc để trống");
+
+            if (dto.IdStaffReception == null || dto.IdStaffReception == 0)
+                throw new Exception("Nhân viên hộ trợ không được để trống");
+
+            if (string.IsNullOrWhiteSpace(dto.PhoneNumber))
+                throw new Exception("Số điện thoại không được để trống");
+
+            if (dto.RequestDate == null)
+                throw new Exception("Ngày yêu cầu không được để trống");
+
+            if (dto.ReceptionDate == null)
+                throw new Exception("Ngày tiếp nhận không được để trống");
 
             // Lưu giá trị cũ để log
             var oldValues = new

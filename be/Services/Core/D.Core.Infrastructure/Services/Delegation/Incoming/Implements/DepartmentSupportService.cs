@@ -61,8 +61,8 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
             
             foreach (var item in phongBanIds)
             {
-                var data = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Where(x => x.DepartmentSupportId == item && x.DelegationIncomingId == dto.DelegationIncomingId).Include( x => x.DelegationIncoming);
-                if(data != null)
+                var data = _unitOfWork.iDepartmentSupportRepository.TableNoTracking.Where(x => x.DepartmentSupportId == item && x.DelegationIncomingId == dto.DelegationIncomingId);
+                if(data.Count() > 0)
                 {
                     var department = _unitOfWork.iDmPhongBanRepository.FindById(item);
                     throw new Exception($"Phòng ban {department.TenPhongBan} đã hỗ trợ đoàn {delegation.Name}");

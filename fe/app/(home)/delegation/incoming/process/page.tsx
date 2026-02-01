@@ -126,7 +126,7 @@ const Page = () => {
       dataIndex: 'location',
       title: 'Địa điểm',
       align: 'center',
-      width: 120
+      width: 200
     },
     {
       key: 'idStaffReception',

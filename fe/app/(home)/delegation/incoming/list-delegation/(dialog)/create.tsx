@@ -155,12 +155,12 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
       <Form form={form} layout="vertical" onFinish={onFinish} disabled={isView}>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Mã đoàn" name="code" rules={[{ required: true, message: 'Nhập mã đoàn' }]}>
+            <Form.Item label="Mã đoàn" name="code" rules={[{ required: true, message: 'Vui lòng nhập mã đoàn' }]}>
               <Input />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Tên đoàn vào" name="name" rules={[{ required: true, message: 'Nhập tên đoàn' }]}>
+            <Form.Item label="Tên đoàn vào" name="name" rules={[{ required: true, message: 'Vui lòng nhập tên đoàn' }]}>
               <Input />
             </Form.Item>
           </Col>
@@ -168,7 +168,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Phòng ban phụ trách" name="idPhongBan" rules={[{ required: true }]}>
+            <Form.Item label="Phòng ban phụ trách" name="idPhongBan" rules={[{ required: true, message: 'Vui lòng nhập phòng ban phụ trách' }]}>
               <Select options={listPhongBan.map((pb: any) => ({ value: pb.idPhongBan, label: pb.tenPhongBan }))} />
             </Form.Item>
           </Col>
@@ -178,7 +178,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Nhân sự tiếp đón" name="idStaffReception" rules={[{ required: true }]}>
+            <Form.Item label="Nhân sự tiếp đón" name="idStaffReception" rules={[{ required: true,  message: 'Vui lòng nhập nhân sự tiếp đón'}]}>
               <Select
                 disabled={!idPhongBan}
                 placeholder={idPhongBan ? 'Chọn nhân sự' : 'Chọn phòng ban trước'}
@@ -198,24 +198,19 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Tổng số người" name="totalPerson">
-              <InputNumber style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="SĐT liên hệ" name="phoneNumber">
+            <Form.Item label="SĐT liên hệ" name="phoneNumber" rules={[{ required: true, message: 'Vui lòng số điện thoại' }]}>
               <Input />
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Ngày yêu cầu" name="requestDate" rules={[{ required: true }]}>
+            <Form.Item label="Ngày yêu cầu" name="requestDate" rules={[{ required: true, message: 'Vui lòng nhập ngày yêu cầu' }]}>
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Ngày tiếp đón" name="receptionDate" rules={[{ required: true }]}>
+            <Form.Item label="Ngày tiếp đón" name="receptionDate" rules={[{ required: true, message: 'Vui lòng nhập ngày tiếp đón' }]}>
               <DatePicker
                 style={{ width: '100%' }}
                 disabledDate={(current) => {
@@ -248,7 +243,7 @@ const CreateDoanVaoModal: React.FC<DoanVaoModalProps> = ({ isModalOpen, setIsMod
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Tải mẫu Upload file">
+              <Form.Item label="Tải mẫu thành viên tham gia">
                 <Button
                   icon={<DownloadOutlined />}
                   onClick={downloadDelegationTemplateExcel}

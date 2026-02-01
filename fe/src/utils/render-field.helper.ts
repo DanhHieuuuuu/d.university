@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Typography } from 'antd';
 import type { FormItemProps } from 'antd';
 import dayjs from 'dayjs';
+import { Rule } from 'antd/es/form';
 
 const Text = Typography.Text;
 
@@ -9,15 +10,16 @@ export interface RenderFieldOptions {
   isEdit: boolean;
   displayValueFormatter?: (value: any) => React.ReactNode;
   displayType?: 'date' | 'time'; // thêm kiểu hiển thị
+  rules?: Rule[];
 }
 
 export function renderField(
   name: FormItemProps['name'],
   initialValue: any,
   input: React.ReactElement,
-  options: RenderFieldOptions
+  options: RenderFieldOptions,
 ): React.ReactElement {
-  const { isEdit, displayValueFormatter } = options;
+  const { isEdit, displayValueFormatter,displayType , rules } = options;
 
   const child = isEdit
     ? input
@@ -34,6 +36,7 @@ export function renderField(
     {
       name,
       initialValue,
+      rules: isEdit ? rules : undefined,
       style: { margin: 0 }
     },
     child

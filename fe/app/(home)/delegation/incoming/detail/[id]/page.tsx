@@ -39,7 +39,11 @@ export default function DetailDoanVaoPage() {
   }, [id, activeKey, delegation, dispatch]);
 
   const handleTabChange = (key: string) => {
+    // Thoát chế độ chỉnh sửa khi đổi tab
+    setIsEdit(false);
+
     setActiveKey(key);
+
     if (key === 'staffReception' && !detailDelegation) {
       dispatch(getByIdDetailDelegation(Number(id)))
         .unwrap()
@@ -50,6 +54,7 @@ export default function DetailDoanVaoPage() {
         .then((res) => setReceptionTime(res));
     }
   };
+
 
   // Sự kiện khi update
   const onClickUpdate = () => { 
@@ -65,23 +70,31 @@ export default function DetailDoanVaoPage() {
 const onClickSave = async () => {
   try {
     if (activeKey === 'delegation') {
-      await delegationFormRef.current?.submit();
+      await delegationFormRef.current?.validateFields();
+      delegationFormRef.current?.submit();
     }
 
     if (activeKey === 'staffReception') {
-      await staffFormRef.current?.submit();
+      await staffFormRef.current?.validateFields();
+      staffFormRef.current?.submit();
     }
 
     if (activeKey === 'receptionTime') {
-      await receptionTimeFormRef.current?.submit();
+      await receptionTimeFormRef.current?.validateFields();
+      receptionTimeFormRef.current?.submit();
     }
 
-    toast.success('Cập nhật thành công');
-    setIsEdit(false);
   } catch (err) {
-    toast.error(String(err));
+    //  validateFields FAIL
+    // Form tự highlight lỗi → KHÔNG LƯU
+    return;
   }
 };
+const handleUpdateSuccess = () => {
+  toast.success('Cập nhật thành công');
+  setIsEdit(false);
+};
+
 
 
   // Sự kiện reload
@@ -110,7 +123,7 @@ const onClickSave = async () => {
       key: 'delegation', 
       label: 'Thông tin đoàn vào', 
       children: delegation ? ( 
-        <DelegationIncomingTab data={delegation} isEdit={isEdit} ref={delegationFormRef} onUpdated={reloadDelegation} /> 
+        <DelegationIncomingTab data={delegation} isEdit={isEdit} ref={delegationFormRef} onUpdated={reloadDelegation} onUpdatedSuccess={handleUpdateSuccess}/> 
       ) : ( 
         <Empty description="Không có dữ liệu đoàn vào" /> 
       ) 
@@ -119,7 +132,7 @@ const onClickSave = async () => {
       key: 'staffReception', 
       label: 'Thông tin nhân sự tiếp đoàn', 
       children: detailDelegation ? ( 
-        <DetailGuestGroupTab data={detailDelegation} isEdit={isEdit}  ref={staffFormRef} onUpdated={reloadDetailDelegation} /> 
+        <DetailGuestGroupTab data={detailDelegation} isEdit={isEdit}  ref={staffFormRef} onUpdated={reloadDetailDelegation} onUpdatedSuccess={handleUpdateSuccess}/> 
       ) : ( 
         <Empty description="Không có dữ liệu nhân sự tiếp đoàn" /> 
       ) 
@@ -134,6 +147,7 @@ const onClickSave = async () => {
             data={receptionTime} 
             isEdit={isEdit} 
             onUpdated={reloadReceptionTime} 
+            onUpdatedSuccess={handleUpdateSuccess}
           /> 
         ) : ( 
           <Empty description="Không có dữ liệu thời gian tiếp đoàn" /> 
@@ -179,7 +193,7 @@ const onClickSave = async () => {
           ) : (
             <div style={{ display: 'flex', gap: 8 }}>
               <Button onClick={onClickCancel}>Huỷ</Button>
-              <Button type="primary" onClick={onClickSave}>
+              <Button type="primary" onClick={onClickSave} htmlType="submit">
                 Lưu
               </Button>
             </div>
