@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useState } from 'react';
-import { Button, Card, Form, Input } from 'antd';
+import { Button, Card, Form, Input, Modal, Select } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import { ReduxStatus } from '@redux/const';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
+import { deletePhongBan, getAllPhongBan } from '@redux/feature/danh-muc/danhmucThunk';
 import { setSelectedIdPhongBan } from '@redux/feature/danh-muc/danhmucSlice';
 
 import AppTable from '@components/common/Table';
@@ -25,8 +25,10 @@ import { formatDateView } from '@utils/index';
 
 const Page = () => {
   const [form] = Form.useForm();
+  const [_modal, contextHolder] = Modal.useModal();
   const dispatch = useAppDispatch();
   const { data: list, status, total: totalItem } = useAppSelector((state) => state.danhmucState.phongBan.$list);
+  const { listLoaiPhongBan } = useAppSelector((state) => state.danhmucState);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isUpdate, setIsModalUpdate] = useState<boolean>(false);
@@ -66,6 +68,23 @@ const Page = () => {
     setIsModalOpen(true);
   };
 
+  const onClickDelete = (id: number) => {
+    setSelectedId(id);
+    _modal.confirm({
+      type: 'error',
+      title: 'Bạn chắc chắn muốn xóa phòng ban này',
+      cancelText: 'Hủy',
+      okText: 'Xác nhận',
+      onOk: () => {
+        var result = dispatch(deletePhongBan(id))
+          .unwrap()
+          .then(() => {
+            refreshData();
+          });
+      }
+    });
+  };
+
   const refreshData = () => {
     dispatch(getAllPhongBan(query));
   };
@@ -74,7 +93,9 @@ const Page = () => {
     {
       key: 'maPhongBan',
       dataIndex: 'maPhongBan',
-      title: 'Mã phòng ban'
+      title: 'Mã phòng ban',
+      width: 120,
+      align: 'center'
     },
     {
       key: 'tenPhongBan',
@@ -84,7 +105,8 @@ const Page = () => {
     {
       key: 'loaiPhongBan',
       dataIndex: 'loaiPhongBan',
-      title: 'Loại phòng ban'
+      title: 'Loại phòng ban',
+      width: 150
     },
     {
       key: 'diaChi',
@@ -105,21 +127,23 @@ const Page = () => {
       key: 'ngayThanhLap',
       dataIndex: 'ngayThanhLap',
       title: 'Ngày thành lập',
+      width: 150,
+      align: 'center',
       render: (value) => {
         const date = formatDateView(value);
         return <p>{date}</p>;
       }
-    },
-    {
-      key: 'nguoiDaiDien',
-      dataIndex: 'nguoiDaiDien',
-      title: 'Người đại diện'
-    },
-    {
-      key: 'chucVuNguoiDaiDien',
-      dataIndex: 'chucVuNguoiDaiDien',
-      title: 'Chức vụ người đại diện'
     }
+    // {
+    //   key: 'nguoiDaiDien',
+    //   dataIndex: 'nguoiDaiDien',
+    //   title: 'Người đại diện'
+    // },
+    // {
+    //   key: 'chucVuNguoiDaiDien',
+    //   dataIndex: 'chucVuNguoiDaiDien',
+    //   title: 'Chức vụ người đại diện'
+    // }
   ];
 
   const actions: IAction[] = [
@@ -147,6 +171,7 @@ const Page = () => {
       icon: <DeleteOutlined />,
       command: (record: IViewPhongBan) => {
         dispatch(setSelectedIdPhongBan(record.id));
+        onClickDelete(record.id);
       }
     }
   ];
@@ -169,10 +194,23 @@ const Page = () => {
         </Button>
       }
     >
+      {contextHolder}
       <Form form={form} layout="horizontal">
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-2 gap-4">
           <Form.Item<IQueryPhongBan> label="Tên phòng ban:" name="Keyword">
             <Input onChange={(e) => handleSearch(e)} />
+          </Form.Item>
+          <Form.Item<IQueryPhongBan> label="Loại phòng ban:" name="idLoaiPhongBan">
+            <Select
+              allowClear
+              options={listLoaiPhongBan?.map((item) => {
+                return {
+                  value: item.id,
+                  label: item.tenLoaiPhongBan
+                };
+              })}
+              onChange={(val) => onFilterChange({ idLoaiPhongBan: val })}
+            />
           </Form.Item>
         </div>
         <Form.Item>
@@ -194,6 +232,7 @@ const Page = () => {
           </div>
         </Form.Item>
       </Form>
+
       <AppTable
         loading={status === ReduxStatus.LOADING}
         rowKey="id"

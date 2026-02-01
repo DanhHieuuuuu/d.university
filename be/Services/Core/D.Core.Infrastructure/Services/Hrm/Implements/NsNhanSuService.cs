@@ -63,6 +63,13 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 query = query.Where(x => x.HienTaiPhongBan == dto.IdPhongBan);
             }
 
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                query = query.Where(x =>
+                    (x.HoDem + " " + x.Ten).ToLower().Contains(dto.Keyword.ToLower())
+                );
+            }
+
             var totalCount = query.Count();
 
             var items = query
@@ -173,7 +180,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             };
         }
 
-        public PageResultDto<NsNhanSuByKpiRoleResponseDto> GetAllNhanSuByKpiRole(NsNhanSuByKpiRoleRequestDto dto)
+        public PageResultDto<NsNhanSuByKpiRoleResponseDto> GetAllNhanSuByKpiRole(
+            NsNhanSuByKpiRoleRequestDto dto
+        )
         {
             var userId = CommonUntil.GetCurrentUserId(_contextAccessor);
             var userRoles = _unitOfWork
@@ -183,8 +192,15 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             var isHieuTruong = userRoles.Any(x => x.Role == "HIEU_TRUONG");
 
             var donViIds = userRoles
-                .Where(x =>(x.Role.StartsWith("TRUONG_DON_VI_CAP_2")|| x.Role.StartsWith("TRUONG_DON_VI_CAP_3")) && x.IdDonVi.HasValue)
-                .Select(x => x.IdDonVi!.Value).Distinct().ToList();
+                .Where(x =>
+                    (
+                        x.Role.StartsWith("TRUONG_DON_VI_CAP_2")
+                        || x.Role.StartsWith("TRUONG_DON_VI_CAP_3")
+                    ) && x.IdDonVi.HasValue
+                )
+                .Select(x => x.IdDonVi!.Value)
+                .Distinct()
+                .ToList();
 
             List<int> allowedNhanSuIds;
             if (isHieuTruong)
@@ -198,7 +214,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             else
             {
                 allowedNhanSuIds = _unitOfWork
-                    .iKpiRoleRepository.TableNoTracking.Where(r => r.IdDonVi.HasValue && donViIds.Contains(r.IdDonVi.Value))
+                    .iKpiRoleRepository.TableNoTracking.Where(r =>
+                        r.IdDonVi.HasValue && donViIds.Contains(r.IdDonVi.Value)
+                    )
                     .Select(r => r.IdNhanSu)
                     .Distinct()
                     .ToList();
@@ -207,7 +225,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             if (dto.IdPhongBan.HasValue)
             {
                 allowedNhanSuIds = _unitOfWork
-                    .iKpiRoleRepository.TableNoTracking.Where(r => r.IdDonVi == dto.IdPhongBan.Value && allowedNhanSuIds.Contains(r.IdNhanSu))
+                    .iKpiRoleRepository.TableNoTracking.Where(r =>
+                        r.IdDonVi == dto.IdPhongBan.Value && allowedNhanSuIds.Contains(r.IdNhanSu)
+                    )
                     .Select(r => r.IdNhanSu)
                     .Distinct()
                     .ToList();
@@ -223,7 +243,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
 
             var items = _unitOfWork
-                .iNsNhanSuRepository.TableNoTracking.Where(x => !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id))
+                .iNsNhanSuRepository.TableNoTracking.Where(x =>
+                    !string.IsNullOrEmpty(x.Password) && allowedNhanSuIds.Contains(x.Id)
+                )
                 .OrderBy(x => x.Id)
                 .Skip(dto.SkipCount())
                 .Take(dto.PageSize)
@@ -248,8 +270,12 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             }
 
             var kpiRolesDict = _unitOfWork
-                .iKpiRoleRepository.TableNoTracking.Where(r =>items.Select(i => i.Id).Contains(r.IdNhanSu) && r.IdDonVi.HasValue)
-                .ToList().GroupBy(r => r.IdNhanSu).ToDictionary(g => g.Key, g => g.ToList());
+                .iKpiRoleRepository.TableNoTracking.Where(r =>
+                    items.Select(i => i.Id).Contains(r.IdNhanSu) && r.IdDonVi.HasValue
+                )
+                .ToList()
+                .GroupBy(r => r.IdNhanSu)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
             var allDonViIds = kpiRolesDict
                 .Values.SelectMany(v => v.Select(r => r.IdDonVi!.Value))
@@ -418,7 +444,6 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 nhansu.TenHocHam = dto.TenHocHam;
                 nhansu.TenChuyenNganhHocHam = dto.TenChuyenNganhHocHam;
 
-
                 _unitOfWork.iNsNhanSuRepository.Update(nhansu);
                 _unitOfWork.iNsNhanSuRepository.SaveChange();
 
@@ -547,26 +572,27 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             return result;
         }
 
-        public List<ThongKeNhanSuTheoPhongBanResponseDto> ThongKeNhanSuTheoPhongBan(ThongKeNhanSuTheoPhongBanRequestDto dto)
+        public List<ThongKeNhanSuTheoPhongBanResponseDto> ThongKeNhanSuTheoPhongBan(
+            ThongKeNhanSuTheoPhongBanRequestDto dto
+        )
         {
             _logger.LogInformation($"Method {nameof(ThongKeNhanSuTheoPhongBan)} called.");
 
             var query =
                 from pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
                 join a in _unitOfWork.iNsNhanSuRepository.TableNoTracking
-                    on pb.Id equals a.HienTaiPhongBan into nsGroup
+                    on pb.Id equals a.HienTaiPhongBan
+                    into nsGroup
                 from a in nsGroup
                     .Where(x =>
-                        x.DaVeHuu != true &&
-                        x.IsThoiViec != true &&
-                        x.DaChamDutHopDong != true
+                        x.DaVeHuu != true && x.IsThoiViec != true && x.DaChamDutHopDong != true
                     )
                     .DefaultIfEmpty()
                 group a by new
                 {
                     pb.Id,
                     pb.STT,
-                    pb.TenPhongBan
+                    pb.TenPhongBan,
                 } into g
                 orderby g.Key.STT
                 select new ThongKeNhanSuTheoPhongBanResponseDto
@@ -574,7 +600,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     Id = g.Key.Id,
                     STT = g.Key.STT,
                     TenPhongBan = g.Key.TenPhongBan,
-                    SoLuongNhanSu = g.Count(x => x != null)
+                    SoLuongNhanSu = g.Count(x => x != null),
                 };
 
             var result = query.ToList();
@@ -807,15 +833,18 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                 where qtct.IdNhanSu == idNhanSu
 
                 join cv in _unitOfWork.iDmChucVuRepository.TableNoTracking
-                    on qtct.IdChucVu equals cv.Id into cvGroup
+                    on qtct.IdChucVu equals cv.Id
+                    into cvGroup
                 from chucVu in cvGroup.DefaultIfEmpty()
 
                 join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
-                    on qtct.IdPhongBan equals pb.Id into pbGroup
+                    on qtct.IdPhongBan equals pb.Id
+                    into pbGroup
                 from phongBan in pbGroup.DefaultIfEmpty()
 
                 join tbm in _unitOfWork.iDmToBoMonRepository.TableNoTracking
-                    on qtct.IdToBoMon equals tbm.Id into tbmGroup
+                    on qtct.IdToBoMon equals tbm.Id
+                    into tbmGroup
                 from toBoMon in tbmGroup.DefaultIfEmpty()
 
                 select new NsQuaTrinhCongTacResponseDto
@@ -827,9 +856,9 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
                     IdPhongBan = qtct.IdPhongBan,
                     IdToBoMon = qtct.IdToBoMon,
                     Description =
-                      (phongBan != null ? $"Đơn vị: <b><i>{phongBan.TenPhongBan}</i></b>. " : "")
-                      + (chucVu != null ? $"Chức vụ: <b><i>{chucVu.TenChucVu}</i></b>. " : "")
-                      + (toBoMon != null ? $"Tổ bộ môn: <b><i>{toBoMon.TenBoMon}</i></b>." : "")
+                        (phongBan != null ? $"Đơn vị: <b><i>{phongBan.TenPhongBan}</i></b>. " : "")
+                        + (chucVu != null ? $"Chức vụ: <b><i>{chucVu.TenChucVu}</i></b>. " : "")
+                        + (toBoMon != null ? $"Tổ bộ môn: <b><i>{toBoMon.TenBoMon}</i></b>." : ""),
                 };
 
             return query.ToList();

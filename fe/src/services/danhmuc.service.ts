@@ -281,7 +281,7 @@ const deleteToBoMon = async (id: number) => {
 
 const getToBoMonById = async (idToBoMon: number) => {
   try {
-    const res = await axios.get(`${apiToBoMonEndpoint}/get-by-id?Id=${idToBoMon}`);
+    const res = await axios.get(`${apiToBoMonEndpoint}/${idToBoMon}`);
 
     const data: IResponseItem<IViewToBoMon> = res.data;
     return Promise.resolve(data);

@@ -27,6 +27,7 @@ const CreateModelModal: React.FC<CreateModelModalProps> = (props) => {
                 name: props.selectedModel.name || '',
                 description: props.selectedModel.description || '',
                 baseURL: props.selectedModel.baseURL || '',
+                apiKey: undefined,
                 modelName: props.selectedModel.modelName || '',
                 isLocal: props.selectedModel.isLocal || false,
                 isSelected: props.selectedModel.isSelected || false
