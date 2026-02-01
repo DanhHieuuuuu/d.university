@@ -15,6 +15,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
     {
         private readonly ILogger<ChatbotService> _logger;
         private readonly ISvChatbotHistoryRepository _chatbotHistoryRepository;
+        private readonly ISvChatbotModelRepository _chatbotModelRepository;
         private readonly ISvSinhVienRepository _sinhVienRepository;
         private readonly ISvSinhVienService _sinhVienService;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -23,6 +24,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
         public ChatbotService(
             ILogger<ChatbotService> logger,
             ISvChatbotHistoryRepository chatbotHistoryRepository,
+            ISvChatbotModelRepository chatbotModelRepository,
             ISvSinhVienRepository sinhVienRepository,
             ISvSinhVienService sinhVienService,
             IHttpClientFactory httpClientFactory,
@@ -31,6 +33,7 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
         {
             _logger = logger;
             _chatbotHistoryRepository = chatbotHistoryRepository;
+            _chatbotModelRepository = chatbotModelRepository;
             _sinhVienRepository = sinhVienRepository;
             _sinhVienService = sinhVienService;
             _httpClientFactory = httpClientFactory;
@@ -62,6 +65,20 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
                 })
                 .ToList();
 
+            // Lấy model đang được chọn
+            var selectedModel = await _chatbotModelRepository.GetSelectedAsync();
+            LlmConfigDto? llmConfig = null;
+            if (selectedModel != null)
+            {
+                llmConfig = new LlmConfigDto
+                {
+                    Name = selectedModel.Name,
+                    BaseUrl = selectedModel.BaseURL,
+                    Model = selectedModel.ModelName,
+                    ApiKey = selectedModel.APIKey
+                };
+            }
+
             // Gọi Python Chatbot API
             var pythonApiUrl = _configuration["ChatbotApi:BaseUrl"] ?? "http://localhost:8000";
             var client = _httpClientFactory.CreateClient();
@@ -82,17 +99,19 @@ namespace D.Core.Infrastructure.Services.SinhVien.Implements
                 {
                     Message = request.Message,
                     Mssv = request.Mssv,
-                    ConversationHistory = conversationHistory
+                    ConversationHistory = conversationHistory,
+                    LlmConfig = llmConfig
                 };
                 jsonContent = JsonSerializer.Serialize(pythonRequest, jsonOptions);
                 apiEndpoint = $"{pythonApiUrl}/api/chat-with-mssv";
             }
             else
             {
-                var pythonRequest = new PythonChatRequest
+                var pythonRequest = new PythonChatRequestWithLlm
                 {
                     Message = request.Message,
-                    ConversationHistory = conversationHistory
+                    ConversationHistory = conversationHistory,
+                    LlmConfig = llmConfig
                 };
                 jsonContent = JsonSerializer.Serialize(pythonRequest, jsonOptions);
                 apiEndpoint = $"{pythonApiUrl}/api/chat";

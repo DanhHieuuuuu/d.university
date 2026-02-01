@@ -1,11 +1,20 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Literal
+
+
+class LLMConfigRequest(BaseModel):
+    """Model cau hinh LLM tu request API."""
+    name: Literal["groq", "vllm"]
+    base_url: str
+    model: str
+    api_key: Optional[str] = None
 
 
 class ChatRequest(BaseModel):
     """Request model cho endpoint chat."""
     message: str
     conversation_history: Optional[List[dict]] = []
+    llm_config: Optional[LLMConfigRequest] = None
 
 
 class ChatResponse(BaseModel):
@@ -26,6 +35,7 @@ class ChatWithMssvRequest(BaseModel):
     message: str
     mssv: str
     conversation_history: Optional[List[dict]] = []
+    llm_config: Optional[LLMConfigRequest] = None
 
 
 class StudentDataItem(BaseModel):
@@ -45,3 +55,8 @@ class SyncStudentsResponse(BaseModel):
     message: str
     total_students: int
     total_chunks: int
+
+
+class OrientationRequest(BaseModel):
+    """Request model cho endpoint orientation."""
+    llm_config: LLMConfigRequest

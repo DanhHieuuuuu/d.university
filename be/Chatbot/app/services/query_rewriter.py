@@ -1,10 +1,10 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 
 class QueryRewriter:
     """Viết lại câu hỏi dựa trên ngữ cảnh hội thoại để tìm kiếm context tốt hơn."""
     
-    def __init__(self, llm_client):
+    def __init__(self, llm_client: Optional[object] = None):
         """Khởi tạo Query Rewriter với LLM client."""
         self.llm_client = llm_client
     

@@ -165,5 +165,111 @@ namespace D.Core.API.Controllers.SinhVien
                 return BadRequest(ex);
             }
         }
+
+        #region ChatbotModel CRUD
+
+        /// <summary>
+        /// Lấy Chatbot Model đang được chọn (IsSelected = true)
+        /// </summary>
+        [HttpGet("model/selected")]
+        public async Task<ResponseAPI> GetSelectedModel()
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetSelectedSvChatbotModelDto());
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách tất cả Chatbot Model
+        /// </summary>
+        [HttpGet("model/list")]
+        public async Task<ResponseAPI> GetAllModels()
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetAllSvChatbotModelDto());
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Lấy Chatbot Model theo Id
+        /// </summary>
+        [HttpGet("model/{id}")]
+        public async Task<ResponseAPI> GetModelById(int id)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetSvChatbotModelByIdDto { Id = id });
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Thêm mới Chatbot Model
+        /// </summary>
+        [HttpPost("model/create")]
+        public async Task<ResponseAPI> CreateModel([FromBody] CreateSvChatbotModelDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật Chatbot Model
+        /// </summary>
+        [HttpPut("model/update")]
+        public async Task<ResponseAPI> UpdateModel([FromBody] UpdateSvChatbotModelDto dto)
+        {
+            try
+            {
+                var result = await _mediator.Send(dto);
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        /// <summary>
+        /// Xóa Chatbot Model
+        /// </summary>
+        [HttpDelete("model/delete/{id}")]
+        public async Task<ResponseAPI> DeleteModel(int id)
+        {
+            try
+            {
+                var result = await _mediator.Send(new DeleteSvChatbotModelDto { Id = id });
+                return new ResponseAPI(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        #endregion
     }
 }

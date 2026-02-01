@@ -6,13 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
 from app.models.schemas import (
     ChatRequest, ChatResponse, HealthResponse,
-    ChatWithMssvRequest, SyncStudentsRequest, SyncStudentsResponse
+    ChatWithMssvRequest, SyncStudentsRequest, SyncStudentsResponse,
+    LLMConfigRequest, OrientationRequest
 )
 from app.services.embedding import EmbeddingService
 from app.services.chroma_vector_store import initialize_chroma_vector_store
 from app.services.groq_client import LLMClient
 from app.services.rag import RAGPipeline
 from app.services.student_data_service import StudentDataService
+from app.llm_providers import create_config_from_request
 
 rag_pipeline: RAGPipeline = None
 student_data_service: StudentDataService = None
@@ -28,31 +30,29 @@ async def lifespan(app: FastAPI):
     print("Khởi động Chatbot Server...")
     print("=" * 50)
     
-    if not config.GROQ_API_KEY:
-        print("CẢNH BÁO: GROQ_API_KEY chưa được cấu hình!")
+    # LLM config giờ được truyền từ API request
+    print("LƯU Ý: LLM config sẽ được truyền từ mỗi API request (llm_config)")
     
-    print("\n[1/5] Khởi tạo Embedding Service...")
+    print("\n[1/4] Khởi tạo Embedding Service...")
     embedding_service = EmbeddingService(config.EMBEDDING_MODEL)
     embedding_service_global = embedding_service
     
-    print("\n[2/5] Khởi tạo ChromaDB Vector Store...")
+    print("\n[2/4] Khởi tạo ChromaDB Vector Store...")
     vector_store = initialize_chroma_vector_store(
         persist_directory=config.CHROMA_PERSIST_DIR,
         embedding_service=embedding_service,
         collection_name=config.CHROMA_COLLECTION_NAME
     )
     
-    print("\n[3/5] Khởi tạo LLM Client...")
-    llm_client = LLMClient()
-    
-    print("\n[4/5] Khởi tạo RAG Pipeline...")
+    print("\n[3/4] Khởi tạo RAG Pipeline (LLM sẽ được cấu hình từ request)...")
+    # Tạo RAG pipeline với LLM client placeholder (sẽ được thay thế trong mỗi request)
     rag_pipeline = RAGPipeline(
         vector_store=vector_store,
-        llm_client=llm_client,
+        llm_client=None,  # LLM client sẽ được tạo từ request
         top_k=config.TOP_K_RESULTS
     )
     
-    print("\n[5/5] Khởi tạo Student Data Service...")
+    print("\n[4/4] Khởi tạo Student Data Service...")
     student_data_service = StudentDataService(
         embedding_service=embedding_service,
         persist_directory=config.CHROMA_PERSIST_DIR,
@@ -97,31 +97,90 @@ async def health_check():
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    """Chat với chatbot, hỗ trợ query rewriting và lịch sử hội thoại."""
-    if not config.GROQ_API_KEY:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY chưa được cấu hình")
+    """Chat với chatbot, hỗ trợ query rewriting và lịch sử hội thoại.
+    
+    Request body:
+        - message: Tin nhan nguoi dung
+        - conversation_history: Lich su hoi thoai (optional)
+        - llm_config: Cau hinh LLM (bat buoc)
+            - name: 'groq' hoac 'vllm'
+            - base_url: URL cua LLM API 
+            - model: Ten model
+            - api_key: API key (bat buoc voi groq)
+    """
+    # Kiem tra llm_config
+    if not request.llm_config:
+        raise HTTPException(
+            status_code=400, 
+            detail="llm_config là bắt buộc. Vui lòng cung cấp name, base_url, model, và api_key (nếu dùng groq)"
+        )
     
     try:
+        # Tao LLMConfig tu request
+        llm_config = create_config_from_request(
+            name=request.llm_config.name,
+            base_url=request.llm_config.base_url,
+            model=request.llm_config.model,
+            api_key=request.llm_config.api_key
+        )
+        
+        # Tao LLMClient voi config tu request
+        llm_client = LLMClient(provider=llm_config)
+        
         history = request.conversation_history or []
-        response, contexts, rewritten_query = await rag_pipeline.query(
+        
+        # Su dung rag_pipeline nhung voi llm_client tu request
+        # Tao RAGPipeline tam thoi voi llm_client moi
+        temp_rag_pipeline = RAGPipeline(
+            vector_store=rag_pipeline.vector_store,
+            llm_client=llm_client,
+            top_k=config.TOP_K_RESULTS
+        )
+        
+        response, contexts, rewritten_query = await temp_rag_pipeline.query(
             question=request.message,
             conversation_history=history,
             use_query_rewriting=True
         )
         return ChatResponse(response=response, context_used=contexts, rewritten_query=rewritten_query)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/orientation")
-async def get_orientation():
-    """Lấy định hướng học tập cho sinh viên dựa trên điểm số."""
-    if not config.GROQ_API_KEY:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY chưa được cấu hình")
+@app.post("/api/orientation")
+async def get_orientation(request: OrientationRequest):
+    """Lấy định hướng học tập cho sinh viên dựa trên điểm số.
     
+    Request body:
+        - llm_config: Cau hinh LLM (bat buoc)
+            - name: 'groq' hoac 'vllm'
+            - base_url: URL cua LLM API
+            - model: Ten model
+            - api_key: API key (bat buoc voi groq)
+    """
     try:
-        orientation = await rag_pipeline.get_study_orientation()
+        # Tao LLMConfig tu request
+        llm_config = create_config_from_request(
+            name=request.llm_config.name,
+            base_url=request.llm_config.base_url,
+            model=request.llm_config.model,
+            api_key=request.llm_config.api_key
+        )
+        
+        # Tao LLMClient va RAG pipeline voi config tu request
+        llm_client = LLMClient(provider=llm_config)
+        temp_rag_pipeline = RAGPipeline(
+            vector_store=rag_pipeline.vector_store,
+            llm_client=llm_client,
+            top_k=config.TOP_K_RESULTS
+        )
+        
+        orientation = await temp_rag_pipeline.get_study_orientation()
         return {"orientation": orientation}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -149,10 +208,10 @@ async def rebuild_index():
             collection_name=config.CHROMA_COLLECTION_NAME,
             force_rebuild=True
         )
-        llm_client = LLMClient()
+        # LLM client sẽ được tạo từ mỗi request
         rag_pipeline = RAGPipeline(
             vector_store=vector_store,
-            llm_client=llm_client,
+            llm_client=None,
             top_k=config.TOP_K_RESULTS
         )
         return {"message": "Đã rebuild ChromaDB index thành công"}
@@ -178,11 +237,37 @@ async def sync_students(request: SyncStudentsRequest):
 
 @app.post("/api/chat-with-mssv", response_model=ChatResponse)
 async def chat_with_mssv(request: ChatWithMssvRequest):
-    """Chat với filter theo mã số sinh viên."""
-    if not config.GROQ_API_KEY:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY chưa được cấu hình")
+    """Chat với filter theo mã số sinh viên.
+    
+    Request body:
+        - message: Tin nhan nguoi dung
+        - mssv: Ma so sinh vien
+        - conversation_history: Lich su hoi thoai (optional)
+        - llm_config: Cau hinh LLM (bat buoc)
+            - name: 'groq' hoac 'vllm'
+            - base_url: URL cua LLM API
+            - model: Ten model
+            - api_key: API key (bat buoc voi groq)
+    """
+    # Kiem tra llm_config
+    if not request.llm_config:
+        raise HTTPException(
+            status_code=400, 
+            detail="llm_config là bắt buộc. Vui lòng cung cấp name, base_url, model, và api_key (nếu dùng groq)"
+        )
     
     try:
+        # Tao LLMConfig tu request
+        llm_config = create_config_from_request(
+            name=request.llm_config.name,
+            base_url=request.llm_config.base_url,
+            model=request.llm_config.model,
+            api_key=request.llm_config.api_key
+        )
+        
+        # Tao LLMClient voi config tu request
+        llm_client = LLMClient(provider=llm_config)
+        
         history = request.conversation_history or []
         mssv = request.mssv
         
@@ -214,7 +299,6 @@ async def chat_with_mssv(request: ChatWithMssvRequest):
                 context_used=[], rewritten_query=None
             )
         
-        llm_client = LLMClient()
         messages = llm_client.build_rag_prompt(
             query=request.message, context=contexts,
             conversation_history=history, student_info=student_info
@@ -222,6 +306,8 @@ async def chat_with_mssv(request: ChatWithMssvRequest):
         response = await llm_client.chat_completion(messages)
         
         return ChatResponse(response=response, context_used=contexts, rewritten_query=None)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -8,12 +8,18 @@ from app.services.query_rewriter import QueryRewriter
 class RAGPipeline:
     """RAG Pipeline kết hợp retrieval và generation, hỗ trợ query rewriting."""
     
-    def __init__(self, vector_store: ChromaVectorStore, llm_client: LLMClient, top_k: int = 5):
-        """Khởi tạo RAG pipeline."""
+    def __init__(self, vector_store: ChromaVectorStore, llm_client: Optional[LLMClient] = None, top_k: int = 5):
+        """Khởi tạo RAG pipeline.
+        
+        Args:
+            vector_store: ChromaDB vector store
+            llm_client: LLM client (có thể None, sẽ được set sau từ request)
+            top_k: Số lượng kết quả tìm kiếm tối đa
+        """
         self.vector_store = vector_store
         self.llm_client = llm_client
         self.top_k = top_k
-        self.query_rewriter = QueryRewriter(llm_client)
+        self.query_rewriter = QueryRewriter(llm_client) if llm_client else None
         self.student_info = None
     
     async def query(
@@ -23,10 +29,13 @@ class RAGPipeline:
         use_query_rewriting: bool = True
     ) -> Tuple[str, List[str], Optional[str]]:
         """Xử lý câu hỏi và trả về phản hồi từ LLM."""
+        if not self.llm_client:
+            raise ValueError("LLM client chưa được cấu hình. Vui lòng truyền llm_config trong request.")
+        
         rewritten_query = None
         search_query = question
         
-        if use_query_rewriting and conversation_history:
+        if use_query_rewriting and conversation_history and self.query_rewriter:
             rewritten_query = await self.query_rewriter.rewrite_query(
                 current_query=question,
                 conversation_history=conversation_history
@@ -51,6 +60,9 @@ class RAGPipeline:
     
     async def get_study_orientation(self) -> str:
         """Lấy định hướng học tập cho sinh viên dựa trên dữ liệu hiện có."""
+        if not self.llm_client:
+            raise ValueError("LLM client chưa được cấu hình. Vui lòng truyền llm_config trong request.")
+        
         student_results = self.vector_store.search("thông tin sinh viên", top_k=1)
         student_info = student_results[0][0]["content"] if student_results else ""
         

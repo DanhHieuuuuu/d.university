@@ -58,5 +58,21 @@ namespace D.Core.Domain.Dtos.SinhVien.ChatbotHistory
         public string? Message { get; set; }
         public string? Mssv { get; set; }
         public List<ConversationHistoryItem>? ConversationHistory { get; set; }
+        public LlmConfigDto? LlmConfig { get; set; }
+    }
+
+    public class PythonChatRequestWithLlm
+    {
+        public string? Message { get; set; }
+        public List<ConversationHistoryItem>? ConversationHistory { get; set; }
+        public LlmConfigDto? LlmConfig { get; set; }
+    }
+
+    public class LlmConfigDto
+    {
+        public string? Name { get; set; }
+        public string? BaseUrl { get; set; }
+        public string? Model { get; set; }
+        public string? ApiKey { get; set; }
     }
 }
