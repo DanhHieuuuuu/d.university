@@ -1,5 +1,4 @@
 import os
-import uuid
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,76 +6,67 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
 from app.models.schemas import (
     ChatRequest, ChatResponse, HealthResponse,
-    ClearSessionRequest, SessionInfoResponse
+    ChatWithMssvRequest, SyncStudentsRequest, SyncStudentsResponse,
+    LLMConfigRequest, OrientationRequest
 )
 from app.services.embedding import EmbeddingService
 from app.services.chroma_vector_store import initialize_chroma_vector_store
 from app.services.groq_client import LLMClient
 from app.services.rag import RAGPipeline
-from app.services.conversation_memory import ConversationMemory
+from app.services.student_data_service import StudentDataService
+from app.llm_providers import create_config_from_request
 
-# Global instances
 rag_pipeline: RAGPipeline = None
-conversation_memory: ConversationMemory = None
+student_data_service: StudentDataService = None
+embedding_service_global: EmbeddingService = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Khoi tao cac service khi server start."""
-    global rag_pipeline, conversation_memory
+    """Khởi tạo các service khi server khởi động."""
+    global rag_pipeline, student_data_service, embedding_service_global
     
     print("=" * 50)
     print("Khởi động Chatbot Server...")
     print("=" * 50)
     
-    # Kiem tra API key
-    if not config.GROQ_API_KEY:
-        print("CANH BAO: GROQ_API_KEY chua duoc cau hinh!")
-        print("Vui long tao file .env va them GROQ_API_KEY")
+    # LLM config giờ được truyền từ API request
+    print("LƯU Ý: LLM config sẽ được truyền từ mỗi API request (llm_config)")
     
-    # Khoi tao conversation memory voi file storage
-    print("\n[1/5] Khởi tạo Conversation Memory...")
-    data_dir = os.path.dirname(config.DATA_PATH)
-    storage_path = os.path.join(data_dir, "conversation_history.json")
-    conversation_memory = ConversationMemory(storage_path=storage_path)
-    print(f"Lưu trữ lịch sử tại: {storage_path}")
-    
-    # Khoi tao embedding service
-    print("\n[2/5] Khởi tạo Embedding Service...")
+    print("\n[1/4] Khởi tạo Embedding Service...")
     embedding_service = EmbeddingService(config.EMBEDDING_MODEL)
+    embedding_service_global = embedding_service
     
-    # Khởi tạo vector store (ChromaDB)
-    print("\n[3/5] Khởi tạo ChromaDB Vector Store...")
+    print("\n[2/4] Khởi tạo ChromaDB Vector Store...")
     vector_store = initialize_chroma_vector_store(
-        data_path=config.DATA_PATH,
         persist_directory=config.CHROMA_PERSIST_DIR,
         embedding_service=embedding_service,
         collection_name=config.CHROMA_COLLECTION_NAME
     )
     
-    # Khoi tao LLM client (tu dong chon provider tu .env)
-    print("\n[4/5] Khởi tạo LLM Client...")
-    llm_client = LLMClient()  # Su dung DEFAULT provider tu .env
-    
-    # Khoi tao RAG pipeline
-    print("\n[5/5] Khởi tạo RAG Pipeline...")
+    print("\n[3/4] Khởi tạo RAG Pipeline (LLM sẽ được cấu hình từ request)...")
+    # Tạo RAG pipeline với LLM client placeholder (sẽ được thay thế trong mỗi request)
     rag_pipeline = RAGPipeline(
         vector_store=vector_store,
-        llm_client=llm_client,
-        top_k=config.TOP_K_RESULTS,
-        data_path=config.DATA_PATH  # Truyen duong dan file JSON de doc thong tin sinh vien
+        llm_client=None,  # LLM client sẽ được tạo từ request
+        top_k=config.TOP_K_RESULTS
+    )
+    
+    print("\n[4/4] Khởi tạo Student Data Service...")
+    student_data_service = StudentDataService(
+        embedding_service=embedding_service,
+        persist_directory=config.CHROMA_PERSIST_DIR,
+        collection_name=config.CHROMA_COLLECTION_NAME
     )
     
     print("\n" + "=" * 50)
-    print("Server da san sang!")
+    print("Server đã sẵn sàng!")
     print("=" * 50 + "\n")
     
     yield
-    
-    print("Shutting down...")
+    print("Đang tắt server...")
 
 
-# Khoi tao FastAPI app
 app = FastAPI(
     title="D.University Chatbot API",
     description="API Chatbot tư vấn sinh viên sử dụng RAG với Groq LLM",
@@ -84,7 +74,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -96,168 +85,109 @@ app.add_middleware(
 
 @app.get("/", response_model=HealthResponse)
 async def root():
-    """Health check endpoint."""
-    return HealthResponse(
-        status="ok",
-        message="D.University Chatbot API đang hoạt động"
-    )
+    """Kiểm tra API đang hoạt động."""
+    return HealthResponse(status="ok", message="D.University Chatbot API đang hoạt động")
 
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
-    """Health check endpoint."""
-    return HealthResponse(
-        status="ok",
-        message="Server hoạt động bình thường"
-    )
+    """Kiểm tra tình trạng server."""
+    return HealthResponse(status="ok", message="Server hoạt động bình thường")
 
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    """
-    Endpoint chat voi chatbot.
+    """Chat với chatbot, hỗ trợ query rewriting và lịch sử hội thoại.
     
-    - **message**: Cau hoi cua sinh vien
-    - **conversation_history**: Lich su hoi thoai tu client (optional)
-    
-    Server se:
-    1. Viet lai cau hoi neu la follow-up question
-    2. Tim kiem context lien quan
-    3. Tra ve phan hoi tu LLM
+    Request body:
+        - message: Tin nhan nguoi dung
+        - conversation_history: Lich su hoi thoai (optional)
+        - llm_config: Cau hinh LLM (bat buoc)
+            - name: 'groq' hoac 'vllm'
+            - base_url: URL cua LLM API 
+            - model: Ten model
+            - api_key: API key (bat buoc voi groq)
     """
-    if not config.GROQ_API_KEY:
+    # Kiem tra llm_config
+    if not request.llm_config:
         raise HTTPException(
-            status_code=500,
-            detail="GROQ_API_KEY chưa được cấu hình. Vui lòng kiểm tra file .env"
+            status_code=400, 
+            detail="llm_config là bắt buộc. Vui lòng cung cấp name, base_url, model, và api_key (nếu dùng groq)"
         )
     
     try:
-        # Lay lich su hoi thoai tu request
+        # Tao LLMConfig tu request
+        llm_config = create_config_from_request(
+            name=request.llm_config.name,
+            base_url=request.llm_config.base_url,
+            model=request.llm_config.model,
+            api_key=request.llm_config.api_key
+        )
+        
+        # Tao LLMClient voi config tu request
+        llm_client = LLMClient(provider=llm_config)
+        
         history = request.conversation_history or []
         
-        # Goi RAG pipeline voi query rewriting
-        response, contexts, rewritten_query = await rag_pipeline.query(
+        # Su dung rag_pipeline nhung voi llm_client tu request
+        # Tao RAGPipeline tam thoi voi llm_client moi
+        temp_rag_pipeline = RAGPipeline(
+            vector_store=rag_pipeline.vector_store,
+            llm_client=llm_client,
+            top_k=config.TOP_K_RESULTS
+        )
+        
+        response, contexts, rewritten_query = await temp_rag_pipeline.query(
             question=request.message,
             conversation_history=history,
             use_query_rewriting=True
         )
-        
-        return ChatResponse(
-            response=response,
-            context_used=contexts,
-            rewritten_query=rewritten_query
-        )
+        return ChatResponse(response=response, context_used=contexts, rewritten_query=rewritten_query)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/session/clear")
-async def clear_session(request: ClearSessionRequest):
-    """
-    Xoa lich su hoi thoai cua mot session (POST method).
-    Goi khi nguoi dung muon bat dau cuoc hoi thoai moi.
-    """
-    conversation_memory.clear_session(request.session_id)
-    return {"message": "Đã xóa session thành công", "session_id": request.session_id}
-
-
-@app.delete("/api/session/{session_id}")
-async def delete_session(session_id: str):
-    """
-    Xoa mot session theo ID (DELETE method - RESTful).
-    """
-    # Kiem tra session ton tai
-    info = conversation_memory.get_session_info(session_id)
-    if not info:
-        raise HTTPException(status_code=404, detail="Session không tồn tại")
+@app.post("/api/orientation")
+async def get_orientation(request: OrientationRequest):
+    """Lấy định hướng học tập cho sinh viên dựa trên điểm số.
     
-    conversation_memory.clear_session(session_id)
-    return {"message": "Đã xóa session thành công", "session_id": session_id}
-
-
-@app.get("/api/sessions")
-async def get_all_sessions():
+    Request body:
+        - llm_config: Cau hinh LLM (bat buoc)
+            - name: 'groq' hoac 'vllm'
+            - base_url: URL cua LLM API
+            - model: Ten model
+            - api_key: API key (bat buoc voi groq)
     """
-    Lay danh sach tat ca cac session da luu.
-    Tra ve thong tin tom tat cua tung session.
-    """
-    sessions = conversation_memory.get_all_sessions()
-    return {
-        "total": len(sessions),
-        "sessions": sessions
-    }
-
-
-@app.get("/api/session/{session_id}")
-async def get_session_info(session_id: str):
-    """
-    Lay thong tin cua mot session (khong bao gom lich su hoi thoai).
-    """
-    info = conversation_memory.get_session_info(session_id)
-    if not info:
-        raise HTTPException(status_code=404, detail="Session không tồn tại")
-    
-    return {
-        "session_id": session_id,
-        "title": info.get("title", ""),
-        "message_count": info["message_count"],
-        "created_at": info["created_at"],
-        "last_access": info["last_access"]
-    }
-
-
-@app.get("/api/session/{session_id}/history")
-async def get_session_history(session_id: str):
-    """
-    Lay lich su hoi thoai day du cua mot session.
-    Bao gom thong tin session va tat ca tin nhan.
-    """
-    session_data = conversation_memory.get_session_with_history(session_id)
-    if not session_data:
-        raise HTTPException(status_code=404, detail="Session không tồn tại")
-    
-    return session_data
-
-
-@app.put("/api/session/{session_id}/rename")
-async def rename_session(session_id: str, title: str):
-    """
-    Doi ten (tieu de) cua mot session.
-    
-    Query params:
-        title: Tieu de moi cho session
-    """
-    success = conversation_memory.rename_session(session_id, title)
-    if not success:
-        raise HTTPException(status_code=404, detail="Session không tồn tại")
-    
-    return {"message": "Đã đổi tên session thành công", "session_id": session_id, "title": title}
-
-
-@app.get("/api/orientation")
-async def get_orientation():
-    """
-    Endpoint lay dinh huong hoc tap cho sinh vien.
-    Phan tich diem so va dua ra loi khuyen cho ky toi.
-    """
-    if not config.GROQ_API_KEY:
-        raise HTTPException(
-            status_code=500,
-            detail="GROQ_API_KEY chưa được cấu hình. Vui lòng kiểm tra file .env"
-        )
-    
     try:
-        orientation = await rag_pipeline.get_study_orientation()
+        # Tao LLMConfig tu request
+        llm_config = create_config_from_request(
+            name=request.llm_config.name,
+            base_url=request.llm_config.base_url,
+            model=request.llm_config.model,
+            api_key=request.llm_config.api_key
+        )
+        
+        # Tao LLMClient va RAG pipeline voi config tu request
+        llm_client = LLMClient(provider=llm_config)
+        temp_rag_pipeline = RAGPipeline(
+            vector_store=rag_pipeline.vector_store,
+            llm_client=llm_client,
+            top_k=config.TOP_K_RESULTS
+        )
+        
+        orientation = await temp_rag_pipeline.get_study_orientation()
         return {"orientation": orientation}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/student/summary")
 async def get_student_summary():
-    """
-    Endpoint lay tom tat thong tin sinh vien.
-    """
+    """Lấy tóm tắt thông tin sinh viên."""
     try:
         summary = rag_pipeline.get_student_summary()
         return {"summary": summary}
@@ -267,32 +197,156 @@ async def get_student_summary():
 
 @app.post("/api/rebuild-index")
 async def rebuild_index():
-    """
-    Endpoint rebuild vector store index.
-    Gọi khi dữ liệu JSON thay đổi.
-    """
+    """Xây dựng lại ChromaDB index."""
     global rag_pipeline
     
     try:
         embedding_service = EmbeddingService(config.EMBEDDING_MODEL)
         vector_store = initialize_chroma_vector_store(
-            data_path=config.DATA_PATH,
             persist_directory=config.CHROMA_PERSIST_DIR,
             embedding_service=embedding_service,
             collection_name=config.CHROMA_COLLECTION_NAME,
             force_rebuild=True
         )
-        
-        llm_client = LLMClient()
-        
+        # LLM client sẽ được tạo từ mỗi request
         rag_pipeline = RAGPipeline(
             vector_store=vector_store,
-            llm_client=llm_client,
-            top_k=config.TOP_K_RESULTS,
-            data_path=config.DATA_PATH
+            llm_client=None,
+            top_k=config.TOP_K_RESULTS
+        )
+        return {"message": "Đã rebuild ChromaDB index thành công"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/sync-students", response_model=SyncStudentsResponse)
+async def sync_students(request: SyncStudentsRequest):
+    """Đồng bộ dữ liệu sinh viên từ .NET API vào ChromaDB."""
+    try:
+        students_data = [{"mssv": s.mssv, "data": s.data} for s in request.students]
+        result = student_data_service.sync_students(students_data)
+        return SyncStudentsResponse(
+            success=result["success"],
+            message=result["message"],
+            total_students=result["total_students"],
+            total_chunks=result["total_chunks"]
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/chat-with-mssv", response_model=ChatResponse)
+async def chat_with_mssv(request: ChatWithMssvRequest):
+    """Chat với filter theo mã số sinh viên.
+    
+    Request body:
+        - message: Tin nhan nguoi dung
+        - mssv: Ma so sinh vien
+        - conversation_history: Lich su hoi thoai (optional)
+        - llm_config: Cau hinh LLM (bat buoc)
+            - name: 'groq' hoac 'vllm'
+            - base_url: URL cua LLM API
+            - model: Ten model
+            - api_key: API key (bat buoc voi groq)
+    """
+    # Kiem tra llm_config
+    if not request.llm_config:
+        raise HTTPException(
+            status_code=400, 
+            detail="llm_config là bắt buộc. Vui lòng cung cấp name, base_url, model, và api_key (nếu dùng groq)"
+        )
+    
+    try:
+        # Tao LLMConfig tu request
+        llm_config = create_config_from_request(
+            name=request.llm_config.name,
+            base_url=request.llm_config.base_url,
+            model=request.llm_config.model,
+            api_key=request.llm_config.api_key
         )
         
-        return {"message": "Đã rebuild ChromaDB index thành công"}
+        # Tao LLMClient voi config tu request
+        llm_client = LLMClient(provider=llm_config)
+        
+        history = request.conversation_history or []
+        mssv = request.mssv
+        
+        student_info = None
+        student_info_result = student_data_service.get_student_info(mssv)
+        if student_info_result:
+            content = student_info_result.get("content", "")
+            student_info = {"ma_sinh_vien": mssv}
+            for line in content.split("\n"):
+                if "Họ tên:" in line:
+                    student_info["ho_ten"] = line.split(":")[-1].strip()
+        
+        search_results = student_data_service.search_by_mssv(
+            query=request.message, mssv=mssv, top_k=config.TOP_K_RESULTS
+        )
+        
+        relevant_results = [(chunk, score) for chunk, score in search_results if score > 0.1]
+        contexts = [chunk["content"] for chunk, _ in relevant_results]
+        
+        if not contexts and student_info:
+            all_data = student_data_service.search_by_mssv(
+                query=f"thông tin sinh viên {mssv}", mssv=mssv, top_k=10
+            )
+            contexts = [chunk["content"] for chunk, _ in all_data]
+        
+        if not contexts:
+            return ChatResponse(
+                response=f"Không tìm thấy thông tin sinh viên {mssv}",
+                context_used=[], rewritten_query=None
+            )
+        
+        messages = llm_client.build_rag_prompt(
+            query=request.message, context=contexts,
+            conversation_history=history, student_info=student_info
+        )
+        response = await llm_client.chat_completion(messages)
+        
+        return ChatResponse(response=response, context_used=contexts, rewritten_query=None)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/student/{mssv}/info")
+async def get_student_info_by_mssv(mssv: str):
+    """Lấy thông tin sinh viên theo mã số sinh viên."""
+    try:
+        results = student_data_service.search_by_mssv(
+            query=f"thông tin sinh viên {mssv}", mssv=mssv, top_k=10
+        )
+        if not results:
+            raise HTTPException(status_code=404, detail=f"Không tìm thấy sinh viên {mssv}")
+        return {
+            "mssv": mssv,
+            "data": [{"content": r[0]["content"], "type": r[0].get("metadata", {}).get("type", ""), "score": r[1]} for r in results]
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/debug/chroma-stats")
+async def get_chroma_stats():
+    """Xem thống kê ChromaDB (debug)."""
+    try:
+        count = student_data_service.vector_store.count()
+        sample = student_data_service.vector_store.collection.get(limit=5, include=["metadatas", "documents"])
+        all_meta = student_data_service.vector_store.collection.get(include=["metadatas"])
+        unique_mssv = set(m.get("mssv") for m in all_meta["metadatas"] if m and "mssv" in m)
+        return {
+            "total_documents": count,
+            "unique_students": list(unique_mssv),
+            "sample_documents": [
+                {"id": sample["ids"][i], "metadata": sample["metadatas"][i], "content_preview": sample["documents"][i][:200]}
+                for i in range(len(sample["ids"]))
+            ] if sample["ids"] else []
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
