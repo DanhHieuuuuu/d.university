@@ -196,7 +196,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                 .ToList();
 
             if (duplicateCodes.Any())
-                throw new Exception($"SupporterCode bị trùng trong request: {string.Join(", ", duplicateCodes)}");
+                throw new Exception($"Mã người hỗ trợ bị trùng trong request: {string.Join(", ", duplicateCodes)}");
 
             // Check trùng code trong DB
             var allSupporters = departmentSupport.Supporters.ToList();
@@ -212,7 +212,7 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
 
                 if (existed != null)
                 {
-                    throw new Exception($"SupporterCode '{item.SupporterCode}' đã tồn tại.");
+                    throw new Exception($"Mã người hỗ trợ '{item.SupporterCode}' đã tồn tại.");
                 }
             }
             // Xoá mềm những nguòi nếu request gửi lên ko có 

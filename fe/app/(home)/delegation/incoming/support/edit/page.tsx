@@ -83,10 +83,23 @@ const DepartmentSupport = () => {
     }
   };
   const filteredNhanSuByDepartment = useMemo(() => {
-    if (!detail?.departmentSupportId) return [];
+  if (!detail?.departmentSupportId) return [];
 
-    return listNhanSu.filter((ns) => ns.idPhongBan === detail.departmentSupportId);
-  }, [listNhanSu, detail]);
+  const filtered = listNhanSu.filter(
+    (ns) => ns.idPhongBan === detail.departmentSupportId
+  );
+
+  // remove duplicate by idNhanSu
+  const map = new Map<number, any>();
+
+  filtered.forEach((n) => {
+    if (!map.has(n.idNhanSu)) {
+      map.set(n.idNhanSu, n);
+    }
+  });
+
+  return Array.from(map.values());
+}, [listNhanSu, detail?.departmentSupportId]);
 
   // View and edit
   const rows: DetailRow[] = useMemo(() => {

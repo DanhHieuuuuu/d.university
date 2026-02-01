@@ -21,6 +21,7 @@ const REQUIRED_RULE = [{ required: true, message: 'Trường này không đượ
 const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProps>(
   ({ data, isEdit = false, onUpdated, onUpdatedSuccess }, ref) => {
     const [form] = Form.useForm();
+    const selectedPhongBan = Form.useWatch("idPhongBan", form);
     const dispatch = useAppDispatch();
     useImperativeHandle(ref, () => form);
 
@@ -33,10 +34,10 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
       formData.append('Id', data.id);
       formData.append('Code', values.code);
       formData.append('Name', values.name);
-      formData.append('Content', values.content);
-      formData.append('IdPhongBan', values.idPhongBan);
-      formData.append('Location', values.location);
-      formData.append('IdStaffReception', values.idStaffReception);
+      formData.append('Content', values.content ?? null);
+      formData.append('IdPhongBan', values.idPhongBan ?? null);
+      formData.append('Location', values.location ?? null);
+      formData.append('IdStaffReception', values.idStaffReception ?? null);
       formData.append('TotalMoney', values.totalMoney.toString());
       formData.append('TotalPerson', values.totalPerson.toString());
       formData.append('PhoneNumber', values.phoneNumber);
@@ -60,31 +61,22 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
       return [
         {
           label: 'Mã đoàn',
-          value: renderField(
-            'code',
-            data.code,
-            <Input disabled />,
-            { isEdit, rules: [{ required: true, message: 'Trường này không được để trống' }] }
-          )
+          value: renderField('code', data.code, <Input disabled />, {
+            isEdit,
+            rules: [{ required: true, message: 'Trường này không được để trống' }]
+          })
         },
         {
           label: 'Tên đoàn vào',
-          value: renderField(
-            'name',
-            data.name,
-            <Input />,
-            { isEdit, rules: [{ required: true, message: 'Tên đoàn vào không được để trống' }] }
-          )
+          value: renderField('name', data.name, <Input />, {
+            isEdit,
+            rules: [{ required: true, message: 'Tên đoàn vào không được để trống' }]
+          })
         },
         {
           label: 'Nội dung',
           full: true,
-          value: renderField(
-            'content',
-            data.content,
-            <Input />,
-            { isEdit }
-          )
+          value: renderField('content', data.content, <Input />, { isEdit })
         },
         {
           label: 'Phòng ban phụ trách',
@@ -97,23 +89,20 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
                 value: pb.idPhongBan,
                 label: pb.tenPhongBan
               }))}
+              onChange={() => {
+                form.setFieldValue('idStaffReception', undefined);
+              }}
             />,
             {
               isEdit,
               rules: REQUIRED_RULE,
-              displayValueFormatter: (val) =>
-                listPhongBan.find((pb) => pb.idPhongBan === val)?.tenPhongBan ?? '-'
+              displayValueFormatter: (val) => listPhongBan.find((pb) => pb.idPhongBan === val)?.tenPhongBan ?? '-'
             }
           )
         },
         {
           label: 'Địa điểm',
-          value: renderField(
-            'location',
-            data.location,
-            <Input />,
-            { isEdit }
-          )
+          value: renderField('location', data.location, <Input />, { isEdit })
         },
         {
           label: 'Nhân sự tiếp đón',
@@ -124,65 +113,53 @@ const DelegationIncomingTab = forwardRef<FormInstance, DelegationIncomingTabProp
               showSearch
               optionFilterProp="label"
               placeholder="Chọn nhân sự"
-              options={listNhanSu.map((ns) => ({
-                value: ns.idNhanSu,
-                label: ns.tenNhanSu
-              }))}
+              options={listNhanSu
+                .filter((ns) => ns.idPhongBan === selectedPhongBan)
+                .map((ns) => ({
+                  value: ns.idNhanSu,
+                  label: ns.tenNhanSu
+                }))}
             />,
             {
               isEdit,
-              displayValueFormatter: (val) =>
-                listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu ?? '-'
+              displayValueFormatter: (val) => listNhanSu.find((ns) => ns.idNhanSu === val)?.tenNhanSu ?? '-'
             }
           )
         },
         {
           label: 'Tổng chi phí ước tính (VNĐ)',
-          value: renderField(
-            'totalMoney',
-            data.totalMoney,
-            <InputNumber style={{ width: '100%' }} />,
-            { isEdit }
-          )
+          value: renderField('totalMoney', data.totalMoney, <InputNumber style={{ width: '100%' }} />, { isEdit })
         },
         {
           label: 'Tổng số người',
-          value: renderField(
-            'totalPerson',
-            data.totalPerson,
-            <InputNumber style={{ width: '100%' }} disabled />,
-            { isEdit, rules: REQUIRED_RULE }
-          )
+          value: renderField('totalPerson', data.totalPerson, <InputNumber style={{ width: '100%' }} disabled />, {
+            isEdit,
+            rules: REQUIRED_RULE
+          })
         },
         {
           label: 'SĐT liên hệ',
-          value: renderField(
-            'phoneNumber',
-            data.phoneNumber,
-            <Input />,
-            { isEdit, rules: [{ required: true, message: 'Số điện thoại liên hệ không được để trống' }] }
-          )
+          value: renderField('phoneNumber', data.phoneNumber, <Input />, {
+            isEdit,
+            rules: [{ required: true, message: 'Số điện thoại liên hệ không được để trống' }]
+          })
         },
         {
           label: 'Ngày yêu cầu',
-          value: renderField(
-            'requestDate',
-            dayjs(data.requestDate),
-            <DatePicker style={{ width: '100%' }} />,
-            { isEdit, rules: [{ required: true, message: 'Ngày yêu cầu không được để trống' }] }
-          )
+          value: renderField('requestDate', dayjs(data.requestDate), <DatePicker style={{ width: '100%' }} />, {
+            isEdit,
+            rules: [{ required: true, message: 'Ngày yêu cầu không được để trống' }]
+          })
         },
         {
           label: 'Ngày tiếp đón',
-          value: renderField(
-            'receptionDate',
-            dayjs(data.receptionDate),
-            <DatePicker style={{ width: '100%' }} />,
-            { isEdit, rules: [{ required: true, message: 'Ngày tiếp đón không được để trống' }] }
-          )
+          value: renderField('receptionDate', dayjs(data.receptionDate), <DatePicker style={{ width: '100%' }} />, {
+            isEdit,
+            rules: [{ required: true, message: 'Ngày tiếp đón không được để trống' }]
+          })
         }
       ];
-    }, [data, isEdit, listPhongBan, listNhanSu]);
+    }, [data, isEdit, listPhongBan, listNhanSu, selectedPhongBan]);
 
     return (
       <Form
