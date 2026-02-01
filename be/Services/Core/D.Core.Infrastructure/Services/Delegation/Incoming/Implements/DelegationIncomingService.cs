@@ -441,20 +441,10 @@ namespace D.Core.Infrastructure.Services.Delegation.Incoming.Implements
                  where ns.DaChamDutHopDong != true
                     && ns.DaVeHuu != true
                     && ns.IsThoiViec != true
-
-                 join pb in _unitOfWork.iDmPhongBanRepository.TableNoTracking
-                    on ns.HienTaiPhongBan equals pb.Id into pbJoin
-                 from pb in pbJoin.DefaultIfEmpty()
-
-                 join sp in _unitOfWork.iSupporterRepository.TableNoTracking
-                    on ns.Id equals sp.SupporterId into spJoin
-                 from sp in spJoin.DefaultIfEmpty()
-
                  select new ViewNhanSuResponseDto
                  {
                      IdNhanSu = ns.Id,
                      TenNhanSu = (ns.HoDem ?? "") + " " + (ns.Ten ?? ""),
-                     SupporterCode = sp != null ? sp.SupporterCode : null,
                      IdPhongBan = ns.HienTaiPhongBan
 
                  })

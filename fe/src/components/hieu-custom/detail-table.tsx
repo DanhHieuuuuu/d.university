@@ -37,7 +37,7 @@ export default function DetailTable({ rows, bordered = false }: DetailTableProps
                   {isArray ? (
                     <ul className="ml-3 list-disc space-y-0.5">
                       {item.value.map((v: any, idx: number) => (
-                        <li key={idx}>{v}</li>
+                        <li key={idx}>{v ?? ""}</li>
                       ))}
                     </ul>
                   ) : (
