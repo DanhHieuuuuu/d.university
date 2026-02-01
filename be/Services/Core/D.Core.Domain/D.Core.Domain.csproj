@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Entities\SinhVien\SvChatbotModel.cs~RF3f4744b.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Entities\Delegation\Outgoing\" />
     <Folder Include="Entities\Hrm\View\" />
   </ItemGroup>

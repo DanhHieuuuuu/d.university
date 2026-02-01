@@ -1,35 +1,62 @@
 from pydantic import BaseModel
-from typing import List, Optional
-import uuid
+from typing import List, Optional, Literal
+
+
+class LLMConfigRequest(BaseModel):
+    """Model cau hinh LLM tu request API."""
+    name: Literal["groq", "vllm"]
+    base_url: str
+    model: str
+    api_key: Optional[str] = None
 
 
 class ChatRequest(BaseModel):
-    """Request model cho chat endpoint."""
+    """Request model cho endpoint chat."""
     message: str
-    conversation_history: Optional[List[dict]] = []  # Lich su hoi thoai tu client
+    conversation_history: Optional[List[dict]] = []
+    llm_config: Optional[LLMConfigRequest] = None
 
 
 class ChatResponse(BaseModel):
-    """Response model cho chat endpoint."""
+    """Response model cho endpoint chat."""
     response: str
     context_used: List[str]
-    rewritten_query: Optional[str] = None  # Cau hoi da duoc viet lai (neu co)
+    rewritten_query: Optional[str] = None
 
 
-class ClearSessionRequest(BaseModel):
-    """Request model de xoa session."""
-    session_id: str
-
-
-class SessionInfoResponse(BaseModel):
-    """Response model cho thong tin session."""
-    session_id: str
-    title: Optional[str] = ""
-    message_count: int
-    created_at: str
-    last_access: str
-
-    
 class HealthResponse(BaseModel):
+    """Response model cho health check."""
     status: str
     message: str
+
+
+class ChatWithMssvRequest(BaseModel):
+    """Request model cho endpoint chat với mssv."""
+    message: str
+    mssv: str
+    conversation_history: Optional[List[dict]] = []
+    llm_config: Optional[LLMConfigRequest] = None
+
+
+class StudentDataItem(BaseModel):
+    """Model cho một sinh viên trong request sync."""
+    mssv: str
+    data: dict
+
+
+class SyncStudentsRequest(BaseModel):
+    """Request model cho endpoint sync sinh viên."""
+    students: List[StudentDataItem]
+
+
+class SyncStudentsResponse(BaseModel):
+    """Response model cho endpoint sync sinh viên."""
+    success: bool
+    message: str
+    total_students: int
+    total_chunks: int
+
+
+class OrientationRequest(BaseModel):
+    """Request model cho endpoint orientation."""
+    llm_config: LLMConfigRequest

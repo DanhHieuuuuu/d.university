@@ -83,6 +83,7 @@ namespace D.Core.Infrastructure
                 .AddScoped<IFileRepository, FileRepository>()
                 .AddScoped<ISvSinhVienRepository, SvSinhVienRepository>()
                 .AddScoped<ISvChatbotHistoryRepository, SvChatbotHistoryRepository>()
+                .AddScoped<ISvChatbotModelRepository, SvChatbotModelRepository>()
 
                 .AddScoped<IDmChucVuRepository, DmChucVuRepository>()
                 .AddScoped<IDmDanTocRepository, DmDanTocRepository>()

@@ -33,7 +33,7 @@ namespace D.Core.Domain.Dtos.SinhVien.ChatbotHistory
 
     public class DeleteSvChatbotHistoryDto : ICommand<bool>
     {
-        public int Id { get; set; }
+        public string? SessionId { get; set; }
     }
 
     public class GetSvChatbotHistoryBySessionDto : IQuery<List<SvChatbotHistoryResponseDto>>

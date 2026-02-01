@@ -1,0 +1,33 @@
+services:
+  chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: duniversity-chatbot
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount thư mục data để persist ChromaDB
+      - ./data:/app/data
+      # Mount file .env để cấu hình
+      - ./.env:/app/.env:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# Nếu cần sử dụng GPU cho PyTorch, uncomment phần dưới:
+# services:
+#   chatbot:
+#     deploy:
+#       resources:
+#         reservations:
+#           devices:
+#             - driver: nvidia
+#               count: 1
+#               capabilities: [gpu]

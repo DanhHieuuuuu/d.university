@@ -24,7 +24,8 @@ import {
   UnorderedListOutlined,
   SafetyCertificateOutlined,
   SolutionOutlined,
-  LineChartOutlined
+  LineChartOutlined,
+  RobotOutlined
 } from '@ant-design/icons';
 import { PermissionCoreConst } from '../permissionWeb/PermissionCore';
 import { AdminIcon, DelegationIcon, StudentIcon, SuggestIcon } from '@components/custom-icon';
@@ -70,6 +71,11 @@ export const listMenuCore: IMenu[] = [
     label: 'Quản lý sinh viên',
     routerLink: '/student/manage',
     icon: <StudentIcon />
+  },
+  {
+    label: 'Quản lý Chatbot',
+    routerLink: '/chatbot',
+    icon: <RobotOutlined />
   },
   {
     label: 'Danh mục',
