@@ -27,6 +27,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateHopDong> name={['thongTinNhanSu', 'gioiTinh']} label="Giới tính">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listGioiTinh?.map((item) => {
             return { label: item.tenGioiTinh, value: item.id };
           })}
@@ -42,6 +44,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateHopDong> name={['thongTinNhanSu', 'quocTich']} label="Quốc tịch">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listQuocTich?.map((item) => {
             return { label: item.tenQuocGia, value: item.id };
           })}
@@ -57,6 +61,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateHopDong> name={['thongTinNhanSu', 'danToc']} label="Dân tộc">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listDanToc?.map((item) => {
             return { label: item.tenDanToc, value: item.id };
           })}
@@ -65,6 +71,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateHopDong> name={['thongTinNhanSu', 'tonGiao']} label="Tôn giáo">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listTonGiao?.map((item) => {
             return { label: item.tenTonGiao, value: item.id };
           })}
@@ -150,7 +158,13 @@ export default function PersonalTab() {
         name={['thongTinNhanSu', 'khanCapSoDienThoai']}
         label="Số điện thoại khẩn cấp"
         className="col-span-2"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          {
+            pattern: /(?:\+84|0084|0)[235789][0-9]{1,2}[0-9]{7}(?:[^\d]+|$)/g,
+            message: 'Số điện thoại không đúng định dạng'
+          }
+        ]}
       >
         <Input placeholder="Nhập số điện thoại người liên hệ khẩn cấp" />
       </Form.Item>
