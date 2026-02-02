@@ -130,7 +130,7 @@ namespace D.Core.Infrastructure.Services.Hrm.Implements
             {
                 var kw = dto.Keyword;
                 query = query.Where(x =>
-                    x.MaNhanSu.Contains(kw)
+                    x.MaNhanSu.Equals(kw)
                     || ((x.HoDem ?? "") + " " + (x.Ten ?? "")).Contains(kw)
                     || (x.SoCccd ?? "").Contains(kw)
                 );
