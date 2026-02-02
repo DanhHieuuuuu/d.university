@@ -210,8 +210,7 @@ const Page = () => {
     initialQuery: {
       PageIndex: 1,
       PageSize: 10,
-      Keyword: '',
-      trangThai: requestStatusConst.DRAFT
+      Keyword: ''
     },
     onQueryChange: (newQuery) => {
       dispatch(getPagingRequest(newQuery));
@@ -274,7 +273,7 @@ const Page = () => {
         </Space>
       }
     >
-      <Form form={form} layout="vertical" initialValues={{ trangThai: requestStatusConst.DRAFT }}>
+      <Form form={form} layout="vertical">
         <div className="grid grid-cols-4 gap-3">
           <Form.Item<IQueryRequest>  name="Keyword">
             <Input placeholder="Nhập mã yêu cầu/tên khảo sát" onChange={(e) => handleSearch(e)} />

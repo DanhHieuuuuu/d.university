@@ -56,6 +56,7 @@ Thông tin sinh viên đang trò chuyện:
 - Mã sinh viên: {student_info.get('ma_sinh_vien', 'Không rõ')}
 - Ngày sinh: {student_info.get('ngay_sinh', 'Không rõ')}
 - Khóa học: {student_info.get('khoa_hoc', 'Không rõ')}
+- Chuyên ngành: {student_info.get('chuyen_nganh', 'Không rõ')}
 - Học kỳ hiện tại: {student_info.get('hoc_ky_hien_tai', 'Không rõ')}
 - Tình trạng: {student_info.get('tinh_trang', 'Không rõ')}
 """
