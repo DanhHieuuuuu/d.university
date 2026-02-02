@@ -27,6 +27,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateNhanSu> name={['gioiTinh']} label="Giới tính">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listGioiTinh?.map((item) => {
             return { label: item.tenGioiTinh, value: item.id };
           })}
@@ -42,6 +44,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateNhanSu> name={['quocTich']} label="Quốc tịch">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listQuocTich?.map((item) => {
             return { label: item.tenQuocGia, value: item.id };
           })}
@@ -57,6 +61,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateNhanSu> name={['danToc']} label="Dân tộc">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listDanToc?.map((item) => {
             return { label: item.tenDanToc, value: item.id };
           })}
@@ -65,6 +71,8 @@ export default function PersonalTab() {
       <Form.Item<ICreateNhanSu> name={['tonGiao']} label="Tôn giáo">
         <Select
           allowClear
+          showSearch
+          optionFilterProp="label"
           options={listTonGiao?.map((item) => {
             return { label: item.tenTonGiao, value: item.id };
           })}
@@ -73,7 +81,11 @@ export default function PersonalTab() {
       <Form.Item<ICreateNhanSu>
         name={['soCccd']}
         label="Số CMND / CCCD"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          { len: 12, message: 'CCCD phải là 12 số' },
+          { pattern: /^(\d{12})$/, message: 'CCCD phải toàn ký tự số' }
+        ]}
       >
         <Input />
       </Form.Item>
@@ -91,14 +103,26 @@ export default function PersonalTab() {
       <Form.Item<ICreateNhanSu>
         name={['email']}
         label="Email cá nhân"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          {
+            pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+            message: 'Email chưa đúng định dạng'
+          }
+        ]}
       >
         <Input />
       </Form.Item>
       <Form.Item<ICreateNhanSu>
         name={['soDienThoai']}
         label="Số điện thoại"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          {
+            pattern: /(?:\+84|0084|0)[235789][0-9]{1,2}[0-9]{7}(?:[^\d]+|$)/g,
+            message: 'Số điện thoại không đúng định dạng'
+          }
+        ]}
       >
         <Input />
       </Form.Item>
@@ -125,7 +149,7 @@ export default function PersonalTab() {
       </Form.Item>
       <Form.Item<ICreateNhanSu>
         name={['khanCapNguoiLienHe']}
-        label="Liên hệ khẩn cấp"
+        label="Người liên hệ khẩn cấp"
         className="col-span-2"
         rules={[{ required: true, message: 'Không được để trống!' }]}
       >
@@ -135,7 +159,13 @@ export default function PersonalTab() {
         name={['khanCapSoDienThoai']}
         label="Số điện thoại khẩn cấp"
         className="col-span-2"
-        rules={[{ required: true, message: 'Không được để trống!' }]}
+        rules={[
+          { required: true, message: 'Không được để trống!' },
+          {
+            pattern: /(?:\+84|0084|0)[235789][0-9]{1,2}[0-9]{7}(?:[^\d]+|$)/g,
+            message: 'Số điện thoại không đúng định dạng'
+          }
+        ]}
       >
         <Input placeholder="Nhập số điện thoại người liên hệ khẩn cấp" />
       </Form.Item>

@@ -68,7 +68,12 @@ export default function JobTabWithoutIdNhanSu() {
       </Form.Item>
 
       <Form.Item<ICreateHopDong> name="idLoaiHopDong" label="Loại hợp đồng">
-        <Select allowClear options={listLoaiHopDong?.map((i) => ({ label: i.tenLoaiHopDong, value: i.id }))} />
+        <Select
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          options={listLoaiHopDong?.map((i) => ({ label: i.tenLoaiHopDong, value: i.id }))}
+        />
       </Form.Item>
 
       <Form.Item<ICreateHopDong>
@@ -80,15 +85,15 @@ export default function JobTabWithoutIdNhanSu() {
       </Form.Item>
 
       <Form.Item<ICreateHopDong> name="idPhongBan" label="Phòng ban" required>
-        <Select allowClear options={phongBanOptions} />
+        <Select allowClear showSearch optionFilterProp="label" options={phongBanOptions} />
       </Form.Item>
 
       <Form.Item<ICreateHopDong> name="idChucVu" label="Chức vụ" required>
-        <Select allowClear options={chucVuOptions} />
+        <Select allowClear showSearch optionFilterProp="label" options={chucVuOptions} />
       </Form.Item>
 
       <Form.Item<ICreateHopDong> name="idToBoMon" label="Tổ bộ môn">
-        <Select allowClear options={toBoMonOptions} />
+        <Select allowClear showSearch optionFilterProp="label" options={toBoMonOptions} />
       </Form.Item>
 
       <Form.Item<ICreateHopDong> name="hasProbation" valuePropName="checked" className="col-span-full !mb-3">

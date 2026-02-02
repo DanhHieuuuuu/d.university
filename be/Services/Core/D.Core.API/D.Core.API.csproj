@@ -37,4 +37,16 @@
     <None Include="wwwroot\Template\detail_delegation.xlsx" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\Template\Ho_So_Nhan_Su.docx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Template\mau_khai_bao_thong_tin_ly_lich_2C.docx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Template\So_yeu_ly_lich_TT_06_2023_TT_BNV.docx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

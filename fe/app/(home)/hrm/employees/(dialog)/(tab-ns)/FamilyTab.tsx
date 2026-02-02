@@ -29,7 +29,9 @@ export default function FamilyTab() {
                   rules={[{ required: true, message: 'Không được để trống!' }]}
                 >
                   <Select
+                    allowClear
                     showSearch
+                    optionFilterProp="label"
                     options={listQuanHe?.map((item) => {
                       return { label: item.tenQuanHe, value: item.id };
                     })}
@@ -44,7 +46,9 @@ export default function FamilyTab() {
                 </Form.Item>
                 <Form.Item name={[field.name, 'quocTich']} label="Quốc tịch">
                   <Select
+                    allowClear
                     showSearch
+                    optionFilterProp="label"
                     options={listQuocTich?.map((item) => {
                       return { label: item.tenQuocGia, value: item.id };
                     })}
