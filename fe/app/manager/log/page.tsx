@@ -184,15 +184,15 @@ const Page = () => {
         className="h-full"
         extra={
           <Button 
-            type="default" 
-            icon={<SyncOutlined />} 
-            onClick={fetchLogFiles}
-            loading={loading}
+          type="default" 
+          icon={<SyncOutlined />} 
+          onClick={fetchLogFiles}
+          loading={loading}
           >
             Làm mới
           </Button>
         }
-      >
+        >
         <Form form={form} layout="horizontal" onFinish={handleSearch} initialValues={{ fileName: '' }}>
           <div className="grid grid-cols-2">
             <Form.Item label="Tên file:" name="fileName">
@@ -209,7 +209,7 @@ const Page = () => {
                 variant="filled"
                 icon={<SyncOutlined />}
                 onClick={handleReset}
-              >
+                >
                 Đặt lại
               </Button>
             </div>
@@ -228,6 +228,7 @@ const Page = () => {
             showSizeChanger: true,
             showTotal: (total) => `Tổng ${total} file`
           }}
+          scroll={{ x: 'max-content', y: 'calc(100vh - 450px)' }}
         />
       </Card>
     </div>

@@ -211,6 +211,7 @@ const Page = () => {
         dataSource={list}
         listActions={actions}
         pagination={{ position: ['bottomRight'], ...pagination }}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 400px)' }}
       />
       <AddUser
         isModalOpen={isModalOpen2}
